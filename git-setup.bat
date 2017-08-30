@@ -1,0 +1,1 @@
+xcopy ".\Tools\Executables\pre-commit.exe" ".\.git\hooks\" /v /c /y
