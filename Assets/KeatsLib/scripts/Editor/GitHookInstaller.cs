@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using UnityEditor;
@@ -110,8 +109,8 @@ public class GitHookInstaller : EditorWindow
 			GUI.color = Color.green;
 			if (GUILayout.Button("Confirm", GUILayout.MaxWidth(150.0f)))
 			{
-				DoGitProcess(string.Format("config --local user.name \"{0}\"", FiringSquad.POSSIBLE_NAMES[mNameIndex]));
-				DoGitProcess(string.Format("config --local user.email {0}", FiringSquad.POSSIBLE_EMAILS[mEmailIndex]));
+				GitProcess.Launch(string.Format("config --local user.name \"{0}\"", FiringSquad.POSSIBLE_NAMES[mNameIndex]));
+				GitProcess.Launch(string.Format("config --local user.email {0}", FiringSquad.POSSIBLE_EMAILS[mEmailIndex]));
 				Close();
 			}
 			GUI.color = startColor;
@@ -142,9 +141,9 @@ public class GitHookInstaller : EditorWindow
 		}
 		else
 		{
-			string currentName = DoGitProcess("config --get user.name");
+			string currentName = GitProcess.Launch("config --get user.name");
 			int nameIndex = Array.IndexOf(FiringSquad.POSSIBLE_NAMES, currentName);
-			string currentEmail = DoGitProcess("config --get user.email");
+			string currentEmail = GitProcess.Launch("config --get user.email");
 			int emailIndex = Array.IndexOf(FiringSquad.POSSIBLE_EMAILS, currentEmail);
 
 			if (nameIndex < 0 || emailIndex < 0)
@@ -195,25 +194,6 @@ public class GitHookInstaller : EditorWindow
 		{
 			string fileName = Path.GetFileName(sourcePath);
 			File.Copy(sourcePath, gitPath + fileName, true);
-		}
-	}
-
-	private static string DoGitProcess(string args, int bufferSize = 2048)
-	{
-		using (Process p = new Process())
-		{
-			p.StartInfo.CreateNoWindow = true;
-			p.StartInfo.UseShellExecute = false;
-			p.StartInfo.RedirectStandardOutput = true;
-			p.StartInfo.FileName = "git";
-			p.StartInfo.Arguments = args;
-			p.Start();
-
-			var buffer = new char[bufferSize];
-			p.StandardOutput.Read(buffer, 0, bufferSize);
-			p.WaitForExit();
-
-			return new string(buffer).TrimEnd('\n', '\0');
 		}
 	}
 }
