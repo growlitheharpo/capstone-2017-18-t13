@@ -10,26 +10,57 @@ namespace UnityEditor
 {
 	public class CustomPostBuildProcessor
 	{
+		private static string kVersionNumber, kProjectPath;
+		private static Action kCurrentState;
+		private static void Waiting() { }
+
 		[MenuItem("Pipeline/Create Build")]
 		public static void DoBuild()
 		{
+			kProjectPath = Path.GetFullPath(Application.dataPath + "\\..");
+			EditorApplication.update += Update;
+			kCurrentState = UpdateRepoState;
+		}
+		
+		public static void Complete()
+		{
+			EditorApplication.update -= Update;
+		}
+
+		private static void Update()
+		{
+			kCurrentState.Invoke();
+			kCurrentState = Waiting;
+		}
+
+		private static void UpdateRepoState()
+		{
 			Debug.Log("Getting the latest version of the build SVN repo.");
-			string currentProjectPath = Path.GetFullPath(Application.dataPath + "\\..");
-			UpdateCloudRepo(currentProjectPath);
+			UpdateCloudRepo(kProjectPath);
 		}
 
-		private static void ContinueAfterRepoUpdate()
+		private static void GetLatestVersionState()
 		{
-			Debug.Log("Success! SVN was updated.");
 			Debug.Log("Finding latest version number.");
-
-			string currentProjectPath = Path.GetFullPath(Application.dataPath + "\\..");
-			GetLatestVersionNumber(currentProjectPath);
+			GetLatestVersionNumber(kProjectPath);
 		}
 
-		private static void ContinueWithVersionNumber(string number)
+		private static void MakeBuildState()
 		{
-			Debug.Log("Success! Using version " + number);
+			Debug.Log("Success! Using version " + kVersionNumber);
+			Complete();
+
+			//Make the actual build
+		}
+
+		private static void CopyBuildState()
+		{
+			//Copy the files to the SVN repo
+		}
+
+		private static void CommitNewBuildState()
+		{
+			//Send the files to the SVN server
 		}
 
 		/*[PostProcessBuild(1)]
@@ -83,13 +114,16 @@ namespace UnityEditor
 		{
 			var window = EditorWindow.GetWindow<SvnWrapper>(true, "SVN", true);
 			window.Initialize(projectPath, "checkout https://pineapple.champlain.edu/svn/capstone-2017-18-t13.svn@HEAD CloudBuild");
-			window.OnProcessComplete += ContinueAfterRepoUpdate;
 			window.OnProcessFail += LogProcessFailure;
+			window.OnProcessComplete += () => {
+				kCurrentState = GetLatestVersionState;
+			};
 		}
 
 		private static void LogProcessFailure()
 		{
 			Debug.LogError("Unable to complete the build. See output window for details.");
+			Complete();
 		}
 
 		private static void GetLatestVersionNumber(string currentProjectPath)
@@ -110,7 +144,10 @@ namespace UnityEditor
 				"Please enter the new version for this build. The form is auto-filled with the current version. " +
 				"Increment either the version number or version letter as appropriate.",
 				val => GUILayout.TextArea(val));
-			window.OnSubmit += ContinueWithVersionNumber;
+			window.OnSubmit += result => {
+				kVersionNumber = result;
+				kCurrentState = MakeBuildState;
+			};
 		}
 		
 		private class SvnWrapper : EditorWindow
@@ -200,7 +237,7 @@ namespace UnityEditor
 
 			private void OnDestroy()
 			{
-				if (mStatus == Status.Running && svnProcess.Responding)
+				if (svnProcess != null)
 				{
 					svnProcess.Kill();
 					svnProcess.Dispose();
