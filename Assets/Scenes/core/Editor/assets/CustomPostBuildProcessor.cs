@@ -12,14 +12,24 @@ namespace UnityEditor
 	{
 		private static string kVersionNumber, kProjectPath;
 		private static Action kCurrentState;
+		private static bool mRunAfterBuild;
+
 		private static void Waiting() { }
 
 		[MenuItem("Pipeline/Create Build")]
 		public static void DoBuild()
 		{
+			mRunAfterBuild = false;
 			kProjectPath = Path.GetFullPath(Application.dataPath + "\\..");
 			EditorApplication.update += Update;
 			kCurrentState = UpdateRepoState;
+		}
+		
+		[MenuItem("Pipeline/Create Build and Run")]
+		public static void DoBuildAndRun()
+		{
+			DoBuild();
+			mRunAfterBuild = true;
 		}
 		
 		public static void Complete()
@@ -48,16 +58,16 @@ namespace UnityEditor
 		private static void MakeBuildState()
 		{
 			Debug.Log("Success! Using version " + kVersionNumber);
-			Complete();
-
+			
 			//Make the actual build
+			var path = kProjectPath + "\\CloudBuild\\builds\\";
 		}
 
-		private static void CopyBuildState()
+		private static void CreateOrUpdateTag()
 		{
-			//Copy the files to the SVN repo
-		}
 
+		}
+		
 		private static void CommitNewBuildState()
 		{
 			//Send the files to the SVN server
