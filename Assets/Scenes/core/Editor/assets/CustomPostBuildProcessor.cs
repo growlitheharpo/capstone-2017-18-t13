@@ -10,7 +10,7 @@ namespace UnityEditor
 	{
 		private static string kVersionNumber, kProjectPath, kCurrentGitBranch, kTagFilePath;
 		private static Action kCurrentState;
-		private static bool kRunAfterBuild;
+		private static bool kRunAfterBuild, kCommitBuild;
 
 		private static void Waiting() { }
 
@@ -18,6 +18,7 @@ namespace UnityEditor
 		public static void DoBuild()
 		{
 			kRunAfterBuild = false;
+			kCommitBuild = true;
 			kProjectPath = Path.GetFullPath(Application.dataPath + "\\..");
 			EditorApplication.update += Update;
 			kCurrentState = UpdateRepoState;
@@ -28,6 +29,14 @@ namespace UnityEditor
 		{
 			DoBuild();
 			kRunAfterBuild = true;
+		}
+		
+		[MenuItem("Pipeline/Build Without Auto-Upload")]
+		public static void DoBuildNoUpload()
+		{
+			DoBuild();
+			kRunAfterBuild = true;
+			kCommitBuild = false;
 		}
 		
 		private static void Update()
@@ -58,35 +67,39 @@ namespace UnityEditor
 			Debug.Log("Starting the build process...");
 			MakeBuild();
 
-			kCurrentState = CreateOrUpdateTag;
+			kCurrentState = CreateOrUpdateTagState;
 		}
 
-		private static void CreateOrUpdateTag()
+		private static void CreateOrUpdateTagState()
 		{
 			Debug.Log("Build complete! Saving tag file.");
-			
-			//save the tag file
-			if (!File.Exists(kTagFilePath))
-			{
-				using(StreamWriter file = File.CreateText(kTagFilePath))
-					file.WriteLine(kVersionNumber);
-			}
-			else
-			{
-				using (FileStream file = File.OpenWrite(kTagFilePath))
-					using (StreamWriter writer = new StreamWriter(file))
-						writer.WriteLine(kVersionNumber);
-			}
+			WriteTag();
 
-			kCurrentState = CommitNewBuildState;
+			kCurrentState = AddAllFilesToCloudRepoState;
+		}
+
+		private static void AddAllFilesToCloudRepoState()
+		{
+			Debug.Log("Tag written. Adding all files to SVN.");
+			AddFilesToRepo();
+
+			kCurrentState = Waiting;
 		}
 		
 		private static void CommitNewBuildState()
 		{
-			//Send the files to the SVN server
+			if (kCommitBuild)
+			{
+				Debug.Log("Files added. Committing to SVN.");
+				CommitToCloudRepo();
 
-			kCurrentState = Waiting;
-			Complete();
+				kCurrentState = Waiting;
+			}
+			else
+			{
+				Debug.Log("Files added. Stopping before upload as requested.");
+				Complete();
+			}
 		}
 		
 		#endregion
@@ -163,11 +176,46 @@ namespace UnityEditor
 			BuildPipeline.BuildPlayer(options);
 		}
 
+		private static void WriteTag()
+		{
+			if (!File.Exists(kTagFilePath))
+			{
+				using(StreamWriter file = File.CreateText(kTagFilePath))
+					file.WriteLine(kVersionNumber);
+			}
+			else
+			{
+				using (FileStream file = File.OpenWrite(kTagFilePath))
+				using (StreamWriter writer = new StreamWriter(file))
+					writer.WriteLine(kVersionNumber);
+			}
+		}
+
+		private static void AddFilesToRepo()
+		{
+			SvnWrapper window = EditorWindow.GetWindow<SvnWrapper>(true, "SVN", true);
+			window.Initialize(kProjectPath + "\\CloudBuild", "add * --force");
+			window.OnProcessFail = LogProcessFailure;
+			window.OnProcessComplete = () => {
+				Debug.Log("Setting state to CommitNewBuildState");
+				kCurrentState = CommitNewBuildState;
+			};
+		}
+
+		private static void CommitToCloudRepo()
+		{
+			SvnWrapper window = EditorWindow.GetWindow<SvnWrapper>(true, "SVN", true);
+			string commitMessage = string.Format("BUILD {0}-{1}", kCurrentGitBranch, kVersionNumber);
+			window.Initialize(kProjectPath + "\\CloudBuild", "commit -m \"" + commitMessage + "\"");
+			window.OnProcessFail = LogProcessFailure;
+			window.OnProcessComplete = Complete;
+		}
+
 		#endregion
 		
 		private class SvnWrapper : EditorWindow
 		{
-			public event Action OnProcessComplete = () => { }, OnProcessFail = () => { };
+			public Action OnProcessComplete = () => { }, OnProcessFail = () => { };
 			private Process mSvnProcess;
 			private string mOutput, mInput, mErrorOutput = "";
 			private enum Status { Running, Success, Fail, Stalled };
@@ -175,25 +223,33 @@ namespace UnityEditor
 
 			public void Initialize(string path, string args)
 			{
-				mSvnProcess = new Process
+				try
 				{
-					StartInfo =
+					mSvnProcess = new Process
 					{
-						CreateNoWindow = true,
-						UseShellExecute = false,
-						RedirectStandardOutput = true,
-						RedirectStandardInput = true,
-						RedirectStandardError = true,
-						FileName = "svn",
-						WorkingDirectory = path,
-						Arguments = args
-					},
-					EnableRaisingEvents = true
-				};
-				mSvnProcess.Exited += SvnProcess_Exited;
+						StartInfo =
+						{
+							CreateNoWindow = true,
+							UseShellExecute = false,
+							RedirectStandardOutput = true,
+							RedirectStandardInput = true,
+							RedirectStandardError = true,
+							FileName = "svn",
+							WorkingDirectory = path,
+							Arguments = args
+						},
+						EnableRaisingEvents = true
+					};
+					mSvnProcess.Exited += SvnProcess_Exited;
 
-				mSvnProcess.Start();
-				mStatus = Status.Running;
+					mSvnProcess.Start();
+					mStatus = Status.Running;
+				}
+				catch (Exception e)
+				{
+					mErrorOutput += e.Message;
+					mStatus = Status.Fail;
+				}
 			}
 
 			private void SvnProcess_Exited(object sender, EventArgs e)
@@ -221,25 +277,29 @@ namespace UnityEditor
 				switch (mStatus) 
 				{
 					case Status.Success:
-						Close();
+						Debug.Log("Success!");
 						OnProcessComplete();
+						Close();
 						break;
 					case Status.Fail:
 						mStatus = Status.Stalled;
-						GUILayout.Box(mErrorOutput, style, GUILayout.MaxWidth(500.0f));
+						GUILayout.Box(mErrorOutput, style);
 						OnProcessFail();
+						Debug.Log("Failure!");
 						break;
 					case Status.Stalled:
-						GUILayout.Box(mErrorOutput, style, GUILayout.MaxWidth(500.0f));
+						Debug.Log("Stall!");
+						GUILayout.Box(mErrorOutput, style);
 						break;
 					default:
+						Debug.Log("Running!");
 						if (mSvnProcess != null)
 						{
 							mSvnProcess.StandardOutput.Read(buffer, 0, 2048);
 							mOutput += new string(buffer).TrimEnd('\0');
 						}
 
-						GUILayout.Box(mOutput, style, GUILayout.MaxWidth(500.0f));
+						GUILayout.Box(mOutput, style);
 						mInput = GUILayout.TextField(mInput);
 
 						if (GUILayout.Button("Enter") && mSvnProcess != null)
