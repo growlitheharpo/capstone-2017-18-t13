@@ -1,25 +1,23 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
-using System.Text.RegularExpressions;
 using UnityEngine;
-using UnityEditor.Callbacks;
 using Debug = UnityEngine.Debug;
 
 namespace UnityEditor
 {
 	public class CustomPostBuildProcessor
 	{
-		private static string kVersionNumber, kProjectPath, kCurrentGitBranch;
+		private static string kVersionNumber, kProjectPath, kCurrentGitBranch, kTagFilePath;
 		private static Action kCurrentState;
-		private static bool mRunAfterBuild;
+		private static bool kRunAfterBuild;
 
 		private static void Waiting() { }
 
 		[MenuItem("Pipeline/Create Build")]
 		public static void DoBuild()
 		{
-			mRunAfterBuild = false;
+			kRunAfterBuild = false;
 			kProjectPath = Path.GetFullPath(Application.dataPath + "\\..");
 			EditorApplication.update += Update;
 			kCurrentState = UpdateRepoState;
@@ -29,23 +27,21 @@ namespace UnityEditor
 		public static void DoBuildAndRun()
 		{
 			DoBuild();
-			mRunAfterBuild = true;
+			kRunAfterBuild = true;
 		}
 		
-		public static void Complete()
-		{
-			EditorApplication.update -= Update;
-		}
-
 		private static void Update()
 		{
 			kCurrentState.Invoke();
 		}
 
+		#region States
+
 		private static void UpdateRepoState()
 		{
 			Debug.Log("Getting the latest version of the build SVN repo.");
 			UpdateCloudRepo(kProjectPath);
+
 			kCurrentState = Waiting;
 		}
 
@@ -53,29 +49,14 @@ namespace UnityEditor
 		{
 			Debug.Log("Finding latest version number.");
 			GetLatestVersionNumber(kProjectPath);
+
 			kCurrentState = Waiting;
 		}
 
 		private static void MakeBuildState()
 		{
 			Debug.Log("Starting the build process...");
-			
-			//Make the actual build
-			var path = kProjectPath + "\\CloudBuild\\builds\\" + kCurrentGitBranch.Replace('/', '\\') + "\\";
-
-			var stringDate = DateTime.Now.ToString("yyMMdd", System.Globalization.CultureInfo.InvariantCulture);
-			var buildName = "build-" + stringDate + "-" + kVersionNumber;
-
-			var scenes = EditorBuildSettingsScene.GetActiveSceneList(EditorBuildSettings.scenes);
-			var options = new BuildPlayerOptions
-			{
-				options = mRunAfterBuild ? BuildOptions.AutoRunPlayer : BuildOptions.None,
-				scenes = scenes,
-				target = BuildTarget.StandaloneWindows,
-				locationPathName = path + buildName + ".exe",
-			};
-
-			BuildPipeline.BuildPlayer(options);
+			MakeBuild();
 
 			kCurrentState = CreateOrUpdateTag;
 		}
@@ -83,30 +64,58 @@ namespace UnityEditor
 		private static void CreateOrUpdateTag()
 		{
 			Debug.Log("Build complete! Saving tag file.");
-			kCurrentState = Waiting;
-			Complete();
+			
+			//save the tag file
+			if (!File.Exists(kTagFilePath))
+			{
+				using(StreamWriter file = File.CreateText(kTagFilePath))
+					file.WriteLine(kVersionNumber);
+			}
+			else
+			{
+				using (FileStream file = File.OpenWrite(kTagFilePath))
+					using (StreamWriter writer = new StreamWriter(file))
+						writer.WriteLine(kVersionNumber);
+			}
+
+			kCurrentState = CommitNewBuildState;
 		}
 		
 		private static void CommitNewBuildState()
 		{
 			//Send the files to the SVN server
-			kCurrentState = Waiting;
-		}
 
-		private static void UpdateCloudRepo(string projectPath)
-		{
-			var window = EditorWindow.GetWindow<SvnWrapper>(true, "SVN", true);
-			window.Initialize(projectPath, "checkout https://pineapple.champlain.edu/svn/capstone-2017-18-t13.svn@HEAD CloudBuild");
-			window.OnProcessFail += LogProcessFailure;
-			window.OnProcessComplete += () => {
-				kCurrentState = GetLatestVersionState;
-			};
+			kCurrentState = Waiting;
+			Complete();
 		}
+		
+		#endregion
+
+		#region Termination Functions
 
 		private static void LogProcessFailure()
 		{
 			Debug.LogError("Unable to complete the build. See output window for details.");
 			Complete();
+		}
+		
+		public static void Complete()
+		{
+			EditorApplication.update -= Update;
+		}
+
+		#endregion
+
+		#region Worker Functions
+
+		private static void UpdateCloudRepo(string projectPath)
+		{
+			SvnWrapper window = EditorWindow.GetWindow<SvnWrapper>(true, "SVN", true);
+			window.Initialize(projectPath, "checkout https://pineapple.champlain.edu/svn/capstone-2017-18-t13.svn@HEAD CloudBuild");
+			window.OnProcessFail += LogProcessFailure;
+			window.OnProcessComplete += () => {
+				kCurrentState = GetLatestVersionState;
+			};
 		}
 
 		private static void GetLatestVersionNumber(string currentProjectPath)
@@ -116,11 +125,13 @@ namespace UnityEditor
 
 			string tagPath = currentProjectPath + "\\CloudBuild\\tags\\";
 
+			kTagFilePath = tagPath + branchVersionPointer;
+
 			string currentValue = "0.00a";
-			if (File.Exists(tagPath + branchVersionPointer))
-				currentValue = File.ReadAllText(tagPath + branchVersionPointer);
-			if (File.Exists(tagPath + "master.txt"))
-				currentValue = File.ReadAllText(tagPath + "master.txt");
+			if (File.Exists(kTagFilePath))
+				currentValue = File.ReadAllLines(kTagFilePath)[0];
+			else if (File.Exists(tagPath + "master.txt"))
+				currentValue = File.ReadAllLines(tagPath + "master.txt")[0];
 
 			SimpleTextEntryWindow window = SimpleTextEntryWindow.Initialize(
 				"Choose Version", currentValue,
@@ -132,50 +143,71 @@ namespace UnityEditor
 				kCurrentState = MakeBuildState;
 			};
 		}
+
+		private static void MakeBuild()
+		{
+			string path = kProjectPath + "\\CloudBuild\\builds\\" + kCurrentGitBranch.Replace('/', '\\') + "\\";
+
+			string stringDate = DateTime.Now.ToString("yyMMdd", System.Globalization.CultureInfo.InvariantCulture);
+			string buildName = "build-" + stringDate + "-" + kVersionNumber;
+
+			var scenes = EditorBuildSettingsScene.GetActiveSceneList(EditorBuildSettings.scenes);
+			BuildPlayerOptions options = new BuildPlayerOptions
+			{
+				options = kRunAfterBuild ? BuildOptions.AutoRunPlayer : BuildOptions.None,
+				scenes = scenes,
+				target = BuildTarget.StandaloneWindows,
+				locationPathName = path + buildName + ".exe",
+			};
+
+			BuildPipeline.BuildPlayer(options);
+		}
+
+		#endregion
 		
 		private class SvnWrapper : EditorWindow
 		{
 			public event Action OnProcessComplete = () => { }, OnProcessFail = () => { };
-			private Process svnProcess;
-			private string output;
-			private string errorOutput = "";
-			private string input;
+			private Process mSvnProcess;
+			private string mOutput, mInput, mErrorOutput = "";
 			private enum Status { Running, Success, Fail, Stalled };
 			private Status mStatus;
 
 			public void Initialize(string path, string args)
 			{
-				svnProcess = new Process();
-				svnProcess.StartInfo.CreateNoWindow = true;
-				svnProcess.StartInfo.UseShellExecute = false;
-				svnProcess.StartInfo.RedirectStandardOutput = true;
-				svnProcess.StartInfo.RedirectStandardInput = true;
-				svnProcess.StartInfo.RedirectStandardError = true;
-				svnProcess.StartInfo.FileName = "svn";
-				svnProcess.StartInfo.WorkingDirectory = path;
-				svnProcess.StartInfo.Arguments = args;
-				svnProcess.EnableRaisingEvents = true;
-				svnProcess.Exited += SvnProcess_Exited;
+				mSvnProcess = new Process
+				{
+					StartInfo =
+					{
+						CreateNoWindow = true,
+						UseShellExecute = false,
+						RedirectStandardOutput = true,
+						RedirectStandardInput = true,
+						RedirectStandardError = true,
+						FileName = "svn",
+						WorkingDirectory = path,
+						Arguments = args
+					},
+					EnableRaisingEvents = true
+				};
+				mSvnProcess.Exited += SvnProcess_Exited;
 
-				svnProcess.Start();
+				mSvnProcess.Start();
 				mStatus = Status.Running;
 			}
 
 			private void SvnProcess_Exited(object sender, EventArgs e)
 			{
-				int exitCode = svnProcess.ExitCode;
+				int exitCode = mSvnProcess.ExitCode;
 				
 				var buffer = new char[2048];
-				svnProcess.StandardError.Read(buffer, 0, 2048);
-				errorOutput += new string(buffer).TrimEnd('\0');
+				mSvnProcess.StandardError.Read(buffer, 0, 2048);
+				mErrorOutput += new string(buffer).TrimEnd('\0');
 
-				svnProcess.WaitForExit();
-				svnProcess.Dispose();
+				mSvnProcess.WaitForExit();
+				mSvnProcess.Dispose();
 
-				if (exitCode == 0)
-					mStatus = Status.Success;
-				else
-					mStatus = Status.Fail;
+				mStatus = exitCode == 0 ? Status.Success : Status.Fail;
 			}
 
 			private void OnGUI()
@@ -186,49 +218,50 @@ namespace UnityEditor
 				};
 				var buffer = new char[2048];
 
-				if (mStatus == Status.Success)
+				switch (mStatus) 
 				{
-					Close();
-					OnProcessComplete();
-				}
-				else if (mStatus == Status.Fail)
-				{
-					mStatus = Status.Stalled;
-					GUILayout.Box(errorOutput, style, GUILayout.MaxWidth(500.0f));
-					OnProcessFail();
-				}
-				else if (mStatus == Status.Stalled)
-				{
-					GUILayout.Box(errorOutput, style, GUILayout.MaxWidth(500.0f));
-					return;
-				}
-				else
-				{
-					if (svnProcess != null && svnProcess.StandardOutput != null)
-					{
-						svnProcess.StandardOutput.Read(buffer, 0, 2048);
-						output += new string(buffer).TrimEnd('\0');
-					}
+					case Status.Success:
+						Close();
+						OnProcessComplete();
+						break;
+					case Status.Fail:
+						mStatus = Status.Stalled;
+						GUILayout.Box(mErrorOutput, style, GUILayout.MaxWidth(500.0f));
+						OnProcessFail();
+						break;
+					case Status.Stalled:
+						GUILayout.Box(mErrorOutput, style, GUILayout.MaxWidth(500.0f));
+						break;
+					default:
+						if (mSvnProcess != null)
+						{
+							mSvnProcess.StandardOutput.Read(buffer, 0, 2048);
+							mOutput += new string(buffer).TrimEnd('\0');
+						}
 
-					GUILayout.Box(output, style, GUILayout.MaxWidth(500.0f));
-					input = GUILayout.TextField(input);
+						GUILayout.Box(mOutput, style, GUILayout.MaxWidth(500.0f));
+						mInput = GUILayout.TextField(mInput);
 
-					if (GUILayout.Button("Enter"))
-						svnProcess.StandardInput.WriteLine(input);
+						if (GUILayout.Button("Enter") && mSvnProcess != null)
+							mSvnProcess.StandardInput.WriteLine(mInput);
+						break;
 				}
 			}
 
 			private void OnDestroy()
 			{
-				if (svnProcess != null)
+				if (mSvnProcess == null)
+					return;
+
+				try
 				{
-					try
-					{
-						svnProcess.Kill();
-					}
-					catch (Exception) { }
-					svnProcess.Dispose();
+					mSvnProcess.Kill();
 				}
+				catch (Exception)
+				{
+					// ignored
+				}
+				mSvnProcess.Dispose();
 			}
 		}
 	}
