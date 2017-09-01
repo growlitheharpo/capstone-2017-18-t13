@@ -10,7 +10,7 @@ namespace UnityEditor
 {
 	public class CustomPostBuildProcessor
 	{
-		private static string kVersionNumber, kProjectPath;
+		private static string kVersionNumber, kProjectPath, kCurrentGitBranch;
 		private static Action kCurrentState;
 		private static bool mRunAfterBuild;
 
@@ -40,85 +40,58 @@ namespace UnityEditor
 		private static void Update()
 		{
 			kCurrentState.Invoke();
-			kCurrentState = Waiting;
 		}
 
 		private static void UpdateRepoState()
 		{
 			Debug.Log("Getting the latest version of the build SVN repo.");
 			UpdateCloudRepo(kProjectPath);
+			kCurrentState = Waiting;
 		}
 
 		private static void GetLatestVersionState()
 		{
 			Debug.Log("Finding latest version number.");
 			GetLatestVersionNumber(kProjectPath);
+			kCurrentState = Waiting;
 		}
 
 		private static void MakeBuildState()
 		{
-			Debug.Log("Success! Using version " + kVersionNumber);
+			Debug.Log("Starting the build process...");
 			
 			//Make the actual build
-			var path = kProjectPath + "\\CloudBuild\\builds\\";
+			var path = kProjectPath + "\\CloudBuild\\builds\\" + kCurrentGitBranch.Replace('/', '\\') + "\\";
+
+			var stringDate = DateTime.Now.ToString("yyMMdd", System.Globalization.CultureInfo.InvariantCulture);
+			var buildName = "build-" + stringDate + "-" + kVersionNumber;
+
+			var scenes = EditorBuildSettingsScene.GetActiveSceneList(EditorBuildSettings.scenes);
+			var options = new BuildPlayerOptions
+			{
+				options = mRunAfterBuild ? BuildOptions.AutoRunPlayer : BuildOptions.None,
+				scenes = scenes,
+				target = BuildTarget.StandaloneWindows,
+				locationPathName = path + buildName + ".exe",
+			};
+
+			BuildPipeline.BuildPlayer(options);
+
+			kCurrentState = CreateOrUpdateTag;
 		}
 
 		private static void CreateOrUpdateTag()
 		{
-
+			Debug.Log("Build complete! Saving tag file.");
+			kCurrentState = Waiting;
+			Complete();
 		}
 		
 		private static void CommitNewBuildState()
 		{
 			//Send the files to the SVN server
+			kCurrentState = Waiting;
 		}
-
-		/*[PostProcessBuild(1)]
-		public static void OnPostprocessBuild(BuildTarget target, string pathToBuildProject)
-		{
-			try
-			{
-				if (IsOfficialBuild(pathToBuildProject))
-					PerformCopy(pathToBuildProject);
-			}
-			catch (Exception e)
-			{
-				Debug.LogWarning("Unable to perform post-build copy to SVN for the following reason:\n" + e.Message);
-				throw;
-			}
-		}
-
-		/// <summary>
-		/// Returns whether or not this build fits the "official" naming convention:
-		/// build-17-MM-DD-[qa|demo]-v0.00[x].exe
-		/// </summary>
-		private static bool IsOfficialBuild(string pathToBuildProject)
-		{
-			string filename = Path.GetFileNameWithoutExtension(pathToBuildProject);
-			return filename != null && new Regex("(build-)(17-(\\d\\d-){2})((qa-)|(demo-))(v\\d\\.\\d\\d[a-z]?)").IsMatch(filename);
-		}
-
-		private static void PerformCopy(string pathToBuild)
-		{
-			string currentProjectPath = Path.GetFullPath(Application.dataPath + "\\..");
-			string targetOutput = Path.GetFullPath(currentProjectPath + "\\CloudBuild\\builds\\");
-			Debug.Log(pathToBuild);
-			Debug.Log(currentProjectPath);
-			Debug.Log(targetOutput);
-
-			string buildName = Path.GetFileNameWithoutExtension(pathToBuild);
-			string dataFolderName = buildName + "_Data";
-
-			// ReSharper disable once PossibleNullReferenceException
-			//string dataFolder = new FileInfo(pathToBuild).Directory.FullName + "\\" + dataFolderName;
-
-			//First, copy the .exe
-			File.Copy(pathToBuild, targetOutput + buildName + ".exe", true);
-
-			//Then, copy everything in the data folder.
-			if (Directory.Exists(targetOutput + dataFolderName))
-				Directory.Delete(targetOutput + dataFolderName, true);
-		}*/
 
 		private static void UpdateCloudRepo(string projectPath)
 		{
@@ -138,8 +111,8 @@ namespace UnityEditor
 
 		private static void GetLatestVersionNumber(string currentProjectPath)
 		{
-			string currentBranch = GitProcess.Launch(currentProjectPath, "rev-parse --abbrev-ref HEAD");
-			string branchVersionPointer = currentBranch.Replace('/', '_') + ".txt";
+			kCurrentGitBranch = GitProcess.Launch(currentProjectPath, "rev-parse --abbrev-ref HEAD");
+			string branchVersionPointer = kCurrentGitBranch.Replace('/', '_') + ".txt";
 
 			string tagPath = currentProjectPath + "\\CloudBuild\\tags\\";
 
@@ -249,7 +222,11 @@ namespace UnityEditor
 			{
 				if (svnProcess != null)
 				{
-					svnProcess.Kill();
+					try
+					{
+						svnProcess.Kill();
+					}
+					catch (Exception) { }
 					svnProcess.Dispose();
 				}
 			}
