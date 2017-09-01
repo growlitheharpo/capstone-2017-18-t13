@@ -8,7 +8,7 @@ using Debug = UnityEngine.Debug;
 
 namespace UnityEditor
 {
-	public class CustomPostBuildProcessor : MonoBehaviour
+	public class CustomPostBuildProcessor
 	{
 		[MenuItem("Pipeline/Create Build")]
 		public static void DoBuild()
@@ -81,7 +81,6 @@ namespace UnityEditor
 
 		private static void UpdateCloudRepo(string projectPath)
 		{
-			//DoSvnProcess(projectPath, "checkout https://pineapple.champlain.edu/svn/capstone-2017-18-t13.svn@HEAD CloudBuild");
 			var window = EditorWindow.GetWindow<SvnWrapper>(true, "SVN", true);
 			window.Initialize(projectPath, "checkout https://pineapple.champlain.edu/svn/capstone-2017-18-t13.svn@HEAD CloudBuild");
 			window.OnProcessComplete += ContinueAfterRepoUpdate;
@@ -90,7 +89,7 @@ namespace UnityEditor
 
 		private static void LogProcessFailure()
 		{
-			Debug.LogError("Unable to complete the build.");
+			Debug.LogError("Unable to complete the build. See output window for details.");
 		}
 
 		private static void GetLatestVersionNumber(string currentProjectPath)
@@ -113,33 +112,16 @@ namespace UnityEditor
 				val => GUILayout.TextArea(val));
 			window.OnSubmit += ContinueWithVersionNumber;
 		}
-
-		//private static void DoSvnProcess(string location, string args, int bufferSize = 2048)
-		//{
-		//	using (Process p = new Process())
-		//	{
-		//		p.StartInfo.CreateNoWindow = true;
-		//		p.StartInfo.UseShellExecute = false;
-		//		p.StartInfo.RedirectStandardOutput = true;
-		//		p.StartInfo.RedirectStandardInput = true;
-		//		p.StartInfo.FileName = "svn";
-		//		p.StartInfo.WorkingDirectory = location;
-		//		p.StartInfo.Arguments = args;
-		//		p.Start();
-
-		//		var buffer = new char[bufferSize];
-		//		p.StandardOutput.Read(buffer, 0, bufferSize);
-
-		//		Debug.Log(new string(buffer).TrimEnd('\n', '\0'));
-		//	}
-		//}
-
+		
 		private class SvnWrapper : EditorWindow
 		{
 			public event Action OnProcessComplete = () => { }, OnProcessFail = () => { };
 			private Process svnProcess;
 			private string output;
+			private string errorOutput = "";
 			private string input;
+			private enum Status { Running, Success, Fail, Stalled };
+			private Status mStatus;
 
 			public void Initialize(string path, string args)
 			{
@@ -148,38 +130,81 @@ namespace UnityEditor
 				svnProcess.StartInfo.UseShellExecute = false;
 				svnProcess.StartInfo.RedirectStandardOutput = true;
 				svnProcess.StartInfo.RedirectStandardInput = true;
+				svnProcess.StartInfo.RedirectStandardError = true;
 				svnProcess.StartInfo.FileName = "svn";
 				svnProcess.StartInfo.WorkingDirectory = path;
 				svnProcess.StartInfo.Arguments = args;
+				svnProcess.EnableRaisingEvents = true;
 				svnProcess.Exited += SvnProcess_Exited;
+
 				svnProcess.Start();
+				mStatus = Status.Running;
 			}
 
 			private void SvnProcess_Exited(object sender, EventArgs e)
 			{
 				int exitCode = svnProcess.ExitCode;
+				
+				var buffer = new char[2048];
+				svnProcess.StandardError.Read(buffer, 0, 2048);
+				errorOutput += new string(buffer).TrimEnd('\0');
 
 				svnProcess.WaitForExit();
 				svnProcess.Dispose();
-				Close();
 
 				if (exitCode == 0)
-					OnProcessComplete();
+					mStatus = Status.Success;
 				else
-					OnProcessFail();
+					mStatus = Status.Fail;
 			}
 
 			private void OnGUI()
 			{
-				var buffer = new char[1028];
-				svnProcess.StandardOutput.Read(buffer, 0, 1028);
-				output += new string(buffer).TrimEnd('\n', '\0');
+				GUIStyle style = new GUIStyle(GUI.skin.label)
+				{
+					alignment = TextAnchor.UpperLeft,
+				};
+				var buffer = new char[2048];
 
-				GUILayout.Box(output, GUILayout.MaxWidth(500.0f));
-				input = GUILayout.TextField(input);
+				if (mStatus == Status.Success)
+				{
+					Close();
+					OnProcessComplete();
+				}
+				else if (mStatus == Status.Fail)
+				{
+					mStatus = Status.Stalled;
+					GUILayout.Box(errorOutput, style, GUILayout.MaxWidth(500.0f));
+					OnProcessFail();
+				}
+				else if (mStatus == Status.Stalled)
+				{
+					GUILayout.Box(errorOutput, style, GUILayout.MaxWidth(500.0f));
+					return;
+				}
+				else
+				{
+					if (svnProcess != null && svnProcess.StandardOutput != null)
+					{
+						svnProcess.StandardOutput.Read(buffer, 0, 2048);
+						output += new string(buffer).TrimEnd('\0');
+					}
 
-				if (GUILayout.Button("Enter"))
-					svnProcess.StandardInput.WriteLine(input);
+					GUILayout.Box(output, style, GUILayout.MaxWidth(500.0f));
+					input = GUILayout.TextField(input);
+
+					if (GUILayout.Button("Enter"))
+						svnProcess.StandardInput.WriteLine(input);
+				}
+			}
+
+			private void OnDestroy()
+			{
+				if (mStatus == Status.Running && svnProcess.Responding)
+				{
+					svnProcess.Kill();
+					svnProcess.Dispose();
+				}
 			}
 		}
 	}
