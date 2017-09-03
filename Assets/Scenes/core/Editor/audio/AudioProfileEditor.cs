@@ -4,6 +4,10 @@ using UnityEngine;
 
 namespace UnityEditor
 {
+	/// <summary>
+	/// Custom editor for the AudioProfile class.
+	/// Binds the ID to the file name.
+	/// </summary>
 	[CustomEditor(typeof(AudioProfile))]
 	public class AudioProfileEditor : Editor
 	{
@@ -28,7 +32,7 @@ namespace UnityEditor
 		{
 			string path = AssetDatabase.GetAssetPath(mTarget);
 			string file = Path.GetFileNameWithoutExtension(path);
-			mTarget.mId = file;
+			mTarget.id = file;
 		}
 
 		private static void DrawProfile(SerializedObject target)
@@ -42,6 +46,10 @@ namespace UnityEditor
 		}
 	}
 
+	/// <summary>
+	/// Custom property drawer for the event-to-clip list
+	/// Cleaner and more Dictionary-like.
+	/// </summary>
 	[CustomPropertyDrawer(typeof(AudioProfile.EventToClipList))]
 	public class AudioProfileEventMatcher : PropertyDrawer
 	{

@@ -6,12 +6,19 @@ using UnityEditor;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
+/// <summary>
+/// Pipeline class used to install our custom git hooks
+/// the first time Unity is launched.
+/// </summary>
 [InitializeOnLoad]
 public class GitHookInstaller : EditorWindow
 {
 	private delegate void GUIState();
 
-	public struct FiringSquad
+	/// <summary>
+	/// static data holder.
+	/// </summary>
+	public static class FiringSquad
 	{
 		public static readonly string[] POSSIBLE_NAMES =
 		{
@@ -37,6 +44,9 @@ public class GitHookInstaller : EditorWindow
 	private GUIStyle mHeaderStyle;
 	private int mNameIndex, mEmailIndex;
 
+	/// <summary>
+	/// Static constructor. Ensures we only perform the check once.
+	/// </summary>
 	static GitHookInstaller()
 	{
 		if (DO_ONCE)
@@ -45,78 +55,11 @@ public class GitHookInstaller : EditorWindow
 		DO_ONCE = true;
 		EditorApplication.update += DoCheck;
 	}
-
-	private void Awake()
-	{
-		titleContent = new GUIContent("Firing Squad: Git Setup");
-		minSize = new Vector2(450.0f, 200.0f);
-	}
-
-	private void OnGUI()
-	{
-		if (mCurrentState == null)
-			mCurrentState = InitialPopup;
-		if (mHeaderStyle == null)
-			mHeaderStyle = new GUIStyle(GUI.skin.label) { fontSize = 14, fontStyle = FontStyle.Bold };
-
-		mCurrentState.Invoke();
-	}
-
-	private void InitialPopup()
-	{
-		CustomEditorGUIUtility.HorizontalLayout(() => { GUILayout.Label("Git Setup", mHeaderStyle); });
-		CustomEditorGUIUtility.HorizontalLayout(() =>
-		{
-			GUILayout.Box(
-				"It appears you do not have the latest version of the git utilities active " +
-				"on this copy of the repository. Would you like to set them up now?", GUILayout.MaxWidth(350.0f));
-		});
-
-		CustomEditorGUIUtility.VerticalSpacer(50.0f);
-
-		CustomEditorGUIUtility.HorizontalLayout(() =>
-		{
-			Color startColor = GUI.color;
-			GUI.color = Color.green;
-			if (GUILayout.Button("Yes", GUILayout.MaxWidth(150.0f)))
-			{
-				CopyGitFiles();
-				mCurrentState = EnsureProperName;
-			}
-			GUI.color = startColor;
-		});
-	}
-
-	private void EnsureProperName()
-	{
-		CustomEditorGUIUtility.HorizontalLayout(() => { GUILayout.Label("Git Setup", mHeaderStyle); });
-
-		CustomEditorGUIUtility.HorizontalLayout(() =>
-		{
-			mNameIndex = EditorGUILayout.Popup(mNameIndex, FiringSquad.POSSIBLE_NAMES, GUILayout.MaxWidth(200.0f));
-		});
-
-		CustomEditorGUIUtility.HorizontalLayout(() =>
-		{
-			mEmailIndex = EditorGUILayout.Popup(mEmailIndex, FiringSquad.POSSIBLE_EMAILS, GUILayout.MaxWidth(200.0f));
-		});
-
-		CustomEditorGUIUtility.VerticalSpacer(50);
-
-		CustomEditorGUIUtility.HorizontalLayout(() =>
-		{
-			Color startColor = GUI.color;
-			GUI.color = Color.green;
-			if (GUILayout.Button("Confirm", GUILayout.MaxWidth(150.0f)))
-			{
-				GitProcess.Launch(string.Format("config --local user.name \"{0}\"", FiringSquad.POSSIBLE_NAMES[mNameIndex]));
-				GitProcess.Launch(string.Format("config --local user.email {0}", FiringSquad.POSSIBLE_EMAILS[mEmailIndex]));
-				Close();
-			}
-			GUI.color = startColor;
-		});
-	}
-
+	
+	/// <summary>
+	/// Checks to see if this local copy of the repository has the hooks installed.
+	/// It also checks to make sure the user name and email are valid.
+	/// </summary>
 	private static void DoCheck()
 	{
 		string repoPath = Application.dataPath + "/..";
@@ -155,7 +98,83 @@ public class GitHookInstaller : EditorWindow
 			}
 		}
 
+		// Remove this function from the update list.
 		EditorApplication.update -= DoCheck;
+	}
+
+	private void Awake()
+	{
+		titleContent = new GUIContent("Firing Squad: Git Setup");
+		minSize = new Vector2(450.0f, 200.0f);
+	}
+
+	private void OnGUI()
+	{
+		if (mCurrentState == null)
+			mCurrentState = InitialPopup;
+		if (mHeaderStyle == null)
+			mHeaderStyle = new GUIStyle(GUI.skin.label) { fontSize = 14, fontStyle = FontStyle.Bold };
+
+		mCurrentState.Invoke();
+	}
+
+	/// <summary>
+	/// The initial prompt to copy the git hooks to the local folder.
+	/// </summary>
+	private void InitialPopup()
+	{
+		CustomEditorGUIUtility.HorizontalLayout(() => { GUILayout.Label("Git Setup", mHeaderStyle); });
+		CustomEditorGUIUtility.HorizontalLayout(() =>
+		{
+			GUILayout.Box(
+				"It appears you do not have the latest version of the git utilities active " +
+				"on this copy of the repository. Would you like to set them up now?", GUILayout.MaxWidth(350.0f));
+		});
+
+		CustomEditorGUIUtility.VerticalSpacer(50.0f);
+
+		CustomEditorGUIUtility.HorizontalLayout(() =>
+		{
+			CustomEditorGUIUtility.DrawAsColor(Color.green, () =>
+			{
+				if (GUILayout.Button("Yes", GUILayout.MaxWidth(150.0f)))
+				{
+					CopyGitFiles();
+					mCurrentState = EnsureProperName;
+				}
+			});
+		});
+	}
+
+	/// <summary>
+	/// The second popup to make sure the user.name and user.email are correct.
+	/// </summary>
+	private void EnsureProperName()
+	{
+		CustomEditorGUIUtility.HorizontalLayout(() => { GUILayout.Label("Git Setup", mHeaderStyle); });
+		CustomEditorGUIUtility.HorizontalLayout(() =>
+		{
+			mNameIndex = EditorGUILayout.Popup(mNameIndex, FiringSquad.POSSIBLE_NAMES, GUILayout.MaxWidth(200.0f));
+		});
+		CustomEditorGUIUtility.HorizontalLayout(() =>
+		{
+			mEmailIndex = EditorGUILayout.Popup(mEmailIndex, FiringSquad.POSSIBLE_EMAILS, GUILayout.MaxWidth(200.0f));
+		});
+
+		CustomEditorGUIUtility.VerticalSpacer(50);
+
+		CustomEditorGUIUtility.HorizontalLayout(() =>
+		{
+			CustomEditorGUIUtility.DrawAsColor(Color.green, () =>
+			{
+				if (GUILayout.Button("Confirm", GUILayout.MaxWidth(150.0f)))
+				{
+					GitProcess.Launch(string.Format("config --local user.name \"{0}\"", FiringSquad.POSSIBLE_NAMES[mNameIndex]));
+					GitProcess.Launch(string.Format("config --local user.email {0}", FiringSquad.POSSIBLE_EMAILS[mEmailIndex]));
+					Close();
+				}
+			});
+		});
 	}
 
 	private static bool FilesAreIdentical(string file1, string file2)

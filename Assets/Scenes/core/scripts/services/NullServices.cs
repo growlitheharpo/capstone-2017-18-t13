@@ -3,8 +3,15 @@ using KeatsLib.Persistence;
 using UnityEngine;
 using Input = KeatsLib.Unity.Input;
 
+/// <summary>
+/// Generates null services for the ServiceLocator when instances are not found.
+/// </summary>
 public class NullServices
 {
+	/// <summary>
+	/// Create an instance of a service from the provided interface type.
+	/// </summary>
+	/// <typeparam name="T">The type of service to be created.</typeparam>
 	public static T Create<T>() where T : class
 	{
 		if (typeof(T) == typeof(IGameConsole))
@@ -21,7 +28,7 @@ public class NullServices
 		return null;
 	}
 
-	public class NullGamestateManager : IGamestateManager
+	private class NullGamestateManager : IGamestateManager
 	{
 		public bool isAlive { get { return false; } }
 		public void RequestShutdown()

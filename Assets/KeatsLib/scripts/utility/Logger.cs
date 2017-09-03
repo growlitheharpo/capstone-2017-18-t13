@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using KeatsLib.Collections;
 using UnityEngine;
 
+/// <summary>
+/// Unity Debug.Log wrapper.
+/// Allows easy colorization and toggling.
+/// </summary>
 public static class Logger
 {
 	private static readonly Dictionary<System, string> COLORS = new Dictionary<System, string>
@@ -26,6 +30,12 @@ public static class Logger
 		Generic = 0x10000,
 	}
 
+	/// <summary>
+	/// Stand-in for Debug.Log().
+	/// Prints information to the Unity console.
+	/// </summary>
+	/// <param name="message">The message to be printed.</param>
+	/// <param name="system">The system of origin for the log, if applicable. Will affect color and header.</param>
 	public static void Info(string message, System system = System.Generic)
 	{
 		if (!CheckLevel(system))
@@ -36,6 +46,12 @@ public static class Logger
 		Debug.Log(colorPair.first + label + ": " + message + colorPair.second);
 	}
 	
+	/// <summary>
+	/// Stand-in for Debug.LogWarning().
+	/// Prints information to the Unity console.
+	/// </summary>
+	/// <param name="message">The message to be printed.</param>
+	/// <param name="system">The system of origin for the log, if applicable. Will affect color and header.</param>
 	public static void Warn(string message, System system = System.Generic)
 	{
 		if (!CheckLevel(system))
@@ -46,6 +62,12 @@ public static class Logger
 		Debug.LogWarning(colorPair.first + label + ": " + message + colorPair.second);
 	}
 	
+	/// <summary>
+	/// Stand-in for Debug.LogError().
+	/// Prints information to the Unity console.
+	/// </summary>
+	/// <param name="message">The message to be printed.</param>
+	/// <param name="system">The system of origin for the log, if applicable. Will affect color and header.</param>
 	public static void Error(string message, System system = System.Generic)
 	{
 		if (!CheckLevel(system))

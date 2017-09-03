@@ -1,32 +1,61 @@
 ﻿using System.Collections.Generic;
 using UnityEngine.SceneManagement;
 
+/// <inheritdoc cref="IGamestateManager"/>
 public partial class GamestateManager : MonoSingleton<GamestateManager>, IGamestateManager
 {
+	/// <summary>
+	/// Interface used for a state.
+	/// </summary>
 	private interface IGameState
 	{
+		/// <summary>
+		/// Called when state is first entered.
+		/// </summary>
 		void OnEnter();
+
+		/// <summary>
+		/// Called every frame that state is active.
+		/// </summary>
 		void Update();
 
-		bool safeToTransition { get;  }
+		/// <summary>
+		/// Whether this state believes a transition is safe at this time.
+		/// </summary>
+		bool safeToTransition { get; }
+
+		/// <summary>
+		/// The state this state wants to transition to. Returns null if we should stay as we are.
+		/// </summary>
 		IGameState GetTransition();
 
+		/// <summary>
+		/// Called when state is exited.
+		/// </summary>
 		void OnExit();
 	}
 
+	/// <summary>
+	/// Interior class used for game states.
+	/// </summary>
 	private abstract class BaseGameState : IGameState
 	{
+		/// <inheritdoc />
 		public virtual void OnEnter() { }
 
+		/// <inheritdoc />
 		public void Update() { }
 
+		/// <inheritdoc />
 		public virtual bool safeToTransition { get { return true;  }}
 
+		/// <inheritdoc />
 		public virtual IGameState GetTransition()
 		{
 			return null;
 		}
 
+		/// <inheritdoc />
 		public virtual void OnExit() { }
 	}
 
@@ -37,8 +66,10 @@ public partial class GamestateManager : MonoSingleton<GamestateManager>, IGamest
 	private Dictionary<string, IGameState> mBaseStates;
 	private IGameState mCurrentState;
 
+	/// <inheritdoc />
 	public bool isAlive { get { return true; } }
 
+	/// <inheritdoc />
 	public void RequestShutdown()
 	{
 		//TODO: Transition to shutdown state
@@ -76,10 +107,12 @@ public partial class GamestateManager : MonoSingleton<GamestateManager>, IGamest
 		{
 			mCurrentState = ChooseStateByScene();
 			Logger.Info("Setting current state to " + mCurrentState + " because of the scene name.", Logger.System.State);
-			mCurrentState.OnEnter();
+			
+			if (mCurrentState != null)
+				mCurrentState.OnEnter();
+			else
+				return;
 		}
-		if (mCurrentState == null)
-			return;
 
 		mCurrentState.Update();
 		IGameState newState = mCurrentState.GetTransition();

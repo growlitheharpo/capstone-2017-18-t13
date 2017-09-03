@@ -1,5 +1,8 @@
 ﻿using UnityEngine;
 
+/// <summary>
+/// Data utility to describe the motion of a character.
+/// </summary>
 [CreateAssetMenu(menuName = "Characters/Movement Data")]
 public class CharacterMovementData : ScriptableObject
 {

@@ -2,6 +2,9 @@
 using UnityEngine;
 using UIImage = UnityEngine.UI.Image;
 
+/// <summary>
+/// A utility UI class attached to a prefab. Used to flash the whole screen a given color.
+/// </summary>
 public class UIScreenFlash : MonoBehaviour
 {
 	private const float DEFAULT_FLASH_TIME = 0.55f;
@@ -14,6 +17,12 @@ public class UIScreenFlash : MonoBehaviour
 			Destroy(this);
 	}
 
+	/// <summary>
+	/// Perform the screen flash.
+	/// </summary>
+	/// <param name="col">The color to flash to.</param>
+	/// <param name="flashCount">The number of times to flash the screen. Defaults to 1.</param>
+	/// <param name="time">The time a flash should take. Defaults to 0.55s</param>
 	public void FlashScreen(Color col, int flashCount = 1, float time = DEFAULT_FLASH_TIME)
 	{
 		if (mFlashRoutine != null)

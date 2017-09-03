@@ -4,9 +4,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-/// <summary>
-/// A game console class used to register and issue commands at runtime.
-/// </summary>
+/// <inheritdoc cref="IGameConsole"/>
 public class GameConsole : MonoSingleton<GameConsole>, IGameConsole
 {
 	private bool mCheatsEnabled;
@@ -31,24 +29,33 @@ public class GameConsole : MonoSingleton<GameConsole>, IGameConsole
 
 		mConsoleView.RegisterCommandHandler(EnterCommand);
 		RegisterCommand("cheats", ToggleCheatsCommand);
+		RegisterCommand("clear", ClearConsoleCmmand);
 		RegisterCommand("help", ListCommandsCommand);
 	}
 
+	/// <inheritdoc />
 	public void AssertCheatsEnabled()
 	{
 		Assert.IsTrue(mCheatsEnabled, "Cheats are not enabled at this time.");
 	}
 
+	/// <inheritdoc />
 	public void RegisterCommand(string command,	 Action<string[]> handle)
 	{
 		mCommandHandlers.Add(command, handle);
 	}
 
+	/// <summary>
+	/// Event called when Unity receives a Debug.Log call or variant.
+	/// </summary>
+	/// <param name="message"></param>
+	/// <param name="stackTrace"></param>
+	/// <param name="type"></param>
 	private void UnityLogToConsole(string message, string stackTrace, LogType type)
 	{
 		switch (type)
 		{
-			case LogType.Error:
+			// Treat Assert, and Exception as errors. The rest are handled as themselves.
 			case LogType.Assert:
 			case LogType.Exception:
 				mConsoleView.AddMessage(message, LogType.Error);
@@ -59,6 +66,9 @@ public class GameConsole : MonoSingleton<GameConsole>, IGameConsole
 		}
 	}
 
+	/// <summary>
+	/// Callback for when a command is entered into the console.
+	/// </summary>
 	private void EnterCommand(string[] typedData)
 	{
 		string command = typedData[0].ToLower();
@@ -81,6 +91,9 @@ public class GameConsole : MonoSingleton<GameConsole>, IGameConsole
 		}
 	}
 
+	/// <summary>
+	/// Handler for the "cheats [0/1]" command.
+	/// </summary>
 	private void ToggleCheatsCommand(string[] data)
 	{
 		if (data.Length != 1 || data[0] != "0" && data[0] != "1")
@@ -97,9 +110,23 @@ public class GameConsole : MonoSingleton<GameConsole>, IGameConsole
 		}
 	}
 
+	/// <summary>
+	/// Handler for the "help" command.
+	/// </summary>
 	private void ListCommandsCommand(string[] data)
 	{
 		string commands = string.Join("\n", mCommandHandlers.Keys.ToArray());
 		Debug.Log(commands);
+	}
+
+	/// <summary>
+	/// Handler for the "clear" command.
+	/// </summary>
+	private void ClearConsoleCmmand(string[] data)
+	{
+		if (data.Length > 0)
+			throw new ArgumentException("Invalid parameters for command: clear");
+
+		mConsoleView.ClearLogs();
 	}
 }

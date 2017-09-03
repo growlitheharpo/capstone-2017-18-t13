@@ -3,6 +3,9 @@ using UnityEngine;
 using Input = KeatsLib.Unity.Input;
 using UnityInput = UnityEngine.Input;
 
+/// <summary>
+/// TEST SCRIPT
+/// </summary>
 public class DummyScript : MonoBehaviour
 {
 	[Serializable]

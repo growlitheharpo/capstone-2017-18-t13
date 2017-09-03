@@ -1,5 +1,8 @@
 ﻿using UnityEngine;
 
+/// <summary>
+/// Class to handle the main options of the game.
+/// </summary>
 public class MainOptionsMenu : MonoBehaviour
 {
 	private const string SETTINGS_ID = "options_menu_options_id";

@@ -6,6 +6,10 @@ using Debug = UnityEngine.Debug;
 
 namespace UnityEditor
 {
+	/// <summary>
+	/// Create a build and auto-upload it to SVN.
+	/// Basically a giant state machine that tries to wait for each step.
+	/// </summary>
 	public class CustomPostBuildProcessor
 	{
 		private static string kVersionNumber, kProjectPath, kCurrentGitBranch, kTagFilePath;

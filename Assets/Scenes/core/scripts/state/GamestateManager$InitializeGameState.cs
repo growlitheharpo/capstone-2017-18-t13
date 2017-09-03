@@ -2,11 +2,15 @@
 
 public partial class GamestateManager
 {
+	/// <summary>
+	/// State used to initialize the game at start-up.
+	/// </summary>
 	private class InitializeGameState : BaseGameState
 	{
 		private static bool kOccured;
 		private bool mSaveLoadComplete, mAudioLoadComplete;
 
+		/// <inheritdoc />
 		public override void OnEnter()
 		{
 			if (kOccured)
@@ -23,8 +27,10 @@ public partial class GamestateManager
 				.InitializeDatabase();
 		}
 
+		/// <inheritdoc />
 		public override bool safeToTransition { get { return false; } }
 
+		/// <inheritdoc />
 		public override IGameState GetTransition()
 		{
 			if (mSaveLoadComplete && mAudioLoadComplete)
@@ -42,6 +48,7 @@ public partial class GamestateManager
 			mAudioLoadComplete = true;
 		}
 
+		/// <inheritdoc />
 		public override void OnExit()
 		{
 			kOccured = true;

@@ -5,9 +5,13 @@ using FiringSquad.Data;
 using KeatsLib.Collections;
 using UnityEngine;
 
+/// <inheritdoc cref="IAudioProfile"/>
 [CreateAssetMenu(fileName = "AudioProfile", menuName = "Audio/Profile")]
 public class AudioProfile : ScriptableObject, IAudioProfile
 {
+	/// <summary>
+	/// Utility struct to bind an event to a list of clips.
+	/// </summary>
 	[Serializable]
 	public struct EventToClipList
 	{
@@ -17,8 +21,8 @@ public class AudioProfile : ScriptableObject, IAudioProfile
 
 	public AudioProfile mParent;
 
-	public string mId;
-	public string id { get { return mId; } }
+	[SerializeField] private string mId;
+	public string id { get { return mId; } set { mId = value; }}
 
 	[SerializeField] private AudioManager.ProfileType mProfile;
 	public AudioManager.ProfileType profile { get { return mProfile; } }
@@ -48,17 +52,20 @@ public class AudioProfile : ScriptableObject, IAudioProfile
 			mClips[st.mEvent] = st.mClips;
 	}
 
+	/// <inheritdoc />
 	public IAudioClip[] GetAllClips()
 	{
 		return mClips.Values.SelectMany(array => array.Select(clip => clip as IAudioClip)).ToArray();
 	}
 
+	/// <inheritdoc />
 	public IAudioClip[] GetClip(AudioManager.AudioEvent e)
 	{
 		AudioClipData[] clips;
 		return mClips.TryGetValue(e, out clips) ? ChooseClip(clips) : null;
 	}
 
+	/// <inheritdoc />
 	public IAudioClip[] GetClipInParents(AudioManager.AudioEvent e)
 	{
 		AudioClipData[] clips;
@@ -68,6 +75,10 @@ public class AudioProfile : ScriptableObject, IAudioProfile
 		return mParent != null ? mParent.GetClipInParents(e) : new IAudioClip[] { };
 	}
 	
+	/// <summary>
+	/// Return the appropriate number of clips based on our profile type (ChooseRandom or PlayAll).
+	/// </summary>
+	/// <param name="clips">The clip array to choose from.</param>
 	private IAudioClip[] ChooseClip(IEnumerable<AudioClipData> clips)
 	{
 		if (mProfile == AudioManager.ProfileType.ChooseRandom)

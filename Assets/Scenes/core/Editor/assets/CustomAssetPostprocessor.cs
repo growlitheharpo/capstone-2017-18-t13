@@ -5,33 +5,27 @@ using System.Text.RegularExpressions;
 using FiringSquad.Data;
 using UnityEngine.Audio;
 
+/// <summary>
+/// Catch-All post processor for the importing of any asset type.
+/// </summary>
 public class CustomAssetPostprocessor : AssetPostprocessor
 {
+	/// <summary>
+	/// Pre-process Model
+	/// Disable Unity's material importing (it doesn't work).
+	/// </summary>
 	private void OnPreprocessModel()
 	{
 		ModelImporter modelImporter = (ModelImporter) assetImporter;
 		modelImporter.importMaterials = false;
 	}
 
-	private void OnPostprocessAudio(AudioClip clip)
-	{
-		string folderPath = Path.GetDirectoryName(assetImporter.assetPath);
-		string fileName = Path.GetFileNameWithoutExtension(assetImporter.assetPath) ?? "";
-
-		AudioMixer mixer = AssetDatabase.LoadAssetAtPath<AudioMixer>("Assets/Scenes/core/audio/MasterAudioMixer.mixer");
-		string dataPath = folderPath + "/" + fileName + ".asset";
-
-		AudioClipData data = AssetDatabase.LoadAssetAtPath<AudioClipData>(dataPath);
-		if (data == null)
-		{
-			data = ScriptableObject.CreateInstance<AudioClipData>();
-			AssetDatabase.CreateAsset(data, dataPath);
-		}
-
-		data.group = mixer.FindMatchingGroups("sfx")[0];
-		AssetDatabase.SaveAssets();
-	}
-
+	/// <summary>
+	/// Post process Model
+	/// Creates a material with the shader that we are using instead of the default.
+	/// Using our naming convention, try to find the correct textures to fill
+	/// all the channels of the material, then save it.
+	/// </summary>
 	private Material OnAssignMaterialModel(Material mat, Renderer render)
 	{
 		string folderPath = Path.GetDirectoryName(assetImporter.assetPath);
@@ -73,4 +67,28 @@ public class CustomAssetPostprocessor : AssetPostprocessor
 
 		return AssetDatabase.LoadAssetAtPath<Texture>(AssetDatabase.GUIDToAssetPath(guid));
 	}
+	
+	/// <summary>
+	/// Post process audio clip files.
+	/// Creates an IAudioData associated with that clip automatically.
+	/// </summary>
+	private void OnPostprocessAudio(AudioClip clip)
+	{
+		string folderPath = Path.GetDirectoryName(assetImporter.assetPath);
+		string fileName = Path.GetFileNameWithoutExtension(assetImporter.assetPath) ?? "";
+
+		AudioMixer mixer = AssetDatabase.LoadAssetAtPath<AudioMixer>("Assets/Scenes/core/audio/MasterAudioMixer.mixer");
+		string dataPath = folderPath + "/" + fileName + ".asset";
+
+		AudioClipData data = AssetDatabase.LoadAssetAtPath<AudioClipData>(dataPath);
+		if (data == null)
+		{
+			data = ScriptableObject.CreateInstance<AudioClipData>();
+			AssetDatabase.CreateAsset(data, dataPath);
+		}
+
+		data.group = mixer.FindMatchingGroups("sfx")[0];
+		AssetDatabase.SaveAssets();
+	}
+
 }

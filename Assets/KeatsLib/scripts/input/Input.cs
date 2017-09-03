@@ -4,6 +4,7 @@ using System.Linq;
 
 namespace KeatsLib.Unity
 {
+	/// <inheritdoc cref="IInput"/>
 	/// <summary>
 	/// Global input manager using the command pattern.
 	/// </summary>
@@ -50,6 +51,7 @@ namespace KeatsLib.Unity
 				mValue = value;
 			}
 
+			/// <inheritdoc />
 			public override bool Activated()
 			{
 				return mFunction(mValue);
@@ -70,11 +72,15 @@ namespace KeatsLib.Unity
 				mAxisName = value;
 			}
 
+			/// <inheritdoc />
 			public override bool Activated()
 			{
 				return Math.Abs(mFunction(mAxisName)) > 0.01f;
 			}
 
+			/// <summary>
+			/// Get the current value of this axis.
+			/// </summary>
 			public float CurrentValue()
 			{
 				return mFunction(mAxisName);
@@ -94,17 +100,11 @@ namespace KeatsLib.Unity
 
 		private readonly Dictionary<Action, List<BaseInputMap>> mCommands = new Dictionary<Action, List<BaseInputMap>>();
 		private readonly Dictionary<Action<float>, List<AxisMap>> mAxes = new Dictionary<Action<float>, List<AxisMap>>();
-
 		private InputLevel mEnabledInputs = InputLevel.None;
 
-		/// <summary>
-		/// Register an input to a command.
-		/// </summary>
-		/// <param name="method">Which Unity input method to use (GetKey, GetKeyDown, GetKeyUp, etc.)</param>
-		/// <param name="key">Which KeyCode or button/axis name to check.</param>
-		/// <param name="command">The command to fire when this input is activated.</param>
-		/// <param name="level">The InputLevel for this input. All flags must be matched for input to fire.</param>
-		/// <param name="allowOtherKeys">Allows other keys to map to this same input.</param>
+		#region IInput Implementation
+
+		/// <inheritdoc />
 		public IInput RegisterInput<T>(Func<T, bool> method, T key, Action command, InputLevel level, bool allowOtherKeys = true)
 		{
 			Logger.Info("Registering " + command.Method.Name + " as a new input on key " + key + ".", Logger.System.Input);
@@ -121,6 +121,7 @@ namespace KeatsLib.Unity
 			return this;
 		}
 
+		/// <inheritdoc />
 		public IInput UnregisterInput(Action command)
 		{
 			Logger.Info("Unegistering " + command.Method.Name + " from all inputs.", Logger.System.Input);
@@ -128,6 +129,7 @@ namespace KeatsLib.Unity
 			return this;
 		}
 
+		/// <inheritdoc />
 		public IInput RegisterAxis(Func<string, float> method, string axis, Action<float> command, InputLevel level, bool allowOtherAxes = true)
 		{
 			Logger.Info("Registering " + command.Method.Name + " as a new input on axis " + axis + ".", Logger.System.Input);
@@ -144,12 +146,48 @@ namespace KeatsLib.Unity
 			return this;
 		}
 
+		/// <inheritdoc />
 		public IInput UnregisterAxis(Action<float> command)
 		{
 			Logger.Info("Unegistering " + command.Method.Name + " from all inputs.", Logger.System.Input);
 			mAxes.Remove(command);
 			return this;
 		}
+
+		/// <inheritdoc />
+		public void SetInputLevel(InputLevel level)
+		{
+			mEnabledInputs = level;
+		}
+
+		/// <inheritdoc />
+		public void SetInputLevelState(InputLevel flag, bool state)
+		{
+			if (state)
+				EnableInputLevel(flag);
+			else
+				DisableInputLevel(flag);
+		}
+
+		/// <inheritdoc />
+		public void DisableInputLevel(InputLevel level)
+		{
+			mEnabledInputs &= ~level;
+		}
+
+		/// <inheritdoc />
+		public void EnableInputLevel(InputLevel level)
+		{
+			mEnabledInputs |= level;
+		}
+
+		/// <inheritdoc />
+		public bool IsInputEnabled(InputLevel level)
+		{
+			return (mEnabledInputs & level) == level;
+		}
+
+		#endregion
 
 		/// <summary>
 		/// Remove all other inputs for this command.
@@ -187,51 +225,6 @@ namespace KeatsLib.Unity
 					.Sum(input => input.CurrentValue());
 				i.Key.Invoke(value);
 			}
-		}
-
-		/// <summary>
-		/// Directly set the current allowed input level.
-		/// </summary>
-		public void SetInputLevel(InputLevel level)
-		{
-			mEnabledInputs = level;
-		}
-
-		/// <summary>
-		/// Set the enabled/disabled state for a specific input level.
-		/// </summary>
-		/// <param name="flag">The level whose state should be changed.</param>
-		/// <param name="state">The state to set the level to.</param>
-		public void SetInputLevelState(InputLevel flag, bool state)
-		{
-			if (state)
-				EnableInputLevel(flag);
-			else
-				DisableInputLevel(flag);
-		}
-
-		/// <summary>
-		/// Sets an input level as disabled.
-		/// </summary>
-		public void DisableInputLevel(InputLevel level)
-		{
-			mEnabledInputs &= ~level;
-		}
-
-		/// <summary>
-		/// Sets an input level as enabled.
-		/// </summary>
-		public void EnableInputLevel(InputLevel level)
-		{
-			mEnabledInputs |= level;
-		}
-
-		/// <summary>
-		/// Check if an input level is enabled or disabled.
-		/// </summary>
-		public bool IsInputEnabled(InputLevel level)
-		{
-			return (mEnabledInputs & level) == level;
 		}
 	}
 }

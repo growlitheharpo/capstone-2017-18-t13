@@ -7,6 +7,9 @@ namespace KeatsLib.Persistence
 {
 	public partial class Persistence
 	{
+		/// <summary>
+		/// The background implementation for the IOptionsData package
+		/// </summary>
 		[Serializable]
 		private class OptionsDataImpl : BasePersisting, IOptionsData
 		{

@@ -1,7 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using UnityEngine;
 
+/// <summary>
+/// Gets instances of the main game services at runtime.
+/// Preferable to using the singleton instance directly because
+/// it will prevent crashes and null references at runtime
+/// when a service does not exist.
+/// </summary>
 public class ServiceLocator : MonoSingleton<ServiceLocator>
 {
 	private Dictionary<Type, object> mInterfaceMap;

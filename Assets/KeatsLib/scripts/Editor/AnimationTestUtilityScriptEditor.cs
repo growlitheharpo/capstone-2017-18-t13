@@ -1,6 +1,10 @@
 ﻿using UnityEditor;
 using UnityEngine;
 
+/// <summary>
+/// Editor script tied to the Animation Test Utility.
+/// Only purpose is for testing animations and animator controllers in the editor.
+/// </summary>
 [CustomEditor(typeof(AnimationTestUtilityScript))]
 public class AnimationTestUtilityScriptEditor : Editor
 {
@@ -38,10 +42,13 @@ public class AnimationTestUtilityScriptEditor : Editor
 		if (mShowWarning)
 			EditorGUILayout.HelpBox("This script will only work while in \"Play\" mode!", MessageType.Error);
 
-		EditorGUILayout.BeginHorizontal();
-		EditorGUILayout.PropertyField(serializedObject.FindProperty("mCurrentAnimationTrigger"), new GUIContent("Animation Trigger"));
-		if (GUILayout.Button("Play Animation"))
+		CustomEditorGUIUtility.HorizontalLayout(() =>
 		{
+			EditorGUILayout.PropertyField(serializedObject.FindProperty("mCurrentAnimationTrigger"), new GUIContent("Animation Trigger"));
+
+			if (!GUILayout.Button("Play Animation"))
+				return;
+
 			if (!EditorApplication.isPlaying)
 				mShowWarning = true;
 			else
@@ -51,7 +58,6 @@ public class AnimationTestUtilityScriptEditor : Editor
 
 				AnimationUtility.PlayAnimation(obj, anim);
 			}
-		}
-		EditorGUILayout.EndHorizontal();
+		});
 	}
 }

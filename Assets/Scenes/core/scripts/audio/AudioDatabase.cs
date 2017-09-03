@@ -2,11 +2,18 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// A scriptable object used to maintain a list of all audio profiles.
+/// </summary>
 public class AudioDatabase : ScriptableObject
 {
 	[SerializeField] private List<AudioProfile> mProfiles;
 	[SerializeField] private Dictionary<IAudioProfile, Dictionary<IAudioClip, GameObject>> mPrefabs;
 
+	/// <summary>
+	/// Creates an instance of every possible audio clip to be Instantiated later.
+	/// </summary>
+	/// <param name="holder">The Transform 'folder' to place the items under.</param>
 	public void InitializePrefabs(Transform holder)
 	{
 		if (mPrefabs != null)
@@ -50,6 +57,9 @@ public class AudioDatabase : ScriptableObject
 		}
 	}
 
+	/// <summary>
+	/// Get the local prefab associated with this profile and clip.
+	/// </summary>
 	public GameObject GetPrefab(IAudioProfile p, IAudioClip c)
 	{
 		if (mPrefabs.ContainsKey(p) && mPrefabs[p].ContainsKey(c))
@@ -57,6 +67,9 @@ public class AudioDatabase : ScriptableObject
 		return null;
 	}
 
+	/// <summary>
+	/// Destroy all of our prefabs and clear the list.
+	/// </summary>
 	private void DestroyPrefabs()
 	{
 		foreach (var profilePair in mPrefabs)

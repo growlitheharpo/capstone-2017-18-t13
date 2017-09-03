@@ -3,9 +3,16 @@ using UnityEngine;
 
 namespace UnityEditor
 {
+	/// <summary>
+	/// Utility editor window for making a text entry.
+	/// </summary>
 	public class SimpleTextEntryWindow : EditorWindow
 	{
+		/// <summary>
+		/// Callback for when the user clicks the "OK" button.
+		/// </summary>
 		public event Action<string> OnSubmit = s => { };
+
 		private Func<string, string> guiUtilityFunc { get; set; }
 		private string startValue { get; set; }
 		private string infoLabel { get; set; }

@@ -1,5 +1,8 @@
 ﻿using UnityEngine;
 
+/// <summary>
+/// Controller attached to the main camera to reflect main menu options.
+/// </summary>
 public class CameraOptionsController : MonoBehaviour
 {
 	private Camera mCamera;

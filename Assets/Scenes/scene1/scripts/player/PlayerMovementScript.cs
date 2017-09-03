@@ -2,6 +2,10 @@
 using UnityEngine;
 using Input = UnityEngine.Input;
 
+/// <summary>
+/// Script for binding first-person player movement to the Input
+/// system and reflecting it in a character controller.
+/// </summary>
 public class PlayerMovementScript : MonoBehaviour
 {
 	[SerializeField] private CharacterMovementData mMovementData;

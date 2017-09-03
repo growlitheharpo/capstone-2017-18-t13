@@ -5,6 +5,10 @@ using Object = UnityEngine.Object;
 
 namespace UnityEditor
 {
+	/// <summary>
+	/// Editor for the component type restruction attribute.
+	/// Shows an error in the inspector if a property is of the wrong type.
+	/// </summary>
 	[CustomPropertyDrawer(typeof(ComponentTypeRestrictionAttribute))]
 	public class ComponentTypeRestrictionDrawer : PropertyDrawer
 	{

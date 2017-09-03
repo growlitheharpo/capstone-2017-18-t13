@@ -1,5 +1,8 @@
 ﻿using UnityEngine;
 
+/// <summary>
+/// Static class with Animation-related utility functions to avoid cluttering code.
+/// </summary>
 public static class AnimationUtility
 {
 	public static void PlayAnimationInChildren(GameObject obj, string trigger)

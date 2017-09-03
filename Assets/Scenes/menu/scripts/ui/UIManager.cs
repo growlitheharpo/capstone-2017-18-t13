@@ -1,5 +1,8 @@
 ﻿using UnityEngine;
 
+/// <summary>
+/// Main menu UI manager.
+/// </summary>
 public class UIManager : MonoBehaviour
 {
 	[SerializeField] private GameObject mMainElementHolder;
@@ -7,7 +10,6 @@ public class UIManager : MonoBehaviour
 	[SerializeField] private ActionProvider mOptionsButton;
 	[SerializeField] private ActionProvider mQuitButton;
 
-	// Use this for initialization
 	private void Start()
 	{
 		mPlayButton.OnClick += ClickPlay;

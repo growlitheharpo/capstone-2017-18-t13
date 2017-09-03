@@ -4,6 +4,11 @@ using UnityEngine;
 
 namespace UnityEditor
 {
+	/// <summary>
+	/// Custom editor for the AudioClipData.
+	/// Tries to make it look more similar to Unity's default inspector
+	/// for an AudioSource
+	/// </summary>
 	[CustomEditor(typeof(AudioClipData))]
 	public class AudioClipDataEditor : Editor
 	{

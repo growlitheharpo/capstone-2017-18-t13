@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 /// <summary>
 /// A utility component placed on a child object when its parent wants to receive
@@ -7,23 +8,11 @@
 /// </summary>
 public class CollisionForwarder : MonoBehaviour
 {
-	public delegate void Collision2DDelegate(Collision2D col);
+	public Action<Collision2D> mCollision2DEnterDelegate, mCollision2DExitDelegate, mCollision2DStayDelegate;
+	public Action<Collision> mCollisionEnterDelegate, mCollisionExitDelegate, mCollisionStayDelegate;
 
-	public delegate void CollisionDelegate(Collision col);
-
-	public delegate void Trigger2DDelegate(Collider2D col);
-
-	// A collection of necessary delegate types.
-	public delegate void TriggerDelegate(Collider col);
-
-	public Collision2DDelegate mCollision2DEnterDelegate, mCollision2DExitDelegate, mCollision2DStayDelegate;
-	public CollisionDelegate mCollisionEnterDelegate, mCollisionExitDelegate, mCollisionStayDelegate;
-
-	// The 2D trigger and collision delegates.
-	public Trigger2DDelegate mTrigger2DEnterDelegate, mTrigger2DExitDelegate, mTrigger2DStayDelegate;
-
-	// The 3D trigger and collision delegates.
-	public TriggerDelegate mTriggerEnterDelegate, mTriggerExitDelegate, mTriggerStayDelegate;
+	public Action<Collider2D> mTrigger2DEnterDelegate, mTrigger2DExitDelegate, mTrigger2DStayDelegate;
+	public Action<Collider> mTriggerEnterDelegate, mTriggerExitDelegate, mTriggerStayDelegate;
 
 	// For every Unity signal, call the relevant delegate if we have one:
 

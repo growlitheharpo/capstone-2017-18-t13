@@ -4,6 +4,9 @@ using UnityEngine;
 
 namespace UnityEditor
 {
+	/// <summary>
+	/// Used to draw flags in the inspector.
+	/// </summary>
 	[CustomPropertyDrawer(typeof(EnumFlagsAttribute))]
 	public class EnumFlagsAttributeDrawer : PropertyDrawer
 	{

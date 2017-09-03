@@ -2,6 +2,7 @@
 using System.Linq;
 using UnityEngine;
 
+/// <inheritdoc cref="IAudioManager"/>
 public class AudioManager : MonoSingleton<AudioManager>, IAudioManager
 {
 	public enum ProfileType
@@ -16,21 +17,33 @@ public class AudioManager : MonoSingleton<AudioManager>, IAudioManager
 		MainBackgroundEffect = 0,
 	}
 
+	/// <summary>
+	/// Private implementation of the IAudioReference interface.
+	/// </summary>
 	private class AudioReference : IAudioReference
 	{
+		/// <summary>
+		/// The clip(s) played by this reference.
+		/// </summary>
 		public List<IAudioClip> mClipData;
+		/// <summary>
+		/// The actual GameObject audio sources created by this reference.
+		/// </summary>
 		public List<AudioSource> mSources;
 
+		/// <inheritdoc />
 		public void Kill()
 		{
 			instance.StopSoundImmediate(this);
 		}
 
+		/// <inheritdoc />
 		public void FadeOut(float time)
 		{
 			throw new System.NotImplementedException("Fading audio in and out is not yet supported!");
 		}
 
+		/// <inheritdoc />
 		public void SetRepeat(bool repeat)
 		{
 			foreach (AudioSource source in mSources)
@@ -53,7 +66,8 @@ public class AudioManager : MonoSingleton<AudioManager>, IAudioManager
 		if (!ServiceLocator.Get<IGamestateManager>().isAlive && mShouldSelfInitialize)
 			InitializeDatabase();
 	}
-	
+
+	/// <inheritdoc />
 	public void InitializeDatabase()
 	{
 		mAudioDatabase.InitializePrefabs(transform);
@@ -66,6 +80,9 @@ public class AudioManager : MonoSingleton<AudioManager>, IAudioManager
 		ProcessFinishedAudio();
 	}
 
+	/// <summary>
+	/// Loop through all of our currently active references and Destroy any that have finished.
+	/// </summary>
 	private void ProcessFinishedAudio()
 	{
 		var refsToDelete = new List<IAudioReference>();
@@ -94,11 +111,13 @@ public class AudioManager : MonoSingleton<AudioManager>, IAudioManager
 			mCurrentSounds.Remove(r);
 	}
 
+	/// <inheritdoc />
 	public IAudioReference PlaySound(AudioEvent e, IAudioProfile profile, Transform location)
 	{
 		return PlaySound(e, profile, location, Vector3.zero);
 	}
 
+	/// <inheritdoc />
 	public IAudioReference PlaySound(AudioEvent e, IAudioProfile profile, Transform location, Vector3 offset)
 	{
 		var clips = profile.GetClipInParents(e);
@@ -129,6 +148,7 @@ public class AudioManager : MonoSingleton<AudioManager>, IAudioManager
 		return newRef;
 	}
 
+	/// <inheritdoc />
 	public IAudioReference CheckReferenceAlive(ref IAudioReference reference)
 	{
 		if (reference == null || mCurrentSounds.Contains(reference))
@@ -138,7 +158,7 @@ public class AudioManager : MonoSingleton<AudioManager>, IAudioManager
 		return null;
 	}
 
-	public void StopSoundImmediate(IAudioReference sound)
+	private void StopSoundImmediate(IAudioReference sound)
 	{
 		if (!mCurrentSounds.Contains(sound))
 			return;
