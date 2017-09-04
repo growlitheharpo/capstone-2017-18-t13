@@ -15,6 +15,9 @@ public class AudioManager : MonoSingleton<AudioManager>, IAudioManager
 	{
 		TestExplosionEffect = -1,
 		MainBackgroundEffect = 0,
+		PrimaryEffect1 = 1,
+		PrimaryEffect2 = 2,
+		PrimaryEffect3 = 3,
 	}
 
 	/// <summary>
@@ -48,6 +51,20 @@ public class AudioManager : MonoSingleton<AudioManager>, IAudioManager
 		{
 			foreach (AudioSource source in mSources)
 				source.loop = repeat;
+		}
+
+		/// <inheritdoc />
+		public void SetVolume(float vol)
+		{
+			for (int i = 0; i < mClipData.Count; i++)
+				mSources[i].volume = mClipData[i].volume * vol;
+		}
+
+		/// <inheritdoc />
+		public void SetPitch(float pitch)
+		{
+			for (int i = 0; i < mClipData.Count; i++)
+				mSources[i].pitch = pitch;
 		}
 	}
 

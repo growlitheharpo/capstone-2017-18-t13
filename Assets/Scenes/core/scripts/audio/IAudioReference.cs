@@ -19,4 +19,14 @@ public interface IAudioReference
 	/// Set whether or not the audio should repeat.
 	/// </summary>
 	void SetRepeat(bool repeat);
+
+	/// <summary>
+	/// Set the volume of the sound to a new level.
+	/// </summary>
+	void SetVolume(float vol);
+
+	/// <summary>
+	/// Set the pitch of the sound to a new level.
+	/// </summary>
+	void SetPitch(float pitch);
 }

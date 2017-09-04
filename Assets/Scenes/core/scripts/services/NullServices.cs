@@ -42,10 +42,10 @@ public class NullServices
 		private class NullAudioReference : IAudioReference
 		{
 			public void Kill() { }
-
 			public void FadeOut(float time) { }
-
 			public void SetRepeat(bool repeat) { }
+			public void SetVolume(float vol) { }
+			public void SetPitch(float pitch) { }
 		}
 
 		public void InitializeDatabase()
