@@ -6,9 +6,8 @@ namespace Prototype1
 	{
 		[SerializeField] private CharacterMovementData mMovementData;
 		private CharacterController mController;
-		private float x1, x2, y1, y2;
+		private float mX1, mX2, mY1, mY2;
 
-		// Use this for initialization
 		private void Start()
 		{
 			//SHOULD NOT BE HERE
@@ -34,22 +33,22 @@ namespace Prototype1
 
 		private void INPUT_MoveHorizontal(float value)
 		{
-			x1 = value;
+			mX1 = value;
 		}
 
 		private void INPUT_MoveVertical(float value)
 		{
-			y1 = value;
+			mY1 = value;
 		}
 
 		private void INPUT_LookHorizontal(float value)
 		{
-			x2 = value;
+			mX2 = value;
 		}
 
 		private void INPUT_LookVertical(float value)
 		{
-			y2 = value;
+			mY2 = value;
 		}
 
 		private void LateUpdate()
@@ -60,8 +59,7 @@ namespace Prototype1
 
 		private void MoveAround()
 		{
-			Vector2 input = new Vector2(x1, y1);
-
+			Vector2 input = new Vector2(mX1, mY1);
 			input *= input.magnitude;
 
 			Vector3 movementVector = new Vector3(input.x, 0.0f, input.y) * mMovementData.forwardSpeed * Time.deltaTime;
@@ -70,10 +68,10 @@ namespace Prototype1
 
 		private void LookTowardsStick()
 		{
-			float angle = Mathf.Atan2(x2, y2) * Mathf.Rad2Deg;
+			float angle = Mathf.Atan2(mX2, mY2) * Mathf.Rad2Deg;
 			Quaternion currentRot = transform.rotation;
 			Quaternion newRot = Quaternion.Euler(transform.eulerAngles.x, angle, transform.eulerAngles.z);
-			float newAngleWeight = x2 * x2 + y2 * y2;
+			float newAngleWeight = mX2 * mX2 + mY2 * mY2;
 
 			transform.rotation = Quaternion.Slerp(currentRot, newRot, (newAngleWeight * newAngleWeight) * mMovementData.lookSpeed);
 		}
