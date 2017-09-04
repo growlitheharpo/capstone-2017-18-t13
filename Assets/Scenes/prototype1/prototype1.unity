@@ -492,11 +492,6 @@ Prefab:
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: bb829d7320cc4b649825c08b14be2b67, type: 2}
   m_IsPrefabParent: 0
---- !u!1 &583094887 stripped
-GameObject:
-  m_PrefabParentObject: {fileID: 1953974638818940, guid: bb829d7320cc4b649825c08b14be2b67,
-    type: 2}
-  m_PrefabInternal: {fileID: 563855060}
 --- !u!4 &583094888 stripped
 Transform:
   m_PrefabParentObject: {fileID: 4064075139203806, guid: bb829d7320cc4b649825c08b14be2b67,
@@ -775,9 +770,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mBumperMultiplier: 4
-  mGunObject: {fileID: 583094887}
+  mGunObject: {fileID: 583094888}
   mCanvas: {fileID: 1107455146}
   mTmpImage: {fileID: 105361169}
+  mSliderTipWeight: 1.5
+  mGunMaxRotationRate: 360
+  mRotationGrowRate: 0.1
 --- !u!1 &1069621216
 GameObject:
   m_ObjectHideFlags: 0

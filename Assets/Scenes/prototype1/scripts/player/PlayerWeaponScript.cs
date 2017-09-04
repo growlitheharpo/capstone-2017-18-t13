@@ -1,17 +1,20 @@
-﻿using System.Collections;
-using UnityEngine;
+﻿using UnityEngine;
 using UIImage = UnityEngine.UI.Image;
 
 public class PlayerWeaponScript : MonoBehaviour
 {
 	[SerializeField] private float mBumperMultiplier;
-	[SerializeField] private GameObject mGunObject;
+	[SerializeField] private Transform mGunObject;
 	[SerializeField] private GameObject mCanvas;
 	[SerializeField] private UIImage mTmpImage;
-	private float mLeftInput, mRightInput;
+	[SerializeField] private float mSliderTipWeight;
+	[SerializeField] private float mGunMaxRotationRate = 360.0f;
+	[SerializeField] private float mRotationGrowRate = 1.0f;
 
+	private float mLeftInput, mRightInput;
 	private float mSliderVelocity;
 	private float mSliderVal;
+	private float mGunCharge;
 
 	// Use this for initialization
 	private void Start()
@@ -19,8 +22,6 @@ public class PlayerWeaponScript : MonoBehaviour
 		ServiceLocator.Get<IInput>()
 			.RegisterAxis(Input.GetAxis, "J1_LeftBumper", INPUT_LeftBumperInput, KeatsLib.Unity.Input.InputLevel.Gameplay)
 			.RegisterAxis(Input.GetAxis, "J1_RightBumper", INPUT_RightBumperInput, KeatsLib.Unity.Input.InputLevel.Gameplay);
-
-		StartCoroutine(ChooseVelocity());
 	}
 
 	private void INPUT_LeftBumperInput(float val)
@@ -41,6 +42,11 @@ public class PlayerWeaponScript : MonoBehaviour
 		mTmpImage.transform.localPosition = pos;
 
 		mCanvas.transform.LookAt(Camera.main.transform, Vector3.down);
+
+		float chargeChange = (0.5f - Mathf.Abs(mSliderVal)) * 4.0f - 1.0f;
+		mGunCharge += chargeChange * mRotationGrowRate * Time.deltaTime;
+		mGunCharge = Mathf.Clamp(mGunCharge, 0.0f, 1.0f);
+		mGunObject.Rotate(mGunObject.right, mGunMaxRotationRate * mGunCharge * Time.deltaTime, Space.World);
 	}
 
 	private void LateUpdate()
@@ -49,23 +55,6 @@ public class PlayerWeaponScript : MonoBehaviour
 		mSliderVal += (l - r) / 2.0f * Time.deltaTime * mBumperMultiplier;
 
 		mSliderVal += mSliderVelocity * Time.deltaTime;
-	}
-
-	private IEnumerator ChooseVelocity()
-	{
-		while (true)
-		{
-			float currentTime = 0.0f;
-			float targetTime = Random.Range(0.5f, 1.2f);
-			float targetVel = Random.Range(-0.6f, 0.6f);
-
-			while (currentTime < targetTime)
-			{
-				mSliderVelocity = Mathf.Lerp(mSliderVelocity, targetVel, currentTime / targetTime);
-				currentTime += Time.deltaTime;
-			}
-
-			yield return new WaitForSeconds(Random.Range(0.5f, 1.0f));
-		}
+		mSliderVelocity = mSliderVal * mSliderTipWeight;
 	}
 }
