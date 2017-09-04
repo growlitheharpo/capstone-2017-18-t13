@@ -15,7 +15,7 @@ public interface IGameConsole
 	/// </summary>
 	/// <param name="command">The name of the command.</param>
 	/// <param name="handle">The action to call with the command parameters.</param>
-	void RegisterCommand(string command, Action<string[]> handle);
+	IGameConsole RegisterCommand(string command, Action<string[]> handle);
 
 	/// <summary>
 	/// Returns the current systems that are allowed to log.

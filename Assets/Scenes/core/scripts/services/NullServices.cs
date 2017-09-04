@@ -80,9 +80,10 @@ public class NullServices
 			Logger.Info("NULL SERVICE: IGameConsole.AssertCheatsEnabled()", Logger.System.Services);
 		}
 
-		public void RegisterCommand(string command, Action<string[]> handle)
+		public IGameConsole RegisterCommand(string command, Action<string[]> handle)
 		{
 			Logger.Info("NULL SERVICE: IGameConsole.RegisterCommand()", Logger.System.Services);
+			return this;
 		}
 
 		public Logger.System enabledLogLevels
