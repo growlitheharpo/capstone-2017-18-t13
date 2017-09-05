@@ -62,6 +62,9 @@ public partial class GamestateManager : MonoSingleton<GamestateManager>, IGamest
 	public const string MAIN_SCENE = "main";
 	public const string MENU_SCENE = "menu";
 	public const string GAME_SCENE = "scene1";
+	public const string PROTOTYPE1_SCENE = "prototype1";
+	public const string PROTOTYPE2_SCENE = "prototype2";
+	public const string PROTOTYPE3_SCENE = "prototype3";
 
 	private Dictionary<string, IGameState> mBaseStates;
 	private IGameState mCurrentState;
