@@ -22,6 +22,12 @@ namespace Prototype2
 				mDefaultRecoil = other.mDefaultRecoil;
 			}
 
+			public override string ToString()
+			{
+				return string.Format("Spread: {0}, Damage: {1}, FireRate: {2}, Recoil: {3}", mDefaultSpread, mDefaultDamage, mFireRate,
+					mDefaultRecoil);
+			}
+
 			// Clip size, reload speed
 		}
 
@@ -39,7 +45,7 @@ namespace Prototype2
 		private Dictionary<Attachment, WeaponPartScript> mCurrentAttachments;
 		private WeaponData mCurrentData;
 
-		private void Start()
+		private void Awake()
 		{
 			mAttachPoints = new Dictionary<Attachment, Transform>
 			{
@@ -68,6 +74,12 @@ namespace Prototype2
 				start = part.ApplyEffects(start);
 
 			mCurrentData = start;
+		}
+
+		public void FireWeapon()
+		{
+			//we'll do this later
+			Debug.Log("Shoot! " + mCurrentData);
 		}
 	}
 }
