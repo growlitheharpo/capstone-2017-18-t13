@@ -1,5 +1,8 @@
 ﻿
-public interface IDamageReceiver
+namespace Prototype1
 {
-	void ApplyDamage(float amount);
+	public interface IDamageReceiver
+	{
+		void ApplyDamage(float amount);
+	}
 }
