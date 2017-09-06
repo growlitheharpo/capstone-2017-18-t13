@@ -39,6 +39,16 @@ public partial class EventManager
 		OnRequestSceneChange(sceneName);
 	}
 
+	// PROTOTYPE 2
+	public static event Action OnUIToggle = () => { LogEvent(); };
+
+	public static void UIToggle()
+	{
+		OnUIToggle();
+	}
+
+	//!PROTOTYPE 2
+
 	public void Start()
 	{
 		ServiceLocator.Get<IGameConsole>().RegisterCommand("event_fire", FireEventFromConsole);
