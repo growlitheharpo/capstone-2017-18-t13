@@ -59,6 +59,9 @@ namespace Prototype2
 
 		public void AttachNewPart(Attachment place, WeaponPartScript part)
 		{
+			if (mCurrentAttachments.ContainsKey(place))
+				Destroy(mCurrentAttachments[place].gameObject);
+
 			part.transform.SetParent(mAttachPoints[place]);
 			part.transform.localPosition = Vector3.zero;
 			part.transform.localRotation = Quaternion.identity;
