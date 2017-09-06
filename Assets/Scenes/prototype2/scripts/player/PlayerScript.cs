@@ -19,6 +19,13 @@ namespace Prototype2
 				.EnableInputLevel(KeatsLib.Unity.Input.InputLevel.Gameplay);
 		}
 
+		private void OnDestroy()
+		{
+			ServiceLocator.Get<IInput>()
+				.UnregisterInput(INPUT_ToggleUIElement)
+				.UnregisterInput(INPUT_FireWeapon);
+		}
+
 		private void INPUT_ToggleUIElement()
 		{
 			EventManager.Notify(EventManager.UIToggle);

@@ -49,6 +49,7 @@ namespace Prototype2
 			mBarrel02Button.OnClick -= ApplyBarrel02;
 			mScope01Button.OnClick -= ApplyScope01;
 			mScope02Button.OnClick -= ApplyScope02;
+			EventManager.OnUIToggle -= HandleUIToggle;
 		}
 
 		private void ApplyBarrel01()

@@ -86,7 +86,10 @@ public partial class GamestateManager : MonoSingleton<GamestateManager>, IGamest
 		{
 			{ MAIN_SCENE, new TransitionToSceneState(MENU_SCENE) },
 			{ MENU_SCENE, new MenuSceneState() },
-			{ GAME_SCENE, new GameSceneState() }
+			{ GAME_SCENE, new GameSceneState() },
+			{ PROTOTYPE1_SCENE, new GameSceneState() },
+			{ PROTOTYPE2_SCENE, new GameSceneState() },
+			{ PROTOTYPE3_SCENE, new GameSceneState() },
 		};
 
 		EventManager.OnRequestSceneChange += ReceiveSceneChangeRequest;
@@ -102,6 +105,9 @@ public partial class GamestateManager : MonoSingleton<GamestateManager>, IGamest
 		mCurrentState = new InitializeGameState();
 		Logger.Info("Setting current state to InitializeGameState", Logger.System.State);
 		mCurrentState.OnEnter();
+
+		ServiceLocator.Get<IGameConsole>()
+			.RegisterCommand("close", s => EventManager.Notify(() => EventManager.RequestSceneChange(MENU_SCENE)));
 	}
 
 	private void Update()
