@@ -80,9 +80,9 @@ public class Modifier
 
 	public enum ModType
 	{
-		SetAbsolute,
-		SetPercentage,
 		AdditiveAbsolute,
-		AdditivePercent
+		SetAbsolute,
+		AdditivePercent,
+		SetPercentage,
 	}
 }
