@@ -7,12 +7,15 @@ namespace Prototype2
 	public class SampleTargetScript : MonoBehaviour, IDamageReceiver
 	{
 		[SerializeField] private UIText mText;
+		[SerializeField] private GameObject mHitIndicator;
 		
-		public void ApplyDamage(float amount)
+		public void ApplyDamage(float amount, Vector3 point)
 		{
 			StopAllCoroutines();
 			mText.color = new Color(0.4f, 0.4f, 0.4f, 1.0f);
 			mText.text = "Damage:\n" + amount.ToString("####");
+
+			Instantiate(mHitIndicator, point, Quaternion.identity);
 
 			StartCoroutine(FadeText());
 		}

@@ -21,7 +21,7 @@ GameObject:
   - component: {fileID: 224516292865650724}
   - component: {fileID: 222805715758132002}
   - component: {fileID: 114430386460282732}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -39,7 +39,7 @@ GameObject:
   - component: {fileID: 223861051501629276}
   - component: {fileID: 114554997009478952}
   - component: {fileID: 114862031180789266}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -54,8 +54,8 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4183376461698450}
-  - component: {fileID: 114385911172523030}
-  m_Layer: 8
+  - component: {fileID: 114282121691719356}
+  m_Layer: 0
   m_Name: p_sampleTarget
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -73,7 +73,7 @@ GameObject:
   - component: {fileID: 33746441935826474}
   - component: {fileID: 136161279229296908}
   - component: {fileID: 23615507023672684}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: p_sampleTargetView
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -100,7 +100,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1421920764596440}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.5, z: 8}
+  m_LocalPosition: {x: 0, y: 1.5, z: 11}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4021424900487442}
@@ -121,7 +121,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_Materials:
-  - {fileID: 2100000, guid: f499a63ce9198c5429645ab42b1c2bbd, type: 2}
+  - {fileID: 2100000, guid: a545126c886b06048934c469193c829e, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -147,7 +147,7 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1566193802756944}
   m_Mesh: {fileID: 10206, guid: 0000000000000000e000000000000000, type: 0}
---- !u!114 &114385911172523030
+--- !u!114 &114282121691719356
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -155,10 +155,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 1421920764596440}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e25c66c2a6c96e341816822914e161ef, type: 3}
+  m_Script: {fileID: 11500000, guid: ab07c9436f8fd1743a04c2dd8cccf539, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   mText: {fileID: 114430386460282732}
+  mHitIndicator: {fileID: 1165381098778742, guid: 2f4b2814662103c469918723097ea370,
+    type: 2}
 --- !u!114 &114430386460282732
 MonoBehaviour:
   m_ObjectHideFlags: 1

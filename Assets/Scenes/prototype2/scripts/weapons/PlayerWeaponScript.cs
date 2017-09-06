@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace Prototype2
 {
@@ -37,6 +38,7 @@ namespace Prototype2
 			Barrel,
 		}
 
+		[SerializeField] private ParticleSystem mShotParticles;
 		[SerializeField] private WeaponData mBaseData;
 		[SerializeField] private Transform mBarrelAttach;
 		[SerializeField] private Transform mScopeAttach;
@@ -44,6 +46,9 @@ namespace Prototype2
 		private Dictionary<Attachment, Transform> mAttachPoints;
 		private Dictionary<Attachment, WeaponPartScript> mCurrentAttachments;
 		private WeaponData mCurrentData;
+		private float mCooldown;
+
+		private const float DEFAULT_SPREAD_FACTOR = 0.001f;
 
 		private void Awake()
 		{
@@ -81,8 +86,36 @@ namespace Prototype2
 
 		public void FireWeapon()
 		{
-			//we'll do this later
-			Debug.Log("Shoot! " + mCurrentData);
+			if (mCooldown > 0.0f)
+				return;
+
+			Logger.Info("Shoot! " + mCurrentData);
+			Transform p = transform.parent;
+
+			mCooldown = 1.0f / mCurrentData.mFireRate;
+
+			float spreadFactor = DEFAULT_SPREAD_FACTOR * mCurrentData.mDefaultSpread;
+			Vector3 randomness = new Vector3(Random.Range(-spreadFactor, spreadFactor), Random.Range(-spreadFactor, spreadFactor), Random.Range(-spreadFactor, spreadFactor));
+			Ray ray = new Ray(p.position + p.up * 1.5f, p.forward + randomness);
+
+			Debug.DrawLine(ray.origin, ray.origin + ray.direction * 2000.0f, Color.red, mCooldown + 0.2f);
+
+			RaycastHit hit;
+			if (!Physics.Raycast(ray, out hit, 2500.0f))
+				return;
+
+			mShotParticles.Stop();
+			mShotParticles.time = 0.0f;
+			mShotParticles.Play();
+
+			IDamageReceiver component = hit.transform.parent.GetComponent<IDamageReceiver>();
+			if (component != null)
+				component.ApplyDamage(mCurrentData.mDefaultDamage, hit.point);
+		}
+
+		private void Update()
+		{
+			mCooldown -= Time.deltaTime;
 		}
 	}
 }
