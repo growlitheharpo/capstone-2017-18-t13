@@ -71,8 +71,8 @@ GameObject:
   m_Component:
   - component: {fileID: 4021424900487442}
   - component: {fileID: 33746441935826474}
-  - component: {fileID: 136161279229296908}
   - component: {fileID: 23615507023672684}
+  - component: {fileID: 65518159601736208}
   m_Layer: 0
   m_Name: p_sampleTargetView
   m_TagString: Untagged
@@ -147,6 +147,18 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1566193802756944}
   m_Mesh: {fileID: 10206, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!65 &65518159601736208
+BoxCollider:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1566193802756944}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1.0000001, y: 2.0000002, z: 1.0000001}
+  m_Center: {x: 0.000000059604645, y: -4.2632564e-14, z: -0.00000008940696}
 --- !u!114 &114282121691719356
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -233,19 +245,6 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
---- !u!136 &136161279229296908
-CapsuleCollider:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1566193802756944}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  m_Radius: 0.5
-  m_Height: 2
-  m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!222 &222805715758132002
 CanvasRenderer:
   m_ObjectHideFlags: 1
