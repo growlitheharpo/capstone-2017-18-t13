@@ -42,7 +42,7 @@ public class GameConsole : MonoSingleton<GameConsole>, IGameConsole
 	/// <inheritdoc />
 	public IGameConsole RegisterCommand(string command, Action<string[]> handle)
 	{
-		mCommandHandlers.Add(command, handle);
+		mCommandHandlers[command] = handle;
 		return this;
 	}
 

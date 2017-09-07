@@ -47,6 +47,18 @@ namespace Prototype1
 				.PlaySound(AudioManager.AudioEvent.PrimaryEffect1, mSfxProfile as IAudioProfile, mGunObject);
 		}
 
+		private void OnDestroy()
+		{
+			ServiceLocator.Get<IInput>()
+				.UnregisterAxis(INPUT_LeftBumperInput)
+				.UnregisterAxis(INPUT_RightBumperInput)
+				.UnregisterInput(INPUT_FireWeapon);
+
+			IAudioManager manager = ServiceLocator.Get<IAudioManager>();
+			if (manager.CheckReferenceAlive(ref mSwishSound) != null)
+				mSwishSound.Kill();
+		}
+
 		#region Service Callbacks
 
 		private void INPUT_LeftBumperInput(float val)
