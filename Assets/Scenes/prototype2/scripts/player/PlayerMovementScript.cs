@@ -53,8 +53,15 @@ namespace Prototype2
 			mCumulativeMovement += transform.right * val * mMovementData.strafeSpeed;
 		}
 
-		private void INPUT_LookHorizontal(float val) { }
-		private void INPUT_LookVertical(float val) { }
+		private void INPUT_LookHorizontal(float val)
+		{
+			mRotationAmount.x += val;
+		}
+
+		private void INPUT_LookVertical(float val)
+		{
+			mRotationAmount.y += val;
+		}
 
 		private void Update()
 		{

@@ -89,14 +89,12 @@ namespace Prototype2
 			if (mCooldown > 0.0f)
 				return;
 
-			Logger.Info("Shoot! " + mCurrentData);
-			Transform p = transform.parent;
-
+			Transform playerEye = Camera.main.transform;
 			mCooldown = 1.0f / mCurrentData.mFireRate;
 
 			float spreadFactor = DEFAULT_SPREAD_FACTOR * mCurrentData.mDefaultSpread;
 			Vector3 randomness = new Vector3(Random.Range(-spreadFactor, spreadFactor), Random.Range(-spreadFactor, spreadFactor), Random.Range(-spreadFactor, spreadFactor));
-			Ray ray = new Ray(p.position + p.up * 1.5f, p.forward + randomness);
+			Ray ray = new Ray(playerEye.position, playerEye.forward + randomness);
 
 			Debug.DrawLine(ray.origin, ray.origin + ray.direction * 2000.0f, Color.red, mCooldown + 0.2f);
 

@@ -44,7 +44,7 @@ public partial class GamestateManager : MonoSingleton<GamestateManager>, IGamest
 		public virtual void OnEnter() { }
 
 		/// <inheritdoc />
-		public void Update() { }
+		public virtual void Update() { }
 
 		/// <inheritdoc />
 		public virtual bool safeToTransition { get { return true;  }}
@@ -89,7 +89,7 @@ public partial class GamestateManager : MonoSingleton<GamestateManager>, IGamest
 			{ MENU_SCENE, new MenuSceneState() },
 			{ GAME_SCENE, new GameSceneState() },
 			{ PROTOTYPE1_SCENE, new GameSceneState() },
-			{ PROTOTYPE2_SCENE, new GameSceneState() },
+			{ PROTOTYPE2_SCENE, new Prototype2State() },
 			{ PROTOTYPE3_SCENE, new GameSceneState() },
 			{ ART_PROTOTYPE_SCENE, new GameSceneState() },
 		};
