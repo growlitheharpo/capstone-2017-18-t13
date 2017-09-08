@@ -55,26 +55,22 @@ namespace Prototype2
 		private void ApplyBarrel01()
 		{
 			mPlayerWeaponRef.AttachNewPart(PlayerWeaponScript.Attachment.Barrel, Instantiate(mBarrel01).GetComponent<WeaponPartScript>());
-			EventManager.Notify(EventManager.UIToggle);
 		}
 
 		private void ApplyBarrel02()
 		{
 			mPlayerWeaponRef.AttachNewPart(PlayerWeaponScript.Attachment.Barrel, Instantiate(mBarrel02).GetComponent<WeaponPartScript>());
-			EventManager.Notify(EventManager.UIToggle);
 		}
 
 		private void ApplyScope01()
 		{
 
 			mPlayerWeaponRef.AttachNewPart(PlayerWeaponScript.Attachment.Scope, Instantiate(mScope01).GetComponent<WeaponPartScript>());
-			EventManager.Notify(EventManager.UIToggle);
 		}
 
 		private void ApplyScope02()
 		{
 			mPlayerWeaponRef.AttachNewPart(PlayerWeaponScript.Attachment.Scope, Instantiate(mScope02).GetComponent<WeaponPartScript>());
-			EventManager.Notify(EventManager.UIToggle);
 		}
 	}
 }
