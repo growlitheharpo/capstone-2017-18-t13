@@ -9,17 +9,20 @@ namespace Prototype2
 		[SerializeField] private CharacterMovementData mMovementData;
 		[SerializeField] private LayerMask mJumpLayermask;
 
+		private CapsuleCollider mCollider;
 		private Transform mMainCameraRef;
 		private Rigidbody mRigidbody;
 
 		private Vector3 mCumulativeMovement;
 		private Vector2 mRotationAmount;
-		private bool mJump;
+		private bool mJump, mCrouching;
 
+		private const float STANDING_HEIGHT = 3.0f, CROUCHING_HEIGHT = 1.5f;
 		private const float DOWNFORCE_MULT = 2.5f;
 
 		private void Awake()
 		{
+			mCollider = GetComponent<CapsuleCollider>();
 			mRigidbody = GetComponent<Rigidbody>();
 			mMainCameraRef = Camera.main.transform;
 		}
@@ -34,6 +37,8 @@ namespace Prototype2
 				.RegisterAxis(Input.GetAxis, "J1_RightStickH", INPUT_LookHorizontal, KeatsLib.Unity.Input.InputLevel.Gameplay)
 				.RegisterAxis(Input.GetAxis, "J1_RightStickV", INPUT_LookVertical, KeatsLib.Unity.Input.InputLevel.Gameplay)
 				.RegisterInput(Input.GetButtonDown, "Jump", INPUT_Jump, KeatsLib.Unity.Input.InputLevel.Gameplay)
+				.RegisterInput(Input.GetButtonDown, "Crouch", INPUT_CrouchStart, KeatsLib.Unity.Input.InputLevel.Gameplay)
+				.RegisterInput(Input.GetButtonUp, "Crouch", INPUT_CrouchStop, KeatsLib.Unity.Input.InputLevel.Gameplay)
 				.EnableInputLevel(KeatsLib.Unity.Input.InputLevel.Gameplay);
 		}
 
@@ -41,6 +46,8 @@ namespace Prototype2
 		{
 			ServiceLocator.Get<IInput>()
 				.UnregisterInput(INPUT_Jump)
+				.UnregisterInput(INPUT_CrouchStart)
+				.UnregisterInput(INPUT_CrouchStop)
 				.UnregisterAxis(INPUT_ForwardBackMovement)
 				.UnregisterAxis(INPUT_LeftRightMovement)
 				.UnregisterAxis(INPUT_LookHorizontal)
@@ -56,6 +63,16 @@ namespace Prototype2
 
 			if (Physics.Raycast(r, dist, mJumpLayermask))
 				mJump = true;
+		}
+
+		private void INPUT_CrouchStart()
+		{
+			mCrouching = true;
+		}
+
+		private void INPUT_CrouchStop()
+		{
+			mCrouching = false;
 		}
 
 		private void INPUT_ForwardBackMovement(float val)
@@ -81,6 +98,7 @@ namespace Prototype2
 		private void Update()
 		{
 			HandleRotation();
+			UpdateCrouch();
 		}
 
 		private void HandleRotation()
@@ -93,6 +111,12 @@ namespace Prototype2
 			mMainCameraRef.RotateAround(mMainCameraRef.position, mMainCameraRef.right, -rotation.y);
 
 			mRotationAmount = Vector2.zero;
+		}
+
+		private void UpdateCrouch()
+		{
+			float current = mCollider.height;
+			mCollider.height = Mathf.Lerp(current, mCrouching ? CROUCHING_HEIGHT : STANDING_HEIGHT, Time.deltaTime * mMovementData.crouchSpeed);
 		}
 
 		private void FixedUpdate()
