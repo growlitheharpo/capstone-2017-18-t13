@@ -47,6 +47,13 @@ public partial class EventManager
 		OnUIToggle();
 	}
 
+	public static event Action<Prototype2.WeaponPartScript> OnConfirmPartAttach = e => { LogEvent(); };
+
+	public static void ConfirmPartAttach(Prototype2.WeaponPartScript newPart)
+	{
+		OnConfirmPartAttach(newPart);
+	}
+
 	//!PROTOTYPE 2
 
 	public void Start()

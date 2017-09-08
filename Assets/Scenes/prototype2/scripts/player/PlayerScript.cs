@@ -14,8 +14,8 @@ namespace Prototype2
 
 		private void Start()
 		{
-			mWeapon.AttachNewPart(PlayerWeaponScript.Attachment.Barrel, Instantiate(mDefaultBarrel).GetComponent<WeaponPartScript>());
-			mWeapon.AttachNewPart(PlayerWeaponScript.Attachment.Scope, Instantiate(mDefaultScope).GetComponent<WeaponPartScript>());
+			Instantiate(mDefaultBarrel).GetComponent<WeaponPickupScript>().ConfirmAttach();
+			Instantiate(mDefaultScope).GetComponent<WeaponPickupScript>().ConfirmAttach();
 
 			mMainCameraRef = Camera.main.transform;
 

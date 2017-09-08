@@ -13,8 +13,6 @@ namespace Prototype2
 		[SerializeField] private GameObject mBarrel02;
 		[SerializeField] private GameObject mScope01;
 		[SerializeField] private GameObject mScope02;
-		[SerializeField] private PlayerWeaponScript mPlayerWeaponRef;
-
 		private bool mEnabled = true; //everything starts enabled
 
 		private void Start()
@@ -54,23 +52,22 @@ namespace Prototype2
 
 		private void ApplyBarrel01()
 		{
-			mPlayerWeaponRef.AttachNewPart(PlayerWeaponScript.Attachment.Barrel, Instantiate(mBarrel01).GetComponent<WeaponPartScript>());
+			Instantiate(mBarrel01).GetComponent<WeaponPickupScript>().ConfirmAttach();
 		}
 
 		private void ApplyBarrel02()
 		{
-			mPlayerWeaponRef.AttachNewPart(PlayerWeaponScript.Attachment.Barrel, Instantiate(mBarrel02).GetComponent<WeaponPartScript>());
+			Instantiate(mBarrel02).GetComponent<WeaponPickupScript>().ConfirmAttach();
 		}
 
 		private void ApplyScope01()
 		{
-
-			mPlayerWeaponRef.AttachNewPart(PlayerWeaponScript.Attachment.Scope, Instantiate(mScope01).GetComponent<WeaponPartScript>());
+			Instantiate(mScope01).GetComponent<WeaponPickupScript>().ConfirmAttach();
 		}
 
 		private void ApplyScope02()
 		{
-			mPlayerWeaponRef.AttachNewPart(PlayerWeaponScript.Attachment.Scope, Instantiate(mScope02).GetComponent<WeaponPartScript>());
+			Instantiate(mScope02).GetComponent<WeaponPickupScript>().ConfirmAttach();
 		}
 	}
 }

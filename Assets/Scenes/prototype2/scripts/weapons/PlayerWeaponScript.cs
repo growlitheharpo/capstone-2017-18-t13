@@ -49,15 +49,22 @@ namespace Prototype2
 		{
 			mMainCameraRef = Camera.main.transform;
 			mCameraOffset = mMainCameraRef.InverseTransformPoint(transform.position);
+			EventManager.OnConfirmPartAttach += AttachNewPart;
 		}
 
+		private void OnDestroy()
+		{
+			EventManager.OnConfirmPartAttach -= AttachNewPart;
+		}
+		
 		/// <summary>
 		/// Attach a new part to the weapon in the given attachment slot.
 		/// </summary>
-		/// <param name="place">The slot to replace and apply the weapon.</param>
 		/// <param name="part">The new WeaponPartScript to be applied.</param>
-		public void AttachNewPart(Attachment place, WeaponPartScript part)
+		private void AttachNewPart(WeaponPartScript part)
 		{
+			Attachment place = part.attachPoint;
+
 			if (mCurrentAttachments.ContainsKey(place))
 				Destroy(mCurrentAttachments[place].gameObject);
 
