@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -7,31 +6,6 @@ namespace Prototype2
 {
 	public class PlayerWeaponScript : MonoBehaviour
 	{
-		[Serializable]
-		public struct WeaponData
-		{
-			[SerializeField] public float mDefaultSpread;
-			[SerializeField] public float mDefaultDamage;
-			[SerializeField] public float mFireRate;
-			[SerializeField] [Range(0.0f, 1.0f)] public float mDefaultRecoil;
-
-			public WeaponData(WeaponData other)
-			{
-				mDefaultSpread = other.mDefaultSpread;
-				mDefaultDamage = other.mDefaultDamage;
-				mFireRate = other.mFireRate;
-				mDefaultRecoil = other.mDefaultRecoil;
-			}
-
-			public override string ToString()
-			{
-				return string.Format("Spread: {0}, Damage: {1}, FireRate: {2}, Recoil: {3}", mDefaultSpread, mDefaultDamage, mFireRate,
-					mDefaultRecoil);
-			}
-
-			// Clip size, reload speed
-		}
-
 		public enum Attachment
 		{
 			Scope,
@@ -43,11 +17,15 @@ namespace Prototype2
 		[SerializeField] private Transform mBarrelAttach;
 		[SerializeField] private Transform mScopeAttach;
 
+		private Transform mMainCameraRef;
+		
 		private Dictionary<Attachment, Transform> mAttachPoints;
 		private Dictionary<Attachment, WeaponPartScript> mCurrentAttachments;
 		private WeaponData mCurrentData;
+		private Vector3 mCameraOffset;
 		private float mCooldown;
 
+		private const float CAMERA_FOLLOW_FACTOR = 10.0f;
 		private const float DEFAULT_SPREAD_FACTOR = 0.001f;
 
 		private void Awake()
@@ -60,6 +38,12 @@ namespace Prototype2
 
 			mCurrentAttachments = new Dictionary<Attachment, WeaponPartScript>(2);
 			mCurrentData = new WeaponData(mBaseData);
+		}
+
+		private void Start()
+		{
+			mMainCameraRef = Camera.main.transform;
+			mCameraOffset = mMainCameraRef.InverseTransformPoint(transform.position);
 		}
 
 		public void AttachNewPart(Attachment place, WeaponPartScript part)
@@ -79,7 +63,10 @@ namespace Prototype2
 		{
 			WeaponData start = new WeaponData(mBaseData);
 			foreach (WeaponPartScript part in mCurrentAttachments.Values)
-				start = part.ApplyEffects(start);
+			{
+				foreach (WeaponPartData effect in part.data)
+					start = new WeaponData(start, effect);
+			}
 
 			mCurrentData = start;
 		}
@@ -113,7 +100,17 @@ namespace Prototype2
 
 		private void Update()
 		{
+			FollowCamera();
 			mCooldown -= Time.deltaTime;
+		}
+
+		private void FollowCamera()
+		{
+			Vector3 location = transform.position;
+			Vector3 targetLocation = mMainCameraRef.TransformPoint(mCameraOffset);
+
+			transform.position = Vector3.Lerp(location, targetLocation, Time.deltaTime * CAMERA_FOLLOW_FACTOR);
+			transform.rotation = Quaternion.Lerp(transform.rotation, mMainCameraRef.rotation, Time.deltaTime * CAMERA_FOLLOW_FACTOR);
 		}
 	}
 }

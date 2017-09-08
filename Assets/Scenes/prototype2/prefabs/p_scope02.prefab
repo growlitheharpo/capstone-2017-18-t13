@@ -20,7 +20,6 @@ GameObject:
   m_Component:
   - component: {fileID: 4507263811832216}
   - component: {fileID: 33858998796921946}
-  - component: {fileID: 65748294922276994}
   - component: {fileID: 23369175283533668}
   m_Layer: 0
   m_Name: Cube
@@ -38,7 +37,6 @@ GameObject:
   m_Component:
   - component: {fileID: 4804393238865280}
   - component: {fileID: 33026630713163584}
-  - component: {fileID: 136095646915774892}
   - component: {fileID: 23756256706786908}
   m_Layer: 0
   m_Name: Cylinder
@@ -55,7 +53,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4065866548179430}
-  - component: {fileID: 114030960291694452}
+  - component: {fileID: 114578221820155564}
   m_Layer: 0
   m_Name: p_scope02
   m_TagString: Untagged
@@ -70,7 +68,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1967676427755860}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.46, y: 2.179, z: -1.211}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4507263811832216}
@@ -182,19 +180,7 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1076215994091186}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!65 &65748294922276994
-BoxCollider:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1076215994091186}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &114030960291694452
+--- !u!114 &114578221820155564
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -202,31 +188,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 1967676427755860}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: adef2e54f09393e4f87b9f116662c1a2, type: 3}
+  m_Script: {fileID: 11500000, guid: ea66c356b6a1c2b4297bc69a9b0a1f74, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mRecoilModifier:
-    mAmount: 0.15
-    mType: 1
-  mSpreadModifier:
-    mAmount: 5
-    mType: 1
-  mFireRateModifier:
-    mAmount: 0
-    mType: 0
-  mDamageModifier:
-    mAmount: 0
-    mType: 0
---- !u!136 &136095646915774892
-CapsuleCollider:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1104631311923672}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  m_Radius: 0.5
-  m_Height: 2
-  m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0}
+  mData:
+  - {fileID: 11400000, guid: a58720100eaa9c44d821e77c21d33531, type: 2}

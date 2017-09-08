@@ -22,7 +22,7 @@ GameObject:
   - component: {fileID: 33358819840258740}
   - component: {fileID: 65089940229160002}
   - component: {fileID: 23385452677367388}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Cube (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -40,7 +40,7 @@ GameObject:
   - component: {fileID: 33563037186408298}
   - component: {fileID: 65587705502751250}
   - component: {fileID: 23345675380463806}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Cube (3)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -55,7 +55,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4096145057804758}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: BarrelAttach
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -72,7 +72,7 @@ GameObject:
   - component: {fileID: 4947061781466740}
   - component: {fileID: 198036377436996958}
   - component: {fileID: 199308468878435562}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: shot_particles
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -87,7 +87,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4197488167877586}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: ScopeAttach
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -105,7 +105,7 @@ GameObject:
   - component: {fileID: 33710485817600558}
   - component: {fileID: 65751191176415522}
   - component: {fileID: 23436840907265892}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Cube (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -120,7 +120,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4001952394694160}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: View
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -136,7 +136,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4064075139203806}
   - component: {fileID: 114397685040299484}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: p_placeholderGun
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -423,9 +423,10 @@ MonoBehaviour:
     mDefaultSpread: 50
     mDefaultDamage: 50
     mFireRate: 2
-    mDefaultRecoil: 0.5
   mBarrelAttach: {fileID: 4096145057804758}
   mScopeAttach: {fileID: 4197488167877586}
+  rotMult: 10
+  posMult: 10
 --- !u!198 &198036377436996958
 ParticleSystem:
   m_ObjectHideFlags: 1
