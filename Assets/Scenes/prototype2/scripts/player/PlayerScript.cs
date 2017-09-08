@@ -14,7 +14,7 @@ namespace Prototype2
 			mWeapon.AttachNewPart(PlayerWeaponScript.Attachment.Scope, Instantiate(mDefaultScope).GetComponent<WeaponPartScript>());
 
 			ServiceLocator.Get<IInput>()
-				.RegisterInput(Input.GetKeyDown, KeyCode.Space, INPUT_ToggleUIElement, KeatsLib.Unity.Input.InputLevel.None)
+				.RegisterInput(Input.GetKeyDown, KeyCode.Tab, INPUT_ToggleUIElement, KeatsLib.Unity.Input.InputLevel.None)
 				.RegisterInput(Input.GetMouseButton, 0, INPUT_FireWeapon, KeatsLib.Unity.Input.InputLevel.Gameplay)
 				.EnableInputLevel(KeatsLib.Unity.Input.InputLevel.Gameplay);
 		}
