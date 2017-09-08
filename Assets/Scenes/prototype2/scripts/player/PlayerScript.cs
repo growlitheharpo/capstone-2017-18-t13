@@ -7,21 +7,29 @@ namespace Prototype2
 		[SerializeField] private PlayerWeaponScript mWeapon;
 		[SerializeField] private GameObject mDefaultScope;
 		[SerializeField] private GameObject mDefaultBarrel;
+		[SerializeField] private float mInteractDistance;
+
+		private Transform mMainCameraRef;
+		private const string INTERACTABLE_TAG = "interactable";
 
 		private void Start()
 		{
 			mWeapon.AttachNewPart(PlayerWeaponScript.Attachment.Barrel, Instantiate(mDefaultBarrel).GetComponent<WeaponPartScript>());
 			mWeapon.AttachNewPart(PlayerWeaponScript.Attachment.Scope, Instantiate(mDefaultScope).GetComponent<WeaponPartScript>());
 
+			mMainCameraRef = Camera.main.transform;
+
 			ServiceLocator.Get<IInput>()
 				.RegisterInput(Input.GetKeyDown, KeyCode.Tab, INPUT_ToggleUIElement, KeatsLib.Unity.Input.InputLevel.None)
-				.RegisterInput(Input.GetMouseButton, 0, INPUT_FireWeapon, KeatsLib.Unity.Input.InputLevel.Gameplay)
+				.RegisterInput(Input.GetButton, "Fire1", INPUT_FireWeapon, KeatsLib.Unity.Input.InputLevel.Gameplay)
+				.RegisterInput(Input.GetButtonDown, "Interact", INPUT_ActivateInteract, KeatsLib.Unity.Input.InputLevel.Gameplay)
 				.EnableInputLevel(KeatsLib.Unity.Input.InputLevel.Gameplay);
 		}
 
 		private void OnDestroy()
 		{
 			ServiceLocator.Get<IInput>()
+				.UnregisterInput(INPUT_ActivateInteract)
 				.UnregisterInput(INPUT_ToggleUIElement)
 				.UnregisterInput(INPUT_FireWeapon);
 		}
@@ -34,6 +42,19 @@ namespace Prototype2
 		private void INPUT_FireWeapon()
 		{
 			mWeapon.FireWeapon();
+		}
+
+		private void INPUT_ActivateInteract()
+		{
+			Ray ray = new Ray(mMainCameraRef.position, mMainCameraRef.forward);
+			
+			RaycastHit hit;
+			if (!Physics.Raycast(ray, out hit, mInteractDistance) || !hit.collider.CompareTag(INTERACTABLE_TAG))
+				return;
+
+			IInteractable interactable = hit.transform.GetComponent<IInteractable>() ?? hit.transform.parent.GetComponent<IInteractable>();
+			if (interactable != null)
+				interactable.Interact();
 		}
 	}
 }
