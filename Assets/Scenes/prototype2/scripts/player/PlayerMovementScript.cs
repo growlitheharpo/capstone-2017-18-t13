@@ -4,6 +4,11 @@ using Input = UnityEngine.Input;
 
 namespace Prototype2
 {
+	/// <summary>
+	/// Component strictly for handling the movement of the character
+	/// object through the game world.
+	/// </summary>
+	/// <inheritdoc />
 	public class PlayerMovementScript : MonoBehaviour
 	{
 		[SerializeField] private CharacterMovementData mMovementData;
@@ -54,26 +59,7 @@ namespace Prototype2
 				.UnregisterAxis(INPUT_LookVertical);
 		}
 
-		private void INPUT_Jump()
-		{
-			Ray r = new Ray(transform.position + Vector3.up * 0.5f, Vector3.up * -1.0f);
-			const float dist = 0.51f;
-
-			Debug.DrawLine(r.origin, r.origin + r.direction * dist, Color.green, 0.5f);
-
-			if (Physics.Raycast(r, dist, mJumpLayermask))
-				mJump = true;
-		}
-
-		private void INPUT_CrouchStart()
-		{
-			mCrouching = true;
-		}
-
-		private void INPUT_CrouchStop()
-		{
-			mCrouching = false;
-		}
+		#region Input Delegates
 
 		private void INPUT_ForwardBackMovement(float val)
 		{
@@ -95,16 +81,47 @@ namespace Prototype2
 			mRotationAmount.y += val;
 		}
 
+		private void INPUT_Jump()
+		{
+			Ray r = new Ray(transform.position + Vector3.up * 0.5f, Vector3.up * -1.0f);
+			const float dist = 0.51f;
+
+			Debug.DrawLine(r.origin, r.origin + r.direction * dist, Color.green, 0.5f);
+
+			if (Physics.Raycast(r, dist, mJumpLayermask))
+				mJump = true;
+		}
+
+		private void INPUT_CrouchStart()
+		{
+			mCrouching = true;
+		}
+
+		private void INPUT_CrouchStop()
+		{
+			mCrouching = false;
+		}
+
+		#endregion
+
 		private void Update()
 		{
 			HandleRotation();
 			UpdateCrouch();
 		}
 
+		private void FixedUpdate()
+		{
+			ApplyMovementForce();
+		}
+
+		/// <summary>
+		/// Follow the mouse or joystick rotation.
+		/// Horizontal rotation is applied to this.transform.
+		/// Vertical rotation is only applied to Camera.main.transform.
+		/// </summary>
 		private void HandleRotation()
 		{
-			// horizontal rotation is applied to us
-			// vertical rotation is applied only to the camera
 			Vector2 rotation = mRotationAmount * mMovementData.lookSpeed;
 
 			transform.RotateAround(transform.position, transform.up, rotation.x);
@@ -113,13 +130,19 @@ namespace Prototype2
 			mRotationAmount = Vector2.zero;
 		}
 
+		/// <summary>
+		/// Squish or stretch our collider based on the crouch state.
+		/// </summary>
 		private void UpdateCrouch()
 		{
 			float current = mCollider.height;
 			mCollider.height = Mathf.Lerp(current, mCrouching ? CROUCHING_HEIGHT : STANDING_HEIGHT, Time.deltaTime * mMovementData.crouchSpeed);
 		}
 
-		private void FixedUpdate()
+		/// <summary>
+		/// Apply movement based on the input we received this frame.
+		/// </summary>
+		private void ApplyMovementForce()
 		{
 			Vector3 movement = mCumulativeMovement.ClampMagnitude(mMovementData.forwardSpeed * Time.deltaTime);
 			mRigidbody.AddForce(movement, ForceMode.Acceleration);

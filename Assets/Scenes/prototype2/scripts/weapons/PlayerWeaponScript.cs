@@ -4,6 +4,11 @@ using Random = UnityEngine.Random;
 
 namespace Prototype2
 {
+	/// <summary>
+	/// Component strictly for handling the player's weapon
+	/// and how it behaves.
+	/// </summary>
+	/// <inheritdoc />
 	public class PlayerWeaponScript : MonoBehaviour
 	{
 		public enum Attachment
@@ -46,6 +51,11 @@ namespace Prototype2
 			mCameraOffset = mMainCameraRef.InverseTransformPoint(transform.position);
 		}
 
+		/// <summary>
+		/// Attach a new part to the weapon in the given attachment slot.
+		/// </summary>
+		/// <param name="place">The slot to replace and apply the weapon.</param>
+		/// <param name="part">The new WeaponPartScript to be applied.</param>
 		public void AttachNewPart(Attachment place, WeaponPartScript part)
 		{
 			if (mCurrentAttachments.ContainsKey(place))
@@ -59,6 +69,9 @@ namespace Prototype2
 			ActivatePartEffects();
 		}
 
+		/// <summary>
+		/// Loop through all parts and all effects per part and apply their modifiers.
+		/// </summary>
 		private void ActivatePartEffects()
 		{
 			WeaponData start = new WeaponData(mBaseData);
@@ -71,29 +84,63 @@ namespace Prototype2
 			mCurrentData = start;
 		}
 
+		/// <summary>
+		/// Begin the fire procedure for the weapon based on whatever its current modifications are.
+		/// </summary>
 		public void FireWeapon()
 		{
 			if (mCooldown > 0.0f)
 				return;
 
-			Transform playerEye = Camera.main.transform;
+			PlayShotEffect();
+
+			Ray shot = CalculateShotDirection();
+
+			FireShot(shot);
+		}
+
+		/// <summary>
+		/// Play any SFX and VFX associated with the weapon based on its current mods.
+		/// </summary>
+		private void PlayShotEffect()
+		{
+			mShotParticles.Stop();
+			mShotParticles.time = 0.0f;
+			mShotParticles.Play();
+		}
+
+		/// <summary>
+		/// Determine the direction our shot will travel based on the camera, current spread variables, etc.
+		/// </summary>
+		private Ray CalculateShotDirection()
+		{
 			mCooldown = 1.0f / mCurrentData.mFireRate;
 
 			float spreadFactor = DEFAULT_SPREAD_FACTOR * mCurrentData.mDefaultSpread;
-			Vector3 randomness = new Vector3(Random.Range(-spreadFactor, spreadFactor), Random.Range(-spreadFactor, spreadFactor), Random.Range(-spreadFactor, spreadFactor));
-			Ray ray = new Ray(playerEye.position, playerEye.forward + randomness);
+			Vector3 randomness = new Vector3(
+				Random.Range(-spreadFactor, spreadFactor),
+				Random.Range(-spreadFactor, spreadFactor),
+				Random.Range(-spreadFactor, spreadFactor));
 
+			return new Ray(mMainCameraRef.position, mMainCameraRef.forward + randomness);
+		}
+
+		/// <summary>
+		/// Calculation for a hitscan weapon.
+		/// TODO: Refactor this into a projectile class which can be hot-swapped with non-hitscan projectiles.
+		/// </summary>
+		private void FireShot(Ray ray)
+		{
+			// Draw a debug line
 			Debug.DrawLine(ray.origin, ray.origin + ray.direction * 2000.0f, Color.red, mCooldown + 0.2f);
 
+			// See if we hit anything
 			RaycastHit hit;
 			if (!Physics.Raycast(ray, out hit, 2500.0f))
 				return;
 
-			mShotParticles.Stop();
-			mShotParticles.time = 0.0f;
-			mShotParticles.Play();
-
-			IDamageReceiver component = hit.transform.parent.GetComponent<IDamageReceiver>();
+			// Try to apply damage to it if we did
+			IDamageReceiver component = hit.transform.GetComponent<IDamageReceiver>() ?? hit.transform.parent.GetComponent<IDamageReceiver>();
 			if (component != null)
 				component.ApplyDamage(mCurrentData.mDefaultDamage, hit.point);
 		}
@@ -104,13 +151,19 @@ namespace Prototype2
 			mCooldown -= Time.deltaTime;
 		}
 
+		/// <summary>
+		/// Lerp our position and rotation to match the camera.
+		/// </summary>
 		private void FollowCamera()
 		{
 			Vector3 location = transform.position;
 			Vector3 targetLocation = mMainCameraRef.TransformPoint(mCameraOffset);
 
+			Quaternion rotation = transform.rotation;
+			Quaternion targetRotation = mMainCameraRef.rotation;
+
 			transform.position = Vector3.Lerp(location, targetLocation, Time.deltaTime * CAMERA_FOLLOW_FACTOR);
-			transform.rotation = Quaternion.Lerp(transform.rotation, mMainCameraRef.rotation, Time.deltaTime * CAMERA_FOLLOW_FACTOR);
+			transform.rotation = Quaternion.Lerp(rotation, targetRotation, Time.deltaTime * CAMERA_FOLLOW_FACTOR);
 		}
 	}
 }
