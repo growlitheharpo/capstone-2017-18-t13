@@ -9,7 +9,7 @@ namespace Prototype2
 	/// and how it behaves.
 	/// </summary>
 	/// <inheritdoc />
-	public class PlayerWeaponScript : MonoBehaviour
+	public class PlayerWeaponScript : MonoBehaviour, IWeapon
 	{
 		public enum Attachment
 		{
@@ -29,6 +29,10 @@ namespace Prototype2
 		private WeaponData mCurrentData;
 		private Vector3 mCameraOffset;
 		private float mCooldown;
+		
+		/*public ICharacter bearer { get; private set; }
+		public WeaponData baseData { get; private set; }
+		public IEnumerable<WeaponPartScript> parts { get; private set; }*/
 
 		private const float CAMERA_FOLLOW_FACTOR = 10.0f;
 		private const float DEFAULT_SPREAD_FACTOR = 0.001f;
@@ -56,7 +60,8 @@ namespace Prototype2
 		{
 			EventManager.OnConfirmPartAttach -= AttachNewPart;
 		}
-		
+
+
 		/// <summary>
 		/// Attach a new part to the weapon in the given attachment slot.
 		/// </summary>
@@ -89,6 +94,11 @@ namespace Prototype2
 			}
 
 			mCurrentData = start;
+		}
+
+		void IWeapon.AttachNewPart(WeaponPartScript part)
+		{
+			AttachNewPart(part);
 		}
 
 		/// <summary>

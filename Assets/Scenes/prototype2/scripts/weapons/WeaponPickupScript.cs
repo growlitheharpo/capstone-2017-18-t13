@@ -5,11 +5,12 @@ namespace Prototype2
 	public class WeaponPickupScript : MonoBehaviour, IInteractable
 	{
 		[SerializeField] private Collider mPickupCollider;
-
+		private Rigidbody mPickupRigidbody;
 		private WeaponPartScript mPart;
 
 		private void Awake()
 		{
+			mPickupRigidbody = GetComponent<Rigidbody>();
 			mPart = GetComponent<WeaponPartScript>();
 		}
 
@@ -23,6 +24,7 @@ namespace Prototype2
 		{
 			EventManager.Notify(() => EventManager.ConfirmPartAttach(mPart));
 			Destroy(mPickupCollider.gameObject);
+			Destroy(mPickupRigidbody);
 			Destroy(this);
 		}
 	}
