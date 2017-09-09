@@ -26,6 +26,7 @@ namespace Prototype2
 		private Dictionary<Attachment, Transform> mAttachPoints;
 		private Dictionary<Attachment, WeaponPartScript> mCurrentAttachments;
 		private WeaponData mCurrentData;
+		private bool mOverrideHitscanEye;
 		private float mShotTime;
 
 		private GameObjectPool mProjectilePool;
@@ -59,7 +60,11 @@ namespace Prototype2
 			mCurrentAttachments[part.attachPoint] = part;
 
 			if (part.attachPoint == Attachment.Mechanism)
-				CreateNewProjectilePool((WeaponPartScriptMechanism)part);
+			{
+				WeaponPartScriptMechanism realPart = (WeaponPartScriptMechanism)part;
+				CreateNewProjectilePool(realPart);
+				mOverrideHitscanEye = realPart.overrideHitscanMethod;
+			}
 
 			ActivatePartEffects();
 		}
@@ -81,6 +86,7 @@ namespace Prototype2
 
 			part.transform.SetParent(mAttachPoints[place]);
 			part.transform.localPosition = Vector3.zero;
+			part.transform.localScale = Vector3.one;
 			part.transform.localRotation = Quaternion.identity;
 		}
 
@@ -126,7 +132,7 @@ namespace Prototype2
 		
 		private Transform GetAimRoot()
 		{
-			if (mAimRoot != null)
+			if (!mOverrideHitscanEye && mAimRoot != null)
 				return mAimRoot;
 
 			WeaponPartScript barrel;
