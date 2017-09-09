@@ -27,11 +27,12 @@ namespace Prototype2
 		private Dictionary<Attachment, WeaponPartScript> mCurrentAttachments;
 		private WeaponData mCurrentData;
 		private bool mOverrideHitscanEye;
-		private float mShotTime;
 
 		private GameObjectPool mProjectilePool;
 
 		protected Transform mAimRoot;
+		protected int mAmountInClip;
+		protected float mShotTime;
 
 		private const float DEFAULT_SPREAD_FACTOR = 0.001f;
 
@@ -54,21 +55,28 @@ namespace Prototype2
 			mShotTime -= Time.deltaTime;
 		}
 
+		#region Part Attachment
+
+		/// <inheritdoc />
 		public void AttachNewPart(WeaponPartScript part)
 		{
 			MoveAttachmentToPoint(part);
 			mCurrentAttachments[part.attachPoint] = part;
+
+			ActivatePartEffects();
 
 			if (part.attachPoint == Attachment.Mechanism)
 			{
 				WeaponPartScriptMechanism realPart = (WeaponPartScriptMechanism)part;
 				CreateNewProjectilePool(realPart);
 				mOverrideHitscanEye = realPart.overrideHitscanMethod;
+				mAmountInClip = mCurrentData.clipSize;
 			}
-
-			ActivatePartEffects();
 		}
 
+		/// <summary>
+		/// When a new mechanism is attached, we create a new pool of the projectiles it fires.
+		/// </summary>
 		private void CreateNewProjectilePool(WeaponPartScriptMechanism part)
 		{
 			StartCoroutine(CleanupDeadPool(mProjectilePool));
@@ -77,6 +85,9 @@ namespace Prototype2
 			mProjectilePool = new GameObjectPool(25, newPrefab, transform);
 		}
 
+		/// <summary>
+		/// Physically move the attachment to the correct position in the game world.
+		/// </summary>
 		private void MoveAttachmentToPoint(WeaponPartScript part)
 		{
 			Attachment place = part.attachPoint;
@@ -90,6 +101,9 @@ namespace Prototype2
 			part.transform.localRotation = Quaternion.identity;
 		}
 
+		/// <summary>
+		/// Loop through all the parts and effects and apply them to our WeaponData to be used.
+		/// </summary>
 		private void ActivatePartEffects()
 		{
 			WeaponData start = new WeaponData(mBaseData);
@@ -101,13 +115,39 @@ namespace Prototype2
 
 			mCurrentData = start;
 		}
+		
+		/// <summary>
+		/// Removes all the old projectiles from previous firing mechanisms once they are no longer in use.
+		/// </summary>
+		private static IEnumerator CleanupDeadPool(GameObjectPool pool)
+		{
+			if (pool == null)
+				yield break;
 
+			while (pool.numInUse > 0)
+				yield return new WaitForEndOfFrame();
+
+			pool.Destroy();
+		}
+
+		#endregion
+
+		#region Fire Weapon
+
+		/// <inheritdoc />
 		public void FireWeapon()
 		{
 			if (mShotTime > 0.0f)
 				return;
 
+			if (mAmountInClip <= 0)
+			{
+				Reload();
+				return;
+			}
+
 			mShotTime = 1.0f / mCurrentData.fireRate;
+			mAmountInClip--;
 
 			PlayShotEffect();
 			Ray shot = CalculateShotDirection();
@@ -116,8 +156,15 @@ namespace Prototype2
 			projectile.GetComponent<IProjectile>().Instantiate(shot, mCurrentData, mProjectilePool);
 		}
 
+		/// <summary>
+		/// To be implemented in child class. Play SFX, VFX, etc. for shot fired.
+		/// </summary>
 		protected abstract void PlayShotEffect();
 
+		/// <summary>
+		/// Determine the direction of the shot based on spread, etc.
+		/// </summary>
+		/// <returns>A new ray (origin + direction) for the next shot.</returns>
 		protected virtual Ray CalculateShotDirection()
 		{
 			float spreadFactor = DEFAULT_SPREAD_FACTOR * mCurrentData.spread;
@@ -130,6 +177,9 @@ namespace Prototype2
 			return new Ray(root.position, root.forward + randomness);
 		}
 		
+		/// <summary>
+		/// Determine the aim root. First we look for one specified by the base class, then the barrel tip, then the bearer's eye.
+		/// </summary>
 		private Transform GetAimRoot()
 		{
 			if (!mOverrideHitscanEye && mAimRoot != null)
@@ -141,16 +191,25 @@ namespace Prototype2
 
 			return bearer.eye;
 		}
+		
+		#endregion
 
-		private static IEnumerator CleanupDeadPool(GameObjectPool pool)
+		#region Reloading
+
+		public void Reload()
 		{
-			if (pool == null)
-				yield break;
-
-			while (pool.numInUse > 0)
-				yield return new WaitForEndOfFrame();
-
-			pool.Destroy();
+			mShotTime = float.MaxValue; //no shooting while reloading.
+			PlayReloadEffect();
 		}
+
+		public void OnReloadComplete()
+		{
+			mAmountInClip = mCurrentData.clipSize;
+			mShotTime = -1.0f;
+		}
+
+		protected abstract void PlayReloadEffect();
+
+		#endregion
 	}
 }

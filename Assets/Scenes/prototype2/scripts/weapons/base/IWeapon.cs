@@ -28,5 +28,10 @@ namespace Prototype2
 		/// Instantiate and fire a projectile from this weapon.
 		/// </summary>
 		void FireWeapon();
+
+		/// <summary>
+		/// Reset the amount of ammo in the clip and play some sort of animation.
+		/// </summary>
+		void Reload();
 	}
 }

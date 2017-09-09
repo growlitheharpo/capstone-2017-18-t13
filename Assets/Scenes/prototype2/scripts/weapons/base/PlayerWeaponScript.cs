@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 
 namespace Prototype2
 {
@@ -35,11 +36,44 @@ namespace Prototype2
 			mShotParticles.time = 0.0f;
 			mShotParticles.Play();
 		}
-		
+
+		/// <summary>
+		/// Play any SFX, VFX, and Animations for reloading.
+		/// </summary>
+		protected override void PlayReloadEffect()
+		{
+			//presumably, reloading will be handled by animation.
+			//normally, we'll wait until we get a callback from it. For now,
+			//we'll fake it.
+			StartCoroutine(DELETEME_WaitForReload());
+		}
+
+		private IEnumerator DELETEME_WaitForReload()
+		{
+			yield return new WaitForSeconds(1.5f);
+			OnReloadComplete();
+		}
+
+		private void OnGUI()
+		{
+			if (mShotTime < 1000.0f)
+				return;
+
+			float width = Screen.width, height = Screen.height;
+			GUILayout.BeginArea(new Rect(width * 0.7f, height * 0.5f, width * 0.2f, height * 0.5f));
+
+			GUILayout.Label("RELOADING");
+
+			GUILayout.EndArea();
+		}
+
 		protected override void Update()
 		{
 			base.Update();
 			FollowCamera();
+
+			if (Input.GetKeyDown(KeyCode.R))
+				Reload();
 		}
 
 		/// <summary>
