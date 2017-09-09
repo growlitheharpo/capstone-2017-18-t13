@@ -54,6 +54,13 @@ public partial class EventManager
 		OnConfirmPartAttach(newPart);
 	}
 
+	public static event Action<BoundProperty, int> OnBoundPropertyCreated = (p, c) => { LogEvent(); };
+
+	public static void BoundPropertyCreated(BoundProperty property, int propertyCode)
+	{
+		OnBoundPropertyCreated(property, propertyCode);
+	}
+
 	//!PROTOTYPE 2
 
 	public void Start()
