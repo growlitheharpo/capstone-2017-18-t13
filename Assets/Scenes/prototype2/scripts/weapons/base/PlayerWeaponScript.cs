@@ -16,8 +16,9 @@ namespace Prototype2
 		
 		private void Start()
 		{
-			mAimRoot = Camera.main.transform;
-			mPlayerEyeOffset = mAimRoot.InverseTransformPoint(transform.position);
+			//mAimRoot = Camera.main.transform;
+			//mPlayerEyeOffset = mAimRoot.InverseTransformPoint(transform.position);
+			mPlayerEyeOffset = Camera.main.transform.InverseTransformPoint(transform.position);
 			EventManager.OnConfirmPartAttach += AttachNewPart;
 		}
 

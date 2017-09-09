@@ -9,10 +9,14 @@ namespace Prototype2
 		[SerializeField] private ActionProvider mBarrel02Button;
 		[SerializeField] private ActionProvider mScope01Button;
 		[SerializeField] private ActionProvider mScope02Button;
+		[SerializeField] private ActionProvider mMech01Button;
+		[SerializeField] private ActionProvider mMech02Button;
 		[SerializeField] private GameObject mBarrel01;
 		[SerializeField] private GameObject mBarrel02;
 		[SerializeField] private GameObject mScope01;
 		[SerializeField] private GameObject mScope02;
+		[SerializeField] private GameObject mMech01;
+		[SerializeField] private GameObject mMech02;
 		private bool mEnabled = true; //everything starts enabled
 
 		private void Start()
@@ -21,6 +25,9 @@ namespace Prototype2
 			mBarrel02Button.OnClick += ApplyBarrel02;
 			mScope01Button.OnClick += ApplyScope01;
 			mScope02Button.OnClick += ApplyScope02;
+			mMech01Button.OnClick += ApplyMech01;
+			mMech02Button.OnClick += ApplyMech02;
+
 
 			EventManager.OnUIToggle += HandleUIToggle;
 			EventManager.UIToggle();
@@ -68,6 +75,16 @@ namespace Prototype2
 		private void ApplyScope02()
 		{
 			Instantiate(mScope02).GetComponent<WeaponPickupScript>().ConfirmAttach();
+		}
+
+		private void ApplyMech01()
+		{
+			Instantiate(mMech01).GetComponent<WeaponPickupScript>().ConfirmAttach();
+		}
+
+		private void ApplyMech02()
+		{
+			Instantiate(mMech02).GetComponent<WeaponPickupScript>().ConfirmAttach();
 		}
 	}
 }

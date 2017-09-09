@@ -36,7 +36,10 @@ namespace Prototype2
 				return;
 
 			// Try to apply damage to it if we did
-			IDamageReceiver component = hit.transform.GetComponent<IDamageReceiver>() ?? hit.transform.parent.GetComponent<IDamageReceiver>();
+			IDamageReceiver component = hit.transform.GetComponent<IDamageReceiver>();
+			if (component == null && hit.transform.parent != null)
+				component = hit.transform.parent.GetComponent<IDamageReceiver>();
+
 			if (component != null)
 				component.ApplyDamage(data.damage, hit.point);
 

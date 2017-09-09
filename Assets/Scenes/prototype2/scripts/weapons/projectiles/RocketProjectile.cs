@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using Prototype2;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Prototype2
 {
@@ -17,12 +14,14 @@ namespace Prototype2
 			mRigidbody = GetComponent<Rigidbody>();
 		}
 
-
-		private void OnCollisionEnter(Collision other)
+		private void OnCollisionEnter(Collision hit)
 		{
-			IDamageReceiver receiver = other.transform.GetComponent<IDamageReceiver>();
-			if (receiver != null)
-				receiver.ApplyDamage(mData.damage, other.contacts[0].point);
+			IDamageReceiver component = hit.transform.GetComponent<IDamageReceiver>();
+			if (component == null && hit.transform.parent != null)
+				component = hit.transform.parent.GetComponent<IDamageReceiver>();
+
+			if (component != null)
+				component.ApplyDamage(mData.damage, hit.contacts[0].point);
 
 			if (mPool != null)
 				mPool.ReturnItem(gameObject);
@@ -37,13 +36,9 @@ namespace Prototype2
 			mRigidbody.velocity = Vector3.zero;
 		}
 
-		public void PreDisable()
-		{
-		}
+		public void PreDisable() { }
 
-		public void PostDisable()
-		{
-		}
+		public void PostDisable() { }
 
 		public void Instantiate(Ray ray, WeaponData data)
 		{
