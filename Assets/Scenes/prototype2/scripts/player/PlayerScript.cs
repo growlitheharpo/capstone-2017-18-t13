@@ -2,11 +2,12 @@
 
 namespace Prototype2
 {
-	public class PlayerScript : MonoBehaviour
+	public class PlayerScript : MonoBehaviour, ICharacter
 	{
 		[SerializeField] private PlayerWeaponScript mWeapon;
 		[SerializeField] private GameObject mDefaultScope;
 		[SerializeField] private GameObject mDefaultBarrel;
+		[SerializeField] private GameObject mDefaultMechanism;
 		[SerializeField] private float mInteractDistance;
 
 		private Transform mMainCameraRef;
@@ -14,6 +15,8 @@ namespace Prototype2
 
 		private void Start()
 		{
+			mWeapon.bearer = this;
+			Instantiate(mDefaultMechanism).GetComponent<WeaponPickupScript>().ConfirmAttach();
 			Instantiate(mDefaultBarrel).GetComponent<WeaponPickupScript>().ConfirmAttach();
 			Instantiate(mDefaultScope).GetComponent<WeaponPickupScript>().ConfirmAttach();
 
@@ -33,6 +36,13 @@ namespace Prototype2
 				.UnregisterInput(INPUT_ToggleUIElement)
 				.UnregisterInput(INPUT_FireWeapon);
 		}
+
+		GameObject ICharacter.GetGameObject()
+		{
+			return gameObject;
+		}
+
+		Transform ICharacter.eye { get { return mMainCameraRef; } }
 
 		private void INPUT_ToggleUIElement()
 		{
