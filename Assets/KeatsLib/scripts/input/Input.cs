@@ -158,6 +158,7 @@ namespace KeatsLib.Unity
 		public void SetInputLevel(InputLevel level)
 		{
 			mEnabledInputs = level;
+			Logger.Warn("Set input level does not send an input event.", Logger.System.Input);
 		}
 
 		/// <inheritdoc />
@@ -172,13 +173,21 @@ namespace KeatsLib.Unity
 		/// <inheritdoc />
 		public void DisableInputLevel(InputLevel level)
 		{
+			if (!IsInputEnabled(level))
+				return;
+
 			mEnabledInputs &= ~level;
+			EventManager.Notify(() => EventManager.InputLevelChanged(level, false));
 		}
 
 		/// <inheritdoc />
 		public void EnableInputLevel(InputLevel level)
 		{
+			if (IsInputEnabled(level))
+				return;
+
 			mEnabledInputs |= level;
+			EventManager.Notify(() => EventManager.InputLevelChanged(level, true));
 		}
 
 		/// <inheritdoc />

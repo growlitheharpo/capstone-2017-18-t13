@@ -9,12 +9,14 @@ namespace Prototype2
 		[SerializeField] private ActionProvider mBarrel02Button;
 		[SerializeField] private ActionProvider mScope01Button;
 		[SerializeField] private ActionProvider mScope02Button;
+		[SerializeField] private ActionProvider mMech01Button;
+		[SerializeField] private ActionProvider mMech02Button;
 		[SerializeField] private GameObject mBarrel01;
 		[SerializeField] private GameObject mBarrel02;
 		[SerializeField] private GameObject mScope01;
 		[SerializeField] private GameObject mScope02;
-		[SerializeField] private PlayerWeaponScript mPlayerWeaponRef;
-
+		[SerializeField] private GameObject mMech01;
+		[SerializeField] private GameObject mMech02;
 		private bool mEnabled = true; //everything starts enabled
 
 		private void Start()
@@ -23,6 +25,9 @@ namespace Prototype2
 			mBarrel02Button.OnClick += ApplyBarrel02;
 			mScope01Button.OnClick += ApplyScope01;
 			mScope02Button.OnClick += ApplyScope02;
+			mMech01Button.OnClick += ApplyMech01;
+			mMech02Button.OnClick += ApplyMech02;
+
 
 			EventManager.OnUIToggle += HandleUIToggle;
 			EventManager.UIToggle();
@@ -54,27 +59,32 @@ namespace Prototype2
 
 		private void ApplyBarrel01()
 		{
-			mPlayerWeaponRef.AttachNewPart(PlayerWeaponScript.Attachment.Barrel, Instantiate(mBarrel01).GetComponent<WeaponPartScript>());
-			EventManager.Notify(EventManager.UIToggle);
+			Instantiate(mBarrel01).GetComponent<WeaponPickupScript>().ConfirmAttach();
 		}
 
 		private void ApplyBarrel02()
 		{
-			mPlayerWeaponRef.AttachNewPart(PlayerWeaponScript.Attachment.Barrel, Instantiate(mBarrel02).GetComponent<WeaponPartScript>());
-			EventManager.Notify(EventManager.UIToggle);
+			Instantiate(mBarrel02).GetComponent<WeaponPickupScript>().ConfirmAttach();
 		}
 
 		private void ApplyScope01()
 		{
-
-			mPlayerWeaponRef.AttachNewPart(PlayerWeaponScript.Attachment.Scope, Instantiate(mScope01).GetComponent<WeaponPartScript>());
-			EventManager.Notify(EventManager.UIToggle);
+			Instantiate(mScope01).GetComponent<WeaponPickupScript>().ConfirmAttach();
 		}
 
 		private void ApplyScope02()
 		{
-			mPlayerWeaponRef.AttachNewPart(PlayerWeaponScript.Attachment.Scope, Instantiate(mScope02).GetComponent<WeaponPartScript>());
-			EventManager.Notify(EventManager.UIToggle);
+			Instantiate(mScope02).GetComponent<WeaponPickupScript>().ConfirmAttach();
+		}
+
+		private void ApplyMech01()
+		{
+			Instantiate(mMech01).GetComponent<WeaponPickupScript>().ConfirmAttach();
+		}
+
+		private void ApplyMech02()
+		{
+			Instantiate(mMech02).GetComponent<WeaponPickupScript>().ConfirmAttach();
 		}
 	}
 }

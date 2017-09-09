@@ -6,4 +6,5 @@
 public interface ICharacter
 {
 	GameObject GetGameObject();
+	Transform eye { get; }
 }

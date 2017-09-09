@@ -24,6 +24,13 @@ public partial class EventManager : MonoSingleton<EventManager>
 		OnXmlSuccesfullyRefreshed();
 	}
 
+	public static event Action<KeatsLib.Unity.Input.InputLevel, bool> OnInputLevelChanged = (a, b) => { };
+
+	public static void InputLevelChanged(KeatsLib.Unity.Input.InputLevel level, bool state)
+	{
+		OnInputLevelChanged(level, state);
+	}
+
 	/// <summary>
 	/// Instantiate the EventManager.
 	/// </summary>

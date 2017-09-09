@@ -77,11 +77,11 @@ public class ImmediateModeConsoleView : BaseGameConsoleView
 	public override void ToggleConsole()
 	{
 		mViewEnabled = !mViewEnabled;
-		ServiceLocator.Get<IInput>().SetInputLevelState(KeatsLib.Unity.Input.InputLevel.DevConsole, mViewEnabled);
+		IInput input = ServiceLocator.Get<IInput>();
+		input.SetInputLevelState(KeatsLib.Unity.Input.InputLevel.DevConsole, mViewEnabled);
+		input.SetInputLevelState(KeatsLib.Unity.Input.InputLevel.Gameplay, !mViewEnabled);
 
 		ForceScrollToBottom();
-
-		//TODO: Issue pause toggle here.
 	}
 
 	/// <summary>
