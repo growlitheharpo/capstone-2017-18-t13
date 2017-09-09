@@ -19,7 +19,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4839716519193572}
-  - component: {fileID: 114247931157892046}
+  - component: {fileID: 114464761056331028}
   - component: {fileID: 114028426663256570}
   - component: {fileID: 54647162185079400}
   m_Layer: 10
@@ -94,6 +94,21 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!1 &1857142722001832
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 4914017821098816}
+  m_Layer: 10
+  m_Name: Tip
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
 --- !u!4 &4176012890998988
 Transform:
   m_ObjectHideFlags: 1
@@ -105,7 +120,7 @@ Transform:
   m_LocalScale: {x: 0.5, y: 0.19999999, z: 0.7}
   m_Children: []
   m_Father: {fileID: 4839716519193572}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &4330985335629340
 Transform:
@@ -133,7 +148,7 @@ Transform:
   - {fileID: 4936472153637698}
   - {fileID: 4330985335629340}
   m_Father: {fileID: 4839716519193572}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &4839716519193572
 Transform:
@@ -145,9 +160,23 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
+  - {fileID: 4914017821098816}
   - {fileID: 4654993471560146}
   - {fileID: 4176012890998988}
   m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!4 &4914017821098816
+Transform:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1857142722001832}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0.605}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 4839716519193572}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &4936472153637698
@@ -280,7 +309,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mPickupCollider: {fileID: 65187305038869720}
---- !u!114 &114247931157892046
+--- !u!114 &114464761056331028
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -288,10 +317,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 1173900482085758}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ea66c356b6a1c2b4297bc69a9b0a1f74, type: 3}
+  m_Script: {fileID: 11500000, guid: 7024d1c3bbf87e0498ff935403a3540e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   mData:
   - {fileID: 11400000, guid: b9d94b976af787e49a4936c9b012296b, type: 2}
   - {fileID: 11400000, guid: 71c8c469516b52a458add2074133ef06, type: 2}
-  mAttachPoint: 1
+  - {fileID: 11400000, guid: 71c8c469516b52a458add2074133ef06, type: 2}
+  mTip: {fileID: 4914017821098816}

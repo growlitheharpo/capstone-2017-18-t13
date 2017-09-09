@@ -84,9 +84,9 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4065866548179430}
-  - component: {fileID: 114578221820155564}
   - component: {fileID: 114399899229538148}
   - component: {fileID: 54741395447935080}
+  - component: {fileID: 114412117028516678}
   m_Layer: 0
   m_Name: p_scope02
   m_TagString: Untagged
@@ -280,7 +280,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mPickupCollider: {fileID: 65755214509483726}
---- !u!114 &114578221820155564
+--- !u!114 &114412117028516678
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -288,9 +288,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 1967676427755860}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ea66c356b6a1c2b4297bc69a9b0a1f74, type: 3}
+  m_Script: {fileID: 11500000, guid: 1f72922dda36b554ba8f1e37d8e306fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   mData:
   - {fileID: 11400000, guid: a58720100eaa9c44d821e77c21d33531, type: 2}
-  mAttachPoint: 0
