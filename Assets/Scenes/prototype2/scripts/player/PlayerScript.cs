@@ -29,6 +29,7 @@ namespace Prototype2
 			ServiceLocator.Get<IInput>()
 				.RegisterInput(Input.GetKeyDown, KeyCode.Tab, INPUT_ToggleUIElement, KeatsLib.Unity.Input.InputLevel.None)
 				.RegisterInput(Input.GetButton, "Fire1", INPUT_FireWeapon, KeatsLib.Unity.Input.InputLevel.Gameplay)
+				.RegisterInput(Input.GetButtonDown, "Reload", INPUT_ReloadWeapon, KeatsLib.Unity.Input.InputLevel.Gameplay)
 				.RegisterInput(Input.GetButtonDown, "Interact", INPUT_ActivateInteract, KeatsLib.Unity.Input.InputLevel.Gameplay)
 				.EnableInputLevel(KeatsLib.Unity.Input.InputLevel.Gameplay);
 		}
@@ -38,6 +39,7 @@ namespace Prototype2
 			ServiceLocator.Get<IInput>()
 				.UnregisterInput(INPUT_ActivateInteract)
 				.UnregisterInput(INPUT_ToggleUIElement)
+				.UnregisterInput(INPUT_ReloadWeapon)
 				.UnregisterInput(INPUT_FireWeapon);
 		}
 
@@ -56,6 +58,11 @@ namespace Prototype2
 		private void INPUT_FireWeapon()
 		{
 			mWeapon.FireWeapon();
+		}
+		
+		private void INPUT_ReloadWeapon()
+		{
+			mWeapon.Reload();
 		}
 
 		private void INPUT_ActivateInteract()
