@@ -9,6 +9,7 @@ namespace Prototype2
 		[SerializeField] private ParticleSystem mHitParticles;
 		[SerializeField] private float mSpeed;
 
+		private Transform mDirectHit;
 		private Rigidbody mRigidbody;
 		private Renderer mRenderer;
 		private GameObjectPool mPool;
@@ -22,16 +23,37 @@ namespace Prototype2
 
 		private void OnCollisionEnter(Collision hit)
 		{
-			IDamageReceiver component = hit.transform.GetComponent<IDamageReceiver>();
-			if (component == null && hit.transform.parent != null)
-				component = hit.transform.parent.GetComponent<IDamageReceiver>();
-
+			IDamageReceiver component = hit.GetDamageReceiver();
 			if (component != null)
+			{
 				component.ApplyDamage(mData.damage, hit.contacts[0].point);
+				mDirectHit = hit.transform;
+			}
 
+			ApplyExplodeDamage();
 			StartCoroutine(ExplodeEffect());
 		}
-		
+
+		private void OnDrawGizmos()
+		{
+			Gizmos.color = Color.red;
+			Gizmos.DrawSphere(transform.position, 1.5f);
+		}
+
+		private void ApplyExplodeDamage()
+		{
+			var hitInfo = Physics.SphereCastAll(transform.position, 1.5f, Vector3.up, 0.01f);
+			foreach (RaycastHit hit in hitInfo)
+			{
+				if (hit.transform == mDirectHit)
+					continue;
+
+				IDamageReceiver component = hit.GetDamageReceiver();
+				if (component != null)
+					component.ApplyDamage(mData.damage / 2.0f, hit.point);
+			}
+		}
+
 		private IEnumerator ExplodeEffect()
 		{
 			mRenderer.enabled = false;
@@ -63,6 +85,7 @@ namespace Prototype2
 		public void PostSetup()
 		{
 			transform.SetParent(null);
+			mDirectHit = null;
 			mRenderer.enabled = true;
 			mRigidbody.velocity = Vector3.zero;
 		}
