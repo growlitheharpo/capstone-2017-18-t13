@@ -1,9 +1,8 @@
 ﻿using UnityEngine;
-using Input = KeatsLib.Unity.Input;
 
 namespace Prototype2
 {
-	public class UIManager : MonoBehaviour
+	public class DebugMenu : MonoBehaviour
 	{
 		[SerializeField] private ActionProvider mBarrel01Button;
 		[SerializeField] private ActionProvider mBarrel02Button;
@@ -17,6 +16,7 @@ namespace Prototype2
 		[SerializeField] private GameObject mScope02;
 		[SerializeField] private GameObject mMech01;
 		[SerializeField] private GameObject mMech02;
+
 		private bool mEnabled = true; //everything starts enabled
 
 		private void Start()
@@ -27,25 +27,9 @@ namespace Prototype2
 			mScope02Button.OnClick += ApplyScope02;
 			mMech01Button.OnClick += ApplyMech01;
 			mMech02Button.OnClick += ApplyMech02;
-
-
+			
 			EventManager.OnUIToggle += HandleUIToggle;
 			EventManager.UIToggle();
-		}
-
-		private void HandleUIToggle()
-		{
-			mEnabled = !mEnabled;
-			SetChildrenState(mEnabled);
-
-			ServiceLocator.Get<IInput>()
-				.SetInputLevelState(Input.InputLevel.Gameplay, !mEnabled);
-		}
-
-		private void SetChildrenState(bool state)
-		{
-			foreach (Transform t in transform)
-				t.gameObject.SetActive(state);
 		}
 
 		private void OnDestroy()
@@ -55,6 +39,21 @@ namespace Prototype2
 			mScope01Button.OnClick -= ApplyScope01;
 			mScope02Button.OnClick -= ApplyScope02;
 			EventManager.OnUIToggle -= HandleUIToggle;
+		}
+		
+		private void HandleUIToggle()
+		{
+			mEnabled = !mEnabled;
+			SetChildrenState(mEnabled);
+
+			ServiceLocator.Get<IInput>()
+				.SetInputLevelState(KeatsLib.Unity.Input.InputLevel.Gameplay, !mEnabled);
+		}
+		
+		private void SetChildrenState(bool state)
+		{
+			foreach (Transform t in transform)
+				t.gameObject.SetActive(state);
 		}
 
 		private void ApplyBarrel01()

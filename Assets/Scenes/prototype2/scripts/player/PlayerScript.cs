@@ -10,6 +10,8 @@ namespace Prototype2
 		[SerializeField] private GameObject mDefaultMechanism;
 		[SerializeField] private float mInteractDistance;
 
+		private BoundProperty<float> mHealth;
+
 		private Transform mMainCameraRef;
 		private const string INTERACTABLE_TAG = "interactable";
 
@@ -19,6 +21,8 @@ namespace Prototype2
 			Instantiate(mDefaultMechanism).GetComponent<WeaponPickupScript>().ConfirmAttach();
 			Instantiate(mDefaultBarrel).GetComponent<WeaponPickupScript>().ConfirmAttach();
 			Instantiate(mDefaultScope).GetComponent<WeaponPickupScript>().ConfirmAttach();
+
+			mHealth = new BoundProperty<float>(100.0f, GameplayUIManager.PLAYER_HEALTH);
 
 			mMainCameraRef = Camera.main.transform;
 

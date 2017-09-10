@@ -31,7 +31,8 @@ namespace Prototype2
 		private GameObjectPool mProjectilePool;
 
 		protected Transform mAimRoot;
-		protected int mAmountInClip;
+		protected BoundProperty<int> mClipSize;
+		protected BoundProperty<int> mAmountInClip;
 		protected float mShotTime;
 
 		private const float DEFAULT_SPREAD_FACTOR = 0.001f;
@@ -48,6 +49,9 @@ namespace Prototype2
 			mCurrentAttachments = new Dictionary<Attachment, WeaponPartScript>(2);
 			mCurrentData = new WeaponData(mBaseData);
 			mProjectilePool = null;
+
+			mClipSize = new BoundProperty<int>(0, GameplayUIManager.CLIP_TOTAL);
+			mAmountInClip = new BoundProperty<int>(0, GameplayUIManager.CLIP_CURRENT);
 		}
 
 		protected virtual void Update()
@@ -70,7 +74,7 @@ namespace Prototype2
 				WeaponPartScriptMechanism realPart = (WeaponPartScriptMechanism)part;
 				CreateNewProjectilePool(realPart);
 				mOverrideHitscanEye = realPart.overrideHitscanMethod;
-				mAmountInClip = mCurrentData.clipSize;
+				mAmountInClip.value = mClipSize.value;
 			}
 		}
 
@@ -114,6 +118,7 @@ namespace Prototype2
 			}
 
 			mCurrentData = start;
+			mClipSize.value = mCurrentData.clipSize;
 		}
 		
 		/// <summary>
@@ -140,14 +145,14 @@ namespace Prototype2
 			if (mShotTime > 0.0f)
 				return;
 
-			if (mAmountInClip <= 0)
+			if (mAmountInClip.value <= 0)
 			{
 				Reload();
 				return;
 			}
 
 			mShotTime = 1.0f / mCurrentData.fireRate;
-			mAmountInClip--;
+			mAmountInClip.value--;
 
 			PlayShotEffect();
 			Ray shot = CalculateShotDirection();
@@ -204,7 +209,7 @@ namespace Prototype2
 
 		public void OnReloadComplete()
 		{
-			mAmountInClip = mCurrentData.clipSize;
+			mAmountInClip.value = mClipSize.value;
 			mShotTime = -1.0f;
 		}
 

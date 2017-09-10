@@ -20,7 +20,8 @@ public class ServiceLocator : MonoSingleton<ServiceLocator>
 			{ typeof(IGameConsole), TryFind<IGameConsole>(GameConsole.instance) },
 			{ typeof(ISaveLoadManager), TryFind<ISaveLoadManager>(SaveLoadManager.instance) },
 			{ typeof(IAudioManager), TryFind<IAudioManager>(AudioManager.instance) },
-			{ typeof(IGamestateManager), TryFind<IGamestateManager>(GamestateManager.instance) }
+			{ typeof(IGamestateManager), TryFind<IGamestateManager>(GamestateManager.instance) },
+			{ typeof(IGameplayUIManager), TryFind<IGameplayUIManager>(GameplayUIManager.instance) }
 		};
 	}
 
