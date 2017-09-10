@@ -20,12 +20,7 @@ public class GameObjectPool
 
 	private Dictionary<GameObject, IPoolable[]> mObjectPoolableComponents;
 
-	private static readonly Vector3 HIDDEN_POSITION =
-#if UNITY_EDITOR
-		new Vector3(-12000, -12000, -12000);
-#else
-            new Vector3(float.MinValue, float.MinValue, float.MinValue);
-#endif
+	private static readonly Vector3 HIDDEN_POSITION = new Vector3(-12000, -12000, -12000);
 
 	/// <summary>
 	/// Creates an object pool of the provided size using the provided prefab. Immediately instantiates size number of the
