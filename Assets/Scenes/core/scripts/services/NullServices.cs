@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using KeatsLib.Persistence;
 using UnityEngine;
 using Input = KeatsLib.Unity.Input;
@@ -24,6 +25,8 @@ public class NullServices
 			return new NullAudioManager() as T;
 		if (typeof(T) == typeof(IGamestateManager))
 			return new NullGamestateManager() as T;
+		if (typeof(T) == typeof(IGameplayUIManager))
+			return new NullGameplayUIManager() as T;
 
 		return null;
 	}
@@ -166,6 +169,15 @@ public class NullServices
 			Logger.Info("NULL SERVICE: ISaveLoadManager.LoadData()", Logger.System.Services);
 			mFakePersistence = Persistence.Create("");
 			EventManager.Notify(EventManager.InitialPersistenceLoadComplete);
+		}
+	}
+
+	private class NullGameplayUIManager : IGameplayUIManager
+	{
+		public BoundProperty<T> GetProperty<T>(int hash)
+		{
+			Logger.Info("NULL SERVICE: NullGameplayUIManager.GetProperty<T>()", Logger.System.Services);
+			return null;
 		}
 	}
 }

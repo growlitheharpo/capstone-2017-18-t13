@@ -50,8 +50,8 @@ namespace Prototype2
 			mCurrentData = new WeaponData(mBaseData);
 			mProjectilePool = null;
 
-			mClipSize = new BoundProperty<int>(0, UIManager.CLIP_TOTAL);
-			mAmountInClip = new BoundProperty<int>(0, UIManager.CLIP_CURRENT);
+			mClipSize = new BoundProperty<int>(0, GameplayUIManager.CLIP_TOTAL);
+			mAmountInClip = new BoundProperty<int>(0, GameplayUIManager.CLIP_CURRENT);
 		}
 
 		protected virtual void Update()

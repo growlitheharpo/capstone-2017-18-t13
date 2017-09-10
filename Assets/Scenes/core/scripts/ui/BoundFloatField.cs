@@ -6,8 +6,8 @@ public class BoundFloatField : MonoBehaviour
 {
 	[SerializeField] private string mBoundProperty;
 	[SerializeField] private string mDisplayFormat;
-	[SerializeField] private Prototype2.UIManager mUIManager;
 
+	private IGameplayUIManager mUIManagerRef;
 	private BoundProperty<float> mProperty;
 	private UIText mTextElement;
 	private int mPropertyHash;
@@ -21,6 +21,7 @@ public class BoundFloatField : MonoBehaviour
 
 	private void Start()
 	{
+		mUIManagerRef = ServiceLocator.Get<IGameplayUIManager>();
 		StartCoroutine(CheckForProperty());
 	}
 
@@ -28,11 +29,7 @@ public class BoundFloatField : MonoBehaviour
 	{
 		while (mProperty == null)
 		{
-			Debug.Log("Checking for property...");
-			BoundProperty testOut;
-			if (mUIManager.propertyMap.TryGetValue(mPropertyHash, out testOut))
-				mProperty = testOut as BoundProperty<float>;
-
+			mProperty = mUIManagerRef.GetProperty<float>(mPropertyHash);
 			yield return null;
 		}
 
