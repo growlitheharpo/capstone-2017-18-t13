@@ -205,6 +205,9 @@ namespace Prototype2
 
 		public void Reload()
 		{
+			if (mShotTime >= float.MaxValue - 1.0f)
+				return;
+
 			mShotTime = float.MaxValue; //no shooting while reloading.
 			PlayReloadEffect();
 		}
