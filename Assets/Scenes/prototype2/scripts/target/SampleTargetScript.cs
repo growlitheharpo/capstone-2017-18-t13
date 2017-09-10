@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using UnityEngine;
 using UIText = UnityEngine.UI.Text;
 
@@ -19,7 +20,31 @@ namespace Prototype2
 			mHealth = new BoundProperty<float>(mStartHealth, (gameObject.name + "-health").GetHashCode());
 		}
 
-		public void ApplyDamage(float amount, Vector3 point)
+		private void Start()
+		{
+			ServiceLocator.Get<IGameConsole>()
+				.RegisterCommand("target", CONSOLE_Reset);
+		}
+
+		private void CONSOLE_Reset(string[] args)
+		{
+			if (args[0].ToLower() == "reset")
+			{
+				mHealth.value = mStartHealth;
+				mMesh.SetActive(true);
+			}
+			else if (args[0].ToLower() == "sethealth")
+			{
+				mHealth.value = float.Parse(args[1]);
+				mMesh.SetActive(true);
+			}
+			else
+			{
+				throw new ArgumentException();
+			}
+		}
+
+		public void ApplyDamage(float amount, Vector3 point, IDamageSource cause = null)
 		{
 			StopAllCoroutines();
 			mHealth.value = Mathf.Clamp(mHealth.value - amount, 0.0f, float.MaxValue);
@@ -65,7 +90,7 @@ namespace Prototype2
 			yield return null; // wait 1 frame
 			yield return new WaitForParticles(mDeathParticles);
 
-			Destroy(gameObject);
+			//Destroy(gameObject);
 		}
 	}
 }

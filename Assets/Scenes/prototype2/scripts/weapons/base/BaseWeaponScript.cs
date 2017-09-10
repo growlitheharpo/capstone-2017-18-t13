@@ -160,7 +160,7 @@ namespace Prototype2
 			Ray shot = CalculateShotDirection();
 
 			GameObject projectile = mProjectilePool.ReleaseNewItem();
-			projectile.GetComponent<IProjectile>().Instantiate(shot, mCurrentData, mProjectilePool);
+			projectile.GetComponent<IProjectile>().Instantiate(this, shot, mCurrentData, mProjectilePool);
 		}
 
 		/// <summary>
