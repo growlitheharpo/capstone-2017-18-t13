@@ -1,10 +1,14 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace Prototype2
 {
 	public class RocketProjectile : MonoBehaviour, IProjectile
 	{
+		[SerializeField] private ParticleSystem mHitParticles;
 		[SerializeField] private float mSpeed;
+
 		private Rigidbody mRigidbody;
 		private Renderer mRenderer;
 		private GameObjectPool mPool;
@@ -25,22 +29,28 @@ namespace Prototype2
 			if (component != null)
 				component.ApplyDamage(mData.damage, hit.contacts[0].point);
 
-			ExplodeEffect();
+			StartCoroutine(ExplodeEffect());
 		}
-
-		private void ExplodeEffect()
+		
+		private IEnumerator ExplodeEffect()
 		{
-			//play particles, sfx, etc.
-
 			mRenderer.enabled = false;
 			mRigidbody.velocity = Vector3.zero;
+			mRigidbody.angularVelocity = Vector3.zero;
 
-			//then...
+			mHitParticles.transform.SetParent(null);
+			mHitParticles.transform.localScale = Vector3.one;
+			mHitParticles.Play();
+			yield return new WaitForParticles(mHitParticles);
+
 			OnEffectComplete();
 		}
 
 		private void OnEffectComplete()
 		{
+			mHitParticles.transform.SetParent(transform);
+			mHitParticles.transform.localPosition = Vector3.zero;
+
 			if (mPool != null)
 				mPool.ReturnItem(gameObject);
 			else
@@ -52,6 +62,7 @@ namespace Prototype2
 		public void PreSetup() { }
 		public void PostSetup()
 		{
+			transform.SetParent(null);
 			mRenderer.enabled = true;
 			mRigidbody.velocity = Vector3.zero;
 		}
