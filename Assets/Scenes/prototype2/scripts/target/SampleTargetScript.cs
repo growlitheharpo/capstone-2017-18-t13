@@ -14,6 +14,7 @@ namespace Prototype2
 		[SerializeField] private float mStartHealth;
 
 		private BoundProperty<float> mHealth;
+		public BoundProperty<float> health { get { return mHealth; } }
 
 		private void Awake()
 		{
@@ -26,21 +27,27 @@ namespace Prototype2
 				.RegisterCommand("target", CONSOLE_Reset);
 		}
 
-		private void CONSOLE_Reset(string[] args)
+		private static void CONSOLE_Reset(string[] args)
 		{
-			if (args[0].ToLower() == "reset")
-			{
-				mHealth.value = mStartHealth;
-				mMesh.SetActive(true);
-			}
-			else if (args[0].ToLower() == "sethealth")
-			{
-				mHealth.value = float.Parse(args[1]);
-				mMesh.SetActive(true);
-			}
-			else
-			{
-				throw new ArgumentException();
+			var allObjects = FindObjectsOfType<SampleTargetScript>();
+
+			switch (args[0].ToLower()) {
+				case "reset":
+					foreach (SampleTargetScript obj in allObjects)
+					{
+						obj.mHealth.value = obj.mStartHealth;
+						obj.mMesh.SetActive(true);
+					}
+					break;
+				case "sethealth":
+					foreach (SampleTargetScript obj in allObjects)
+					{
+						obj.mHealth.value = float.Parse(args[1]);
+						obj.mMesh.SetActive(true);
+					}
+					break;
+				default:
+					throw new ArgumentException("Invalid arguments for command: target");
 			}
 		}
 
@@ -79,15 +86,6 @@ namespace Prototype2
 		{
 			mMesh.SetActive(false);
 			mDeathParticles.Play();
-			//StartCoroutine(WaitForDeath());
 		}
-
-		/*private IEnumerator WaitForDeath()
-		{
-			yield return null; // wait 1 frame
-			yield return new WaitForParticles(mDeathParticles);
-
-			//Destroy(gameObject);
-		}*/
 	}
 }

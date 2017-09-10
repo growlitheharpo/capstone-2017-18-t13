@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace Prototype2
 {
@@ -33,5 +34,10 @@ namespace Prototype2
 		/// Reset the amount of ammo in the clip and play some sort of animation.
 		/// </summary>
 		void Reload();
+
+		/// <summary>
+		/// The underlying transform property for the weapon.
+		/// </summary>
+		Transform transform { get; }
 	}
 }
