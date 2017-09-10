@@ -50,10 +50,7 @@ namespace Prototype2
 			mHealth.value = Mathf.Clamp(mHealth.value - amount, 0.0f, float.MaxValue);
 
 			if (mHealth.value <= 0.0f)
-			{
 				Die();
-				return;
-			}
 
 			mText.color = new Color(0.4f, 0.4f, 0.4f, 1.0f);
 			mText.text = "Damage:\n" + amount.ToString("####");
@@ -82,15 +79,15 @@ namespace Prototype2
 		{
 			mMesh.SetActive(false);
 			mDeathParticles.Play();
-			StartCoroutine(WaitForDeath());
+			//StartCoroutine(WaitForDeath());
 		}
 
-		private IEnumerator WaitForDeath()
+		/*private IEnumerator WaitForDeath()
 		{
 			yield return null; // wait 1 frame
 			yield return new WaitForParticles(mDeathParticles);
 
 			//Destroy(gameObject);
-		}
+		}*/
 	}
 }
