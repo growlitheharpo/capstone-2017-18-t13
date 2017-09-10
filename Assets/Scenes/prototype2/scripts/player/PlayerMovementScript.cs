@@ -22,7 +22,8 @@ namespace Prototype2
 		private Vector2 mRotationAmount;
 		private bool mJump, mCrouching;
 
-		private const float STANDING_HEIGHT = 3.0f, CROUCHING_HEIGHT = 1.5f;
+		private const float STANDING_HEIGHT = 3.0f;
+		private const float STANDING_RADIUS = 0.75f;
 		private const float DOWNFORCE_MULT = 2.5f;
 
 		private void Awake()
@@ -136,7 +137,9 @@ namespace Prototype2
 		private void UpdateCrouch()
 		{
 			float current = mCollider.height;
-			mCollider.height = Mathf.Lerp(current, mCrouching ? CROUCHING_HEIGHT : STANDING_HEIGHT, Time.deltaTime * mMovementData.crouchSpeed);
+			mCollider.height = Mathf.Lerp(current, mCrouching ? STANDING_HEIGHT * mMovementData.crouchHeight : STANDING_HEIGHT, Time.deltaTime * mMovementData.crouchSpeed);
+			current = mCollider.radius;
+			mCollider.radius = Mathf.Lerp(current, mCrouching ? STANDING_RADIUS * mMovementData.crouchHeight : STANDING_RADIUS, Time.deltaTime * mMovementData.crouchSpeed);
 		}
 
 		/// <summary>
