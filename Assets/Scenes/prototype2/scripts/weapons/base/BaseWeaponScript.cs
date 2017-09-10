@@ -64,16 +64,18 @@ namespace Prototype2
 		/// <inheritdoc />
 		public void AttachNewPart(WeaponPartScript part)
 		{
+			int clipSize = mCurrentData.clipSize;
+
 			MoveAttachmentToPoint(part);
 			mCurrentAttachments[part.attachPoint] = part;
 
 			ActivatePartEffects();
 
-			if (part.attachPoint == Attachment.Mechanism)
+			if (part.attachPoint == Attachment.Mechanism || mCurrentData.clipSize != clipSize)
 			{
-				WeaponPartScriptMechanism realPart = (WeaponPartScriptMechanism)part;
-				CreateNewProjectilePool(realPart);
-				mOverrideHitscanEye = realPart.overrideHitscanMethod;
+				WeaponPartScriptMechanism mech = (WeaponPartScriptMechanism)mCurrentAttachments[Attachment.Mechanism];
+				CreateNewProjectilePool(mech);
+				mOverrideHitscanEye = mech.overrideHitscanMethod;
 				mAmountInClip.value = mClipSize.value;
 			}
 		}
@@ -86,7 +88,7 @@ namespace Prototype2
 			StartCoroutine(CleanupDeadPool(mProjectilePool));
 
 			GameObject newPrefab = part.projectilePrefab;
-			mProjectilePool = new GameObjectPool(25, newPrefab, transform);
+			mProjectilePool = new GameObjectPool(Mathf.CeilToInt(mCurrentData.clipSize * 1.25f), newPrefab, transform);
 		}
 
 		/// <summary>
