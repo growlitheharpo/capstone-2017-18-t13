@@ -14,7 +14,7 @@ namespace Prototype2
 			Mechanism,
 		}
 
-		public ICharacter bearer { get; set; }
+		public IWeaponBearer bearer { get; set; }
 		public WeaponData baseData { get { return mBaseData; } }
 		public IEnumerable<WeaponPartScript> parts { get { return mCurrentAttachments.Values; } }
 
@@ -161,6 +161,8 @@ namespace Prototype2
 
 			GameObject projectile = mProjectilePool.ReleaseNewItem();
 			projectile.GetComponent<IProjectile>().Instantiate(this, shot, mCurrentData, mProjectilePool);
+
+			bearer.ApplyRecoil(Vector3.up, mCurrentData.recoil * Random.Range(0.75f, 1.25f));
 		}
 
 		/// <summary>
@@ -209,7 +211,7 @@ namespace Prototype2
 				return;
 
 			mShotTime = float.MaxValue; //no shooting while reloading.
-			PlayReloadEffect();
+			PlayReloadEffect(mCurrentData.reloadTime);
 		}
 
 		public void OnReloadComplete()
@@ -218,7 +220,7 @@ namespace Prototype2
 			mShotTime = -1.0f;
 		}
 
-		protected abstract void PlayReloadEffect();
+		protected abstract void PlayReloadEffect(float time);
 
 		#endregion
 	}

@@ -26,16 +26,18 @@ public class AIWeaponScript : BaseWeaponScript
 	/// <summary>
 	/// Play any SFX, VFX, and Animations for reloading.
 	/// </summary>
-	protected override void PlayReloadEffect()
+	protected override void PlayReloadEffect(float time)
 	{
 		AnimationUtility.PlayAnimation(mAnimator, "reload");
-		StartCoroutine(WaitForReload());
+		StartCoroutine(WaitForReload(time));
 	}
 
-	private IEnumerator WaitForReload()
+	private IEnumerator WaitForReload(float time)
 	{
 		yield return null;
+		mAnimator.speed = 1.0f / time;
 		yield return new WaitForAnimation(mAnimator);
+		mAnimator.speed = 1.0f;
 		OnReloadComplete();
 	}
 }

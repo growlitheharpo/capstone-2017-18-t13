@@ -8,7 +8,7 @@ namespace Prototype2
 		/// <summary>
 		/// The character holding this weapon
 		/// </summary>
-		ICharacter bearer { get; }
+		IWeaponBearer bearer { get; }
 
 		/// <summary>
 		/// The base data for this weapon.

@@ -2,7 +2,7 @@
 using Prototype2;
 using UnityEngine;
 
-public class AggressiveTargetScript : MonoBehaviour, ICharacter
+public class AggressiveTargetScript : MonoBehaviour, IWeaponBearer
 {
 	[SerializeField] private AIWeaponScript mWeapon;
 	[SerializeField] private GameObject mDefaultScope;
@@ -44,4 +44,9 @@ public class AggressiveTargetScript : MonoBehaviour, ICharacter
 	}
 
 	public Transform eye { get { return transform; } }
+
+	public void ApplyRecoil(Vector3 direction, float amount)
+	{
+		// don't do anything
+	}
 }

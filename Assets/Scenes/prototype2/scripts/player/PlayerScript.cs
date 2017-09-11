@@ -2,7 +2,7 @@
 
 namespace Prototype2
 {
-	public class PlayerScript : MonoBehaviour, ICharacter, IDamageReceiver
+	public class PlayerScript : MonoBehaviour, IWeaponBearer, IDamageReceiver
 	{
 		[SerializeField] private PlayerWeaponScript mWeapon;
 		[SerializeField] private GameObject mDefaultScope;
@@ -10,10 +10,16 @@ namespace Prototype2
 		[SerializeField] private GameObject mDefaultMechanism;
 		[SerializeField] private float mInteractDistance;
 
+		private PlayerMovementScript mMovement;
 		private BoundProperty<float> mHealth;
 
 		private Transform mMainCameraRef;
 		private const string INTERACTABLE_TAG = "interactable";
+
+		private void Awake()
+		{
+			mMovement = GetComponent<PlayerMovementScript>();
+		}
 
 		private void Start()
 		{
@@ -50,6 +56,11 @@ namespace Prototype2
 
 		Transform ICharacter.eye { get { return mMainCameraRef; } }
 
+		public void ApplyRecoil(Vector3 direction, float amount)
+		{
+			mMovement.AddRecoil(direction, amount);
+		}
+
 		private void INPUT_ToggleUIElement()
 		{
 			EventManager.Notify(EventManager.UIToggle);
@@ -80,7 +91,7 @@ namespace Prototype2
 
 		public void ApplyDamage(float amount, Vector3 point, IDamageSource cause = null)
 		{
-			if (cause != null && cause.source == this)
+			if (cause != null && ReferenceEquals(cause.source, this))
 				amount /= 2.0f;
 
 			mHealth.value -= amount;

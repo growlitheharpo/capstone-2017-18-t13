@@ -20,6 +20,7 @@ namespace Prototype2
 
 		private Vector3 mCumulativeMovement;
 		private Vector2 mRotationAmount;
+		private float mRecoilAmount;
 		private bool mJump, mCrouching;
 
 		private const float STANDING_HEIGHT = 3.0f;
@@ -31,6 +32,7 @@ namespace Prototype2
 			mCollider = GetComponent<CapsuleCollider>();
 			mRigidbody = GetComponent<Rigidbody>();
 			mMainCameraRef = Camera.main.transform;
+			mRecoilAmount = 0.0f;
 		}
 
 		private void Start()
@@ -116,6 +118,18 @@ namespace Prototype2
 			ApplyMovementForce();
 		}
 
+		private static float ClampAngle(float currentValue, float minAngle, float maxAngle, float clampAroundAngle = 0)
+		{
+			float angle = currentValue - (clampAroundAngle + 180);
+
+			while (angle < 0)
+				angle += 360;
+
+			angle = Mathf.Repeat(angle, 360);
+
+			return Mathf.Clamp(angle - 180, minAngle, maxAngle) + 360 + clampAroundAngle;
+		}
+
 		/// <summary>
 		/// Follow the mouse or joystick rotation.
 		/// Horizontal rotation is applied to this.transform.
@@ -125,10 +139,13 @@ namespace Prototype2
 		{
 			Vector2 rotation = mRotationAmount * mMovementData.lookSpeed;
 
+			rotation.y += mRecoilAmount;
+			
 			transform.RotateAround(transform.position, transform.up, rotation.x);
 			mMainCameraRef.RotateAround(mMainCameraRef.position, mMainCameraRef.right, -rotation.y);
 
 			mRotationAmount = Vector2.zero;
+			mRecoilAmount = Mathf.Lerp(mRecoilAmount, 0.0f, Time.deltaTime * 20.0f);
 		}
 
 		/// <summary>
@@ -159,6 +176,11 @@ namespace Prototype2
 				mRigidbody.AddForce(Vector3.down * mMovementData.jumpForce * DOWNFORCE_MULT, ForceMode.Force);
 
 			mCumulativeMovement = Vector3.zero;
+		}
+
+		public void AddRecoil(Vector3 direction, float amount)
+		{
+			mRecoilAmount = amount;
 		}
 	}
 }
