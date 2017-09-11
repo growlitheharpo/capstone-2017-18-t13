@@ -12,6 +12,7 @@ namespace Prototype2
 			Scope,
 			Barrel,
 			Mechanism,
+			Grip,
 		}
 
 		public IWeaponBearer bearer { get; set; }
@@ -22,6 +23,7 @@ namespace Prototype2
 		[SerializeField] private Transform mBarrelAttach;
 		[SerializeField] private Transform mScopeAttach;
 		[SerializeField] private Transform mMechanismAttach;
+		[SerializeField] private Transform mGripAttach;
 
 		private Dictionary<Attachment, Transform> mAttachPoints;
 		private Dictionary<Attachment, WeaponPartScript> mCurrentAttachments;
@@ -44,6 +46,7 @@ namespace Prototype2
 				{ Attachment.Scope, mScopeAttach },
 				{ Attachment.Barrel, mBarrelAttach },
 				{ Attachment.Mechanism, mMechanismAttach },
+				{ Attachment.Grip, mGripAttach },
 			};
 
 			mCurrentAttachments = new Dictionary<Attachment, WeaponPartScript>(2);

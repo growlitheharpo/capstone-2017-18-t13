@@ -8,6 +8,7 @@ namespace Prototype2
 		[SerializeField] private GameObject mDefaultScope;
 		[SerializeField] private GameObject mDefaultBarrel;
 		[SerializeField] private GameObject mDefaultMechanism;
+		[SerializeField] private GameObject mDefaultGrip;
 		[SerializeField] private float mInteractDistance;
 
 		private PlayerMovementScript mMovement;
