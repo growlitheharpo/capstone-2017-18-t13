@@ -13,7 +13,6 @@ namespace Prototype2
 		[SerializeField] private ParticleSystem mShotParticles;
 		private Vector3 mPlayerEyeOffset;
 		private Animator mAnimator;
-		private bool mReloading;
 
 		private const float CAMERA_FOLLOW_FACTOR = 10.0f;
 
@@ -50,7 +49,6 @@ namespace Prototype2
 		/// </summary>
 		protected override void PlayReloadEffect()
 		{
-			mReloading = true;
 			AnimationUtility.PlayAnimation(mAnimator, "reload");
 			StartCoroutine(WaitForReload());
 		}
@@ -59,7 +57,6 @@ namespace Prototype2
 		{
 			yield return null;
 			yield return new WaitForAnimation(mAnimator);
-			mReloading = false;
 			OnReloadComplete();
 		}
 		

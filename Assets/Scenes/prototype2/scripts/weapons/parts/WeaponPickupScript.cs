@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 
 namespace Prototype2
 {
@@ -25,6 +26,20 @@ namespace Prototype2
 			EventManager.Notify(() => EventManager.ConfirmPartAttach(mPart));
 			Destroy(mPickupCollider.gameObject);
 			Destroy(mPickupRigidbody);
+			Destroy(this);
+		}
+
+		public void ConfirmAttach(IWeapon weapon)
+		{
+			Destroy(mPickupCollider.gameObject);
+			Destroy(mPickupRigidbody);
+			StartCoroutine(DirectAttach(weapon));
+		}
+
+		private IEnumerator DirectAttach(IWeapon weapon)
+		{
+			yield return null; //wait one tick
+			weapon.AttachNewPart(mPart);
 			Destroy(this);
 		}
 	}

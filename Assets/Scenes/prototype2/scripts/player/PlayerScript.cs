@@ -2,7 +2,7 @@
 
 namespace Prototype2
 {
-	public class PlayerScript : MonoBehaviour, ICharacter
+	public class PlayerScript : MonoBehaviour, ICharacter, IDamageReceiver
 	{
 		[SerializeField] private PlayerWeaponScript mWeapon;
 		[SerializeField] private GameObject mDefaultScope;
@@ -76,6 +76,14 @@ namespace Prototype2
 			IInteractable interactable = hit.transform.GetComponent<IInteractable>() ?? hit.transform.parent.GetComponent<IInteractable>();
 			if (interactable != null)
 				interactable.Interact();
+		}
+
+		public void ApplyDamage(float amount, Vector3 point, IDamageSource cause = null)
+		{
+			if (cause != null && cause.source == this)
+				amount /= 2.0f;
+
+			mHealth.value -= amount;
 		}
 	}
 }

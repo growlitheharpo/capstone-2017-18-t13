@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Prototype2
@@ -26,7 +25,7 @@ namespace Prototype2
 			IDamageReceiver component = hit.GetDamageReceiver();
 			if (component != null)
 			{
-				component.ApplyDamage(mData.damage, hit.contacts[0].point);
+				component.ApplyDamage(mData.damage, hit.contacts[0].point, this);
 				mDirectHit = hit.transform;
 			}
 
@@ -50,7 +49,7 @@ namespace Prototype2
 
 				IDamageReceiver component = hit.GetDamageReceiver();
 				if (component != null)
-					component.ApplyDamage(mData.damage / 2.0f, hit.point);
+					component.ApplyDamage(mData.damage / 2.0f, hit.point, this);
 			}
 		}
 
@@ -96,9 +95,13 @@ namespace Prototype2
 		#endregion
 		
 		#region IProjectile Implementation
+		
+		public ICharacter source { get { return sourceWeapon.bearer; } }
+		public IWeapon sourceWeapon { get; private set; }
 
-		public void Instantiate(Ray ray, WeaponData data)
+		public void Instantiate(IWeapon weapon, Ray ray, WeaponData data)
 		{
+			sourceWeapon = weapon;
 			mPool = null;
 			transform.position = ray.origin;
 
@@ -106,8 +109,9 @@ namespace Prototype2
 			mData = data;
 		}
 
-		public void Instantiate(Ray ray, WeaponData data, GameObjectPool pool)
+		public void Instantiate(IWeapon weapon, Ray ray, WeaponData data, GameObjectPool pool)
 		{
+			sourceWeapon = weapon;
 			mPool = pool;
 			transform.position = ray.origin;
 

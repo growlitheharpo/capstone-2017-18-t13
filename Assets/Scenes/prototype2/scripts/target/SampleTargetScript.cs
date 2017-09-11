@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using UnityEngine;
 using UIText = UnityEngine.UI.Text;
 
@@ -6,12 +7,58 @@ namespace Prototype2
 {
 	public class SampleTargetScript : MonoBehaviour, IDamageReceiver
 	{
-		[SerializeField] private UIText mText;
+		[SerializeField] private ParticleSystem mDeathParticles;
 		[SerializeField] private GameObject mHitIndicator;
-		
-		public void ApplyDamage(float amount, Vector3 point)
+		[SerializeField] private GameObject mMesh;
+		[SerializeField] private UIText mText;
+		[SerializeField] private float mStartHealth;
+
+		private BoundProperty<float> mHealth;
+		public BoundProperty<float> health { get { return mHealth; } }
+
+		private void Awake()
+		{
+			mHealth = new BoundProperty<float>(mStartHealth, (gameObject.name + "-health").GetHashCode());
+		}
+
+		private void Start()
+		{
+			ServiceLocator.Get<IGameConsole>()
+				.RegisterCommand("target", CONSOLE_Reset);
+		}
+
+		private static void CONSOLE_Reset(string[] args)
+		{
+			var allObjects = FindObjectsOfType<SampleTargetScript>();
+
+			switch (args[0].ToLower()) {
+				case "reset":
+					foreach (SampleTargetScript obj in allObjects)
+					{
+						obj.mHealth.value = obj.mStartHealth;
+						obj.mMesh.SetActive(true);
+					}
+					break;
+				case "sethealth":
+					foreach (SampleTargetScript obj in allObjects)
+					{
+						obj.mHealth.value = float.Parse(args[1]);
+						obj.mMesh.SetActive(true);
+					}
+					break;
+				default:
+					throw new ArgumentException("Invalid arguments for command: target");
+			}
+		}
+
+		public void ApplyDamage(float amount, Vector3 point, IDamageSource cause = null)
 		{
 			StopAllCoroutines();
+			mHealth.value = Mathf.Clamp(mHealth.value - amount, 0.0f, float.MaxValue);
+
+			if (mHealth.value <= 0.0f)
+				Die();
+
 			mText.color = new Color(0.4f, 0.4f, 0.4f, 1.0f);
 			mText.text = "Damage:\n" + amount.ToString("####");
 
@@ -33,6 +80,12 @@ namespace Prototype2
 			}
 
 			yield return null;
+		}
+
+		private void Die()
+		{
+			mMesh.SetActive(false);
+			mDeathParticles.Play();
 		}
 	}
 }

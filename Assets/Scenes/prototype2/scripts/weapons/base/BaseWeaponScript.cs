@@ -160,7 +160,7 @@ namespace Prototype2
 			Ray shot = CalculateShotDirection();
 
 			GameObject projectile = mProjectilePool.ReleaseNewItem();
-			projectile.GetComponent<IProjectile>().Instantiate(shot, mCurrentData, mProjectilePool);
+			projectile.GetComponent<IProjectile>().Instantiate(this, shot, mCurrentData, mProjectilePool);
 		}
 
 		/// <summary>
@@ -205,6 +205,9 @@ namespace Prototype2
 
 		public void Reload()
 		{
+			if (mShotTime >= float.MaxValue - 1.0f)
+				return;
+
 			mShotTime = float.MaxValue; //no shooting while reloading.
 			PlayReloadEffect();
 		}
