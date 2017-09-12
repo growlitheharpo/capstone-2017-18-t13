@@ -1,4 +1,5 @@
-﻿using KeatsLib.Unity;
+﻿using KeatsLib;
+using KeatsLib.Unity;
 using UnityEngine;
 using Input = UnityEngine.Input;
 
@@ -20,6 +21,7 @@ namespace Prototype2
 
 		private Vector3 mCumulativeMovement;
 		private Vector2 mRotationAmount;
+		private float mRecoilAmount;
 		private bool mJump, mCrouching;
 
 		private const float STANDING_HEIGHT = 3.0f;
@@ -31,6 +33,7 @@ namespace Prototype2
 			mCollider = GetComponent<CapsuleCollider>();
 			mRigidbody = GetComponent<Rigidbody>();
 			mMainCameraRef = Camera.main.transform;
+			mRecoilAmount = 0.0f;
 		}
 
 		private void Start()
@@ -116,6 +119,8 @@ namespace Prototype2
 			ApplyMovementForce();
 		}
 
+		private float mRotationY;
+
 		/// <summary>
 		/// Follow the mouse or joystick rotation.
 		/// Horizontal rotation is applied to this.transform.
@@ -124,11 +129,15 @@ namespace Prototype2
 		private void HandleRotation()
 		{
 			Vector2 rotation = mRotationAmount * mMovementData.lookSpeed;
-
 			transform.RotateAround(transform.position, transform.up, rotation.x);
-			mMainCameraRef.RotateAround(mMainCameraRef.position, mMainCameraRef.right, -rotation.y);
+
+			mRotationY += rotation.y + mRecoilAmount;
+
+			mRotationY = GenericExt.ClampAngle(mRotationY, -85.0f, 85.0f);
+			mMainCameraRef.localRotation = Quaternion.AngleAxis(mRotationY, Vector3.left);
 
 			mRotationAmount = Vector2.zero;
+			mRecoilAmount = Mathf.Lerp(mRecoilAmount, 0.0f, Time.deltaTime * 20.0f);
 		}
 
 		/// <summary>
@@ -159,6 +168,11 @@ namespace Prototype2
 				mRigidbody.AddForce(Vector3.down * mMovementData.jumpForce * DOWNFORCE_MULT, ForceMode.Force);
 
 			mCumulativeMovement = Vector3.zero;
+		}
+
+		public void AddRecoil(Vector3 direction, float amount)
+		{
+			mRecoilAmount = amount;
 		}
 	}
 }

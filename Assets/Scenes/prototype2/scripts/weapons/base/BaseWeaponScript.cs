@@ -12,9 +12,10 @@ namespace Prototype2
 			Scope,
 			Barrel,
 			Mechanism,
+			Grip,
 		}
 
-		public ICharacter bearer { get; set; }
+		public IWeaponBearer bearer { get; set; }
 		public WeaponData baseData { get { return mBaseData; } }
 		public IEnumerable<WeaponPartScript> parts { get { return mCurrentAttachments.Values; } }
 
@@ -22,6 +23,7 @@ namespace Prototype2
 		[SerializeField] private Transform mBarrelAttach;
 		[SerializeField] private Transform mScopeAttach;
 		[SerializeField] private Transform mMechanismAttach;
+		[SerializeField] private Transform mGripAttach;
 
 		private Dictionary<Attachment, Transform> mAttachPoints;
 		private Dictionary<Attachment, WeaponPartScript> mCurrentAttachments;
@@ -44,6 +46,7 @@ namespace Prototype2
 				{ Attachment.Scope, mScopeAttach },
 				{ Attachment.Barrel, mBarrelAttach },
 				{ Attachment.Mechanism, mMechanismAttach },
+				{ Attachment.Grip, mGripAttach },
 			};
 
 			mCurrentAttachments = new Dictionary<Attachment, WeaponPartScript>(2);
@@ -161,6 +164,8 @@ namespace Prototype2
 
 			GameObject projectile = mProjectilePool.ReleaseNewItem();
 			projectile.GetComponent<IProjectile>().Instantiate(this, shot, mCurrentData, mProjectilePool);
+
+			bearer.ApplyRecoil(Vector3.up, mCurrentData.recoil * Random.Range(0.75f, 1.25f));
 		}
 
 		/// <summary>
@@ -209,7 +214,7 @@ namespace Prototype2
 				return;
 
 			mShotTime = float.MaxValue; //no shooting while reloading.
-			PlayReloadEffect();
+			PlayReloadEffect(mCurrentData.reloadTime);
 		}
 
 		public void OnReloadComplete()
@@ -218,7 +223,7 @@ namespace Prototype2
 			mShotTime = -1.0f;
 		}
 
-		protected abstract void PlayReloadEffect();
+		protected abstract void PlayReloadEffect(float time);
 
 		#endregion
 	}

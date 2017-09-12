@@ -1,4 +1,5 @@
 ﻿using System;
+using UnityEngine;
 
 namespace KeatsLib
 {
@@ -35,6 +36,27 @@ namespace KeatsLib
 		public static double Inverse(this double v)
 		{
 			return 1.0 / v;
+		}
+
+		/// <summary>
+		/// Clamp an angle.
+		/// </summary>
+		/// <param name="angle"></param>
+		/// <param name="min"></param>
+		/// <param name="max"></param>
+		/// <returns>angle clamped between min and max.</returns>
+		/// <see cref="http://wiki.unity3d.com/index.php/SmoothMouseLook"/>
+		public static float ClampAngle(float angle, float min, float max)
+		{
+			angle = angle % 360;
+			if (angle >= -360F && angle <= 360F)
+			{
+				if (angle < -360F)
+					angle += 360F;
+				if (angle > 360F)
+					angle -= 360F;
+			}
+			return Mathf.Clamp(angle, min, max);
 		}
 	}
 }

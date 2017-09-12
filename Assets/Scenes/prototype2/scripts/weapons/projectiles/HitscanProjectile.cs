@@ -39,7 +39,10 @@ namespace Prototype2
 			// See if we hit anything
 			RaycastHit hit;
 			if (!Physics.Raycast(ray, out hit))
+			{
+				KillSelf(pool);
 				return;
+			}
 
 			// Try to apply damage to it if we did
 			IDamageReceiver component = hit.GetDamageReceiver();
@@ -60,7 +63,11 @@ namespace Prototype2
 		private IEnumerator PlayEffectAndKillSelf(GameObjectPool pool, Vector3 hitPoint)
 		{
 			yield return mEffect.Flash(hitPoint);
-			
+			KillSelf(pool);
+		}
+
+		private void KillSelf(GameObjectPool pool)
+		{
 			if (pool != null)
 				pool.ReturnItem(gameObject);
 			else
