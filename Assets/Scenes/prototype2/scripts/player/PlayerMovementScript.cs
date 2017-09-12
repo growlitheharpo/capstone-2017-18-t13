@@ -1,4 +1,5 @@
-﻿using KeatsLib.Unity;
+﻿using KeatsLib;
+using KeatsLib.Unity;
 using UnityEngine;
 using Input = UnityEngine.Input;
 
@@ -118,17 +119,7 @@ namespace Prototype2
 			ApplyMovementForce();
 		}
 
-		private static float ClampAngle(float currentValue, float minAngle, float maxAngle, float clampAroundAngle = 0)
-		{
-			float angle = currentValue - (clampAroundAngle + 180);
-
-			while (angle < 0)
-				angle += 360;
-
-			angle = Mathf.Repeat(angle, 360);
-
-			return Mathf.Clamp(angle - 180, minAngle, maxAngle) + 360 + clampAroundAngle;
-		}
+		private float mRotationY;
 
 		/// <summary>
 		/// Follow the mouse or joystick rotation.
@@ -138,11 +129,12 @@ namespace Prototype2
 		private void HandleRotation()
 		{
 			Vector2 rotation = mRotationAmount * mMovementData.lookSpeed;
-
-			rotation.y += mRecoilAmount;
-			
 			transform.RotateAround(transform.position, transform.up, rotation.x);
-			mMainCameraRef.RotateAround(mMainCameraRef.position, mMainCameraRef.right, -rotation.y);
+
+			mRotationY += rotation.y + mRecoilAmount;
+
+			mRotationY = GenericExt.ClampAngle(mRotationY, -85.0f, 85.0f);
+			mMainCameraRef.localRotation = Quaternion.AngleAxis(mRotationY, Vector3.left);
 
 			mRotationAmount = Vector2.zero;
 			mRecoilAmount = Mathf.Lerp(mRecoilAmount, 0.0f, Time.deltaTime * 20.0f);
