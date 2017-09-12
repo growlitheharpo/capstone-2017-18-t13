@@ -35,7 +35,7 @@ namespace Prototype2
 			mMainCameraRef = Camera.main.transform;
 
 			ServiceLocator.Get<IInput>()
-				.RegisterInput(Input.GetKeyDown, KeyCode.Tab, INPUT_ToggleUIElement, KeatsLib.Unity.Input.InputLevel.None)
+				.RegisterInput(Input.GetButtonDown, "ToggleMenu", INPUT_ToggleUIElement, KeatsLib.Unity.Input.InputLevel.None)
 				.RegisterInput(Input.GetButton, "Fire1", INPUT_FireWeapon, KeatsLib.Unity.Input.InputLevel.Gameplay)
 				.RegisterInput(Input.GetButtonDown, "Reload", INPUT_ReloadWeapon, KeatsLib.Unity.Input.InputLevel.Gameplay)
 				.RegisterInput(Input.GetButtonDown, "Interact", INPUT_ActivateInteract, KeatsLib.Unity.Input.InputLevel.Gameplay)
