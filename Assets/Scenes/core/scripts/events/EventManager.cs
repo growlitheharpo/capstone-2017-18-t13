@@ -61,6 +61,20 @@ public partial class EventManager
 		OnBoundPropertyCreated(property, propertyCode);
 	}
 
+	public static event Action OnPlayerDied = () => { LogEvent(); };
+
+	public static void PlayerDied()
+	{
+		OnPlayerDied();
+	}
+
+	public static event Action OnResetLevel = () => { LogEvent(); };
+
+	public static void ResetLevel()
+	{
+		OnResetLevel();
+	}
+
 	//!PROTOTYPE 2
 
 	public void Start()

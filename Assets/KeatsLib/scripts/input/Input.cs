@@ -158,7 +158,15 @@ namespace KeatsLib.Unity
 		public void SetInputLevel(InputLevel level)
 		{
 			mEnabledInputs = level;
-			Logger.Warn("Set input level does not send an input event.", Logger.System.Input);
+			foreach (object value in Enum.GetValues(typeof(InputLevel)))
+			{
+				InputLevel v = (InputLevel)value;
+
+				if ((level & v) == v)
+					EventManager.Notify(() => EventManager.InputLevelChanged(v, true));
+				else
+					EventManager.Notify(() => EventManager.InputLevelChanged(v, false));
+			}
 		}
 
 		/// <inheritdoc />
