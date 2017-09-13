@@ -20,6 +20,9 @@ namespace Prototype2
 		{
 			base.Awake();
 			mAnimator = GetComponent<Animator>();
+
+			mClipSize = new BoundProperty<int>(0, GameplayUIManager.CLIP_TOTAL);
+			mAmountInClip = new BoundProperty<int>(0, GameplayUIManager.CLIP_CURRENT);
 		}
 
 		private void Start()

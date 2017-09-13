@@ -11,6 +11,9 @@ public class AIWeaponScript : BaseWeaponScript
 	{
 		base.Awake();
 		mAnimator = GetComponent<Animator>();
+
+		mClipSize = new BoundProperty<int>(0);
+		mAmountInClip = new BoundProperty<int>(0);
 	}
 	
 	/// <summary>
