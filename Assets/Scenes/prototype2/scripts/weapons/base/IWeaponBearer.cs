@@ -1,6 +1,9 @@
 ﻿using UnityEngine;
 
-public interface IWeaponBearer : ICharacter
+namespace FiringSquad.Gameplay
 {
-	void ApplyRecoil(Vector3 direction, float amount);
+	public interface IWeaponBearer : ICharacter
+	{
+		void ApplyRecoil(Vector3 direction, float amount);
+	}
 }

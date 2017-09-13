@@ -3,7 +3,7 @@ using KeatsLib.Unity;
 using UnityEngine;
 using Input = UnityEngine.Input;
 
-namespace Prototype2
+namespace FiringSquad.Gameplay
 {
 	/// <summary>
 	/// Component strictly for handling the movement of the character
@@ -90,7 +90,7 @@ namespace Prototype2
 			Ray r = new Ray(transform.position + Vector3.up * 0.5f, Vector3.up * -1.0f);
 			const float dist = 0.51f;
 
-			Debug.DrawLine(r.origin, r.origin + r.direction * dist, Color.green, 0.5f);
+			UnityEngine.Debug.DrawLine(r.origin, r.origin + r.direction * dist, Color.green, 0.5f);
 
 			if (Physics.Raycast(r, dist, mJumpLayermask))
 				mJump = true;

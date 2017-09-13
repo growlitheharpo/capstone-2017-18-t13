@@ -1,7 +1,8 @@
 ﻿using System.Collections;
+using FiringSquad.Data;
 using UnityEngine;
 
-namespace Prototype2
+namespace FiringSquad.Gameplay
 {
 	public class HitscanProjectile : MonoBehaviour, IProjectile
 	{
@@ -34,7 +35,7 @@ namespace Prototype2
 		{
 			SetupShot(weapon);
 
-			Debug.DrawLine(ray.origin, ray.origin + ray.direction * 2000.0f, Color.red, 1.0f / data.fireRate + 0.2f);
+			UnityEngine.Debug.DrawLine(ray.origin, ray.origin + ray.direction * 2000.0f, Color.red, 1.0f / data.fireRate + 0.2f);
 
 			// See if we hit anything
 			RaycastHit hit;

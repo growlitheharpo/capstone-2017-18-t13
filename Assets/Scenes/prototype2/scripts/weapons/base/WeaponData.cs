@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace Prototype2
+namespace FiringSquad.Data
 {
 	[Serializable]
 	public struct WeaponData

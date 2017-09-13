@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Prototype2
+namespace FiringSquad.Data
 {
 	[CreateAssetMenu(menuName = "Weapons/Weapon Part Data")]
 	public class WeaponPartData : ScriptableObject

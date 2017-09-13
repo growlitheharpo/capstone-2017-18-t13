@@ -1,4 +1,4 @@
-﻿namespace Prototype2
+﻿namespace FiringSquad.Gameplay
 {
 	public class WeaponPartScriptGrip : WeaponPartScript
 	{

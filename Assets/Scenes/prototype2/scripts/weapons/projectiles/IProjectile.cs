@@ -1,6 +1,7 @@
-﻿using UnityEngine;
+﻿using FiringSquad.Data;
+using UnityEngine;
 
-namespace Prototype2
+namespace FiringSquad.Gameplay
 {
 	public interface IProjectile : IPoolable, IDamageSource
 	{

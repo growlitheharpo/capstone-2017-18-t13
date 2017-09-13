@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
+using FiringSquad.Data;
 
-namespace Prototype2
+namespace FiringSquad.Gameplay
 {
 	public abstract class WeaponPartScript : MonoBehaviour
 	{

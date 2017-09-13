@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Prototype2
+namespace FiringSquad.Gameplay
 {
 	public class WeaponPartScriptMechanism : WeaponPartScript
 	{

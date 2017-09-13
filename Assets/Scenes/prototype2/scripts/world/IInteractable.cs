@@ -1,8 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-namespace Prototype2
+﻿
+namespace FiringSquad.Gameplay
 {
 	public interface IInteractable
 	{

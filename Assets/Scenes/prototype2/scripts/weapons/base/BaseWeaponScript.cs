@@ -1,8 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using FiringSquad.Data;
 using UnityEngine;
 
-namespace Prototype2
+namespace FiringSquad.Gameplay
 {
 	/// <inheritdoc cref="IWeapon" />
 	public abstract class BaseWeaponScript : MonoBehaviour, IWeapon
