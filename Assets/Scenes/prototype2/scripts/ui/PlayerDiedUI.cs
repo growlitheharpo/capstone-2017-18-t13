@@ -1,49 +1,52 @@
-﻿using Prototype2;
+﻿using FiringSquad.Debug;
 using UnityEngine;
 using Input = KeatsLib.Unity.Input;
 
-public class PlayerDiedUI : MonoBehaviour
+namespace FiringSquad.Gameplay
 {
-	[SerializeField] private ActionProvider mResetButton;
-	[SerializeField] private ActionProvider mQuitButton;
-	[SerializeField] private GameObject mView;
-
-	// Use this for initialization
-	private void Start()
+	public class PlayerDiedUI : MonoBehaviour
 	{
-		mView.SetActive(false);
+		[SerializeField] private ActionProvider mResetButton;
+		[SerializeField] private ActionProvider mQuitButton;
+		[SerializeField] private GameObject mView;
 
-		mQuitButton.OnClick += HandleQuit;
-		mResetButton.OnClick += DoReset;
-		EventManager.OnPlayerDied += HandlePlayerDeath;
-	}
+		// Use this for initialization
+		private void Start()
+		{
+			mView.SetActive(false);
 
-	private void OnDestroy()
-	{
-		mQuitButton.OnClick -= HandleQuit;
-		mResetButton.OnClick -= DoReset;
-		EventManager.OnPlayerDied -= HandlePlayerDeath;
-	}
+			mQuitButton.OnClick += HandleQuit;
+			mResetButton.OnClick += DoReset;
+			EventManager.OnPlayerDied += HandlePlayerDeath;
+		}
 
-	private void HandlePlayerDeath()
-	{
-		if (FindObjectOfType<DebugMenu>().currentlyActive)
-			EventManager.UIToggle();
+		private void OnDestroy()
+		{
+			mQuitButton.OnClick -= HandleQuit;
+			mResetButton.OnClick -= DoReset;
+			EventManager.OnPlayerDied -= HandlePlayerDeath;
+		}
 
-		ServiceLocator.Get<IInput>()
-			.SetInputLevel(Input.InputLevel.None);
+		private void HandlePlayerDeath()
+		{
+			if (FindObjectOfType<DebugMenu>().currentlyActive)
+				EventManager.UIToggle();
 
-		mView.SetActive(true);
-	}
+			ServiceLocator.Get<IInput>()
+				.SetInputLevel(Input.InputLevel.None);
 
-	private void DoReset()
-	{
-		mView.SetActive(false);
-		EventManager.Notify(EventManager.ResetLevel);
-	}
+			mView.SetActive(true);
+		}
 
-	private void HandleQuit()
-	{
-		EventManager.Notify(() => EventManager.RequestSceneChange(GamestateManager.MENU_SCENE));
+		private void DoReset()
+		{
+			mView.SetActive(false);
+			EventManager.Notify(EventManager.ResetLevel);
+		}
+
+		private void HandleQuit()
+		{
+			EventManager.Notify(() => EventManager.RequestSceneChange(GamestateManager.MENU_SCENE));
+		}
 	}
 }

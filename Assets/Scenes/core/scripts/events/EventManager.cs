@@ -47,9 +47,9 @@ public partial class EventManager
 		OnUIToggle();
 	}
 
-	public static event Action<Prototype2.WeaponPartScript> OnConfirmPartAttach = e => { LogEvent(); };
+	public static event Action<FiringSquad.Gameplay.WeaponPartScript> OnConfirmPartAttach = e => { LogEvent(); };
 
-	public static void ConfirmPartAttach(Prototype2.WeaponPartScript newPart)
+	public static void ConfirmPartAttach(FiringSquad.Gameplay.WeaponPartScript newPart)
 	{
 		OnConfirmPartAttach(newPart);
 	}
