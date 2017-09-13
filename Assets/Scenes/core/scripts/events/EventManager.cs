@@ -75,6 +75,13 @@ public partial class EventManager
 		OnResetLevel();
 	}
 
+	public static event Action<ICharacter> OnPlayerKilledEnemy = e => { LogEvent(); };
+
+	public static void PlayerKilledEnemy(ICharacter enemy)
+	{
+		OnPlayerKilledEnemy(enemy);
+	}
+
 	//!PROTOTYPE 2
 
 	public void Start()
