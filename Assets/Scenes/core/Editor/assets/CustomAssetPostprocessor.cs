@@ -76,19 +76,20 @@ public class CustomAssetPostprocessor : AssetPostprocessor
 	{
 		string folderPath = Path.GetDirectoryName(assetImporter.assetPath);
 		string fileName = Path.GetFileNameWithoutExtension(assetImporter.assetPath) ?? "";
-
-		AudioMixer mixer = AssetDatabase.LoadAssetAtPath<AudioMixer>("Assets/Scenes/core/audio/MasterAudioMixer.mixer");
 		string dataPath = folderPath + "/" + fileName + ".asset";
 
+		AudioMixer mixer = AssetDatabase.LoadAssetAtPath<AudioMixer>("Assets/Scenes/core/audio/MasterAudioMixer.mixer");
+
 		AudioClipData data = AssetDatabase.LoadAssetAtPath<AudioClipData>(dataPath);
-		if (data == null)
+		if (data == null && !File.Exists(dataPath))
 		{
 			data = ScriptableObject.CreateInstance<AudioClipData>();
 			AssetDatabase.CreateAsset(data, dataPath);
 		}
 
-		data.group = mixer.FindMatchingGroups("sfx")[0];
+		if (data != null)
+			data.group = mixer.FindMatchingGroups("sfx")[0];
+
 		AssetDatabase.SaveAssets();
 	}
-
 }
