@@ -61,6 +61,27 @@ public partial class EventManager
 		OnBoundPropertyCreated(property, propertyCode);
 	}
 
+	public static event Action OnPlayerDied = () => { LogEvent(); };
+
+	public static void PlayerDied()
+	{
+		OnPlayerDied();
+	}
+
+	public static event Action OnResetLevel = () => { LogEvent(); };
+
+	public static void ResetLevel()
+	{
+		OnResetLevel();
+	}
+
+	public static event Action<ICharacter> OnPlayerKilledEnemy = e => { LogEvent(); };
+
+	public static void PlayerKilledEnemy(ICharacter enemy)
+	{
+		OnPlayerKilledEnemy(enemy);
+	}
+
 	//!PROTOTYPE 2
 
 	public void Start()

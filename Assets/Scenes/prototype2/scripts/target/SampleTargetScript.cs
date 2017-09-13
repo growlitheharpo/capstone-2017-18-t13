@@ -25,6 +25,13 @@ namespace Prototype2
 		{
 			ServiceLocator.Get<IGameConsole>()
 				.RegisterCommand("target", CONSOLE_Reset);
+
+			EventManager.OnResetLevel += HandleResetEvent;
+		}
+
+		private void OnDestroy()
+		{
+			EventManager.OnResetLevel -= HandleResetEvent;
 		}
 
 		private static void CONSOLE_Reset(string[] args)
@@ -82,9 +89,20 @@ namespace Prototype2
 			yield return null;
 		}
 
+		private void HandleResetEvent()
+		{
+			mHealth.value = mStartHealth;
+			mMesh.SetActive(true);
+		}
+
 		private void Die()
 		{
 			mMesh.SetActive(false);
+
+			ICharacter characterComponent = GetComponent<AggressiveTargetScript>();
+			if (characterComponent != null)
+				EventManager.Notify(() => EventManager.PlayerKilledEnemy(characterComponent));
+
 			mDeathParticles.Play();
 		}
 	}

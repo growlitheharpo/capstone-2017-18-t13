@@ -22,6 +22,7 @@ namespace Prototype2
 		[SerializeField] private GameObject mGrip02;
 
 		private bool mEnabled = true; //everything starts enabled
+		public bool currentlyActive { get { return mEnabled; } }
 
 		private void Start()
 		{
