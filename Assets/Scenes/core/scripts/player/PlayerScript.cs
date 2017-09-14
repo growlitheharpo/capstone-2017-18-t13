@@ -29,7 +29,10 @@ namespace FiringSquad.Gameplay
 		private void Start()
 		{
 			mWeapon.bearer = this;
-			mGravityGun.bearer = this;
+
+			if (mGravityGun != null)
+				mGravityGun.bearer = this;
+
 			mMainCameraRef = Camera.main.transform;
 			mHealth = new BoundProperty<float>(mDefaultHealth, GameplayUIManager.PLAYER_HEALTH);
 
