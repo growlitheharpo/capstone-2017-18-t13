@@ -1,52 +1,54 @@
 ﻿using System.Collections;
-using Prototype2;
 using UnityEngine;
 
-public class AggressiveTargetScript : MonoBehaviour, IWeaponBearer
+namespace FiringSquad.Gameplay
 {
-	[SerializeField] private AIWeaponScript mWeapon;
-	[SerializeField] private GameObject mDefaultScope;
-	[SerializeField] private GameObject mDefaultBarrel;
-	[SerializeField] private GameObject mDefaultMechanism;
-
-	private BoundProperty<float> mHealthProp;
-	
-	// Use this for initialization
-	private void Start()
+	public class AggressiveTargetScript : MonoBehaviour, IWeaponBearer
 	{
-		mWeapon.bearer = this;
-		Instantiate(mDefaultMechanism).GetComponent<WeaponPickupScript>().ConfirmAttach(mWeapon);
-		Instantiate(mDefaultBarrel).GetComponent<WeaponPickupScript>().ConfirmAttach(mWeapon);
-		Instantiate(mDefaultScope).GetComponent<WeaponPickupScript>().ConfirmAttach(mWeapon);
+		[SerializeField] private AIWeaponScript mWeapon;
+		[SerializeField] private GameObject mDefaultScope;
+		[SerializeField] private GameObject mDefaultBarrel;
+		[SerializeField] private GameObject mDefaultMechanism;
 
-		StartCoroutine(FireLoop());
-	}
+		private BoundProperty<float> mHealthProp;
 
-	private IEnumerator FireLoop()
-	{
-		yield return null;
-		mHealthProp = GetComponent<SampleTargetScript>().health;
+		// Use this for initialization
+		private void Start()
+		{
+			mWeapon.bearer = this;
+			Instantiate(mDefaultMechanism).GetComponent<WeaponPickupScript>().ConfirmAttach(mWeapon);
+			Instantiate(mDefaultBarrel).GetComponent<WeaponPickupScript>().ConfirmAttach(mWeapon);
+			Instantiate(mDefaultScope).GetComponent<WeaponPickupScript>().ConfirmAttach(mWeapon);
 
-		while (true)
+			StartCoroutine(FireLoop());
+		}
+
+		private IEnumerator FireLoop()
 		{
 			yield return null;
+			mHealthProp = GetComponent<SampleTargetScript>().health;
 
-			if (mHealthProp.value <= 0.0f)
-				continue;
-			
-			mWeapon.FireWeapon();
+			while (true)
+			{
+				yield return null;
+
+				if (mHealthProp.value <= 0.0f)
+					continue;
+
+				mWeapon.FireWeapon();
+			}
 		}
-	}
 
-	public GameObject GetGameObject()
-	{
-		return gameObject;
-	}
+		public GameObject GetGameObject()
+		{
+			return gameObject;
+		}
 
-	public Transform eye { get { return transform; } }
+		public Transform eye { get { return transform; } }
 
-	public void ApplyRecoil(Vector3 direction, float amount)
-	{
-		// don't do anything
+		public void ApplyRecoil(Vector3 direction, float amount)
+		{
+			// don't do anything
+		}
 	}
 }

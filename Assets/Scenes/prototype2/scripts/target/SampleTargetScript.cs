@@ -3,7 +3,7 @@ using System.Collections;
 using UnityEngine;
 using UIText = UnityEngine.UI.Text;
 
-namespace Prototype2
+namespace FiringSquad.Gameplay
 {
 	public class SampleTargetScript : MonoBehaviour, IDamageReceiver
 	{

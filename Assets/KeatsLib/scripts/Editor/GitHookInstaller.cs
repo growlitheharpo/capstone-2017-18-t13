@@ -63,6 +63,9 @@ public class GitHookInstaller : EditorWindow
 	private static void DoCheck()
 	{
 		string repoPath = Application.dataPath + "/..";
+
+		EnsureGitHooksExists(repoPath + "/.git/hooks/");
+
 		var currentGitPaths = Directory.GetFiles(repoPath + "/.git/hooks/");
 		var currentExePaths = Directory.GetFiles(repoPath + "/Tools/Executables/");
 
@@ -100,6 +103,12 @@ public class GitHookInstaller : EditorWindow
 
 		// Remove this function from the update list.
 		EditorApplication.update -= DoCheck;
+	}
+
+	private static void EnsureGitHooksExists(string s)
+	{
+		if (!Directory.Exists(s))
+			Directory.CreateDirectory(s);
 	}
 
 	private void Awake()

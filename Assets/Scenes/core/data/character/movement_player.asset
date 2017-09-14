@@ -8,8 +8,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 316e501c42d8f9349807f2293d0650f0, type: 3}
-  m_Name: MasterAudioDatabase
+  m_Script: {fileID: 11500000, guid: b4533908b3b8dee4680460518cd9f76c, type: 3}
+  m_Name: movement_player
   m_EditorClassIdentifier: 
-  mProfiles:
-  - {fileID: 11400000, guid: 0086f43a469a85b4e99519b8cd38f5f9, type: 2}
+  mForwardSpeed: 6000
+  mBackwardSpeed: -1
+  mStrafeSpeed: 4000
+  mCrouchSpeed: 15
+  mCrouchPercent: 0.25
+  mJumpForce: 3500
+  mLookSpeed: 5

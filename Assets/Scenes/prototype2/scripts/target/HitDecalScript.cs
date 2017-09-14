@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-namespace Prototype2
+namespace FiringSquad.Gameplay
 {
 	public class HitDecalScript : MonoBehaviour
 	{

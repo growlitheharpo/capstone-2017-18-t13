@@ -4,6 +4,7 @@ using UnityEngine.Audio;
 namespace FiringSquad.Data
 {
 	/// <inheritdoc cref="IAudioClip" />
+	[CreateAssetMenu(menuName = "Audio/Audio Clip Data")]
 	public class AudioClipData : ScriptableObject, IAudioClip
 	{
 		[SerializeField] private bool mBypassEffects;

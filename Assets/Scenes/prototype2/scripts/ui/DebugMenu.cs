@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
+using FiringSquad.Gameplay;
 
-namespace Prototype2
+namespace FiringSquad.Debug
 {
 	public class DebugMenu : MonoBehaviour
 	{

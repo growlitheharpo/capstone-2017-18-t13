@@ -1,12 +1,12 @@
 ﻿using UnityEngine;
 
-namespace Prototype2
+namespace FiringSquad.Gameplay
 {
 	public class SampleInteractable : MonoBehaviour, IInteractable
 	{
 		public void Interact()
 		{
-			Debug.Log("You clicked on the box!!");
+			Logger.Info("You clicked on the box!");
 		}
 	}
 }

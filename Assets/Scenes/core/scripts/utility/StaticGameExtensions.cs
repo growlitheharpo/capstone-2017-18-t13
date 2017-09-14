@@ -1,4 +1,4 @@
-﻿using Prototype2;
+﻿using FiringSquad.Gameplay;
 using UnityEngine;
 
 public static class StaticGameExtensions
