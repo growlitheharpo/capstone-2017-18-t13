@@ -4,6 +4,7 @@ namespace FiringSquad.Gameplay
 {
 	public class PlayerScript : MonoBehaviour, IWeaponBearer, IDamageReceiver
 	{
+		[SerializeField] private PlayerGravGunWeapon mGravityGun;
 		[SerializeField] private PlayerWeaponScript mWeapon;
 		[SerializeField] private GameObject mDefaultScope;
 		[SerializeField] private GameObject mDefaultBarrel;
@@ -28,6 +29,7 @@ namespace FiringSquad.Gameplay
 		private void Start()
 		{
 			mWeapon.bearer = this;
+			mGravityGun.bearer = this;
 			mMainCameraRef = Camera.main.transform;
 			mHealth = new BoundProperty<float>(mDefaultHealth, GameplayUIManager.PLAYER_HEALTH);
 
