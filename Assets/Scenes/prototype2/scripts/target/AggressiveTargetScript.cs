@@ -38,12 +38,7 @@ namespace FiringSquad.Gameplay
 				mWeapon.FireWeapon();
 			}
 		}
-
-		public GameObject GetGameObject()
-		{
-			return gameObject;
-		}
-
+		
 		public Transform eye { get { return transform; } }
 
 		public void ApplyRecoil(Vector3 direction, float amount)

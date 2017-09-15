@@ -88,12 +88,7 @@ namespace FiringSquad.Gameplay
 			ServiceLocator.Get<IInput>()
 				.EnableInputLevel(KeatsLib.Unity.Input.InputLevel.Gameplay);
 		}
-
-		GameObject ICharacter.GetGameObject()
-		{
-			return gameObject;
-		}
-
+		
 		Transform ICharacter.eye { get { return mMainCameraRef; } }
 
 		public void ApplyRecoil(Vector3 direction, float amount)
