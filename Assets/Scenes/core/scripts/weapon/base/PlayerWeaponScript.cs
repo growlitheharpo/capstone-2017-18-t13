@@ -35,6 +35,9 @@ namespace FiringSquad.Gameplay
 		private void OnDestroy()
 		{
 			EventManager.OnConfirmPartAttach -= AttachNewPart;
+
+			mClipSize.Cleanup();
+			mAmountInClip.Cleanup();
 		}
 		
 		/// <summary>

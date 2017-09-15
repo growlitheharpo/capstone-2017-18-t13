@@ -9,6 +9,13 @@ public class BoundProperty
 	{
 		ValueChanged();
 	}
+
+	public void Cleanup()
+	{
+		var delegates = ValueChanged.GetInvocationList();
+		foreach (Delegate d in delegates)
+			ValueChanged -= (Action)d;
+	}
 }
 
 public class BoundProperty<T> : BoundProperty

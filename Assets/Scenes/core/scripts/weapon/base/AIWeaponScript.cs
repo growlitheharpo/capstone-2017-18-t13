@@ -17,6 +17,12 @@ namespace FiringSquad.Gameplay
 			mAmountInClip = new BoundProperty<int>(0);
 		}
 
+		private void OnDestroy()
+		{
+			mClipSize.Cleanup();
+			mAmountInClip.Cleanup();
+		}
+
 		/// <summary>
 		/// Play any SFX and VFX associated with the weapon based on its current mods.
 		/// </summary>

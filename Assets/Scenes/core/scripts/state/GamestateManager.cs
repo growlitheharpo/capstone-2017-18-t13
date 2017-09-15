@@ -88,7 +88,7 @@ public partial class GamestateManager : MonoSingleton<GamestateManager>, IGamest
 			{ MAIN_SCENE, new TransitionToSceneState(MENU_SCENE) },
 			{ MENU_SCENE, new MenuSceneState() },
 			{ GAME_SCENE, new GameSceneState() },
-			{ PROTOTYPE1_SCENE, new GameSceneState() },
+			{ PROTOTYPE1_SCENE, new Prototype1State() },
 			{ PROTOTYPE2_SCENE, new Prototype2State() },
 			{ PROTOTYPE3_SCENE, new GameSceneState() },
 			{ ART_PROTOTYPE_SCENE, new GameSceneState() },

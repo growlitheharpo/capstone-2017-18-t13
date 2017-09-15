@@ -1,21 +1,18 @@
-﻿using UnityEngine;
+﻿using FiringSquad.Data;
+using KeatsLib;
+using UnityEngine;
 
 namespace FiringSquad.Gameplay
 {
 	public class PlayerScript : MonoBehaviour, IWeaponBearer, IDamageReceiver
 	{
-		[SerializeField] private PlayerGravGunWeapon mGravityGun;
-		[SerializeField] private PlayerWeaponScript mWeapon;
-		[SerializeField] private GameObject mDefaultScope;
-		[SerializeField] private GameObject mDefaultBarrel;
-		[SerializeField] private GameObject mDefaultMechanism;
-		[SerializeField] private GameObject mDefaultGrip;
-		[SerializeField] private float mInteractDistance;
-		[SerializeField] private float mDefaultHealth;
+		[SerializeField] private PlayerDefaultsData mData;
 		private Vector3 mDefaultPosition;
 
+		private PlayerGravGunWeapon mGravityGun;
 		private PlayerMovementScript mMovement;
 		private BoundProperty<float> mHealth;
+		private PlayerWeaponScript mWeapon;
 
 		private Transform mMainCameraRef;
 		private const string INTERACTABLE_TAG = "interactable";
@@ -24,6 +21,19 @@ namespace FiringSquad.Gameplay
 		{
 			mDefaultPosition = transform.position;
 			mMovement = GetComponent<PlayerMovementScript>();
+
+			if (mData.makeWeaponGun && mData.baseWeaponPrefab != null)
+			{
+				Transform offset = transform.Find("Gun1Offset");
+				GameObject newGun = UnityUtils.InstantiateIntoHolder(mData.baseWeaponPrefab, offset, true, true);
+				mWeapon = newGun.GetComponent<PlayerWeaponScript>();
+			}
+			if (mData.makeGravGun && mData.gravityGunPrefab != null)
+			{
+				Transform offset = transform.Find("Gun2Offset");
+				GameObject newGun = UnityUtils.InstantiateIntoHolder(mData.gravityGunPrefab, offset, true, true);
+				mGravityGun = newGun.GetComponent<PlayerGravGunWeapon>();
+			}
 		}
 
 		private void Start()
@@ -34,7 +44,7 @@ namespace FiringSquad.Gameplay
 				mGravityGun.bearer = this;
 
 			mMainCameraRef = Camera.main.transform;
-			mHealth = new BoundProperty<float>(mDefaultHealth, GameplayUIManager.PLAYER_HEALTH);
+			mHealth = new BoundProperty<float>(mData.defaultHealth, GameplayUIManager.PLAYER_HEALTH);
 
 			ServiceLocator.Get<IInput>()
 				.RegisterInput(Input.GetButtonDown, "ToggleMenu", INPUT_ToggleUIElement, KeatsLib.Unity.Input.InputLevel.None)
@@ -56,16 +66,22 @@ namespace FiringSquad.Gameplay
 				.UnregisterInput(INPUT_FireWeapon);
 
 			EventManager.OnResetLevel -= ReceiveResetEvent;
+			mHealth.Cleanup();
 		}
 
 		private void InitializeValues()
 		{
-			Instantiate(mDefaultMechanism).GetComponent<WeaponPickupScript>().ConfirmAttach();
-			Instantiate(mDefaultBarrel).GetComponent<WeaponPickupScript>().ConfirmAttach();
-			Instantiate(mDefaultScope).GetComponent<WeaponPickupScript>().ConfirmAttach();
-			Instantiate(mDefaultGrip).GetComponent<WeaponPickupScript>().ConfirmAttach();
+			if (mData.makeParts)
+			{
+				WeaponDefaultsData defaults = mData.defaultWeaponParts;
 
-			mHealth.value = mDefaultHealth;
+				Instantiate(defaults.mechanism).GetComponent<WeaponPickupScript>().ConfirmAttach();
+				Instantiate(defaults.barrel).GetComponent<WeaponPickupScript>().ConfirmAttach();
+				Instantiate(defaults.scope).GetComponent<WeaponPickupScript>().ConfirmAttach();
+				Instantiate(defaults.grip).GetComponent<WeaponPickupScript>().ConfirmAttach();
+			}
+
+			mHealth.value = mData.defaultHealth;
 			transform.position = mDefaultPosition;
 			transform.rotation = Quaternion.identity;
 
@@ -105,7 +121,7 @@ namespace FiringSquad.Gameplay
 			Ray ray = new Ray(mMainCameraRef.position, mMainCameraRef.forward);
 			
 			RaycastHit hit;
-			if (!Physics.Raycast(ray, out hit, mInteractDistance) || !hit.collider.CompareTag(INTERACTABLE_TAG))
+			if (!Physics.Raycast(ray, out hit, mData.interactDistance) || !hit.collider.CompareTag(INTERACTABLE_TAG))
 				return;
 
 			IInteractable interactable = hit.transform.GetComponent<IInteractable>() ?? hit.transform.parent.GetComponent<IInteractable>();

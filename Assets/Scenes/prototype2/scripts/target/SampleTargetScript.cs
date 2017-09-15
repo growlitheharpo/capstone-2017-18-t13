@@ -32,6 +32,7 @@ namespace FiringSquad.Gameplay
 		private void OnDestroy()
 		{
 			EventManager.OnResetLevel -= HandleResetEvent;
+			mHealth.Cleanup();
 		}
 
 		private static void CONSOLE_Reset(string[] args)
