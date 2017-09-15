@@ -1,6 +1,7 @@
 ﻿using FiringSquad.Data;
 using KeatsLib;
 using UnityEngine;
+using UnityEngine.AI;
 
 namespace FiringSquad.Gameplay
 {
@@ -9,6 +10,7 @@ namespace FiringSquad.Gameplay
 		[SerializeField] private GameObject mGunPrefab;
 		[SerializeField] private WeaponDefaultsData mGunDefaultParts;
 		[SerializeField] private float mDefaultHealth;
+		[SerializeField] private AIDecisionMaker.DecisionMakerVariables mVars;
 
 		private BoundProperty<float> mCurrentHealth;
 		private AIDecisionMaker mDecisionMaker;
@@ -25,10 +27,9 @@ namespace FiringSquad.Gameplay
 			GameObject gun = UnityUtils.InstantiateIntoHolder(mGunPrefab, offset, true, true);
 			mWeapon = gun.GetComponent<AIWeaponScript>();
 
-			mDecisionMaker = new AIDecisionMaker(mWeapon, eye);
+			mDecisionMaker = new AIDecisionMaker(mVars, mWeapon, eye, GetComponent<NavMeshAgent>());
 		}
 
-		// Use this for initialization
 		private void Start()
 		{
 			mCurrentHealth = new BoundProperty<float>(mDefaultHealth, (name + "-health").GetHashCode());
@@ -45,10 +46,14 @@ namespace FiringSquad.Gameplay
 			mCurrentHealth.Cleanup();
 		}
 
-		// Update is called once per frame
 		private void Update()
 		{
 			mDecisionMaker.Tick();
+		}
+
+		private void OnGUI()
+		{
+			mDecisionMaker.OnGUI();
 		}
 
 		public void ApplyRecoil(Vector3 direction, float amount)
