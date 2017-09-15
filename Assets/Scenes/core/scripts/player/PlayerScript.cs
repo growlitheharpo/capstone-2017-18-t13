@@ -15,6 +15,8 @@ namespace FiringSquad.Gameplay
 		private PlayerWeaponScript mWeapon;
 
 		private Transform mMainCameraRef;
+		Transform ICharacter.eye { get { return mMainCameraRef; } }
+
 		private const string INTERACTABLE_TAG = "interactable";
 
 		private void Awake()
@@ -86,8 +88,6 @@ namespace FiringSquad.Gameplay
 			ServiceLocator.Get<IInput>()
 				.EnableInputLevel(KeatsLib.Unity.Input.InputLevel.Gameplay);
 		}
-		
-		Transform ICharacter.eye { get { return mMainCameraRef; } }
 
 		public void ApplyRecoil(Vector3 direction, float amount)
 		{
