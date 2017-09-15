@@ -19,18 +19,22 @@ namespace FiringSquad.Gameplay
 
 		private void Awake()
 		{
-			mDecisionMaker = new AIDecisionMaker();
 			mFakeEye = transform.Find("FakeAIEye");
 
-			var offset = transform.Find("Gun1Offset");
-			var gun = UnityUtils.InstantiateIntoHolder(mGunPrefab, offset, true, true);
+			Transform offset = transform.Find("Gun1Offset");
+			GameObject gun = UnityUtils.InstantiateIntoHolder(mGunPrefab, offset, true, true);
 			mWeapon = gun.GetComponent<AIWeaponScript>();
+
+			mDecisionMaker = new AIDecisionMaker(mWeapon, eye);
 		}
 
 		// Use this for initialization
 		private void Start()
 		{
 			mCurrentHealth = new BoundProperty<float>(mDefaultHealth, (name + "-health").GetHashCode());
+
+			mWeapon.bearer = this;
+			mWeapon.SetAimRoot(eye);
 
 			foreach (GameObject part in mGunDefaultParts)
 				Instantiate(part).GetComponent<WeaponPickupScript>().ConfirmAttach(mWeapon);
