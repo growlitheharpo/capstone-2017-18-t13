@@ -1,118 +1,84 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
 using FiringSquad.Gameplay;
 
 namespace FiringSquad.Debug
 {
 	public class DebugMenu : MonoBehaviour
 	{
-		[SerializeField] private ActionProvider mBarrel01Button;
-		[SerializeField] private ActionProvider mBarrel02Button;
-		[SerializeField] private ActionProvider mScope01Button;
-		[SerializeField] private ActionProvider mScope02Button;
-		[SerializeField] private ActionProvider mMech01Button;
-		[SerializeField] private ActionProvider mMech02Button;
-		[SerializeField] private ActionProvider mGrip01Button;
-		[SerializeField] private ActionProvider mGrip02Button;
-		[SerializeField] private GameObject mBarrel01;
-		[SerializeField] private GameObject mBarrel02;
-		[SerializeField] private GameObject mScope01;
-		[SerializeField] private GameObject mScope02;
-		[SerializeField] private GameObject mMech01;
-		[SerializeField] private GameObject mMech02;
-		[SerializeField] private GameObject mGrip01;
-		[SerializeField] private GameObject mGrip02;
+		[SerializeField] private WeaponPartScript[] mMechanisms;
+		[SerializeField] private WeaponPartScript[] mBarrels;
+		[SerializeField] private WeaponPartScript[] mScopes;
+		[SerializeField] private WeaponPartScript[] mGrips;
 
-		private bool mEnabled = true; //everything starts enabled
-		public bool currentlyActive { get { return mEnabled; } }
+		private bool mActive;
+		public bool currentlyActive { get { return mActive; } }
 
+#if UNITY_EDITOR
+		public void RefreshWeaponList()
+		{
+			var allObjects = Resources.LoadAll<GameObject>("prefabs/weapons");
+			var parts = allObjects
+				.Where(x => x.GetComponent<WeaponPartScript>() != null)
+				.Select(x => x.GetComponent<WeaponPartScript>()).ToArray();
+
+			mMechanisms = parts.Where(x => x.attachPoint == BaseWeaponScript.Attachment.Mechanism).ToArray();
+			mBarrels = parts.Where(x => x.attachPoint == BaseWeaponScript.Attachment.Barrel).ToArray();
+			mScopes = parts.Where(x => x.attachPoint == BaseWeaponScript.Attachment.Scope).ToArray();
+			mGrips = parts.Where(x => x.attachPoint == BaseWeaponScript.Attachment.Grip).ToArray();
+
+		}
+#endif
 		private void Start()
 		{
-			mBarrel01Button.OnClick += ApplyBarrel01;
-			mBarrel02Button.OnClick += ApplyBarrel02;
-
-			mScope01Button.OnClick += ApplyScope01;
-			mScope02Button.OnClick += ApplyScope02;
-
-			mMech01Button.OnClick += ApplyMech01;
-			mMech02Button.OnClick += ApplyMech02;
-
-			mGrip01Button.OnClick += ApplyGrip01;
-			mGrip02Button.OnClick += ApplyGrip02;
-			
-			EventManager.OnUIToggle += HandleUIToggle;
-			EventManager.UIToggle();
+			RefreshWeaponList();
+			EventManager.OnUIToggle += ToggleUI;
 		}
 
 		private void OnDestroy()
 		{
-			mBarrel01Button.OnClick -= ApplyBarrel01;
-			mBarrel02Button.OnClick -= ApplyBarrel02;
-
-			mScope01Button.OnClick -= ApplyScope01;
-			mScope02Button.OnClick -= ApplyScope02;
-
-			mMech01Button.OnClick -= ApplyScope01;
-			mMech02Button.OnClick -= ApplyScope02;
-			
-			mGrip01Button.OnClick -= ApplyGrip01;
-			mGrip02Button.OnClick -= ApplyGrip02;
-
-			EventManager.OnUIToggle -= HandleUIToggle;
+			EventManager.OnUIToggle -= ToggleUI;
 		}
-		
-		private void HandleUIToggle()
-		{
-			mEnabled = !mEnabled;
-			SetChildrenState(mEnabled);
 
+		private void ToggleUI()
+		{
+			mActive = !mActive;
 			ServiceLocator.Get<IInput>()
-				.SetInputLevelState(KeatsLib.Unity.Input.InputLevel.Gameplay, !mEnabled);
-		}
-		
-		private void SetChildrenState(bool state)
-		{
-			foreach (Transform t in transform)
-				t.gameObject.SetActive(state);
+				.SetInputLevelState(KeatsLib.Unity.Input.InputLevel.Gameplay, !mActive);
 		}
 
-		private void ApplyBarrel01()
+		private void OnGUI()
 		{
-			Instantiate(mBarrel01).GetComponent<WeaponPickupScript>().ConfirmAttach();
+			if (!mActive)
+				return;
+
+			float columnWidth = Screen.width / 4.0f;
+
+			Rect mechRect = new Rect(0.0f, 0.0f, columnWidth, Screen.height);
+			Rect barrelRect = new Rect(mechRect.x + mechRect.width, 0.0f, columnWidth, Screen.height);
+			Rect scopeRect = new Rect(barrelRect.x + barrelRect.width, 0.0f, columnWidth, Screen.height);
+			Rect gripRect = new Rect(scopeRect.x + scopeRect.width, 0.0f, columnWidth, Screen.height);
+
+			DrawPartList(mechRect, mMechanisms);
+			DrawPartList(barrelRect, mBarrels);
+			DrawPartList(scopeRect, mScopes);
+			DrawPartList(gripRect, mGrips);
 		}
 
-		private void ApplyBarrel02()
+		private static void DrawPartList(Rect area, WeaponPartScript[] parts)
 		{
-			Instantiate(mBarrel02).GetComponent<WeaponPickupScript>().ConfirmAttach();
-		}
+			GUILayout.BeginArea(area);
+			foreach (WeaponPartScript part in parts)
+			{
+				string label = part.name;
+				if (part.description != "")
+					label += "\n\n" + part.description;
 
-		private void ApplyScope01()
-		{
-			Instantiate(mScope01).GetComponent<WeaponPickupScript>().ConfirmAttach();
-		}
-
-		private void ApplyScope02()
-		{
-			Instantiate(mScope02).GetComponent<WeaponPickupScript>().ConfirmAttach();
-		}
-
-		private void ApplyMech01()
-		{
-			Instantiate(mMech01).GetComponent<WeaponPickupScript>().ConfirmAttach();
-		}
-
-		private void ApplyMech02()
-		{
-			Instantiate(mMech02).GetComponent<WeaponPickupScript>().ConfirmAttach();
-		}
-
-		private void ApplyGrip01()
-		{
-			Instantiate(mGrip01).GetComponent<WeaponPickupScript>().ConfirmAttach();
-		}
-		
-		private void ApplyGrip02()
-		{
-			Instantiate(mGrip02).GetComponent<WeaponPickupScript>().ConfirmAttach();
+				if (GUILayout.Button(label, GUILayout.MaxHeight(100.0f)))
+					Instantiate(part.gameObject).GetComponent<WeaponPickupScript>().ConfirmAttach();
+			}
+			GUILayout.EndArea();
 		}
 	}
 }
