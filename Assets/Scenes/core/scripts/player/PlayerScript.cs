@@ -1,4 +1,5 @@
-﻿using FiringSquad.Data;
+﻿using System;
+using FiringSquad.Data;
 using KeatsLib;
 using UnityEngine;
 
@@ -13,6 +14,7 @@ namespace FiringSquad.Gameplay
 		private PlayerMovementScript mMovement;
 		private BoundProperty<float> mHealth;
 		private PlayerWeaponScript mWeapon;
+		private bool mGodmode;
 
 		private Transform mMainCameraRef;
 		Transform ICharacter.eye { get { return mMainCameraRef; } }
@@ -53,6 +55,9 @@ namespace FiringSquad.Gameplay
 				.RegisterInput(Input.GetButton, "Fire1", INPUT_FireWeapon, KeatsLib.Unity.Input.InputLevel.Gameplay)
 				.RegisterInput(Input.GetButtonDown, "Reload", INPUT_ReloadWeapon, KeatsLib.Unity.Input.InputLevel.Gameplay)
 				.RegisterInput(Input.GetButtonDown, "Interact", INPUT_ActivateInteract, KeatsLib.Unity.Input.InputLevel.Gameplay);
+
+			ServiceLocator.Get<IGameConsole>()
+				.RegisterCommand("godmode", CONSOLE_ToggleGodmode);
 
 			EventManager.OnResetLevel += ReceiveResetEvent;
 
@@ -122,9 +127,20 @@ namespace FiringSquad.Gameplay
 				interactable.Interact();
 		}
 
+		private void CONSOLE_ToggleGodmode(string[] args)
+		{
+			if (args.Length > 0)
+				throw new ArgumentException("Invalid arguments for command 'godmode'");
+
+			ServiceLocator.Get<IGameConsole>()
+				.AssertCheatsEnabled();
+
+			mGodmode = !mGodmode;
+		}
+
 		public void ApplyDamage(float amount, Vector3 point, IDamageSource cause = null)
 		{
-			if (mHealth.value <= 0.0f)
+			if (mGodmode || mHealth.value <= 0.0f)
 				return;
 
 			if (cause != null && ReferenceEquals(cause.source, this))

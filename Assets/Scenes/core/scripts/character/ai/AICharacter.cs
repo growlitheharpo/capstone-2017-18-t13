@@ -26,12 +26,11 @@ namespace FiringSquad.Gameplay
 			Transform offset = transform.Find("Gun1Offset");
 			GameObject gun = UnityUtils.InstantiateIntoHolder(mGunPrefab, offset, true, true);
 			mWeapon = gun.GetComponent<AIWeaponScript>();
-
-			mDecisionMaker = new AIDecisionMaker(mVars, mWeapon, eye, GetComponent<NavMeshAgent>());
 		}
 
 		private void Start()
 		{
+			mDecisionMaker = new AIDecisionMaker(mVars, mWeapon, eye, GetComponent<NavMeshAgent>());
 			mCurrentHealth = new BoundProperty<float>(mDefaultHealth, (name + "-health").GetHashCode());
 
 			mWeapon.bearer = this;
@@ -63,7 +62,7 @@ namespace FiringSquad.Gameplay
 
 		public void ApplyDamage(float amount, Vector3 point, IDamageSource cause)
 		{
-			StopAllCoroutines();
+			mDecisionMaker.NotifyAttackedByPlayer();
 			mCurrentHealth.value = Mathf.Clamp(mCurrentHealth.value - amount, 0.0f, float.MaxValue);
 
 			if (mCurrentHealth.value <= 0.0f)

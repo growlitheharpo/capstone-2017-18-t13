@@ -2,6 +2,7 @@
 using UnityEngine;
 using UnityEngine.AI;
 using GameLogger = Logger;
+using Random = UnityEngine.Random;
 
 namespace FiringSquad.Gameplay
 {
@@ -13,6 +14,10 @@ namespace FiringSquad.Gameplay
 			public float mClosestDistanceToPlayer;
 			public float mMaxDistanceFromPlayer;
 			public float mLineOfSight;
+			public float mRecentlyAttackedTimeThreshold;
+			public float mBaseInaccuracy;
+			public float mPurposefullyMissPlayerScale;
+			public float mRotateSpeed;
 
 			public LayerMask mVisionLayermask;
 		}
@@ -24,8 +29,11 @@ namespace FiringSquad.Gameplay
 		private NavMeshAgent mMovementAgent;
 		private IWeapon mWeapon;
 		private Transform mEye;
+		private Transform mPlayerRef;
+		private float mLastAttackedTime;
 
 		private Transform transform { get; set; }
+		private bool wasRecentlyAttacked { get { return Time.time - mLastAttackedTime <= mVars.mRecentlyAttackedTimeThreshold; } }
 
 		private Vector3 mMovementTarget;
 
@@ -36,6 +44,10 @@ namespace FiringSquad.Gameplay
 			mWeapon = weapon;
 			mEye = eye;
 			mVars = vars;
+
+			mPlayerRef = ReferenceForwarder.get.player.transform;
+
+			mLastAttackedTime = float.NegativeInfinity;
 
 			transform = agent.transform;
 
@@ -55,26 +67,46 @@ namespace FiringSquad.Gameplay
 
 
 			if (KnowsOfPlayer())
-				mCurrentState = TickIdle;
+				mCurrentState = TickIdle; //shoot instead!
 		}
 
 		private void TickPurposefullyMissPlayer()
 		{
 			// instruct our gun to shoot near the player, but not AT them.
+			Vector3 dirToPlayer = mPlayerRef.position - transform.position;
+
+			Vector3 leftDir = Vector3.Cross(dirToPlayer, transform.up).normalized;
+			Vector3 rightDir = -leftDir;
+
+			Vector3 closerDir = Vector3.Dot(leftDir, transform.forward) > Vector3.Dot(rightDir, transform.forward) ? leftDir : rightDir;
+			Vector3 target = dirToPlayer + closerDir * mVars.mPurposefullyMissPlayerScale * Vector3.Distance(transform.position, mPlayerRef.position);
+
+			UnityEngine.Debug.DrawLine(transform.position, transform.position + target, Color.HSVToRGB(0.8f, 0.6f, 0.55f));
+			
+			// TODO: Don't face towards the target, face the player!
+			ShootInDirection(target, target);
 		}
 
 		private void TickShootAtPlayer()
 		{
 			// shoot at the player, with some level of inaccuracy.
+			Vector3 dirToPlayer = mPlayerRef.position - transform.position;
+			float spreadFactor = mVars.mBaseInaccuracy;
+
+			Vector3 randomness = new Vector3(
+				Random.Range(-spreadFactor, spreadFactor),
+				Random.Range(-spreadFactor, spreadFactor),
+				Random.Range(-spreadFactor, spreadFactor));
+
+			Vector3 eyeGoal = dirToPlayer + randomness;
+			ShootInDirection(dirToPlayer, eyeGoal);
 		}
 
 		private void TickChaseAfterPlayer()
 		{
-			Transform player = GetPlayerTransform();
-
-			if (mMovementTarget == new Vector3(-10000, -10000, -10000) || Vector3.Distance(transform.position, player.position) > mVars.mMaxDistanceFromPlayer)
+			if (mMovementTarget == new Vector3(-10000, -10000, -10000) || Vector3.Distance(transform.position, mPlayerRef.position) > mVars.mMaxDistanceFromPlayer)
 			{
-				ChooseMovementTarget(player);
+				ChooseMovementTarget(mPlayerRef);
 
 				GameLogger.Info(mMovementTarget.ToString());
 
@@ -105,7 +137,7 @@ namespace FiringSquad.Gameplay
 		/// </summary>
 		private bool KnowsOfPlayer()
 		{
-			return CanSeePlayer() || AttackedByPlayer();
+			return CanSeePlayer() || wasRecentlyAttacked;
 		}
 
 		/// <summary>
@@ -113,8 +145,7 @@ namespace FiringSquad.Gameplay
 		/// </summary>
 		private bool CanSeePlayer()
 		{
-			Transform player = GetPlayerTransform();
-			Vector3 directionToPlayer = (player.position - mEye.position).normalized;
+			Vector3 directionToPlayer = (mPlayerRef.position - mEye.position).normalized;
 
 			float dot = Vector3.Dot(mEye.forward.normalized, directionToPlayer);
 			bool inLoS = dot >= mVars.mLineOfSight;
@@ -136,31 +167,38 @@ namespace FiringSquad.Gameplay
 		/// </summary>
 		private bool CanSeePlayer(Ray ray)
 		{
-			Transform player = GetPlayerTransform();
-			
 			//TODO: Add more cone stuff.
 			RaycastHit hit;
 			bool hitYes = Physics.Raycast(ray, out hit, 5000.0f, mVars.mVisionLayermask);// && hit.collider.CompareTag("Player");
 			
 			UnityEngine.Debug.DrawLine(ray.origin, hitYes ? hit.point : ray.origin + ray.direction * 3000.0f, hitYes ? Color.cyan : Color.red, 2.0f);
 			return hitYes && hit.collider.CompareTag("Player");
-
 		}
 
 		/// <summary>
 		/// Whether or not we were hit by the player within the threshold.
 		/// </summary>
-		private bool AttackedByPlayer()
+		public void NotifyAttackedByPlayer()
 		{
-			return false;
+			mLastAttackedTime = Time.time;
 		}
 
-		private static Transform GetPlayerTransform()
+		private void ShootInDirection(Vector3 faceDirection, Vector3 shootDirection)
 		{
-			// TODO: Cache this for better performance
-			return ReferenceForwarder.get.player.transform;
-		}
+			Quaternion randomishRot = Quaternion.LookRotation(shootDirection, Vector3.up);
+			Quaternion perciseRot = Quaternion.LookRotation(faceDirection, Vector3.up);
+			Quaternion bodyRot = Quaternion.Euler(0.0f, perciseRot.eulerAngles.y, 0.0f);
 
+			transform.rotation = Quaternion.Slerp(transform.rotation, bodyRot, Time.deltaTime * mVars.mRotateSpeed);
+
+			Quaternion realEyeGoal = Quaternion.Euler(randomishRot.eulerAngles.x, transform.rotation.eulerAngles.y, randomishRot.eulerAngles.z);
+			mEye.rotation = realEyeGoal;
+
+			UnityEngine.Debug.DrawLine(mEye.position, mEye.position + mEye.forward * 20.0f, Color.yellow);
+
+			mWeapon.FireWeapon();
+		}
+		
 		private Action DecideToChaseOrShoot()
 		{
 			// return TickShootAtPlayer, TickChaseAfterPlayer, or TickChaseAndShoot
@@ -222,7 +260,7 @@ namespace FiringSquad.Gameplay
 			if (GUILayout.Button("Lost Player"))
 				mCurrentState = TickLostPlayer;
 
-			GUILayout.Label("Can see player? " + CanSeePlayer());
+			GUILayout.Label("Know where the player is? " + KnowsOfPlayer());
 		}
 	}
 }
