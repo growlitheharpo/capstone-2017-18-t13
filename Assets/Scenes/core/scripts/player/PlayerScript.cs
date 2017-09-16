@@ -50,6 +50,7 @@ namespace FiringSquad.Gameplay
 				.RegisterInput(Input.GetButtonDown, "ToggleMenu", INPUT_ToggleUIElement, KeatsLib.Unity.Input.InputLevel.None)
 				.RegisterInput(Input.GetButton, "Fire1", INPUT_FireWeapon, KeatsLib.Unity.Input.InputLevel.Gameplay)
 				.RegisterInput(Input.GetButtonDown, "Reload", INPUT_ReloadWeapon, KeatsLib.Unity.Input.InputLevel.Gameplay)
+				.RegisterInput(Input.GetKeyDown, KeyCode.Return, () => SampleTargetScript.CONSOLE_Reset(new[]{"reset"}), KeatsLib.Unity.Input.InputLevel.Gameplay)
 				.RegisterInput(Input.GetButtonDown, "Interact", INPUT_ActivateInteract, KeatsLib.Unity.Input.InputLevel.Gameplay);
 
 			EventManager.OnResetLevel += ReceiveResetEvent;

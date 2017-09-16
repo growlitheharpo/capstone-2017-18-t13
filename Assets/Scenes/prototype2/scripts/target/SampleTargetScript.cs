@@ -35,7 +35,7 @@ namespace FiringSquad.Gameplay
 			mHealth.Cleanup();
 		}
 
-		private static void CONSOLE_Reset(string[] args)
+		public static void CONSOLE_Reset(string[] args)
 		{
 			var allObjects = FindObjectsOfType<SampleTargetScript>();
 
