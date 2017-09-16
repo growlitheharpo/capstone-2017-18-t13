@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace FiringSquad.Data
@@ -15,5 +16,17 @@ namespace FiringSquad.Data
 		public GameObject barrel { get { return mBarrel; } }
 		public GameObject mechanism { get { return mMechanism; } }
 		public GameObject grip { get { return mGrip; } }
+
+		/// <summary>
+		/// Allows this class to be iterated over.
+		/// </summary>
+		/// <returns></returns>
+		public IEnumerator<GameObject> GetEnumerator()
+		{
+			yield return scope;
+			yield return barrel;
+			yield return mechanism;
+			yield return grip;
+		}
 	}
 }

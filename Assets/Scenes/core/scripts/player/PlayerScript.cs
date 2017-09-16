@@ -75,10 +75,8 @@ namespace FiringSquad.Gameplay
 			{
 				WeaponDefaultsData defaults = mData.defaultWeaponParts;
 
-				Instantiate(defaults.mechanism).GetComponent<WeaponPickupScript>().ConfirmAttach();
-				Instantiate(defaults.barrel).GetComponent<WeaponPickupScript>().ConfirmAttach();
-				Instantiate(defaults.scope).GetComponent<WeaponPickupScript>().ConfirmAttach();
-				Instantiate(defaults.grip).GetComponent<WeaponPickupScript>().ConfirmAttach();
+				foreach (GameObject part in defaults)
+					Instantiate(part).GetComponent<WeaponPickupScript>().ConfirmAttach();
 			}
 
 			mHealth.value = mData.defaultHealth;
