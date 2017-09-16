@@ -8,19 +8,23 @@ public class UIManager : MonoBehaviour
 	[SerializeField] private GameObject mMainElementHolder;
 	[SerializeField] private ActionProvider mProto1Button;
 	[SerializeField] private ActionProvider mProto2Button;
+	[SerializeField] private ActionProvider mProto3Button;
+	[SerializeField] private ActionProvider mArtProtoButton;
 	[SerializeField] private ActionProvider mQuitButton;
 
 	private void Start()
 	{
 		mProto1Button.OnClick += LaunchProto1;
 		mProto2Button.OnClick += LaunchProto2;
+		mProto3Button.OnClick += LaunchProto3;
+		mArtProtoButton.OnClick += LaunchArtProto;
 		mQuitButton.OnClick += ClickQuit;
 	}
 
 	private void LaunchProto1()
 	{
 		mMainElementHolder.SetActive(false);
-		EventManager.Notify(() => EventManager.RequestSceneChange(GamestateManager.DESIGN_TEST_SCENE));
+		EventManager.Notify(() => EventManager.RequestSceneChange(GamestateManager.PROTOTYPE1_SCENE));
 	}
 	
 	private void LaunchProto2()

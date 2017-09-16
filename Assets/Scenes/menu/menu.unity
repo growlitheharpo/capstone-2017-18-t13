@@ -234,10 +234,6 @@ Prefab:
       propertyPath: m_LocalScale.z
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 1110876172334604, guid: 96b483a1e5b7d9e49b6f418a4c5c2484, type: 2}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 96b483a1e5b7d9e49b6f418a4c5c2484, type: 2}
   m_IsPrefabParent: 0
@@ -246,6 +242,12 @@ RectTransform:
   m_PrefabParentObject: {fileID: 224639446783123652, guid: 96b483a1e5b7d9e49b6f418a4c5c2484,
     type: 2}
   m_PrefabInternal: {fileID: 33412595}
+--- !u!114 &33412597 stripped
+MonoBehaviour:
+  m_PrefabParentObject: {fileID: 114549163088502988, guid: 96b483a1e5b7d9e49b6f418a4c5c2484,
+    type: 2}
+  m_PrefabInternal: {fileID: 33412595}
+  m_Script: {fileID: 11500000, guid: f2b20a53498efc0438484489b90d3de1, type: 3}
 --- !u!1 &128185056
 GameObject:
   m_ObjectHideFlags: 0
@@ -466,7 +468,7 @@ Prefab:
     - target: {fileID: 114525772595385032, guid: 96b483a1e5b7d9e49b6f418a4c5c2484,
         type: 2}
       propertyPath: m_Text
-      value: Sample Level
+      value: Prototype 1
       objectReference: {fileID: 0}
     - target: {fileID: 114525772595385032, guid: 96b483a1e5b7d9e49b6f418a4c5c2484,
         type: 2}
@@ -633,7 +635,7 @@ Prefab:
     - target: {fileID: 114525772595385032, guid: 96b483a1e5b7d9e49b6f418a4c5c2484,
         type: 2}
       propertyPath: m_Text
-      value: Sandbox
+      value: Prototype 2
       objectReference: {fileID: 0}
     - target: {fileID: 114525772595385032, guid: 96b483a1e5b7d9e49b6f418a4c5c2484,
         type: 2}
@@ -1003,7 +1005,7 @@ Prefab:
     - target: {fileID: 224639446783123652, guid: 96b483a1e5b7d9e49b6f418a4c5c2484,
         type: 2}
       propertyPath: m_AnchoredPosition.y
-      value: -10
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224639446783123652, guid: 96b483a1e5b7d9e49b6f418a4c5c2484,
         type: 2}
@@ -1013,7 +1015,7 @@ Prefab:
     - target: {fileID: 224639446783123652, guid: 96b483a1e5b7d9e49b6f418a4c5c2484,
         type: 2}
       propertyPath: m_SizeDelta.y
-      value: -30
+      value: -50
       objectReference: {fileID: 0}
     - target: {fileID: 224639446783123652, guid: 96b483a1e5b7d9e49b6f418a4c5c2484,
         type: 2}
@@ -1059,10 +1061,6 @@ Prefab:
       propertyPath: m_Text
       value: Quit
       objectReference: {fileID: 0}
-    - target: {fileID: 1110876172334604, guid: 96b483a1e5b7d9e49b6f418a4c5c2484, type: 2}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 96b483a1e5b7d9e49b6f418a4c5c2484, type: 2}
   m_IsPrefabParent: 0
@@ -1091,7 +1089,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1134776214
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1259,6 +1257,7 @@ MonoBehaviour:
   mMainElementHolder: {fileID: 351889646}
   mProto1Button: {fileID: 301243855}
   mProto2Button: {fileID: 1644521449}
+  mProto3Button: {fileID: 33412597}
   mArtProtoButton: {fileID: 2140587328}
   mQuitButton: {fileID: 1072773132}
 --- !u!114 &1644521449 stripped
