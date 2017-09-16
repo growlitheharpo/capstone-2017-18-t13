@@ -1,5 +1,8 @@
-﻿using FiringSquad.Data;
+﻿using System;
+using System.Collections;
+using FiringSquad.Data;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace FiringSquad.Gameplay
 {
@@ -7,14 +10,16 @@ namespace FiringSquad.Gameplay
 	{
 		[SerializeField] private WeaponDefaultsData mDefaultParts;
 
-		private WeaponDefaultsData mChosenParts;
-		private DemoWeaponScript mDemoWeapon;
-
 		private BoundProperty<float> mSpread, mRecoil, mReload, mFireRate, mDamage, mClipsize;
+		private GameObject mScope, mBarrel, mMechanism, mGrip;
+		private DemoWeaponScript mDemoWeapon;
 
 		private void Awake()
 		{
-			mChosenParts = new WeaponDefaultsData(mDefaultParts);
+			mScope = mDefaultParts.scope;
+			mBarrel = mDefaultParts.barrel;
+			mMechanism = mDefaultParts.mechanism;
+			mGrip = mDefaultParts.grip;
 
 			mSpread = new BoundProperty<float>(0.0f, "IntroSpread".GetHashCode());
 			mRecoil = new BoundProperty<float>(0.0f, "IntroRecoil".GetHashCode());
@@ -26,10 +31,56 @@ namespace FiringSquad.Gameplay
 
 		private void Start()
 		{
+			DontDestroyOnLoad(gameObject);
+			SceneManager.activeSceneChanged += HandleSceneChange;
 			mDemoWeapon = FindObjectOfType<DemoWeaponScript>();
 			
-			foreach (GameObject part in mChosenParts)
+			foreach (GameObject part in mDefaultParts)
 				Instantiate(part).GetComponent<WeaponPickupScript>().ConfirmAttach(mDemoWeapon);
+		}
+
+		public void AttachPart(GameObject part)
+		{
+			Instantiate(part).GetComponent<WeaponPickupScript>().ConfirmAttach(mDemoWeapon);
+			BaseWeaponScript.Attachment type = part.GetComponent<WeaponPartScript>().attachPoint;
+
+			switch (type)
+			{
+				case BaseWeaponScript.Attachment.Scope:
+					mScope = part;
+					break;
+				case BaseWeaponScript.Attachment.Barrel:
+					mBarrel = part;
+					break;
+				case BaseWeaponScript.Attachment.Mechanism:
+					mMechanism = part;
+					break;
+				case BaseWeaponScript.Attachment.Grip:
+					mGrip = part;
+					break;
+			}
+		}
+
+		private void HandleSceneChange(Scene arg0, Scene arg1)
+		{
+			if (arg1.name == GamestateManager.PROTOTYPE1_SCENE)
+				StartCoroutine(WaitAndAttach());
+			else
+				Destroy(gameObject);
+		}
+
+		private IEnumerator WaitAndAttach()
+		{
+			// wait 2 frames
+			yield return new WaitForEndOfFrame();
+			yield return new WaitForEndOfFrame();
+
+			Instantiate(mScope).GetComponent<WeaponPickupScript>().ConfirmAttach();
+			Instantiate(mBarrel).GetComponent<WeaponPickupScript>().ConfirmAttach();
+			Instantiate(mMechanism).GetComponent<WeaponPickupScript>().ConfirmAttach();
+			Instantiate(mGrip).GetComponent<WeaponPickupScript>().ConfirmAttach();
+
+			Destroy(gameObject);
 		}
 
 		private void Update()

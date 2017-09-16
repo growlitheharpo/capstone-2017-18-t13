@@ -38,12 +38,12 @@ public class InitialPartChoiceScript : MonoBehaviour
 	public MenuState mMainState;
 	public MenuState mMechs, mBarrels, mScopes, mGrips;
 
-	private DemoWeaponScript mDemoWeapon;
+	private IntroWeaponChoiceManager mManager;
 	private MenuState[] mPartStates;
 
 	private void Start()
 	{
-		mDemoWeapon = FindObjectOfType<DemoWeaponScript>();
+		mManager = FindObjectOfType<IntroWeaponChoiceManager>();
 		mPartStates = new[] { mMechs, mBarrels, mScopes, mGrips };
 
 		foreach (MenuState state in mPartStates)
@@ -91,11 +91,11 @@ public class InitialPartChoiceScript : MonoBehaviour
 	{
 		mMechButton1.OnClick += () =>
 		{
-			Instantiate(mMech1).GetComponent<WeaponPickupScript>().ConfirmAttach(mDemoWeapon);
+			mManager.AttachPart(mMech1);
 		};
 		mMechButton2.OnClick += () =>
 		{
-			Instantiate(mMech2).GetComponent<WeaponPickupScript>().ConfirmAttach(mDemoWeapon);
+			mManager.AttachPart(mMech2);
 		};
 	}
 
@@ -103,15 +103,15 @@ public class InitialPartChoiceScript : MonoBehaviour
 	{
 		mBarrelButton1.OnClick += () =>
 		{
-			Instantiate(mBarrel1).GetComponent<WeaponPickupScript>().ConfirmAttach(mDemoWeapon);
+			mManager.AttachPart(mBarrel1);
 		};
 		mBarrelButton2.OnClick += () =>
 		{
-			Instantiate(mBarrel2).GetComponent<WeaponPickupScript>().ConfirmAttach(mDemoWeapon);
+			mManager.AttachPart(mBarrel2);
 		};
 		mBarrelButton3.OnClick += () =>
 		{
-			Instantiate(mBarrel3).GetComponent<WeaponPickupScript>().ConfirmAttach(mDemoWeapon);
+			mManager.AttachPart(mBarrel3);
 		};
 	}
 
@@ -119,11 +119,11 @@ public class InitialPartChoiceScript : MonoBehaviour
 	{
 		mScopeButton1.OnClick += () =>
 		{
-			Instantiate(mScope1).GetComponent<WeaponPickupScript>().ConfirmAttach(mDemoWeapon);
+			mManager.AttachPart(mScope1);
 		};
 		mScopeButton2.OnClick += () =>
 		{
-			Instantiate(mScope2).GetComponent<WeaponPickupScript>().ConfirmAttach(mDemoWeapon);
+			mManager.AttachPart(mScope2);
 		};
 	}
 
@@ -131,11 +131,11 @@ public class InitialPartChoiceScript : MonoBehaviour
 	{
 		mGripButton1.OnClick += () =>
 		{
-			Instantiate(mGrip1).GetComponent<WeaponPickupScript>().ConfirmAttach(mDemoWeapon);
+			mManager.AttachPart(mGrip1);
 		};
 		mGripButton2.OnClick += () =>
 		{
-			Instantiate(mGrip2).GetComponent<WeaponPickupScript>().ConfirmAttach(mDemoWeapon);
+			mManager.AttachPart(mGrip2);
 		};
 	}
 
