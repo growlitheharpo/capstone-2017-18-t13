@@ -8,6 +8,9 @@ namespace FiringSquad.Gameplay
 		[SerializeField] private WeaponPartData[] mData;
 		public WeaponPartData[] data { get { return mData; } }
 
+		[SerializeField] private string mDescription;
+		public string description { get { return mDescription; } }
+
 		public abstract BaseWeaponScript.Attachment attachPoint { get; }
 	}
 }
