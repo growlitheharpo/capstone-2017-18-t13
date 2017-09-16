@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using UnityEngine;
 using FiringSquad.Gameplay;
 
@@ -15,7 +14,6 @@ namespace FiringSquad.Debug
 		private bool mActive;
 		public bool currentlyActive { get { return mActive; } }
 
-#if UNITY_EDITOR
 		public void RefreshWeaponList()
 		{
 			var allObjects = Resources.LoadAll<GameObject>("prefabs/weapons");
@@ -29,7 +27,7 @@ namespace FiringSquad.Debug
 			mGrips = parts.Where(x => x.attachPoint == BaseWeaponScript.Attachment.Grip).ToArray();
 
 		}
-#endif
+
 		private void Start()
 		{
 			RefreshWeaponList();
