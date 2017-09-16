@@ -12,6 +12,14 @@ namespace FiringSquad.Gameplay
 		protected override void PlayShotEffect() { }
 		protected override void PlayReloadEffect(float time) { }
 
+		protected override void Awake()
+		{
+			base.Awake();
+
+			mClipSize = new BoundProperty<int>(0, GameplayUIManager.CLIP_TOTAL);
+			mAmountInClip = new BoundProperty<int>(0, GameplayUIManager.CLIP_CURRENT);
+		}
+
 		protected override void Update()
 		{
 			base.Update();
