@@ -30,6 +30,7 @@ namespace FiringSquad.Gameplay
 
 		private void Awake()
 		{
+			Application.targetFrameRate = 60;
 			mCollider = GetComponent<CapsuleCollider>();
 			mRigidbody = GetComponent<Rigidbody>();
 			mMainCameraRef = Camera.main.transform;
