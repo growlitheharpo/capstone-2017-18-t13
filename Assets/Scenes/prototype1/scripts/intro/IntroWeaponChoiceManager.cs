@@ -63,6 +63,7 @@ namespace FiringSquad.Gameplay
 
 		private void HandleSceneChange(Scene arg0, Scene arg1)
 		{
+			SceneManager.activeSceneChanged -= HandleSceneChange;
 			if (arg1.name == GamestateManager.PROTOTYPE1_SCENE)
 				StartCoroutine(WaitAndAttach());
 			else

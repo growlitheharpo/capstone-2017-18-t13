@@ -24,7 +24,7 @@ public class UIManager : MonoBehaviour
 	private void LaunchProto1()
 	{
 		mMainElementHolder.SetActive(false);
-		EventManager.Notify(() => EventManager.RequestSceneChange(GamestateManager.PROTOTYPE1_SCENE));
+		EventManager.Notify(() => EventManager.RequestSceneChange(GamestateManager.PROTOTYPE1_SETUP_SCENE));
 	}
 	
 	private void LaunchProto2()
