@@ -28,8 +28,12 @@ public class CustomAssetPostprocessor : AssetPostprocessor
 	/// </summary>
 	private Material OnAssignMaterialModel(Material mat, Renderer render)
 	{
-		string folderPath = Path.GetDirectoryName(assetImporter.assetPath);
+		string folderPath = Path.GetDirectoryName(assetImporter.assetPath) ?? "";
 		string fileName = Path.GetFileNameWithoutExtension(assetImporter.assetPath) ?? "";
+
+		// Don't create extra materials for kit items
+		if (folderPath.ToLower().Contains("kit"))
+			return null;
 
 		string trimmedFileName = new Regex("(?<=(mesh_))(.)+").Match(fileName).Value;
 		string materialPath = folderPath + "/mat_" + trimmedFileName + ".mat";
