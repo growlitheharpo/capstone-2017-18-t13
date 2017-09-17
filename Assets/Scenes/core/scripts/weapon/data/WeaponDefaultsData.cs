@@ -30,5 +30,13 @@ namespace FiringSquad.Data
 			yield return mechanism;
 			yield return grip;
 		}
+
+		public WeaponDefaultsData(WeaponDefaultsData copy)
+		{
+			mScope = copy.mScope;
+			mBarrel = copy.mBarrel;
+			mMechanism = copy.mMechanism;
+			mGrip = copy.mGrip;
+		}
 	}
 }

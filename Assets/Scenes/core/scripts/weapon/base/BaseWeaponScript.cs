@@ -1,7 +1,9 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using FiringSquad.Data;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace FiringSquad.Gameplay
 {
@@ -28,11 +30,11 @@ namespace FiringSquad.Gameplay
 
 		private Dictionary<Attachment, Transform> mAttachPoints;
 		private Dictionary<Attachment, WeaponPartScript> mCurrentAttachments;
-		private WeaponData mCurrentData;
 		private bool mOverrideHitscanEye;
 
 		private GameObjectPool mProjectilePool;
 
+		protected WeaponData mCurrentData;
 		protected Transform mAimRoot;
 		protected BoundProperty<int> mClipSize;
 		protected BoundProperty<int> mAmountInClip;
@@ -114,12 +116,21 @@ namespace FiringSquad.Gameplay
 		private void ActivatePartEffects()
 		{
 			WeaponData start = new WeaponData(mBaseData);
-			foreach (WeaponPartScript part in mCurrentAttachments.Values)
-			{
-				foreach (WeaponPartData effect in part.data)
-					start = new WeaponData(start, effect);
-			}
 
+			Action<WeaponPartScript> apply = part =>
+			{
+				foreach (WeaponPartData data in part.data)
+					start = new WeaponData(start, data);
+			};
+
+			var partOrder = new[] { Attachment.Mechanism, Attachment.Barrel, Attachment.Scope, Attachment.Grip };
+
+			foreach (Attachment part in partOrder)
+			{
+				if (mCurrentAttachments.ContainsKey(part))
+					apply(mCurrentAttachments[part]);
+			}
+			
 			mCurrentData = start;
 			mClipSize.value = mCurrentData.clipSize;
 		}
