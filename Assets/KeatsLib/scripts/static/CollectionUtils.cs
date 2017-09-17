@@ -199,5 +199,10 @@ namespace KeatsLib.Collections
 			list[i] = list[j];
 			list[j] = tmp;
 		}
+
+		public static T1 GetHighestValueKey<T1, T2>(this IDictionary<T1, T2> list) where T2 : IComparable
+		{
+			return list.Aggregate((l, r) => l.Value.CompareTo(r.Value) >= 0 ? l : r).Key;
+		}
 	}
 }

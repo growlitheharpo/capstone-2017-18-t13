@@ -7,20 +7,23 @@ namespace FiringSquad.Gameplay.AI
 {
 	public class AICharacter : MonoBehaviour, IWeaponBearer, IDamageReceiver
 	{
+		[SerializeField] private CharacterMovementData mMovementData;
 		[SerializeField] private GameObject mGunPrefab;
 		[SerializeField] private WeaponDefaultsData mGunDefaultParts;
 		[SerializeField] private float mDefaultHealth;
-		[SerializeField] private AIDecisionMaker.DecisionMakerVariables mVars;
 
 		private BoundProperty<float> mCurrentHealth;
-		private AIDecisionMaker mDecisionMaker;
+		private AIStateMachine mStateMachine;
 		private AIWeaponScript mWeapon;
 		private Transform mFakeEye;
 
+		public CharacterMovementData movementData { get { return mMovementData; } }
 		public Transform eye { get { return mFakeEye; } }
+		public IWeapon weapon { get { return mWeapon; }}
 
 		private void Awake()
 		{
+			mStateMachine = GetComponent<AIStateMachine>();
 			mFakeEye = transform.Find("FakeAIEye");
 
 			Transform offset = transform.Find("Gun1Offset");
@@ -30,7 +33,6 @@ namespace FiringSquad.Gameplay.AI
 
 		private void Start()
 		{
-			mDecisionMaker = new AIDecisionMaker(mVars, mWeapon, eye, GetComponent<NavMeshAgent>());
 			mCurrentHealth = new BoundProperty<float>(mDefaultHealth, (name + "-health").GetHashCode());
 
 			mWeapon.bearer = this;
@@ -44,22 +46,7 @@ namespace FiringSquad.Gameplay.AI
 		{
 			mCurrentHealth.Cleanup();
 		}
-
-		private void Update()
-		{
-			mDecisionMaker.Tick();
-		}
-
-		private void OnGUI()
-		{
-			mDecisionMaker.OnGUI();
-		}
-
-		private void OnDrawGizmos()
-		{
-			mDecisionMaker.OnDrawGizmos();
-		}
-
+		
 		public void ApplyRecoil(Vector3 direction, float amount)
 		{
 			// TODO: How will the AI respond to recoil?
@@ -67,7 +54,7 @@ namespace FiringSquad.Gameplay.AI
 
 		public void ApplyDamage(float amount, Vector3 point, IDamageSource cause)
 		{
-			mDecisionMaker.NotifyAttackedByPlayer();
+			mStateMachine.NotifyAttackedByPlayer();
 			mCurrentHealth.value = Mathf.Clamp(mCurrentHealth.value - amount, 0.0f, float.MaxValue);
 
 			if (mCurrentHealth.value <= 0.0f)

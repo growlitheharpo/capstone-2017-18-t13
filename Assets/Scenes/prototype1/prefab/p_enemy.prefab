@@ -139,6 +139,7 @@ GameObject:
   - component: {fileID: 136095065641054148}
   - component: {fileID: 195462910836823464}
   - component: {fileID: 114231566527979904}
+  - component: {fileID: 114352049684114196}
   m_Layer: 0
   m_Name: p_enemy
   m_TagString: Untagged
@@ -424,6 +425,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 329af2b4a1a7bfd4fbebd694fa722237, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mMovementData: {fileID: 11400000, guid: 5ef109a932ca7a6418c73960962cd4c4, type: 2}
   mGunPrefab: {fileID: 1953974638818940, guid: 1dce9fbf896c24c40945cfd478905868, type: 2}
   mGunDefaultParts:
     mScope: {fileID: 1289196357881978, guid: 363ec9baf39beb0458b6c51a5e07d379, type: 2}
@@ -432,14 +434,24 @@ MonoBehaviour:
       type: 2}
     mGrip: {fileID: 1614481287065458, guid: bf400f714370ec646bb93b34e1e624d0, type: 2}
   mDefaultHealth: 100
-  mVars:
-    mClosestDistanceToPlayer: 8
-    mMaxDistanceFromPlayer: 15
-    mLineOfSight: 0.15
+--- !u!114 &114352049684114196
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1990981221914872}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e71f75c2c24079499057b1ed25444e4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mTweakables:
     mRecentlyAttackedTimeThreshold: 1
+    mLineOfSight: 0.15
     mBaseInaccuracy: 1
     mPurposefullyMissPlayerScale: 0.25
-    mRotateSpeed: 4
+    mPurposefullyMissPlayerTime: 0.75
+    mLostPlayerTimeout: 4
     mHintData: {fileID: 11400000, guid: d43f744d854cdf4479025c06abf0db65, type: 2}
     mVisionLayermask:
       serializedVersion: 2

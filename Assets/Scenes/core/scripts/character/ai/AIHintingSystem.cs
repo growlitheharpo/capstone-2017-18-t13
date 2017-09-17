@@ -8,6 +8,25 @@ namespace FiringSquad.Gameplay.AI
 {
 	public class AIHintingSystem : MonoBehaviour
 	{
+		public class PositionEvaluationResult
+		{
+			public float time { get; private set; }
+			public Vector3 enemyPosition { get; private set; }
+			public Vector3 playerPosition { get; private set; }
+			public Quaternion playerRotation { get; private set; }
+
+			public Dictionary<Vector3, float> positionScores { get; private set; }
+
+			public PositionEvaluationResult(Vector3 enemyPos, Vector3 playerPos, Quaternion playerRot, Dictionary<Vector3, float> result)
+			{
+				time = Time.time;
+				enemyPosition = enemyPos;
+				playerPosition = playerPos;
+				playerRotation = playerRot;
+				positionScores = result;
+			}
+		}
+
 		private class NavPoint
 		{
 			public Vector3 localPos { get; private set; }
@@ -86,7 +105,7 @@ namespace FiringSquad.Gameplay.AI
 			return mValidPositions;
 		}
 		
-		public Dictionary<Vector3, float> EvaluatePosition(Vector3 enemyPosition, AIHintValueData values)
+		public PositionEvaluationResult EvaluatePosition(Vector3 enemyPosition, AIHintValueData values)
 		{
 			var allPositions = validWorldPositions;
 			var forwardScores = allPositions.Select(RawScorePositionPlayerForward);
@@ -111,7 +130,8 @@ namespace FiringSquad.Gameplay.AI
 			var result = new Dictionary<Vector3, float>();
 			for (int i = 0; i < allPositions.Length; i++)
 				result[allPositions[i]] = scores[i];
-			return result;
+
+			return new PositionEvaluationResult(enemyPosition, transform.position, transform.rotation, result);
 		}
 
 		public float RawScorePositionPlayerForward(Vector3 worldPos)

@@ -11,6 +11,7 @@ namespace FiringSquad.Gameplay
 		[SerializeField] private GameObject mDefaultMechanism;
 
 		private BoundProperty<float> mHealthProp;
+		public IWeapon weapon { get { return mWeapon; } }
 
 		// Use this for initialization
 		private void Start()
