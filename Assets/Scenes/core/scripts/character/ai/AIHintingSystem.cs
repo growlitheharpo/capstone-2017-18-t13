@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Experimental.UIElements;
 
 public class AIHintingSystem : MonoBehaviour
 {
@@ -33,6 +33,21 @@ public class AIHintingSystem : MonoBehaviour
 
 	private Vector3[] worldPositions { get { return mPositions.Select(x => x.worldPos).ToArray(); } }
 	private Vector3 mCachedPosition, mCachedForward;
+
+	[Serializable]
+	public class AINavigationValues
+	{
+		public float mPlayerDistanceExponent;
+		public float mPlayerDistanceWeight = 1.0f;
+
+		public float mPlayerForwardExponent;
+		public float mPlayerForwardWeight = 1.0f;
+
+		public float mEnemyDistanceExponent;
+		public float mEnemyDistanceWeight = 1.0f;
+	}
+
+	public AINavigationValues mValues;
 
 	// Use this for initialization
 	void Start()
@@ -65,19 +80,22 @@ public class AIHintingSystem : MonoBehaviour
 
 	private Vector3[] CheckValidPositions()
 	{
-		/*if (Vector3.Distance(transform.position, mCachedPosition) < 0.5f
-			&& (transform.forward + mCachedForward).magnitude >= 1.8f)
-			return mValidPositions;*/
+		if (Vector3.Distance(transform.position, mCachedPosition) < 0.5f
+			&& (transform.forward + mCachedForward).magnitude >= 1.995f)
+			return mValidPositions;
 
 		mCachedPosition = transform.position;
 		mCachedForward = transform.forward;
 
 		foreach (NavPoint t in mPositions) {
-			Ray ray = new Ray(t.worldPos, transform.position - t.worldPos);
+			float dist = t.localPos.magnitude;
+			Vector3 up = new Vector3(0.0f, 0.25f, 0.0f);
+			Ray ray = new Ray(transform.position + up, (t.worldPos - transform.position) + up);
+
+			Debug.DrawLine(ray.origin, ray.origin + ray.direction * dist, Color.magenta, 0.5f);
 
 			RaycastHit hitInfo;
-			t.valid = Physics.Raycast(ray, out hitInfo, t.localPos.magnitude * 1.5f, mVisibilityLayers)
-					&& hitInfo.collider.CompareTag("Player");
+			t.valid = !Physics.Raycast(ray, out hitInfo, dist, mVisibilityLayers);
 		}
 		mValidPositions = mPositions
 			.Where(pos => pos.valid)
@@ -89,22 +107,124 @@ public class AIHintingSystem : MonoBehaviour
 
 
 	// Update is called once per frame
-	void Update()
+	private void Update()
 	{
 		CheckValidPositions();
 	}
 
 	private void OnDrawGizmos()
 	{
-		if (mPositions == null)
-			BuildSpots();
+		if (mPositions == null || mValidPositions == null)
+			return;
 
-		Debug.Log(mValidPositions.Length);
+		float hRed, hGreen, s, v;
+		Color.RGBToHSV(Color.red, out hRed, out s, out v);
+		Color.RGBToHSV(Color.green, out hGreen, out s, out v);
 
-		foreach (NavPoint pos in mPositions)
+		/*foreach (NavPoint pos in mPositions)
 		{
-			Gizmos.color = pos.valid ? Color.green : Color.grey;
+			Color col;
+			if (!pos.valid)
+				col = Color.black;
+			else
+			{
+				//float hue = Mathf.Lerp(hRed, hGreen, ScorePositionDistanceFromPlayer(pos.worldPos, Vector3.down, goalDist));
+				col = Color.HSVToRGB(hGreen, s, v);
+			}
+
+			//Gizmos.color = pos.valid ? Color.green : Color.grey;
+			Gizmos.color = col;
 			Gizmos.DrawSphere(pos.worldPos, 0.25f);
+		}*/
+		var enemyPos = FindObjectOfType<FiringSquad.Gameplay.AICharacter>();
+
+		var allPositions = mPositions;
+		var forwardScores = allPositions.Select(x => RawScorePositionPlayerForward(x.worldPos));
+		var playerDistScores = allPositions.Select(x => RawScorePositionDistanceFromPlayer(x.worldPos));
+		var enemyDistScores = allPositions.Select(x => RawScorePositionDistanceFromEnemy(x.worldPos, enemyPos.transform.position));
+
+		forwardScores = NormalizeValues(forwardScores);
+		playerDistScores = NormalizeValues(playerDistScores);
+		enemyDistScores = NormalizeValues(enemyDistScores);
+
+		forwardScores = ModValuesExponent(forwardScores, mValues.mPlayerForwardExponent);
+		playerDistScores = ModValuesExponent(playerDistScores, mValues.mPlayerDistanceExponent);
+		enemyDistScores = ModValuesExponent(enemyDistScores, mValues.mEnemyDistanceExponent);
+
+		var finalScore = CreateFinalScore(new[] { forwardScores.ToArray(), playerDistScores.ToArray(), enemyDistScores.ToArray() },
+			new[] { mValues.mPlayerForwardWeight, mValues.mEnemyDistanceWeight, mValues.mEnemyDistanceWeight });
+
+		for (int i = 0; i < allPositions.Length; i++)
+		{
+			Color col;
+			if (!allPositions[i].valid)
+				col = Color.black;
+			else
+			{
+				float hue = Mathf.Lerp(hRed, hGreen, finalScore[i]);
+				col = Color.HSVToRGB(hue, s, v);
+			}
+
+			Gizmos.color = col;
+			Gizmos.DrawSphere(allPositions[i].worldPos, 0.25f);
 		}
+	}
+
+	// evaluations: dot product with player's forward, distance from player, distance from enemy
+	public float RawScorePositionPlayerForward(Vector3 worldPos)
+	{
+		Vector3 direction = worldPos - transform.position;
+		return Vector3.Dot(transform.forward, direction.normalized);
+	}
+
+	public float RawScorePositionDistanceFromPlayer(Vector3 worldPos)
+	{
+		return Vector3.Distance(worldPos, transform.position);
+	}
+
+	public float RawScorePositionDistanceFromEnemy(Vector3 worldPos, Vector3 enemyPos)
+	{
+		return Vector3.Distance(worldPos, enemyPos);
+	}
+
+	/// <see cref="https://stackoverflow.com/a/5384025"/>
+	public static float[] NormalizeValues(IEnumerable<float> values)
+	{
+		var floats = values as float[] ?? values.ToArray();
+		float dataMin = floats.Min();
+		float dataMax = floats.Max();
+		float range = dataMax - dataMin;
+
+		return floats
+			.Select(d => (d - dataMin) / range)
+			.ToArray();
+	}
+
+	public static IEnumerable<float> ModValuesInverse(IEnumerable<float> values)
+	{
+		return values.Select(x => 1.0f / x);
+	}
+
+	public static IEnumerable<float> ModValuesExponent(IEnumerable<float> values, float exponent)
+	{
+		return values.Select(x => Mathf.Pow(x, exponent)).ToArray();
+	}
+
+	public static IEnumerable<float> ModValuesInverseSquare(IEnumerable<float> values, float exponent = 2.0f)
+	{
+		return values.Select(x => 1.0f / Mathf.Pow(x, exponent)).ToArray();
+	}
+
+	public static float[] CreateFinalScore(float[][] allValues, float[] weights)
+	{
+		var vals = new float[allValues[0].Length];
+
+		for (int i = 0; i < vals.Length; i++)
+		{
+			float sum = allValues.Select((t, j) => t[i] * weights[j]).Sum() / weights.Length;
+			vals[i] = sum;
+		}
+
+		return vals;
 	}
 }
