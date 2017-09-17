@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using FiringSquad.Data;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -31,11 +30,11 @@ namespace FiringSquad.Gameplay
 
 		private Dictionary<Attachment, Transform> mAttachPoints;
 		private Dictionary<Attachment, WeaponPartScript> mCurrentAttachments;
-		private WeaponData mCurrentData;
 		private bool mOverrideHitscanEye;
 
 		private GameObjectPool mProjectilePool;
 
+		protected WeaponData mCurrentData;
 		protected Transform mAimRoot;
 		protected BoundProperty<int> mClipSize;
 		protected BoundProperty<int> mAmountInClip;

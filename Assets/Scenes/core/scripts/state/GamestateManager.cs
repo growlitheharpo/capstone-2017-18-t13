@@ -63,6 +63,7 @@ public partial class GamestateManager : MonoSingleton<GamestateManager>, IGamest
 	public const string MENU_SCENE = "menu";
 	public const string GAME_SCENE = "scene1";
 	public const string PROTOTYPE1_SCENE = "prototype1";
+	public const string PROTOTYPE1_SETUP_SCENE = "prototype1_intro";
 	public const string PROTOTYPE2_SCENE = "prototype2";
 	public const string PROTOTYPE3_SCENE = "prototype3";
 	public const string ART_PROTOTYPE_SCENE = "artproto";
@@ -89,6 +90,7 @@ public partial class GamestateManager : MonoSingleton<GamestateManager>, IGamest
 			{ MENU_SCENE, new MenuSceneState() },
 			{ GAME_SCENE, new GameSceneState() },
 			{ PROTOTYPE1_SCENE, new Prototype1State() },
+			{ PROTOTYPE1_SETUP_SCENE, new MenuSceneState() },
 			{ PROTOTYPE2_SCENE, new Prototype2State() },
 			{ PROTOTYPE3_SCENE, new GameSceneState() },
 			{ ART_PROTOTYPE_SCENE, new GameSceneState() },
