@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using FiringSquad.Data;
 using KeatsLib.Collections;
 using UnityEngine;
@@ -35,6 +34,8 @@ namespace FiringSquad.Gameplay.AI
 		private NavMeshAgent mMovementAgent;
 		private AICharacter mCharacter;
 		private Transform mPlayerRef;
+
+		private Vector3 mLastKnownPlayerLocation;
 
 		private float mLastAttackedTime = float.MinValue;
 		private bool wasRecentlyAttacked
@@ -81,6 +82,8 @@ namespace FiringSquad.Gameplay.AI
 				TransitionStates(new ShootAtPlayerState(this));
 			if (GUILayout.Button("Shoot and Chase State"))
 				TransitionStates(new ShootAndChasePlayerState(this));
+			if (GUILayout.Button("Seek Lost Player State"))
+				TransitionStates(new SeekOutPlayer(this));
 			if (GUILayout.Button("Lost Player State"))
 				TransitionStates(new LostPlayerState(this));
 
@@ -223,9 +226,9 @@ namespace FiringSquad.Gameplay.AI
 			public override IState GetTransition()
 			{
 				if (!mMachine.KnowsOfPlayer())
-					return new LostPlayerState(mMachine);
+					return new SeekOutPlayer(mMachine);
 
-				return mMachine.IsPositionEvaluationStale() ? new ShootAtPlayerState(mMachine) : this;
+				return mMachine.IsPositionEvaluationStale() ? (IState)new ShootAndChasePlayerState(mMachine) : this;
 			}
 		}
 		
@@ -259,6 +262,45 @@ namespace FiringSquad.Gameplay.AI
 			{
 				if (!mMachine.IsPositionEvaluationStale() && Vector3.Distance(mGoal, mMachine.transform.position) <= 1.0f)
 					return mInnerState;
+				if (!mMachine.KnowsOfPlayer())
+					return new SeekOutPlayer(mMachine);
+				return this;
+			}
+		}
+
+		/// <summary>
+		/// Go to the last known player location to see if we can find them from there.
+		/// </summary>
+		private class SeekOutPlayer : BaseState<AIStateMachine>
+		{
+			public SeekOutPlayer(AIStateMachine m) : base(m) { }
+
+			private Vector3 mGoal;
+			private float mTimer;
+
+			public override void OnEnter()
+			{
+				mGoal = mMachine.mLastKnownPlayerLocation;
+				mMachine.mMovementAgent.SetDestination(mGoal);
+				mTimer = 10.0f;
+			}
+
+			public override void Update()
+			{
+				base.Update();
+				mTimer -= Time.deltaTime;
+			}
+
+			public override IState GetTransition()
+			{
+				// if we found the player, start shooting at them
+				if (mMachine.KnowsOfPlayer())
+					return new JustSawPlayerState(mMachine);
+
+				// if we reached our goal and we still don't know where they are, we give up.
+				if (Vector3.Distance(mMachine.transform.position, mGoal) < 1.0f || mTimer <= 0.0f)
+					return new LostPlayerState(mMachine);
+
 				return this;
 			}
 		}
@@ -267,16 +309,28 @@ namespace FiringSquad.Gameplay.AI
 		{
 			public LostPlayerState(AIStateMachine m) : base(m) { }
 
-			private float mTimer;
+			private float mTimer, mStartVal;
+			private Quaternion mLeftRot, mRightRot;
 
 			public override void OnEnter()
 			{
-				mTimer = mMachine.tweakables.lostPlayerTimeout;
+				mStartVal = mMachine.tweakables.lostPlayerTimeout;
+				mTimer = mStartVal;
+
+				mLeftRot = mMachine.transform.rotation * Quaternion.AngleAxis(-90.0f, Vector3.up);
+				mRightRot = mMachine.transform.rotation * Quaternion.AngleAxis(90.0f, Vector3.up);
 			}
 
 			public override void Update()
 			{
 				mTimer -= Time.deltaTime;
+				
+				// we want to go from 0.5 to 1 to 0 to 0.5
+				// range is 2.5, start is 0.5, end is 3.0
+				// total percent is 0 to 1
+				float totalPercent = (mStartVal - mTimer) / mStartVal;
+				float currentPercent = Mathf.Lerp(0.5f, 2.5f, totalPercent);
+				mMachine.transform.rotation = Quaternion.Lerp(mLeftRot, mRightRot, Mathf.PingPong(currentPercent, 1.0f));
 			}
 
 			public override IState GetTransition()
@@ -318,7 +372,11 @@ namespace FiringSquad.Gameplay.AI
 			Ray ray = new Ray(mCharacter.eye.position, directionToPlayer);
 			bool hit = Physics.Raycast(ray, out hitInfo, 5000.0f, tweakables.visionLayermask);
 
-			return hit && hitInfo.collider.CompareTag("Player");
+			if (!hit || !hitInfo.collider.CompareTag("Player"))
+				return false;
+
+			mLastKnownPlayerLocation = hitInfo.transform.position;
+			return true;
 		}
 
 		/// <summary>
