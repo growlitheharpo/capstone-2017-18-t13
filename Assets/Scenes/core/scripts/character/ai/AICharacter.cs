@@ -3,7 +3,7 @@ using KeatsLib;
 using UnityEngine;
 using UnityEngine.AI;
 
-namespace FiringSquad.Gameplay
+namespace FiringSquad.Gameplay.AI
 {
 	public class AICharacter : MonoBehaviour, IWeaponBearer, IDamageReceiver
 	{
@@ -53,6 +53,11 @@ namespace FiringSquad.Gameplay
 		private void OnGUI()
 		{
 			mDecisionMaker.OnGUI();
+		}
+
+		private void OnDrawGizmos()
+		{
+			mDecisionMaker.OnDrawGizmos();
 		}
 
 		public void ApplyRecoil(Vector3 direction, float amount)

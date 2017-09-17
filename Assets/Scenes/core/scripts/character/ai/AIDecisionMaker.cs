@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using FiringSquad.Data;
 using UnityEngine;
 using UnityEngine.AI;
 using GameLogger = Logger;
 using Random = UnityEngine.Random;
 
-namespace FiringSquad.Gameplay
+namespace FiringSquad.Gameplay.AI
 {
 	public class AIDecisionMaker
 	{
@@ -18,6 +21,7 @@ namespace FiringSquad.Gameplay
 			public float mBaseInaccuracy;
 			public float mPurposefullyMissPlayerScale;
 			public float mRotateSpeed;
+			public AIHintValueData mHintData;
 
 			public LayerMask mVisionLayermask;
 		}
@@ -25,6 +29,7 @@ namespace FiringSquad.Gameplay
 		private Action mCurrentState;
 		private DecisionMakerVariables mVars;
 
+		private AIHintingSystem mHintingSystemRef;
 		private NavMeshPath mCurrentPath = null;
 		private NavMeshAgent mMovementAgent;
 		private IWeapon mWeapon;
@@ -46,6 +51,7 @@ namespace FiringSquad.Gameplay
 			mVars = vars;
 
 			mPlayerRef = ReferenceForwarder.get.player.transform;
+			mHintingSystemRef = ReferenceForwarder.get.aiHintSystem;
 
 			mLastAttackedTime = float.NegativeInfinity;
 
@@ -104,11 +110,9 @@ namespace FiringSquad.Gameplay
 
 		private void TickChaseAfterPlayer()
 		{
-			if (mMovementTarget == new Vector3(-10000, -10000, -10000) || Vector3.Distance(transform.position, mPlayerRef.position) > mVars.mMaxDistanceFromPlayer)
+			//if (mMovementTarget == new Vector3(-10000, -10000, -10000) || Vector3.Distance(transform.position, mPlayerRef.position) > mVars.mMaxDistanceFromPlayer)
 			{
-				ChooseMovementTarget(mPlayerRef);
-
-				GameLogger.Info(mMovementTarget.ToString());
+				ChooseMovementTarget();
 
 				if (!mMovementAgent.SetDestination(mMovementTarget))
 					mMovementTarget = new Vector3(-10000, -10000, -10000);
@@ -161,20 +165,7 @@ namespace FiringSquad.Gameplay
 
 			return false;
 		}
-
-		/// <summary>
-		/// If the player is within our line-of-sight
-		/// </summary>
-		private bool CanSeePlayer(Ray ray)
-		{
-			//TODO: Add more cone stuff.
-			RaycastHit hit;
-			bool hitYes = Physics.Raycast(ray, out hit, 5000.0f, mVars.mVisionLayermask);// && hit.collider.CompareTag("Player");
-			
-			UnityEngine.Debug.DrawLine(ray.origin, hitYes ? hit.point : ray.origin + ray.direction * 3000.0f, hitYes ? Color.cyan : Color.red, 2.0f);
-			return hitYes && hit.collider.CompareTag("Player");
-		}
-
+		
 		/// <summary>
 		/// Whether or not we were hit by the player within the threshold.
 		/// </summary>
@@ -205,38 +196,39 @@ namespace FiringSquad.Gameplay
 			return TickShootAtPlayer;
 		}
 
-		/// <summary>
-		/// TODO: Rewrite this entire function. It works for now.
-		/// </summary>
-		/// <param name="player"></param>
-		private void ChooseMovementTarget(Transform player)
+		private Dictionary<Vector3, float> mDebugPositions;
+		public void OnDrawGizmos()
+		{
+			if (mDebugPositions == null)
+				return;
+
+			foreach (var pos in mDebugPositions)
+			{
+				Gizmos.color = Color.Lerp(Color.red, Color.green, pos.Value);
+				UnityEditor.Handles.Label(pos.Key, pos.Value.ToString("#.###"));
+				Gizmos.DrawSphere(pos.Key, 0.25f);
+			}
+
+			Gizmos.color = Color.cyan;
+			Gizmos.DrawSphere(mMovementTarget + Vector3.up, 0.4f);
+		}
+
+		private void ChooseMovementTarget()
 		{
 			mCurrentPath = new NavMeshPath();
+			var validPositions = mHintingSystemRef.EvaluatePosition(transform.position, mVars.mHintData);
+			mDebugPositions = validPositions;
 
-			Vector3 pointInFrontOfPlayer = player.position + player.forward * mVars.mClosestDistanceToPlayer + Vector3.up;
-			mMovementTarget = pointInFrontOfPlayer;
+			var positions = validPositions.OrderByDescending(x => x.Value).Select(x => x.Key).ToArray();
+			int i = 0;
+			do
+			{
+				mMovementTarget = positions[i];
+				i++;
+			} while (!mMovementAgent.CalculatePath(mMovementTarget, mCurrentPath) && i < positions.Length);
 
-			if (!CanSeePlayer(new Ray(mMovementTarget, player.position - mMovementTarget)) || !mMovementAgent.CalculatePath(mMovementTarget, mCurrentPath))
-				mMovementTarget = player.position + player.right * mVars.mClosestDistanceToPlayer + Vector3.up;
-			else
-				return;
-
-			// can't see from front or right, check left
-			if (!CanSeePlayer(new Ray(mMovementTarget, player.position - mMovementTarget)) || !mMovementAgent.CalculatePath(mMovementTarget, mCurrentPath))
-				mMovementTarget = player.position + player.right * -mVars.mClosestDistanceToPlayer + Vector3.up;
-			else
-				return;
-
-			// can't see from any of the above. just use the front position.
-			if (!CanSeePlayer(new Ray(mMovementTarget, player.position - mMovementTarget)) || !mMovementAgent.CalculatePath(mMovementTarget, mCurrentPath))
-				return;
-
-			NavMeshHit hit;
-			NavMesh.SamplePosition(pointInFrontOfPlayer, out hit, 10.0f, NavMesh.AllAreas);
-			mMovementTarget = hit.position;
-			mCurrentPath = null;
-
-			UnityEngine.Debug.DrawLine(mMovementTarget, mMovementTarget + Vector3.up * 3.0f, Color.green);
+			if (i >= positions.Length)
+				GameLogger.Warn("AI " + transform.name + " was unable to find a target location.");
 		}
 
 		#endregion
@@ -253,7 +245,7 @@ namespace FiringSquad.Gameplay
 			if (GUILayout.Button("Chase After Player"))
 				mCurrentState = TickChaseAfterPlayer;
 			if (GUILayout.Button("Force New Position"))
-				ChooseMovementTarget(ReferenceForwarder.get.player.transform);
+				ChooseMovementTarget();
 			GUILayout.EndHorizontal();
 			if (GUILayout.Button("Chase And Shoot"))
 				mCurrentState = TickChaseAndShoot;
@@ -262,5 +254,6 @@ namespace FiringSquad.Gameplay
 
 			GUILayout.Label("Know where the player is? " + KnowsOfPlayer());
 		}
+
 	}
 }

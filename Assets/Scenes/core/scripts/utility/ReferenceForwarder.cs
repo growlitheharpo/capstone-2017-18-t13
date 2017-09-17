@@ -1,4 +1,5 @@
 ﻿using System;
+using FiringSquad.Gameplay.AI;
 using UnityEngine;
 
 public class ReferenceForwarder : MonoBehaviour
@@ -8,6 +9,9 @@ public class ReferenceForwarder : MonoBehaviour
 	{
 		[SerializeField] private GameObject mPlayerRef;
 		public GameObject player { get { return mPlayerRef; } }
+
+		[SerializeField] private AIHintingSystem mAIHintRef;
+		public AIHintingSystem aiHintSystem { get { return mAIHintRef; } }
 	}
 
 	[SerializeField] private References mReferences;
