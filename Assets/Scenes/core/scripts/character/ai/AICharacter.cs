@@ -7,7 +7,6 @@ namespace FiringSquad.Gameplay.AI
 {
 	public class AICharacter : MonoBehaviour, IWeaponBearer, IDamageReceiver
 	{
-		[SerializeField] private CharacterMovementData mMovementData;
 		[SerializeField] private WeaponDefaultsData mGunDefaultParts;
 		[SerializeField] private GameObject mDeathParticlesPrefab;
 		[SerializeField] private GameObject mGunPrefab;
@@ -18,7 +17,6 @@ namespace FiringSquad.Gameplay.AI
 		private AIWeaponScript mWeapon;
 		private Transform mFakeEye;
 
-		public CharacterMovementData movementData { get { return mMovementData; } }
 		public Transform eye { get { return mFakeEye; } }
 		public IWeapon weapon { get { return mWeapon; } }
 

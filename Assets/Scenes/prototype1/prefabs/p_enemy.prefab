@@ -137,9 +137,9 @@ GameObject:
   m_Component:
   - component: {fileID: 4844674569917206}
   - component: {fileID: 136095065641054148}
-  - component: {fileID: 195462910836823464}
   - component: {fileID: 114231566527979904}
   - component: {fileID: 114352049684114196}
+  - component: {fileID: 195462910836823464}
   m_Layer: 0
   m_Name: p_enemy
   m_TagString: Untagged
@@ -425,7 +425,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 329af2b4a1a7bfd4fbebd694fa722237, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mMovementData: {fileID: 11400000, guid: 5ef109a932ca7a6418c73960962cd4c4, type: 2}
   mGunDefaultParts:
     mScope: {fileID: 1289196357881978, guid: 363ec9baf39beb0458b6c51a5e07d379, type: 2}
     mBarrel: {fileID: 1297151579918920, guid: ae2a9ffdc62cede43828d78624b9146c, type: 2}
@@ -454,6 +453,7 @@ MonoBehaviour:
     mPurposefullyMissPlayerScale: 0.25
     mPurposefullyMissPlayerTime: 0.75
     mLostPlayerTimeout: 4
+    mTurnAimSpeed: 4
     mHintData: {fileID: 11400000, guid: d43f744d854cdf4479025c06abf0db65, type: 2}
     mVisionLayermask:
       serializedVersion: 2

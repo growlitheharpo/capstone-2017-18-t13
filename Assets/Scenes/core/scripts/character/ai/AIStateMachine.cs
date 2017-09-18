@@ -9,15 +9,33 @@ namespace FiringSquad.Gameplay.AI
 	public class AIStateMachine : BaseStateMachine
 	{
 		[SerializeField] private StateMachineVariables mTweakables;
-		[Serializable] private class StateMachineVariables
+		[Serializable] public class StateMachineVariables
 		{
+			[Tooltip("How many seconds after we were shot by the player should we \"know\" where the player is?")]
 			[SerializeField] private float mRecentlyAttackedTimeThreshold;
+
+			[Tooltip("The size of our \"cone\" for our line of sight test. SMALLER values are a WIDER cone.")]
 			[SerializeField] private float mLineOfSight;
+
+			[Tooltip("The base magic number for how inaccurate this AI is.")]
 			[SerializeField] private float mBaseInaccuracy;
+
+			[Tooltip("The base magic number for how much we should miss the player during their grace period.")]
 			[SerializeField] private float mPurposefullyMissPlayerScale;
+
+			[Tooltip("The length of the player's grace period.")]
 			[SerializeField] private float mPurposefullyMissPlayerTime;
+
+			[Tooltip("How long after losing the player before we give up entirely.")]
 			[SerializeField] private float mLostPlayerTimeout;
+
+			[Tooltip("How quickly we can rotate to face the player to shoot at them.")]
+			[SerializeField] private float mTurnAimSpeed;
+
+			[Tooltip("Our navigation-specific values.")]
 			[SerializeField] private AIHintValueData mHintData;
+
+			[Tooltip("Which collision layers block our view when looking for the player.")]
 			[SerializeField] private LayerMask mVisionLayermask;
 
 			public float lineOfSight { get { return mLineOfSight; } }
@@ -26,6 +44,7 @@ namespace FiringSquad.Gameplay.AI
 			public float purposefullyMissPlayerScale { get { return mPurposefullyMissPlayerScale; } }
 			public float purposefullyMissPlayerTime { get { return mPurposefullyMissPlayerTime; } }
 			public float lostPlayerTimeout { get { return mLostPlayerTimeout; } }
+			public float turnAimSpeed { get { return mTurnAimSpeed; } }
 			public AIHintValueData hintData { get { return mHintData; } }
 			public LayerMask visionLayermask { get { return mVisionLayermask; } }
 		}
@@ -160,7 +179,6 @@ namespace FiringSquad.Gameplay.AI
 				mMissPlayerTimer = m.tweakables.purposefullyMissPlayerTime;
 			}
 
-			private CharacterMovementData movementData { get { return mMachine.mCharacter.movementData; } }
 			private Transform transform { get { return mMachine.transform; } }
 			private Transform eye { get { return mMachine.mCharacter.eye; } }
 
@@ -215,7 +233,7 @@ namespace FiringSquad.Gameplay.AI
 				Quaternion perciseRot = Quaternion.LookRotation(faceDirection, Vector3.up);
 				Quaternion bodyRot = Quaternion.Euler(0.0f, perciseRot.eulerAngles.y, 0.0f);
 
-				transform.rotation = Quaternion.Slerp(transform.rotation, bodyRot, Time.deltaTime * movementData.lookSpeed);
+				transform.rotation = Quaternion.Slerp(transform.rotation, bodyRot, Time.deltaTime * mMachine.tweakables.turnAimSpeed);
 
 				Quaternion realEyeGoal = Quaternion.Euler(randomishRot.eulerAngles.x, transform.rotation.eulerAngles.y, randomishRot.eulerAngles.z);
 				eye.rotation = realEyeGoal;
