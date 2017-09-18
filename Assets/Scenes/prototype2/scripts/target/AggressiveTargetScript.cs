@@ -11,6 +11,7 @@ namespace FiringSquad.Gameplay
 		[SerializeField] private GameObject mDefaultMechanism;
 
 		private BoundProperty<float> mHealthProp;
+		public IWeapon weapon { get { return mWeapon; } }
 
 		// Use this for initialization
 		private void Start()
@@ -38,12 +39,7 @@ namespace FiringSquad.Gameplay
 				mWeapon.FireWeapon();
 			}
 		}
-
-		public GameObject GetGameObject()
-		{
-			return gameObject;
-		}
-
+		
 		public Transform eye { get { return transform; } }
 
 		public void ApplyRecoil(Vector3 direction, float amount)

@@ -4,6 +4,9 @@ using UnityEngine;
 
 namespace FiringSquad.Data
 {
+	/// <summary>
+	/// Serializable utility class that stores a collection of weapon parts.
+	/// </summary>
 	[Serializable]
 	public class WeaponDefaultsData
 	{
@@ -20,7 +23,6 @@ namespace FiringSquad.Data
 		/// <summary>
 		/// Allows this class to be iterated over.
 		/// </summary>
-		/// <returns></returns>
 		public IEnumerator<GameObject> GetEnumerator()
 		{
 			yield return scope;

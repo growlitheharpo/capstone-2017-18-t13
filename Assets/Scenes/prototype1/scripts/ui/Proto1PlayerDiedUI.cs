@@ -29,7 +29,8 @@ namespace FiringSquad.Gameplay
 
 		private void HandlePlayerDeath()
 		{
-			if (FindObjectOfType<DebugMenu>().currentlyActive)
+			DebugMenu menu = FindObjectOfType<DebugMenu>();
+			if (menu != null && menu.currentlyActive)
 				EventManager.UIToggle();
 
 			ServiceLocator.Get<IInput>()
