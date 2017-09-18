@@ -7,7 +7,6 @@ public class GameplayUIManager : MonoSingleton<GameplayUIManager>, IGameplayUIMa
 	public static readonly int CLIP_TOTAL = "player_clip_total".GetHashCode();
 	public static readonly int PLAYER_HEALTH = "player_health_current".GetHashCode();
 
-	private WeakReference mRef;
 	private Dictionary<int, WeakReference> mPropertyMap;
 
 	protected override void Awake()

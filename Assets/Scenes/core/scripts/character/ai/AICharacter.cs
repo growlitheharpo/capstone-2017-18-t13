@@ -1,15 +1,16 @@
-﻿using FiringSquad.Data;
+﻿using System.Collections;
+using FiringSquad.Data;
 using KeatsLib;
 using UnityEngine;
-using UnityEngine.AI;
 
 namespace FiringSquad.Gameplay.AI
 {
 	public class AICharacter : MonoBehaviour, IWeaponBearer, IDamageReceiver
 	{
 		[SerializeField] private CharacterMovementData mMovementData;
-		[SerializeField] private GameObject mGunPrefab;
 		[SerializeField] private WeaponDefaultsData mGunDefaultParts;
+		[SerializeField] private GameObject mDeathParticlesPrefab;
+		[SerializeField] private GameObject mGunPrefab;
 		[SerializeField] private float mDefaultHealth;
 
 		private BoundProperty<float> mCurrentHealth;
@@ -19,7 +20,7 @@ namespace FiringSquad.Gameplay.AI
 
 		public CharacterMovementData movementData { get { return mMovementData; } }
 		public Transform eye { get { return mFakeEye; } }
-		public IWeapon weapon { get { return mWeapon; }}
+		public IWeapon weapon { get { return mWeapon; } }
 
 		private void Awake()
 		{
@@ -55,16 +56,37 @@ namespace FiringSquad.Gameplay.AI
 		public void ApplyDamage(float amount, Vector3 point, IDamageSource cause)
 		{
 			mStateMachine.NotifyAttackedByPlayer();
-			mCurrentHealth.value = Mathf.Clamp(mCurrentHealth.value - amount, 0.0f, float.MaxValue);
+			mCurrentHealth.value -= amount;
 
-			if (mCurrentHealth.value <= 0.0f)
+			// HACK: Checking "mCurrentHealth.value > -50000.0f" is how we check to see if we're already dying.
+			if (mCurrentHealth.value <= 0.0f && mCurrentHealth.value > -50000.0f)
 				Die();
 		}
 
 		private void Die()
 		{
-			// TODO: Implement death
-			Logger.Info("\"I just died :(\" - " + name);
+			mCurrentHealth.value = float.MinValue;
+
+			Destroy(mStateMachine);
+			Destroy(GetComponent<Collider>());
+
+			foreach (Transform child in transform)
+				Destroy(child.gameObject);
+
+			StartCoroutine(DoDeathEffects());
+		}
+
+		private IEnumerator DoDeathEffects()
+		{
+			ParticleSystem ps = Instantiate(mDeathParticlesPrefab).GetComponent<ParticleSystem>();
+			ps.transform.SetParent(transform);
+			ps.Play();
+
+			yield return null;
+			yield return null;
+			yield return new WaitForParticles(ps);
+			yield return null;
+			Destroy(gameObject);
 		}
 	}
 }
