@@ -90,8 +90,12 @@ namespace FiringSquad.Gameplay.AI
 
 #endif
 
+#if UNITY_EDITOR
 		private void OnGUI()
 		{
+			if (UnityEditor.Selection.activeGameObject != gameObject)
+				return;
+
 			GUILayout.Label("Current state: " + currentState.GetType().Name);
 			if (GUILayout.Button("Idle State"))
 				TransitionStates(new IdleState(this));
@@ -106,12 +110,10 @@ namespace FiringSquad.Gameplay.AI
 			if (GUILayout.Button("Lost Player State"))
 				TransitionStates(new LostPlayerState(this));
 
-#if DEBUG || DEVELOPMENT_BUILD
 			if (GUILayout.Button(mSuppressNormalTransitions ? "Re-Enable Normal Transitions" : "Suppress Normal Transitions"))
 				mSuppressNormalTransitions = !mSuppressNormalTransitions;
-#endif
-
 		}
+#endif
 
 #if UNITY_EDITOR
 		private void OnDrawGizmos()
@@ -349,7 +351,7 @@ namespace FiringSquad.Gameplay.AI
 				// range is 2.5, start is 0.5, end is 3.0
 				// total percent is 0 to 1
 				float totalPercent = (mStartVal - mTimer) / mStartVal;
-				float currentPercent = Mathf.Lerp(0.5f, 2.5f, totalPercent);
+				float currentPercent = Mathf.LerpUnclamped(0.5f, 2.5f, totalPercent);
 				mMachine.transform.rotation = Quaternion.Lerp(mLeftRot, mRightRot, Mathf.PingPong(currentPercent, 1.0f));
 			}
 
