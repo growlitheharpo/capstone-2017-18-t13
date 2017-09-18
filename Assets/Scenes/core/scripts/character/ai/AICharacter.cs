@@ -78,6 +78,7 @@ namespace FiringSquad.Gameplay.AI
 		{
 			ParticleSystem ps = Instantiate(mDeathParticlesPrefab).GetComponent<ParticleSystem>();
 			ps.transform.SetParent(transform);
+			ps.transform.localPosition = Vector3.zero;
 			ps.Play();
 
 			yield return null;
