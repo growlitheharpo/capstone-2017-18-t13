@@ -94,6 +94,7 @@ namespace FiringSquad.Gameplay.AI
 
 		}
 
+#if UNITY_EDITOR
 		private void OnDrawGizmos()
 		{
 			if (mMostRecentResult == null || mMostRecentResult.positionScores == null)
@@ -109,6 +110,7 @@ namespace FiringSquad.Gameplay.AI
 			Gizmos.color = Color.cyan;
 			Gizmos.DrawSphere(mMostRecentResult.positionScores.GetHighestValueKey() + Vector3.up, 0.4f);
 		}
+#endif
 
 		#endregion
 
