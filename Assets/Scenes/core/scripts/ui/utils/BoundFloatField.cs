@@ -27,6 +27,8 @@ public class BoundFloatField : MonoBehaviour
 
 	private IEnumerator CheckForProperty()
 	{
+		yield return new WaitForEndOfFrame();
+		yield return new WaitForEndOfFrame();
 		while (mProperty == null)
 		{
 			mProperty = mUIManagerRef.GetProperty<float>(mPropertyHash);
