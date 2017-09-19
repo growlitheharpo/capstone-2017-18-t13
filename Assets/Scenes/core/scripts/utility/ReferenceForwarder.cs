@@ -12,6 +12,9 @@ public class ReferenceForwarder : MonoBehaviour
 
 		[SerializeField] private AIHintingSystem mAIHintRef;
 		public AIHintingSystem aiHintSystem { get { return mAIHintRef; } }
+
+		[SerializeField] private GameObject mDroppedWeaponParticles;
+		public GameObject droppedWeaponParticlesPrefab { get { return mDroppedWeaponParticles; } }
 	}
 
 	[SerializeField] private References mReferences;
