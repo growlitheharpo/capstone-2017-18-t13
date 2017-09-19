@@ -73,7 +73,8 @@ namespace FiringSquad.Gameplay.AI
 			foreach (Transform child in transform)
 				Destroy(child.gameObject);
 
-			DropWeapon();
+			if (ServiceLocator.Get<IGamestateManager>().IsFeatureEnabled(GamestateManager.Feature.WeaponDrops))
+				DropWeapon();
 
 			StartCoroutine(DoDeathEffects());
 		}
@@ -89,7 +90,6 @@ namespace FiringSquad.Gameplay.AI
 			Transform parent = instance.transform.Find("PickupCollider");
 
 			particles.transform.SetParent(parent, false);
-
 		}
 
 		private IEnumerator DoDeathEffects()

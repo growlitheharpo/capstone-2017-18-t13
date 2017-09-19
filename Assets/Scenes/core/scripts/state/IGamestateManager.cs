@@ -17,4 +17,9 @@ public interface IGamestateManager
 	/// killing the application.
 	/// </summary>
 	void RequestShutdown();
+
+	/// <summary>
+	/// Returns whether or not a feature is currently enabled. For prototyping only.
+	/// </summary>
+	bool IsFeatureEnabled(GamestateManager.Feature feat);
 }

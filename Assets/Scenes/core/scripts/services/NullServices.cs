@@ -38,6 +38,11 @@ public class NullServices
 		{
 			Logger.Info("NULL SERVICE: NullGamestateManager.RequestShutdown()", Logger.System.Services);
 		}
+
+		public bool IsFeatureEnabled(GamestateManager.Feature feat)
+		{
+			return false;
+		}
 	}
 
 	private class NullAudioManager : IAudioManager

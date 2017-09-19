@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine.SceneManagement;
 
 /// <inheritdoc cref="IGamestateManager"/>
@@ -68,6 +69,14 @@ public partial class GamestateManager : MonoSingleton<GamestateManager>, IGamest
 	public const string PROTOTYPE3_SCENE = "prototype3";
 	public const string ART_PROTOTYPE_SCENE = "artproto";
 
+	public enum Feature
+	{
+		WeaponDrops,
+		WeaponDurability,
+	}
+
+	private bool mOverrideEnableDrops, mOverrideEnableDurability;
+
 	private Dictionary<string, IGameState> mBaseStates;
 	private IGameState mCurrentState;
 
@@ -111,8 +120,10 @@ public partial class GamestateManager : MonoSingleton<GamestateManager>, IGamest
 		mCurrentState.OnEnter();
 
 		ServiceLocator.Get<IGameConsole>()
-			.RegisterCommand("close", s => EventManager.Notify(() => EventManager.RequestSceneChange(MENU_SCENE)));
+			.RegisterCommand("close", s => EventManager.Notify(() => EventManager.RequestSceneChange(MENU_SCENE)))
+			.RegisterCommand("feature", HandleFeatureForceCommand);
 	}
+
 
 	private void Update()
 	{
@@ -156,5 +167,38 @@ public partial class GamestateManager : MonoSingleton<GamestateManager>, IGamest
 		mCurrentState = new TransitionToSceneState(sceneName);
 		Logger.Info("Setting current state to TransitionToSceneState because of an event.", Logger.System.State);
 		mCurrentState.OnEnter();
+	}
+
+	private void HandleFeatureForceCommand(string[] obj)
+	{
+		if (obj.Length != 2)
+			throw new ArgumentException("Invalid arguments for command \"feature\".");
+
+		string feat = obj[0].ToLower();
+		int val = int.Parse(obj[1]);
+
+		switch (feat) {
+			case "drops":
+				mOverrideEnableDrops = val == 1;
+				break;
+			case "durability":
+				mOverrideEnableDurability = val == 1;
+				break;
+			default:
+				throw new ArgumentException(obj[0] + " is not a valid feature.");
+		}
+	}
+
+	public bool IsFeatureEnabled(Feature feat)
+	{
+		switch (feat)
+		{
+			case Feature.WeaponDrops:
+				return SceneManager.GetActiveScene().name == PROTOTYPE2_SCENE || mOverrideEnableDrops;
+			case Feature.WeaponDurability:
+				return SceneManager.GetActiveScene().name == PROTOTYPE1_SCENE || mOverrideEnableDurability;
+			default:
+				throw new ArgumentOutOfRangeException("feat", feat, null);
+		}
 	}
 }
