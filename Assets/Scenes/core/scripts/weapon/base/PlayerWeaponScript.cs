@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using UnityEngine;
 
 namespace FiringSquad.Gameplay
@@ -48,6 +49,17 @@ namespace FiringSquad.Gameplay
 			mShotParticles.Stop();
 			mShotParticles.time = 0.0f;
 			mShotParticles.Play();
+		}
+
+		protected override void OnPreFireShot()
+		{
+			if (ServiceLocator.Get<IGamestateManager>().IsFeatureEnabled(GamestateManager.Feature.WeaponDurability))
+				DegradeWeapon();
+		}
+
+		private void DegradeWeapon()
+		{
+			UnityEngine.Debug.Log("BREAK EVERYTHING!!!");
 		}
 
 		/// <summary>
