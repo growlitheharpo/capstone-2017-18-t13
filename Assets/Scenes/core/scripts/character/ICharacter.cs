@@ -5,6 +5,6 @@
 /// </summary>
 public interface ICharacter
 {
-	GameObject GetGameObject();
+	GameObject gameObject { get; }
 	Transform eye { get; }
 }

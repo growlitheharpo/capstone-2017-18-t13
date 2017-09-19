@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using FiringSquad.Gameplay;
 using UnityEngine;
 
 namespace FiringSquad.Data
 {
+	/// <summary>
+	/// Serializable utility class that stores a collection of weapon parts.
+	/// </summary>
 	[Serializable]
 	public class WeaponDefaultsData
 	{
@@ -20,7 +24,6 @@ namespace FiringSquad.Data
 		/// <summary>
 		/// Allows this class to be iterated over.
 		/// </summary>
-		/// <returns></returns>
 		public IEnumerator<GameObject> GetEnumerator()
 		{
 			yield return scope;
@@ -35,6 +38,29 @@ namespace FiringSquad.Data
 			mBarrel = copy.mBarrel;
 			mMechanism = copy.mMechanism;
 			mGrip = copy.mGrip;
+		}
+
+		/// <summary>
+		/// Allows access to weapon parts by their attachment.
+		/// </summary>
+		public GameObject this[BaseWeaponScript.Attachment index]
+		{
+			get
+			{
+				switch (index)
+				{
+					case BaseWeaponScript.Attachment.Scope:
+						return mScope;
+					case BaseWeaponScript.Attachment.Barrel:
+						return mBarrel;
+					case BaseWeaponScript.Attachment.Mechanism:
+						return mMechanism;
+					case BaseWeaponScript.Attachment.Grip:
+						return mGrip;
+					default:
+						throw new ArgumentOutOfRangeException("index", index, null);
+				}
+			}
 		}
 	}
 }
