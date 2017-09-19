@@ -21,6 +21,7 @@ namespace FiringSquad.Gameplay.AI
 
 		public Transform eye { get { return mFakeEye; } }
 		public IWeapon weapon { get { return mWeapon; } }
+		public WeaponDefaultsData defaultParts { get { return mGunDefaultParts; } }
 
 		private void Awake()
 		{

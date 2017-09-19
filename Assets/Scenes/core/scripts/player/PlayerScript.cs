@@ -19,6 +19,7 @@ namespace FiringSquad.Gameplay
 		private Transform mMainCameraRef;
 		Transform ICharacter.eye { get { return mMainCameraRef; } }
 		public IWeapon weapon { get { return mWeapon; } }
+		public WeaponDefaultsData defaultParts { get { return mData.defaultWeaponParts; } }
 
 		private const string INTERACTABLE_TAG = "interactable";
 
