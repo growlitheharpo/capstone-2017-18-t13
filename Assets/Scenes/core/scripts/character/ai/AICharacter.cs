@@ -12,6 +12,8 @@ namespace FiringSquad.Gameplay.AI
 		[SerializeField] private GameObject mGunPrefab;
 		[SerializeField] private float mDefaultHealth;
 
+		[SerializeField] private WeaponDropWeights mDropWeights;
+
 		private BoundProperty<float> mCurrentHealth;
 		private AIStateMachine mStateMachine;
 		private AIWeaponScript mWeapon;
