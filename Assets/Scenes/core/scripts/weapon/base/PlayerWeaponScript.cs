@@ -11,6 +11,7 @@ namespace FiringSquad.Gameplay
 	/// <inheritdoc />
 	public class PlayerWeaponScript : BaseWeaponScript
 	{
+		[SerializeField] private GameObject mPartBreakParticlesPrefab;
 		[SerializeField] private ParticleSystem mShotParticles;
 		private Vector3 mPlayerEyeOffset;
 		private Animator mAnimator;
@@ -59,7 +60,24 @@ namespace FiringSquad.Gameplay
 
 		private void DegradeWeapon()
 		{
-			UnityEngine.Debug.Log("BREAK EVERYTHING!!!");
+			foreach (WeaponPartScript attachment in parts)
+			{
+				if (attachment.durability <= 0)
+					continue;
+
+				attachment.durability -= 1;
+				if (attachment.durability == 0)
+					BreakPart(attachment);
+			}
+		}
+
+		private void BreakPart(WeaponPartScript part)
+		{
+			GameObject prefab = bearer.defaultParts[part.attachPoint];
+			Instantiate(prefab).GetComponent<WeaponPickupScript>().ConfirmAttach(this);
+
+			//TODO: Play an effect or something
+			Instantiate(mPartBreakParticlesPrefab, part.transform.position, Quaternion.identity);
 		}
 
 		/// <summary>
