@@ -12,6 +12,8 @@ namespace FiringSquad.Gameplay.AI
 		[SerializeField] private GameObject mGunPrefab;
 		[SerializeField] private float mDefaultHealth;
 
+		[SerializeField] private WeaponDropWeights mDropWeights;
+
 		private BoundProperty<float> mCurrentHealth;
 		private AIStateMachine mStateMachine;
 		private AIWeaponScript mWeapon;
@@ -71,7 +73,23 @@ namespace FiringSquad.Gameplay.AI
 			foreach (Transform child in transform)
 				Destroy(child.gameObject);
 
+			DropWeapon();
+
 			StartCoroutine(DoDeathEffects());
+		}
+
+		private void DropWeapon()
+		{
+			BaseWeaponScript.Attachment attachment = mDropWeights.ChooseRandomWeightedAttachment();
+			GameObject prefab = mGunDefaultParts[attachment];
+
+			GameObject particles = Instantiate(ReferenceForwarder.get.droppedWeaponParticlesPrefab, Vector3.zero, Quaternion.identity);
+
+			GameObject instance = Instantiate(prefab, transform.position, Quaternion.identity);
+			Transform parent = instance.transform.Find("PickupCollider");
+
+			particles.transform.SetParent(parent, false);
+
 		}
 
 		private IEnumerator DoDeathEffects()
