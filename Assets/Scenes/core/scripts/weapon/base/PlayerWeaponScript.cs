@@ -76,7 +76,6 @@ namespace FiringSquad.Gameplay
 			GameObject prefab = bearer.defaultParts[part.attachPoint];
 			Instantiate(prefab).GetComponent<WeaponPickupScript>().ConfirmAttach(this);
 
-			//TODO: Play an effect or something
 			Instantiate(mPartBreakParticlesPrefab, part.transform.position, Quaternion.identity);
 		}
 

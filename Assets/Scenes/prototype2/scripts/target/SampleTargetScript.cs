@@ -31,6 +31,9 @@ namespace FiringSquad.Gameplay
 
 		private void OnDestroy()
 		{
+			ServiceLocator.Get<IGameConsole>()
+				.UnregisterCommand("target");
+
 			EventManager.OnResetLevel -= HandleResetEvent;
 			mHealth.Cleanup();
 		}

@@ -74,6 +74,9 @@ namespace FiringSquad.Gameplay
 				.UnregisterInput(INPUT_ReloadWeapon)
 				.UnregisterInput(INPUT_FireWeapon);
 
+			ServiceLocator.Get<IGameConsole>()
+				.UnregisterCommand("godmode");
+
 			EventManager.OnResetLevel -= ReceiveResetEvent;
 			mHealth.Cleanup();
 		}
