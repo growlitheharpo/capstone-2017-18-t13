@@ -6,190 +6,270 @@ namespace FiringSquad.Gameplay
 {
 	public class PlayerGravGunWeapon : BaseStateMachine
 	{
-		private class IdleState : BaseState<PlayerGravGunWeapon>
+		private const float SNAP_DISTANCE = 4.0f;
+
+		private abstract class GravGunState : BaseState<PlayerGravGunWeapon>
 		{
-			public IdleState(PlayerGravGunWeapon m) : base(m) { }
+			protected GravGunState(PlayerGravGunWeapon machine) : base(machine) { }
 
-			public override IState GetTransition()
-			{
-
-			}
+			public virtual void OnInputPressed() { }
+			public virtual void OnInputHeld() { }
+			public virtual void OnInputReleased() { }
 		}
 
-		private enum InputState
-		{
-			OFF,
-			PRESSED,
-			HELD,
-			RELEASED,
-		}
+		// mock the weapon interface
+		public IWeaponBearer bearer { get; set; }
 
+		[SerializeField] [Range(0.0f, 1.0f)] private float mReelInSensitivity;
+		[SerializeField] private float mPullStrength;
+
+		public IInteractable heldObject { get { return mHoldTarget == null ? null : mHoldTarget.GetComponentUpwards<IInteractable>(); } }
+
+		private Rigidbody mHoldTarget;
 		private bool mGotInputThisFrame;
-		private InputState mInput;
 
 		private void Start()
 		{
 			TransitionStates(new IdleState(this));
 
 			ServiceLocator.Get<IInput>()
-				.RegisterInput(Input.GetButton, "Fire2", SetInputState, KeatsLib.Unity.Input.InputLevel.Gameplay);
+				.RegisterInput(Input.GetButtonDown, "Fire2", HandlePressed, KeatsLib.Unity.Input.InputLevel.Gameplay)
+				.RegisterInput(Input.GetButton, "Fire2", HandleHeld, KeatsLib.Unity.Input.InputLevel.Gameplay)
+				.RegisterInput(Input.GetButtonUp, "Fire2", HandleReleased, KeatsLib.Unity.Input.InputLevel.Gameplay);
 		}
-
+		
 		private void OnDestroy()
 		{
 			ServiceLocator.Get<IInput>()
-				.UnregisterInput(SetInputState);
+				.UnregisterInput(HandlePressed)
+				.UnregisterInput(HandleHeld)
+				.UnregisterInput(HandleReleased);
+		}
+		
+		private void HandleReleased()
+		{
+			GravGunState realState = currentState as GravGunState;
+			if (realState != null)
+				realState.OnInputReleased();
 		}
 
-		protected override void Update()
+		private void HandleHeld()
 		{
-			if (mGotInputThisFrame)
+			GravGunState realState = currentState as GravGunState;
+			if (realState != null)
+				realState.OnInputHeld();
+		}
+
+		private void HandlePressed()
+		{
+			GravGunState realState = currentState as GravGunState;
+			if (realState != null)
+				realState.OnInputPressed();
+		}
+
+		private class IdleState : GravGunState
+		{
+			public IdleState(PlayerGravGunWeapon m) : base(m) { }
+
+			private bool mPressed;
+
+			public override void OnInputPressed()
 			{
-				
+				mPressed = true;
 			}
-			else if (mInput == InputState.HELD || mInput == InputState.PRESSED)
-				mInput = InputState.RELEASED;
-			else
-				mInput = InputState.OFF;
 
-			mGotInputThisFrame = false;
-			base.Update();
+			public override IState GetTransition()
+			{
+				if (mPressed)
+					return new TryDrawObjectState(mMachine);
+				return this;
+			}
 		}
 
-		private void SetInputState()
+		private class TryDrawObjectState : GravGunState
 		{
-			mGotInputThisFrame = true;
+			public TryDrawObjectState(PlayerGravGunWeapon m) : base(m) { }
+
+			private Rigidbody mPullTarget;
+			private bool mCancelled;
+
+			private bool objectInRange
+			{
+				get {
+					return mPullTarget != null
+							&& Vector3.Distance(mPullTarget.transform.position, mMachine.transform.position) <= SNAP_DISTANCE;
+				}
+			}
+
+			public override void OnInputReleased()
+			{
+				mCancelled = true;
+			}
+
+			public override void OnEnter()
+			{
+				mPullTarget = null;
+			}
+
+			public override void Update()
+			{
+				if (mPullTarget == null)
+					TryGrabObject();
+				else
+				{
+					if (CheckStillLooking())
+						ReelObjectIn();
+				}
+			}
+
+			private void TryGrabObject()
+			{
+				// this is where we raycast
+				Transform eye = mMachine.bearer.eye;
+
+				Ray ray = new Ray(eye.position, eye.forward);
+				UnityEngine.Debug.DrawLine(ray.origin, ray.origin + ray.direction * 4000.0f, new Color(.6f, 0.0f, 1.0f), 0.2f);
+
+				RaycastHit hit;
+				if (!Physics.Raycast(ray, out hit, 4000.0f))
+					return;
+
+				Rigidbody rb = hit.rigidbody;
+				if (rb == null)
+					return;
+
+				mPullTarget = rb;
+			}
+			
+			private bool CheckStillLooking()
+			{
+				if (mPullTarget == null)
+					return false;
+
+				Vector3 direction = mPullTarget.position - mMachine.bearer.eye.position;
+				Vector3 looking = mMachine.bearer.eye.forward;
+
+				float dot = Vector3.Dot(direction.normalized, looking.normalized);
+				if (dot < mMachine.mReelInSensitivity)
+				{
+					mPullTarget = null;
+					return false;
+				}
+
+				return true;
+			}
+
+			private void ReelObjectIn()
+			{
+				Vector3 direction = mMachine.transform.position - mPullTarget.position;
+				mPullTarget.AddForce(direction * Time.deltaTime * mMachine.mPullStrength, ForceMode.Impulse);
+			}
+
+			public override IState GetTransition()
+			{
+				if (objectInRange)
+				{
+					mMachine.mHoldTarget = mPullTarget;
+					return new GrabAndHoldState(mMachine);
+				}
+				if (mCancelled)
+					return new IdleState(mMachine);
+
+				return this;
+			}
+		}
+
+		private class GrabAndHoldState : GravGunState
+		{
+			public GrabAndHoldState(PlayerGravGunWeapon m) : base(m) { }
+
+			private RigidbodyConstraints mOriginalConstraints;
+
+			private Transform mPreviousParent;
+			private Coroutine mGrabRoutine;
+			private bool mReleasedOnce, mExit;
+			private float mHoldTime;
+			private Vector3 mEndForce;
+
+			public override void OnEnter()
+			{
+				mOriginalConstraints = mMachine.mHoldTarget.constraints;
+				mMachine.mHoldTarget.constraints = RigidbodyConstraints.FreezeAll;
+
+				mPreviousParent = mMachine.mHoldTarget.transform.parent;
+				mMachine.mHoldTarget.transform.SetParent(mMachine.transform);
+
+				mGrabRoutine = mMachine.StartCoroutine(LerpToMyPosition());
+			}
+			
+			private IEnumerator LerpToMyPosition(float time = 0.3f)
+			{
+				Vector3 originalPos = mMachine.mHoldTarget.transform.position;
+				float currentTime = 0.0f;
+
+				while (currentTime < time)
+				{
+					if (mMachine.mHoldTarget == null)
+						yield break;
+
+					mMachine.mHoldTarget.transform.position = Vector3.Lerp(originalPos, mMachine.transform.position, currentTime / time);
+					currentTime += Time.deltaTime;
+
+					yield return null;
+				}
+			}
+
+			public override void OnInputHeld()
+			{
+				if (mReleasedOnce)
+					mHoldTime += Time.deltaTime;
+			}
+
+			public override void OnInputReleased()
+			{
+				if (!mReleasedOnce)
+					mReleasedOnce = true;
+				else
+					HandleTriggerRelease();
+			}
+			
+			private void HandleTriggerRelease()
+			{
+				if (mHoldTime < 1.0f)
+					mEndForce = Vector3.zero;
+				else
+					mEndForce = mMachine.bearer.eye.forward * 150.0f;
+
+				if (mGrabRoutine != null)
+					mMachine.StopCoroutine(mGrabRoutine);
+
+				mExit = true;
+			}
+
+			public override void Update()
+			{
+				if (mMachine.mHoldTarget == null)
+					mExit = true;
+			}
+
+			public override void OnExit()
+			{
+				if (mMachine.mHoldTarget == null)
+					return;
+
+				mMachine.mHoldTarget.constraints = mOriginalConstraints;
+				mMachine.mHoldTarget.AddForce(mEndForce, ForceMode.Impulse);
+				mMachine.mHoldTarget.transform.SetParent(mPreviousParent);
+				mMachine.mHoldTarget = null;
+			}
+
+			public override IState GetTransition()
+			{
+				if (mExit)
+					return new IdleState(mMachine);
+
+				return this;
+			}
 		}
 	}
-
-	/*public class PlayerGravGunWeapon : MonoBehaviour
-	{
-		public IWeaponBearer bearer { get; set; }
-
-		[SerializeField] public float mStrength = 2.0f;
-
-		private enum HoldState
-		{
-			None,
-			Grabbing,
-			Holding,
-		}
-
-		private HoldState mState = HoldState.None;
-		private RigidbodyConstraints mOriginalConstraints;
-		private float mFire2DownTime = float.MaxValue;
-		private Rigidbody mHeldItem;
-
-		private void Update()
-		{
-			if (mState == HoldState.Holding)
-				KeepItemSteady();
-
-			if (mState == HoldState.None && Input.GetButton("Fire2"))
-				TryPullItem();
-			else if (mState == HoldState.Holding)
-			{
-				if (Input.GetButtonDown("Fire2"))
-					StartChargingDown();
-				else if (Input.GetButtonUp("Fire2"))
-					ReleaseButton();
-			}
-		}
-
-
-		private void StartChargingDown()
-		{
-			mFire2DownTime = Time.time;
-		}
-
-		private void ReleaseButton()
-		{
-			if (mFire2DownTime > Time.time)
-				return;
-
-			float length = Time.time - mFire2DownTime;
-
-			if (length < 1.0f)
-				DropItem();
-			else
-				ThrowItem();
-
-			mFire2DownTime = float.MaxValue;
-		}
-
-		public void FireWeapon() { }
-
-		private void TryPullItem()
-		{
-			Transform eye = bearer.eye;
-
-			Ray ray = new Ray(eye.position, eye.forward);
-			UnityEngine.Debug.DrawLine(ray.origin, ray.origin + ray.direction * 4000.0f, new Color(.6f, 0.0f, 1.0f), 0.2f);
-
-			RaycastHit hit;
-			if (!Physics.Raycast(ray, out hit, 4000.0f))
-				return;
-
-			Rigidbody rb = hit.rigidbody;
-			if (rb == null)
-				return;
-
-			Vector3 direction = transform.position - rb.position;
-
-			if (direction.magnitude <= 4.0f)
-				GrabItem(rb);
-			else
-				rb.AddForce(direction * Time.deltaTime * mStrength, ForceMode.Impulse);
-		}
-
-		private void GrabItem(Rigidbody item)
-		{
-			mOriginalConstraints = item.constraints;
-			item.constraints = RigidbodyConstraints.FreezeAll;
-			mHeldItem = item;
-
-			StartCoroutine(LerpToMyPosition(Vector3.Distance(transform.position, mHeldItem.position) / 15.0f));
-			mState = HoldState.Grabbing;
-		}
-
-		private IEnumerator LerpToMyPosition(float time = 0.3f)
-		{
-			Vector3 originalPos = mHeldItem.transform.position;
-			float currentTime = 0.0f;
-
-			while (currentTime < time)
-			{
-				mHeldItem.transform.position = Vector3.Lerp(originalPos, transform.position, currentTime / time);
-				currentTime += Time.deltaTime;
-
-				yield return null;
-			}
-
-			mState = HoldState.Holding;
-		}
-
-		private void KeepItemSteady()
-		{
-			//for now, just set the position
-			mHeldItem.transform.position = transform.position;
-		}
-
-		private void DropItem()
-		{
-			mHeldItem.constraints = mOriginalConstraints;
-
-			mState = HoldState.None;
-			mHeldItem = null;
-		}
-
-		private void ThrowItem()
-		{
-			mHeldItem.constraints = mOriginalConstraints;
-
-			mHeldItem.AddForce(bearer.eye.forward * 150.0f, ForceMode.Impulse);
-
-			mState = HoldState.None;
-			mHeldItem = null;
-		}
-	}*/
 }
