@@ -240,6 +240,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e1e12fd3aee61e84793bc395b4f05929, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mInputMap:
+    mToggleMenuButton: ToggleMenu
+    mFireWeaponButton: Fire1
+    mFireGravGunButton: Fire2
+    mReloadButton: Reload
+    mInteractButton: Interact
+    mMoveBackFrontAxis: Vertical
+    mMoveSidewaysAxis: Horizontal
+    mLookUpDownAxis: Mouse Y
+    mLookLeftRightAxis: Mouse X
+    mJumpButton: Jump
+    mCrouchButton: Crouch
   mData:
     mGravityGunPrefab: {fileID: 1669731964624448, guid: 2238c490de166544ab39c851a8200f36,
       type: 2}

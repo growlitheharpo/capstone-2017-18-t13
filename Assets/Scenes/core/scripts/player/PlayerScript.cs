@@ -2,11 +2,13 @@
 using FiringSquad.Data;
 using KeatsLib;
 using UnityEngine;
+using InputLevel = KeatsLib.Unity.Input.InputLevel;
 
 namespace FiringSquad.Gameplay
 {
 	public class PlayerScript : MonoBehaviour, IWeaponBearer, IDamageReceiver
 	{
+		[SerializeField] private PlayerInputMap mInputMap;
 		[SerializeField] private PlayerDefaultsData mData;
 		private Vector3 mDefaultPosition;
 
@@ -15,11 +17,12 @@ namespace FiringSquad.Gameplay
 		private BoundProperty<float> mHealth;
 		private PlayerWeaponScript mWeapon;
 		private bool mGodmode;
-
 		private Transform mMainCameraRef;
+
 		Transform ICharacter.eye { get { return mMainCameraRef; } }
 		public IWeapon weapon { get { return mWeapon; } }
 		public WeaponDefaultsData defaultParts { get { return mDefaultsOverride ?? mData.defaultWeaponParts; } }
+		public PlayerInputMap inputMap { get { return mInputMap; } }
 
 		private WeaponDefaultsData mDefaultsOverride;
 		private const string INTERACTABLE_TAG = "interactable";
@@ -54,10 +57,13 @@ namespace FiringSquad.Gameplay
 			mHealth = new BoundProperty<float>(mData.defaultHealth, GameplayUIManager.PLAYER_HEALTH);
 
 			ServiceLocator.Get<IInput>()
-				.RegisterInput(Input.GetButtonDown, "ToggleMenu", INPUT_ToggleUIElement, KeatsLib.Unity.Input.InputLevel.None)
-				.RegisterInput(Input.GetButton, "Fire1", INPUT_FireWeapon, KeatsLib.Unity.Input.InputLevel.Gameplay)
-				.RegisterInput(Input.GetButtonDown, "Reload", INPUT_ReloadWeapon, KeatsLib.Unity.Input.InputLevel.Gameplay)
-				.RegisterInput(Input.GetButtonDown, "Interact", INPUT_ActivateInteract, KeatsLib.Unity.Input.InputLevel.Gameplay);
+				.RegisterInput(Input.GetButtonDown, inputMap.toggleMenuButton, INPUT_ToggleUIElement, InputLevel.None)
+				.RegisterInput(Input.GetButton, inputMap.fireWeaponButton, INPUT_FireWeapon, InputLevel.Gameplay)
+				.RegisterInput(Input.GetButtonDown, inputMap.reloadButton, INPUT_ReloadWeapon, InputLevel.Gameplay)
+				.RegisterInput(Input.GetButtonDown, inputMap.interactButton, INPUT_ActivateInteract, InputLevel.Gameplay);
+
+			if (mGravityGun != null)
+				mGravityGun.RegisterInput(inputMap);
 
 			ServiceLocator.Get<IGameConsole>()
 				.RegisterCommand("godmode", CONSOLE_ToggleGodmode);
