@@ -124,21 +124,11 @@ namespace KeatsLib.Collections
 		/// <returns>A random item from the provided IEnumerable.</returns>
 		public static T ChooseRandom<T>(this IEnumerable<T> collection)
 		{
-			var iList = collection as IList<T>;
-			if (iList != null)
-			{
-				if (iList.Count == 0)
-					throw new ArgumentException("Trying to choose random item from an empty list!");
-
-				return iList[Random.Range(0, iList.Count)];
-			}
-
-			var arrayList = collection.ToArray();
-			if (arrayList.Length == 0)
+			var iList = collection as IList<T> ?? collection.ToArray();
+			if (iList.Count == 0)
 				throw new ArgumentException("Trying to choose random item from an empty list!");
 
-			int index = Random.Range(0, arrayList.Length);
-			return arrayList.ElementAt(index);
+			return iList[Random.Range(0, iList.Count)];
 		}
 
 		/// <summary>
