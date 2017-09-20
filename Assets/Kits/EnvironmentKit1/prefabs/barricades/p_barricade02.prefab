@@ -37,12 +37,13 @@ GameObject:
   - component: {fileID: 33997065370266436}
   - component: {fileID: 23920366473294204}
   - component: {fileID: 95522155530529170}
+  - component: {fileID: 64779296147038250}
   m_Layer: 0
   m_Name: barricade2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 8
   m_IsActive: 1
 --- !u!4 &4435637776189026
 Transform:
@@ -50,14 +51,14 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1136888012547528}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: -0, y: -0.5528255, z: -0, w: 0.8332971}
+  m_LocalPosition: {x: -24.41, y: 0.5, z: -9.33}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4938788489910940}
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: -67.122, z: 0}
 --- !u!4 &4938788489910940
 Transform:
   m_ObjectHideFlags: 1
@@ -110,6 +111,20 @@ MeshFilter:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1616804918225100}
+  m_Mesh: {fileID: 4300000, guid: e89777cd490291b48bf822f148c0f457, type: 3}
+--- !u!64 &64779296147038250
+MeshCollider:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1616804918225100}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Convex: 0
+  m_InflateMesh: 0
+  m_SkinWidth: 0.01
   m_Mesh: {fileID: 4300000, guid: e89777cd490291b48bf822f148c0f457, type: 3}
 --- !u!95 &95522155530529170
 Animator:
