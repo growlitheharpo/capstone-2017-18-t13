@@ -53,7 +53,7 @@ namespace FiringSquad.Gameplay
 			if (mGravityGun != null)
 				mGravityGun.bearer = this;
 
-			mMainCameraRef = Camera.main.transform;
+			mMainCameraRef = GetComponentInChildren<Camera>().transform;
 			mHealth = new BoundProperty<float>(mData.defaultHealth, GameplayUIManager.PLAYER_HEALTH);
 
 			ServiceLocator.Get<IInput>()
@@ -69,7 +69,6 @@ namespace FiringSquad.Gameplay
 				.RegisterCommand("godmode", CONSOLE_ToggleGodmode);
 
 			EventManager.OnResetLevel += ReceiveResetEvent;
-
 			InitializeValues();
 		}
 
@@ -88,7 +87,7 @@ namespace FiringSquad.Gameplay
 			mHealth.Cleanup();
 		}
 
-		private void InitializeValues()
+		private void InitializeValues(bool reposition = false)
 		{
 			if (mData.makeParts)
 			{
@@ -104,11 +103,12 @@ namespace FiringSquad.Gameplay
 			}
 
 			mHealth.value = mData.defaultHealth;
-			transform.position = mDefaultPosition;
-			transform.rotation = Quaternion.identity;
 
-			ServiceLocator.Get<IInput>()
-				.EnableInputLevel(InputLevel.Gameplay);
+			if (reposition)
+			{
+				transform.position = mDefaultPosition;
+				transform.rotation = Quaternion.identity;
+			}
 		}
 
 		public void ApplyRecoil(Vector3 direction, float amount)
@@ -180,12 +180,20 @@ namespace FiringSquad.Gameplay
 
 		private void ReceiveResetEvent()
 		{
-			InitializeValues();
+			InitializeValues(true);
 		}
 
 		public void OverrideDefaultParts(GameObject mechanism, GameObject barrel, GameObject scope, GameObject grip)
 		{
 			mDefaultsOverride = new WeaponDefaultsData(mechanism, barrel, scope, grip);
+		}
+
+		/// <summary>
+		/// Resets the player's health and weapon.
+		/// </summary>
+		public void ResetArenaPlayer()
+		{
+			InitializeValues();
 		}
 	}
 }

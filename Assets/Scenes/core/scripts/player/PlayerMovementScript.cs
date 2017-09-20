@@ -33,7 +33,7 @@ namespace FiringSquad.Gameplay
 		{
 			mCollider = GetComponent<CapsuleCollider>();
 			mRigidbody = GetComponent<Rigidbody>();
-			mMainCameraRef = Camera.main.transform;
+			mMainCameraRef = GetComponentInChildren<Camera>().transform;
 			mRecoilAmount = 0.0f;
 		}
 

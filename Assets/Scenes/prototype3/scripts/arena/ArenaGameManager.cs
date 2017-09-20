@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using KeatsLib.Collections;
 using UnityEngine;
 using Input = KeatsLib.Unity.Input;
 
@@ -12,6 +15,7 @@ namespace FiringSquad.Gameplay
 		private BoundProperty<int> mPlayer2Score;
 		private BoundProperty<float> mRemainingTime;
 		private PlayerScript[] mPlayerList;
+		private Transform[] mSpawnPoints;
 
 		private void Awake()
 		{
@@ -25,11 +29,32 @@ namespace FiringSquad.Gameplay
 		private void Start()
 		{
 			GeneratePlayerList();
+			GenerateSpawnList();
+			MovePlayersToSpawn();
 		}
 
 		private void GeneratePlayerList()
 		{
 			mPlayerList = FindObjectsOfType<PlayerScript>();
+		}
+
+		private void GenerateSpawnList()
+		{
+			// Loops over all children and converts to array.
+			mSpawnPoints = transform.Cast<Transform>().ToArray();
+		}
+
+		private void MovePlayersToSpawn()
+		{
+			var spawnsCopy = new List<Transform>(mSpawnPoints);
+			foreach (PlayerScript player in mPlayerList)
+			{
+				Transform t = spawnsCopy.ChooseRandom();
+				spawnsCopy.Remove(t);
+
+				player.transform.position = t.position;
+				player.transform.rotation = t.rotation;
+			}
 		}
 
 		private void Update()
@@ -54,6 +79,14 @@ namespace FiringSquad.Gameplay
 				mPlayer1Score.value += 1;
 			else
 				throw new ArgumentException("We got an invalid player from OnPlayerDied!");
+
+			PlayerScript player = (PlayerScript)obj;
+			Transform t = mSpawnPoints.ChooseRandom();
+
+			player.transform.position = t.position;
+			player.transform.rotation = t.rotation;
+
+			player.ResetArenaPlayer();
 		}
 	}
 }
