@@ -127,13 +127,22 @@ namespace FiringSquad.Gameplay
 
 		private void INPUT_ActivateInteract()
 		{
-			Ray ray = new Ray(mMainCameraRef.position, mMainCameraRef.forward);
-			
-			RaycastHit hit;
-			if (!Physics.Raycast(ray, out hit, mData.interactDistance) || !hit.collider.CompareTag(INTERACTABLE_TAG))
-				return;
+			IInteractable interactable = null;
 
-			IInteractable interactable = hit.GetInteractableComponent();
+			if (mGravityGun != null)
+				interactable = mGravityGun.heldObject;
+
+			if (interactable == null)
+			{
+				Ray ray = new Ray(mMainCameraRef.position, mMainCameraRef.forward);
+			
+				RaycastHit hit;
+				if (!Physics.Raycast(ray, out hit, mData.interactDistance) || !hit.collider.CompareTag(INTERACTABLE_TAG))
+					return;
+
+				interactable = hit.GetInteractableComponent();
+			}
+
 			if (interactable != null)
 				interactable.Interact();
 		}
