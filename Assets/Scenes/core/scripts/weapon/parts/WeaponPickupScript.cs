@@ -21,6 +21,12 @@ namespace FiringSquad.Gameplay
 			ConfirmAttach();
 		}
 
+		public WeaponPickupScript OverrideDurability(int value)
+		{
+			mPart.durability = value;
+			return this;
+		}
+
 		public void ConfirmAttach()
 		{
 			EventManager.Notify(() => EventManager.ConfirmPartAttach(mPart));

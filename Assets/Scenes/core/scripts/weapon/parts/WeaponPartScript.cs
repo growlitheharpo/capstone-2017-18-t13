@@ -6,13 +6,15 @@ namespace FiringSquad.Gameplay
 {
 	public abstract class WeaponPartScript : MonoBehaviour
 	{
+		public const int INFINITE_DURABILITY = -1;
+
 		[SerializeField] private WeaponPartData[] mData;
 		public WeaponPartData[] data { get { return mData; } }
 
 		[SerializeField] private string mDescription;
 		public string description { get { return mDescription; } }
 		
-		[SerializeField] private int mDurability = -1;
+		[SerializeField] private int mDurability = INFINITE_DURABILITY;
 
 		public int durability
 		{
@@ -22,9 +24,6 @@ namespace FiringSquad.Gameplay
 			}
 			set
 			{
-				if (mDurability == -1)
-					throw new ArgumentException("Durability cannot be modified for this part!");
-
 				mDurability = value;
 			}
 		}

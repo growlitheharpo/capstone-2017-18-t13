@@ -62,7 +62,7 @@ namespace FiringSquad.Gameplay
 		{
 			foreach (WeaponPartScript attachment in parts)
 			{
-				if (attachment.durability <= 0)
+				if (attachment.durability == WeaponPartScript.INFINITE_DURABILITY)
 					continue;
 
 				attachment.durability -= 1;
@@ -73,8 +73,11 @@ namespace FiringSquad.Gameplay
 
 		private void BreakPart(WeaponPartScript part)
 		{
-			GameObject prefab = bearer.defaultParts[part.attachPoint];
-			Instantiate(prefab).GetComponent<WeaponPickupScript>().ConfirmAttach(this);
+			GameObject defaultPart = bearer.defaultParts[part.attachPoint];
+			Instantiate(defaultPart)
+				.GetComponent<WeaponPickupScript>()
+				.OverrideDurability(WeaponPartScript.INFINITE_DURABILITY)
+				.ConfirmAttach(this);
 
 			Instantiate(mPartBreakParticlesPrefab, part.transform.position, Quaternion.identity);
 		}

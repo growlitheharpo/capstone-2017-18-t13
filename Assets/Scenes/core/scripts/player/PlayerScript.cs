@@ -85,10 +85,15 @@ namespace FiringSquad.Gameplay
 		{
 			if (mData.makeParts)
 			{
-				WeaponDefaultsData defaults = mData.defaultWeaponParts;
+				WeaponDefaultsData defaults = defaultParts;
 
 				foreach (GameObject part in defaults)
-					Instantiate(part).GetComponent<WeaponPickupScript>().ConfirmAttach();
+				{
+					Instantiate(part)
+						.GetComponent<WeaponPickupScript>()
+						.OverrideDurability(WeaponPartScript.INFINITE_DURABILITY)
+						.ConfirmAttach(mWeapon);
+				}
 			}
 
 			mHealth.value = mData.defaultHealth;

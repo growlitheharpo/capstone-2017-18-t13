@@ -41,7 +41,12 @@ namespace FiringSquad.Gameplay.AI
 			mWeapon.SetAimRoot(eye);
 
 			foreach (GameObject part in mGunDefaultParts)
-				Instantiate(part).GetComponent<WeaponPickupScript>().ConfirmAttach(mWeapon);
+			{
+				Instantiate(part)
+					.GetComponent<WeaponPickupScript>()
+					.OverrideDurability(WeaponPartScript.INFINITE_DURABILITY)
+					.ConfirmAttach(mWeapon);
+			}
 		}
 
 		private void OnDestroy()

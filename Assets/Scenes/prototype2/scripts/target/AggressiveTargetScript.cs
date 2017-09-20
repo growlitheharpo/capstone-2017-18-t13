@@ -20,9 +20,20 @@ namespace FiringSquad.Gameplay
 		private void Start()
 		{
 			mWeapon.bearer = this;
-			Instantiate(mDefaultMechanism).GetComponent<WeaponPickupScript>().ConfirmAttach(mWeapon);
-			Instantiate(mDefaultBarrel).GetComponent<WeaponPickupScript>().ConfirmAttach(mWeapon);
-			Instantiate(mDefaultScope).GetComponent<WeaponPickupScript>().ConfirmAttach(mWeapon);
+			Instantiate(mDefaultMechanism)
+				.GetComponent<WeaponPickupScript>()
+				.OverrideDurability(WeaponPartScript.INFINITE_DURABILITY)
+				.ConfirmAttach(mWeapon);
+
+			Instantiate(mDefaultBarrel)
+				.GetComponent<WeaponPickupScript>()
+				.OverrideDurability(WeaponPartScript.INFINITE_DURABILITY)
+				.ConfirmAttach(mWeapon);
+
+			Instantiate(mDefaultScope)
+				.GetComponent<WeaponPickupScript>()
+				.OverrideDurability(WeaponPartScript.INFINITE_DURABILITY)
+				.ConfirmAttach(mWeapon);
 
 			StartCoroutine(FireLoop());
 		}
