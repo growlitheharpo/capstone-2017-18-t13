@@ -68,6 +68,7 @@ public partial class GamestateManager : MonoSingleton<GamestateManager>, IGamest
 	public const string PROTOTYPE2_SCENE = "prototype2";
 	public const string PROTOTYPE3_SCENE = "prototype3";
 	public const string ART_PROTOTYPE_SCENE = "artproto";
+	public const string DESIGN_TEST_SCENE = "p1&p2_testlevel";
 
 	public enum Feature
 	{
@@ -103,6 +104,7 @@ public partial class GamestateManager : MonoSingleton<GamestateManager>, IGamest
 			{ PROTOTYPE2_SCENE, new Prototype2State() },
 			{ PROTOTYPE3_SCENE, new GameSceneState() },
 			{ ART_PROTOTYPE_SCENE, new GameSceneState() },
+			{ DESIGN_TEST_SCENE, new Prototype2State() },
 		};
 
 		EventManager.OnRequestSceneChange += ReceiveSceneChangeRequest;
