@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using KeatsLib.Unity;
 using UnityEngine;
 
 namespace FiringSquad.Gameplay
@@ -79,7 +80,8 @@ namespace FiringSquad.Gameplay
 				.OverrideDurability(WeaponPartScript.INFINITE_DURABILITY)
 				.ConfirmAttach(this);
 
-			Instantiate(mPartBreakParticlesPrefab, part.transform.position, Quaternion.identity);
+			ParticleSystem ps = Instantiate(mPartBreakParticlesPrefab, part.transform.position, Quaternion.identity).GetComponent<ParticleSystem>();
+			StartCoroutine(Coroutines.WaitAndDestroyParticleSystem(ps));
 		}
 
 		/// <summary>
