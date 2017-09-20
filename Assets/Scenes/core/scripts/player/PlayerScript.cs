@@ -150,7 +150,7 @@ namespace FiringSquad.Gameplay
 			}
 
 			if (interactable != null)
-				interactable.Interact();
+				interactable.Interact(this);
 		}
 
 		private void CONSOLE_ToggleGodmode(string[] args)
