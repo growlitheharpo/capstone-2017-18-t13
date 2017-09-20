@@ -108,7 +108,7 @@ namespace FiringSquad.Gameplay
 			transform.rotation = Quaternion.identity;
 
 			ServiceLocator.Get<IInput>()
-				.EnableInputLevel(KeatsLib.Unity.Input.InputLevel.Gameplay);
+				.EnableInputLevel(InputLevel.Gameplay);
 		}
 
 		public void ApplyRecoil(Vector3 direction, float amount)
@@ -175,7 +175,7 @@ namespace FiringSquad.Gameplay
 			mHealth.value = Mathf.Clamp(mHealth.value - amount, 0.0f, float.MaxValue);
 
 			if (mHealth.value <= 0.0f)
-				EventManager.Notify(EventManager.PlayerDied);
+				EventManager.Notify(() => EventManager.PlayerDied(this));
 		}
 
 		private void ReceiveResetEvent()

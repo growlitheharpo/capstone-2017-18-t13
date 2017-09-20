@@ -61,11 +61,11 @@ public partial class EventManager
 		OnBoundPropertyCreated(property, propertyCode);
 	}
 
-	public static event Action OnPlayerDied = () => { LogEvent(); };
+	public static event Action<ICharacter> OnPlayerDied = p => { LogEvent(); };
 
-	public static void PlayerDied()
+	public static void PlayerDied(ICharacter player)
 	{
-		OnPlayerDied();
+		OnPlayerDied(player);
 	}
 
 	public static event Action OnResetLevel = () => { LogEvent(); };
