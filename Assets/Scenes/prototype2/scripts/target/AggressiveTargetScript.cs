@@ -1,8 +1,10 @@
 ﻿using System.Collections;
+using FiringSquad.Data;
 using UnityEngine;
 
 namespace FiringSquad.Gameplay
 {
+	// TODO: DELETE THIS CLASS
 	public class AggressiveTargetScript : MonoBehaviour, IWeaponBearer
 	{
 		[SerializeField] private AIWeaponScript mWeapon;
@@ -12,14 +14,26 @@ namespace FiringSquad.Gameplay
 
 		private BoundProperty<float> mHealthProp;
 		public IWeapon weapon { get { return mWeapon; } }
+		public WeaponDefaultsData defaultParts { get { throw new System.NotSupportedException("Aggressive target cannot break its weapon."); }}
 
 		// Use this for initialization
 		private void Start()
 		{
 			mWeapon.bearer = this;
-			Instantiate(mDefaultMechanism).GetComponent<WeaponPickupScript>().ConfirmAttach(mWeapon);
-			Instantiate(mDefaultBarrel).GetComponent<WeaponPickupScript>().ConfirmAttach(mWeapon);
-			Instantiate(mDefaultScope).GetComponent<WeaponPickupScript>().ConfirmAttach(mWeapon);
+			Instantiate(mDefaultMechanism)
+				.GetComponent<WeaponPickupScript>()
+				.OverrideDurability(WeaponPartScript.INFINITE_DURABILITY)
+				.ConfirmAttach(mWeapon);
+
+			Instantiate(mDefaultBarrel)
+				.GetComponent<WeaponPickupScript>()
+				.OverrideDurability(WeaponPartScript.INFINITE_DURABILITY)
+				.ConfirmAttach(mWeapon);
+
+			Instantiate(mDefaultScope)
+				.GetComponent<WeaponPickupScript>()
+				.OverrideDurability(WeaponPartScript.INFINITE_DURABILITY)
+				.ConfirmAttach(mWeapon);
 
 			StartCoroutine(FireLoop());
 		}

@@ -200,5 +200,17 @@ namespace KeatsLib.Unity
 			if (callback != null)
 				callback();
 		}
+
+		/// <summary>
+		/// Destroys a particle system after it has finished playing.
+		/// </summary>
+		public static IEnumerator WaitAndDestroyParticleSystem(ParticleSystem ps, bool destroyGameObject = true)
+		{
+			yield return null;
+			yield return new WaitForParticles(ps);
+			yield return null;
+
+			Object.Destroy(destroyGameObject ? (Object)ps.gameObject : ps);
+		}
 	}
 }

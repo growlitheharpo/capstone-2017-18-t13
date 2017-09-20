@@ -46,6 +46,21 @@ public class GameConsole : MonoSingleton<GameConsole>, IGameConsole
 		return this;
 	}
 
+	public IGameConsole UnregisterCommand(string command)
+	{
+		mCommandHandlers.Remove(command);
+		return this;
+	}
+
+	public IGameConsole UnregisterCommand(Action<string[]> handle)
+	{
+		var keys = mCommandHandlers.Where(x => x.Value == handle).ToArray();
+		foreach (var k in keys)
+			mCommandHandlers.Remove(k.Key);
+
+		return this;
+	}
+
 	/// <summary>
 	/// Event called when Unity receives a Debug.Log call or variant.
 	/// </summary>

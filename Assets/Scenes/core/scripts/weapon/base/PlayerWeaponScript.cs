@@ -1,4 +1,6 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
+using KeatsLib.Unity;
 using UnityEngine;
 
 namespace FiringSquad.Gameplay
@@ -10,6 +12,7 @@ namespace FiringSquad.Gameplay
 	/// <inheritdoc />
 	public class PlayerWeaponScript : BaseWeaponScript
 	{
+		[SerializeField] private GameObject mPartBreakParticlesPrefab;
 		[SerializeField] private ParticleSystem mShotParticles;
 		private Vector3 mPlayerEyeOffset;
 		private Animator mAnimator;
@@ -48,6 +51,37 @@ namespace FiringSquad.Gameplay
 			mShotParticles.Stop();
 			mShotParticles.time = 0.0f;
 			mShotParticles.Play();
+		}
+
+		protected override void OnPreFireShot()
+		{
+			if (ServiceLocator.Get<IGamestateManager>().IsFeatureEnabled(GamestateManager.Feature.WeaponDurability))
+				DegradeWeapon();
+		}
+
+		private void DegradeWeapon()
+		{
+			foreach (WeaponPartScript attachment in parts)
+			{
+				if (attachment.durability == WeaponPartScript.INFINITE_DURABILITY)
+					continue;
+
+				attachment.durability -= 1;
+				if (attachment.durability == 0)
+					BreakPart(attachment);
+			}
+		}
+
+		private void BreakPart(WeaponPartScript part)
+		{
+			GameObject defaultPart = bearer.defaultParts[part.attachPoint];
+			Instantiate(defaultPart)
+				.GetComponent<WeaponPickupScript>()
+				.OverrideDurability(WeaponPartScript.INFINITE_DURABILITY)
+				.ConfirmAttach(this);
+
+			ParticleSystem ps = Instantiate(mPartBreakParticlesPrefab, part.transform.position, Quaternion.identity).GetComponent<ParticleSystem>();
+			StartCoroutine(Coroutines.WaitAndDestroyParticleSystem(ps));
 		}
 
 		/// <summary>

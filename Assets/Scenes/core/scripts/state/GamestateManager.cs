@@ -126,7 +126,6 @@ public partial class GamestateManager : MonoSingleton<GamestateManager>, IGamest
 			.RegisterCommand("feature", HandleFeatureForceCommand);
 	}
 
-
 	private void Update()
 	{
 		if (mCurrentState == null)

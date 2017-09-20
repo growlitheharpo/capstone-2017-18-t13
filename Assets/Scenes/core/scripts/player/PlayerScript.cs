@@ -19,7 +19,9 @@ namespace FiringSquad.Gameplay
 		private Transform mMainCameraRef;
 		Transform ICharacter.eye { get { return mMainCameraRef; } }
 		public IWeapon weapon { get { return mWeapon; } }
+		public WeaponDefaultsData defaultParts { get { return mDefaultsOverride ?? mData.defaultWeaponParts; } }
 
+		private WeaponDefaultsData mDefaultsOverride;
 		private const string INTERACTABLE_TAG = "interactable";
 
 		private void Awake()
@@ -73,6 +75,9 @@ namespace FiringSquad.Gameplay
 				.UnregisterInput(INPUT_ReloadWeapon)
 				.UnregisterInput(INPUT_FireWeapon);
 
+			ServiceLocator.Get<IGameConsole>()
+				.UnregisterCommand("godmode");
+
 			EventManager.OnResetLevel -= ReceiveResetEvent;
 			mHealth.Cleanup();
 		}
@@ -81,10 +86,15 @@ namespace FiringSquad.Gameplay
 		{
 			if (mData.makeParts)
 			{
-				WeaponDefaultsData defaults = mData.defaultWeaponParts;
+				WeaponDefaultsData defaults = defaultParts;
 
 				foreach (GameObject part in defaults)
-					Instantiate(part).GetComponent<WeaponPickupScript>().ConfirmAttach();
+				{
+					Instantiate(part)
+						.GetComponent<WeaponPickupScript>()
+						.OverrideDurability(WeaponPartScript.INFINITE_DURABILITY)
+						.ConfirmAttach(mWeapon);
+				}
 			}
 
 			mHealth.value = mData.defaultHealth;
@@ -117,13 +127,22 @@ namespace FiringSquad.Gameplay
 
 		private void INPUT_ActivateInteract()
 		{
-			Ray ray = new Ray(mMainCameraRef.position, mMainCameraRef.forward);
-			
-			RaycastHit hit;
-			if (!Physics.Raycast(ray, out hit, mData.interactDistance) || !hit.collider.CompareTag(INTERACTABLE_TAG))
-				return;
+			IInteractable interactable = null;
 
-			IInteractable interactable = hit.transform.GetComponent<IInteractable>() ?? hit.transform.parent.GetComponent<IInteractable>();
+			if (mGravityGun != null)
+				interactable = mGravityGun.heldObject;
+
+			if (interactable == null)
+			{
+				Ray ray = new Ray(mMainCameraRef.position, mMainCameraRef.forward);
+			
+				RaycastHit hit;
+				if (!Physics.Raycast(ray, out hit, mData.interactDistance) || !hit.collider.CompareTag(INTERACTABLE_TAG))
+					return;
+
+				interactable = hit.GetInteractableComponent();
+			}
+
 			if (interactable != null)
 				interactable.Interact();
 		}
@@ -156,6 +175,11 @@ namespace FiringSquad.Gameplay
 		private void ReceiveResetEvent()
 		{
 			InitializeValues();
+		}
+
+		public void OverrideDefaultParts(GameObject mechanism, GameObject barrel, GameObject scope, GameObject grip)
+		{
+			mDefaultsOverride = new WeaponDefaultsData(mechanism, barrel, scope, grip);
 		}
 	}
 }
