@@ -22,6 +22,7 @@ namespace FiringSquad.Gameplay
 
 		[SerializeField] [Range(0.0f, 1.0f)] private float mReelInSensitivity;
 		[SerializeField] private float mPullStrength;
+		[SerializeField] private float mThrowForce;
 
 		public IInteractable heldObject { get { return mHoldTarget == null ? null : mHoldTarget.GetComponentUpwards<IInteractable>(); } }
 
@@ -235,10 +236,13 @@ namespace FiringSquad.Gameplay
 			
 			private void HandleTriggerRelease()
 			{
+				if (mMachine.mHoldTarget == null)
+					return;
+
 				if (mHoldTime < 1.0f)
 					mEndForce = Vector3.zero;
 				else
-					mEndForce = mMachine.bearer.eye.forward * 150.0f;
+					mEndForce = mMachine.bearer.eye.forward * mMachine.mHoldTarget.mass * mMachine.mThrowForce;
 
 				if (mGrabRoutine != null)
 					mMachine.StopCoroutine(mGrabRoutine);
