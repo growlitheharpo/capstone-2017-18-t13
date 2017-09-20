@@ -4,7 +4,65 @@ using Input = UnityEngine.Input;
 
 namespace FiringSquad.Gameplay
 {
-	public class PlayerGravGunWeapon : MonoBehaviour
+	public class PlayerGravGunWeapon : BaseStateMachine
+	{
+		private class IdleState : BaseState<PlayerGravGunWeapon>
+		{
+			public IdleState(PlayerGravGunWeapon m) : base(m) { }
+
+			public override IState GetTransition()
+			{
+
+			}
+		}
+
+		private enum InputState
+		{
+			OFF,
+			PRESSED,
+			HELD,
+			RELEASED,
+		}
+
+		private bool mGotInputThisFrame;
+		private InputState mInput;
+
+		private void Start()
+		{
+			TransitionStates(new IdleState(this));
+
+			ServiceLocator.Get<IInput>()
+				.RegisterInput(Input.GetButton, "Fire2", SetInputState, KeatsLib.Unity.Input.InputLevel.Gameplay);
+		}
+
+		private void OnDestroy()
+		{
+			ServiceLocator.Get<IInput>()
+				.UnregisterInput(SetInputState);
+		}
+
+		protected override void Update()
+		{
+			if (mGotInputThisFrame)
+			{
+				
+			}
+			else if (mInput == InputState.HELD || mInput == InputState.PRESSED)
+				mInput = InputState.RELEASED;
+			else
+				mInput = InputState.OFF;
+
+			mGotInputThisFrame = false;
+			base.Update();
+		}
+
+		private void SetInputState()
+		{
+			mGotInputThisFrame = true;
+		}
+	}
+
+	/*public class PlayerGravGunWeapon : MonoBehaviour
 	{
 		public IWeaponBearer bearer { get; set; }
 
@@ -133,5 +191,5 @@ namespace FiringSquad.Gameplay
 			mState = HoldState.None;
 			mHeldItem = null;
 		}
-	}
+	}*/
 }
