@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using KeatsLib.Collections;
+using KeatsLib.Unity;
 using UnityEngine;
 using Input = KeatsLib.Unity.Input;
 
@@ -9,6 +10,7 @@ namespace FiringSquad.Gameplay
 {
 	public class ArenaGameManager : MonoBehaviour
 	{
+		[SerializeField] private GameObject mDeathParticles;
 		[SerializeField] private float mRoundTime;
 
 		private BoundProperty<int> mPlayer1Score;
@@ -82,6 +84,13 @@ namespace FiringSquad.Gameplay
 
 			PlayerScript player = (PlayerScript)obj;
 			Transform t = mSpawnPoints.ChooseRandom();
+
+			if (mDeathParticles != null)
+			{
+				ParticleSystem ps = Instantiate(mDeathParticles, player.transform.position, Quaternion.identity).GetComponent<ParticleSystem>();
+				ps.Play();
+				StartCoroutine(Coroutines.WaitAndDestroyParticleSystem(ps));
+			}
 
 			player.transform.position = t.position;
 			player.transform.rotation = t.rotation;
