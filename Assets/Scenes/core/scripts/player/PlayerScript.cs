@@ -19,8 +19,9 @@ namespace FiringSquad.Gameplay
 		private Transform mMainCameraRef;
 		Transform ICharacter.eye { get { return mMainCameraRef; } }
 		public IWeapon weapon { get { return mWeapon; } }
-		public WeaponDefaultsData defaultParts { get { return mData.defaultWeaponParts; } }
+		public WeaponDefaultsData defaultParts { get { return mDefaultsOverride ?? mData.defaultWeaponParts; } }
 
+		private WeaponDefaultsData mDefaultsOverride;
 		private const string INTERACTABLE_TAG = "interactable";
 
 		private void Awake()
@@ -165,6 +166,11 @@ namespace FiringSquad.Gameplay
 		private void ReceiveResetEvent()
 		{
 			InitializeValues();
+		}
+
+		public void OverrideDefaultParts(GameObject mechanism, GameObject barrel, GameObject scope, GameObject grip)
+		{
+			mDefaultsOverride = new WeaponDefaultsData(mechanism, barrel, scope, grip);
 		}
 	}
 }

@@ -34,7 +34,7 @@ namespace FiringSquad.Gameplay
 			DontDestroyOnLoad(gameObject);
 			SceneManager.activeSceneChanged += HandleSceneChange;
 			mDemoWeapon = FindObjectOfType<DemoWeaponScript>();
-			
+
 			foreach (GameObject part in mDefaultParts)
 				Instantiate(part).GetComponent<WeaponPickupScript>().ConfirmAttach(mDemoWeapon);
 		}
@@ -65,28 +65,14 @@ namespace FiringSquad.Gameplay
 		{
 			SceneManager.activeSceneChanged -= HandleSceneChange;
 			if (arg1.name == GamestateManager.PROTOTYPE1_SCENE)
-				StartCoroutine(WaitAndAttach());
-			else
-				Destroy(gameObject);
-		}
-
-		private IEnumerator WaitAndAttach()
-		{
-			// wait 2 frames
-			yield return new WaitForEndOfFrame();
-			yield return new WaitForEndOfFrame();
-
-			Instantiate(mScope).GetComponent<WeaponPickupScript>().ConfirmAttach();
-			Instantiate(mBarrel).GetComponent<WeaponPickupScript>().ConfirmAttach();
-			Instantiate(mMechanism).GetComponent<WeaponPickupScript>().ConfirmAttach();
-			Instantiate(mGrip).GetComponent<WeaponPickupScript>().ConfirmAttach();
+				ReferenceForwarder.get.player.GetComponent<PlayerScript>().OverrideDefaultParts(mMechanism, mBarrel, mScope, mGrip);
 
 			Destroy(gameObject);
 		}
 
 		private void Update()
 		{
-			var data = mDemoWeapon.currentStats;
+			WeaponData data = mDemoWeapon.currentStats;
 
 			mSpread.value = data.spread;
 			mRecoil.value = data.recoil;

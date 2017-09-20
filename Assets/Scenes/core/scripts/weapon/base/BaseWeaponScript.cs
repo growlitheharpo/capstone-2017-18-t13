@@ -76,6 +76,9 @@ namespace FiringSquad.Gameplay
 
 			if (part.attachPoint == Attachment.Mechanism || mCurrentData.clipSize != clipSize)
 			{
+				if (!mCurrentAttachments.ContainsKey(Attachment.Mechanism))
+					return;
+
 				WeaponPartScriptMechanism mech = (WeaponPartScriptMechanism)mCurrentAttachments[Attachment.Mechanism];
 				CreateNewProjectilePool(mech);
 				mOverrideHitscanEye = mech.overrideHitscanMethod;
