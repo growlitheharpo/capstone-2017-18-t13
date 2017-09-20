@@ -94,6 +94,16 @@ public class NullServices
 			return this;
 		}
 
+		public IGameConsole UnregisterCommand(string command)
+		{
+			return this;
+		}
+
+		public IGameConsole UnregisterCommand(Action<string[]> handle)
+		{
+			return this;
+		}
+
 		public Logger.System enabledLogLevels
 		{
 			get

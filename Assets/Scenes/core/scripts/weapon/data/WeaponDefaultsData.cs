@@ -40,6 +40,14 @@ namespace FiringSquad.Data
 			mGrip = copy.mGrip;
 		}
 
+		public WeaponDefaultsData(GameObject mechanism1, GameObject barrel1, GameObject scope1, GameObject grip1)
+		{
+			mMechanism = mechanism1;
+			mBarrel = barrel1;
+			mScope = scope1;
+			mGrip = grip1;
+		}
+
 		/// <summary>
 		/// Allows access to weapon parts by their attachment.
 		/// </summary>
