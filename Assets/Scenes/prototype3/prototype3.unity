@@ -325,6 +325,61 @@ Prefab:
       propertyPath: mData.mInteractDistance
       value: 4
       objectReference: {fileID: 0}
+    - target: {fileID: 114532926038648210, guid: e4a500ab5eb85564ea26d9d9f3385e64,
+        type: 2}
+      propertyPath: mInputMap.mToggleMenuButton
+      value: ToggleMenu_P1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114532926038648210, guid: e4a500ab5eb85564ea26d9d9f3385e64,
+        type: 2}
+      propertyPath: mInputMap.mFireWeaponButton
+      value: Fire1_P1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114532926038648210, guid: e4a500ab5eb85564ea26d9d9f3385e64,
+        type: 2}
+      propertyPath: mInputMap.mFireGravGunButton
+      value: Fire2_P1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114532926038648210, guid: e4a500ab5eb85564ea26d9d9f3385e64,
+        type: 2}
+      propertyPath: mInputMap.mReloadButton
+      value: Reload_P1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114532926038648210, guid: e4a500ab5eb85564ea26d9d9f3385e64,
+        type: 2}
+      propertyPath: mInputMap.mInteractButton
+      value: Interact_P1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114532926038648210, guid: e4a500ab5eb85564ea26d9d9f3385e64,
+        type: 2}
+      propertyPath: mInputMap.mMoveBackFrontAxis
+      value: Vertical_P1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114532926038648210, guid: e4a500ab5eb85564ea26d9d9f3385e64,
+        type: 2}
+      propertyPath: mInputMap.mMoveSidewaysAxis
+      value: Horizontal_P1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114532926038648210, guid: e4a500ab5eb85564ea26d9d9f3385e64,
+        type: 2}
+      propertyPath: mInputMap.mJumpButton
+      value: Jump_P1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114532926038648210, guid: e4a500ab5eb85564ea26d9d9f3385e64,
+        type: 2}
+      propertyPath: mInputMap.mCrouchButton
+      value: Crouch_P1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114532926038648210, guid: e4a500ab5eb85564ea26d9d9f3385e64,
+        type: 2}
+      propertyPath: mInputMap.mLookUpDownAxis
+      value: LookV_P1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114532926038648210, guid: e4a500ab5eb85564ea26d9d9f3385e64,
+        type: 2}
+      propertyPath: mInputMap.mLookLeftRightAxis
+      value: LookH_P1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: e4a500ab5eb85564ea26d9d9f3385e64, type: 2}
   m_IsPrefabParent: 0
@@ -627,7 +682,62 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 1665910216302330, guid: e4a500ab5eb85564ea26d9d9f3385e64, type: 2}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114532926038648210, guid: e4a500ab5eb85564ea26d9d9f3385e64,
+        type: 2}
+      propertyPath: mInputMap.mToggleMenuButton
+      value: ToggleMenu_P2
+      objectReference: {fileID: 0}
+    - target: {fileID: 114532926038648210, guid: e4a500ab5eb85564ea26d9d9f3385e64,
+        type: 2}
+      propertyPath: mInputMap.mFireWeaponButton
+      value: Fire1_P2
+      objectReference: {fileID: 0}
+    - target: {fileID: 114532926038648210, guid: e4a500ab5eb85564ea26d9d9f3385e64,
+        type: 2}
+      propertyPath: mInputMap.mFireGravGunButton
+      value: Fire2_P2
+      objectReference: {fileID: 0}
+    - target: {fileID: 114532926038648210, guid: e4a500ab5eb85564ea26d9d9f3385e64,
+        type: 2}
+      propertyPath: mInputMap.mReloadButton
+      value: Reload_P2
+      objectReference: {fileID: 0}
+    - target: {fileID: 114532926038648210, guid: e4a500ab5eb85564ea26d9d9f3385e64,
+        type: 2}
+      propertyPath: mInputMap.mInteractButton
+      value: Interact_P2
+      objectReference: {fileID: 0}
+    - target: {fileID: 114532926038648210, guid: e4a500ab5eb85564ea26d9d9f3385e64,
+        type: 2}
+      propertyPath: mInputMap.mMoveBackFrontAxis
+      value: Vertical_P2
+      objectReference: {fileID: 0}
+    - target: {fileID: 114532926038648210, guid: e4a500ab5eb85564ea26d9d9f3385e64,
+        type: 2}
+      propertyPath: mInputMap.mMoveSidewaysAxis
+      value: Horizontal_P2
+      objectReference: {fileID: 0}
+    - target: {fileID: 114532926038648210, guid: e4a500ab5eb85564ea26d9d9f3385e64,
+        type: 2}
+      propertyPath: mInputMap.mJumpButton
+      value: Jump_P2
+      objectReference: {fileID: 0}
+    - target: {fileID: 114532926038648210, guid: e4a500ab5eb85564ea26d9d9f3385e64,
+        type: 2}
+      propertyPath: mInputMap.mCrouchButton
+      value: Crouch_P2
+      objectReference: {fileID: 0}
+    - target: {fileID: 114532926038648210, guid: e4a500ab5eb85564ea26d9d9f3385e64,
+        type: 2}
+      propertyPath: mInputMap.mLookUpDownAxis
+      value: LookV_P2
+      objectReference: {fileID: 0}
+    - target: {fileID: 114532926038648210, guid: e4a500ab5eb85564ea26d9d9f3385e64,
+        type: 2}
+      propertyPath: mInputMap.mLookLeftRightAxis
+      value: LookH_P2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: e4a500ab5eb85564ea26d9d9f3385e64, type: 2}
