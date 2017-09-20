@@ -127,7 +127,7 @@ namespace FiringSquad.Gameplay
 			if (!Physics.Raycast(ray, out hit, mData.interactDistance) || !hit.collider.CompareTag(INTERACTABLE_TAG))
 				return;
 
-			IInteractable interactable = hit.transform.GetComponent<IInteractable>() ?? hit.transform.parent.GetComponent<IInteractable>();
+			IInteractable interactable = hit.GetInteractableComponent();
 			if (interactable != null)
 				interactable.Interact();
 		}
