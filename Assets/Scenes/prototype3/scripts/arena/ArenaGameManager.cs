@@ -35,7 +35,7 @@ namespace FiringSquad.Gameplay
 
 		private void GeneratePlayerList()
 		{
-			mPlayerList = FindObjectsOfType<PlayerScript>();
+			mPlayerList = FindObjectsOfType<PlayerScript>().OrderBy(x => x.name).ToArray();
 		}
 
 		private void GenerateSpawnList()
