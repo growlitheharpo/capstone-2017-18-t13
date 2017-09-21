@@ -37,6 +37,7 @@ GameObject:
   - component: {fileID: 33354841746471372}
   - component: {fileID: 23115552991726722}
   - component: {fileID: 95606122462588074}
+  - component: {fileID: 64634458438527048}
   m_Layer: 0
   m_Name: bridge1
   m_TagString: Untagged
@@ -50,8 +51,8 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1240324108387260}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -30, y: 4.5, z: -23}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4439809427201482}
@@ -110,6 +111,20 @@ MeshFilter:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1908018803360042}
+  m_Mesh: {fileID: 4300000, guid: 4c44fc72374d21245980ab903c526e2c, type: 3}
+--- !u!64 &64634458438527048
+MeshCollider:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1908018803360042}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Convex: 0
+  m_InflateMesh: 0
+  m_SkinWidth: 0.01
   m_Mesh: {fileID: 4300000, guid: 4c44fc72374d21245980ab903c526e2c, type: 3}
 --- !u!95 &95606122462588074
 Animator:
