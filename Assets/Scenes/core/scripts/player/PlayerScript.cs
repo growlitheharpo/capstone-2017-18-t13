@@ -2,11 +2,13 @@
 using FiringSquad.Data;
 using KeatsLib;
 using UnityEngine;
+using InputLevel = KeatsLib.Unity.Input.InputLevel;
 
 namespace FiringSquad.Gameplay
 {
 	public class PlayerScript : MonoBehaviour, IWeaponBearer, IDamageReceiver
 	{
+		[SerializeField] private PlayerInputMap mInputMap;
 		[SerializeField] private PlayerDefaultsData mData;
 		private Vector3 mDefaultPosition;
 
@@ -15,11 +17,12 @@ namespace FiringSquad.Gameplay
 		private BoundProperty<float> mHealth;
 		private PlayerWeaponScript mWeapon;
 		private bool mGodmode;
-
 		private Transform mMainCameraRef;
+
 		Transform ICharacter.eye { get { return mMainCameraRef; } }
 		public IWeapon weapon { get { return mWeapon; } }
 		public WeaponDefaultsData defaultParts { get { return mDefaultsOverride ?? mData.defaultWeaponParts; } }
+		public PlayerInputMap inputMap { get { return mInputMap; } }
 
 		private WeaponDefaultsData mDefaultsOverride;
 		private const string INTERACTABLE_TAG = "interactable";
@@ -50,20 +53,22 @@ namespace FiringSquad.Gameplay
 			if (mGravityGun != null)
 				mGravityGun.bearer = this;
 
-			mMainCameraRef = Camera.main.transform;
+			mMainCameraRef = GetComponentInChildren<Camera>().transform;
 			mHealth = new BoundProperty<float>(mData.defaultHealth, GameplayUIManager.PLAYER_HEALTH);
 
 			ServiceLocator.Get<IInput>()
-				.RegisterInput(Input.GetButtonDown, "ToggleMenu", INPUT_ToggleUIElement, KeatsLib.Unity.Input.InputLevel.None)
-				.RegisterInput(Input.GetButton, "Fire1", INPUT_FireWeapon, KeatsLib.Unity.Input.InputLevel.Gameplay)
-				.RegisterInput(Input.GetButtonDown, "Reload", INPUT_ReloadWeapon, KeatsLib.Unity.Input.InputLevel.Gameplay)
-				.RegisterInput(Input.GetButtonDown, "Interact", INPUT_ActivateInteract, KeatsLib.Unity.Input.InputLevel.Gameplay);
+				.RegisterInput(Input.GetButtonDown, inputMap.toggleMenuButton, INPUT_ToggleUIElement, InputLevel.None)
+				.RegisterInput(Input.GetButton, inputMap.fireWeaponButton, INPUT_FireWeapon, InputLevel.Gameplay)
+				.RegisterInput(Input.GetButtonDown, inputMap.reloadButton, INPUT_ReloadWeapon, InputLevel.Gameplay)
+				.RegisterInput(Input.GetButtonDown, inputMap.interactButton, INPUT_ActivateInteract, InputLevel.Gameplay);
+
+			if (mGravityGun != null)
+				mGravityGun.RegisterInput(inputMap);
 
 			ServiceLocator.Get<IGameConsole>()
 				.RegisterCommand("godmode", CONSOLE_ToggleGodmode);
 
 			EventManager.OnResetLevel += ReceiveResetEvent;
-
 			InitializeValues();
 		}
 
@@ -82,7 +87,7 @@ namespace FiringSquad.Gameplay
 			mHealth.Cleanup();
 		}
 
-		private void InitializeValues()
+		private void InitializeValues(bool reposition = false)
 		{
 			if (mData.makeParts)
 			{
@@ -98,11 +103,12 @@ namespace FiringSquad.Gameplay
 			}
 
 			mHealth.value = mData.defaultHealth;
-			transform.position = mDefaultPosition;
-			transform.rotation = Quaternion.identity;
 
-			ServiceLocator.Get<IInput>()
-				.EnableInputLevel(KeatsLib.Unity.Input.InputLevel.Gameplay);
+			if (reposition)
+			{
+				transform.position = mDefaultPosition;
+				transform.rotation = Quaternion.identity;
+			}
 		}
 
 		public void ApplyRecoil(Vector3 direction, float amount)
@@ -144,7 +150,7 @@ namespace FiringSquad.Gameplay
 			}
 
 			if (interactable != null)
-				interactable.Interact();
+				interactable.Interact(this);
 		}
 
 		private void CONSOLE_ToggleGodmode(string[] args)
@@ -169,17 +175,25 @@ namespace FiringSquad.Gameplay
 			mHealth.value = Mathf.Clamp(mHealth.value - amount, 0.0f, float.MaxValue);
 
 			if (mHealth.value <= 0.0f)
-				EventManager.Notify(EventManager.PlayerDied);
+				EventManager.Notify(() => EventManager.PlayerDied(this));
 		}
 
 		private void ReceiveResetEvent()
 		{
-			InitializeValues();
+			InitializeValues(true);
 		}
 
 		public void OverrideDefaultParts(GameObject mechanism, GameObject barrel, GameObject scope, GameObject grip)
 		{
 			mDefaultsOverride = new WeaponDefaultsData(mechanism, barrel, scope, grip);
+		}
+
+		/// <summary>
+		/// Resets the player's health and weapon.
+		/// </summary>
+		public void ResetArenaPlayer()
+		{
+			InitializeValues();
 		}
 	}
 }

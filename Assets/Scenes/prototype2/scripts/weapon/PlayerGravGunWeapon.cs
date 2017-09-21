@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using FiringSquad.Data;
 using UnityEngine;
 using Input = UnityEngine.Input;
 
@@ -33,13 +34,16 @@ namespace FiringSquad.Gameplay
 		private void Start()
 		{
 			TransitionStates(new IdleState(this));
-
-			ServiceLocator.Get<IInput>()
-				.RegisterInput(Input.GetButtonDown, "Fire2", HandlePressed, KeatsLib.Unity.Input.InputLevel.Gameplay)
-				.RegisterInput(Input.GetButton, "Fire2", HandleHeld, KeatsLib.Unity.Input.InputLevel.Gameplay)
-				.RegisterInput(Input.GetButtonUp, "Fire2", HandleReleased, KeatsLib.Unity.Input.InputLevel.Gameplay);
 		}
 		
+		public void RegisterInput(PlayerInputMap input)
+		{
+			ServiceLocator.Get<IInput>()
+				.RegisterInput(Input.GetButtonDown, input.fireGravGunButton, HandlePressed, KeatsLib.Unity.Input.InputLevel.Gameplay)
+				.RegisterInput(Input.GetButton, input.fireGravGunButton, HandleHeld, KeatsLib.Unity.Input.InputLevel.Gameplay)
+				.RegisterInput(Input.GetButtonUp, input.fireGravGunButton, HandleReleased, KeatsLib.Unity.Input.InputLevel.Gameplay);
+		}
+
 		private void OnDestroy()
 		{
 			ServiceLocator.Get<IInput>()
@@ -47,12 +51,12 @@ namespace FiringSquad.Gameplay
 				.UnregisterInput(HandleHeld)
 				.UnregisterInput(HandleReleased);
 		}
-		
-		private void HandleReleased()
+
+		private void HandlePressed()
 		{
 			GravGunState realState = currentState as GravGunState;
 			if (realState != null)
-				realState.OnInputReleased();
+				realState.OnInputPressed();
 		}
 
 		private void HandleHeld()
@@ -62,11 +66,11 @@ namespace FiringSquad.Gameplay
 				realState.OnInputHeld();
 		}
 
-		private void HandlePressed()
+		private void HandleReleased()
 		{
 			GravGunState realState = currentState as GravGunState;
 			if (realState != null)
-				realState.OnInputPressed();
+				realState.OnInputReleased();
 		}
 
 		private class IdleState : GravGunState

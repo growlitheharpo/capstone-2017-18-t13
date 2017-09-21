@@ -27,7 +27,7 @@ namespace FiringSquad.Gameplay
 			EventManager.OnPlayerDied -= HandlePlayerDeath;
 		}
 
-		private void HandlePlayerDeath()
+		private void HandlePlayerDeath(ICharacter player)
 		{
 			DebugMenu menu = FindObjectOfType<DebugMenu>();
 			if (menu != null && menu.currentlyActive)

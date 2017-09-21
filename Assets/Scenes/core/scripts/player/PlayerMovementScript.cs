@@ -1,4 +1,5 @@
-﻿using KeatsLib;
+﻿using FiringSquad.Data;
+using KeatsLib;
 using KeatsLib.Unity;
 using UnityEngine;
 using Input = UnityEngine.Input;
@@ -32,22 +33,22 @@ namespace FiringSquad.Gameplay
 		{
 			mCollider = GetComponent<CapsuleCollider>();
 			mRigidbody = GetComponent<Rigidbody>();
-			mMainCameraRef = Camera.main.transform;
+			mMainCameraRef = GetComponentInChildren<Camera>().transform;
 			mRecoilAmount = 0.0f;
 		}
 
 		private void Start()
 		{
+			PlayerInputMap input = GetComponent<PlayerScript>().inputMap;
+
 			ServiceLocator.Get<IInput>()
-				.RegisterAxis(Input.GetAxis, "Horizontal", INPUT_LeftRightMovement, KeatsLib.Unity.Input.InputLevel.Gameplay)
-				.RegisterAxis(Input.GetAxis, "Vertical", INPUT_ForwardBackMovement, KeatsLib.Unity.Input.InputLevel.Gameplay)
-				.RegisterAxis(Input.GetAxis, "Mouse X", INPUT_LookHorizontal, KeatsLib.Unity.Input.InputLevel.Gameplay)
-				.RegisterAxis(Input.GetAxis, "Mouse Y", INPUT_LookVertical, KeatsLib.Unity.Input.InputLevel.Gameplay)
-				.RegisterAxis(Input.GetAxis, "J1_RightStickH", INPUT_LookHorizontal, KeatsLib.Unity.Input.InputLevel.Gameplay)
-				.RegisterAxis(Input.GetAxis, "J1_RightStickV", INPUT_LookVertical, KeatsLib.Unity.Input.InputLevel.Gameplay)
-				.RegisterInput(Input.GetButtonDown, "Jump", INPUT_Jump, KeatsLib.Unity.Input.InputLevel.Gameplay)
-				.RegisterInput(Input.GetButtonDown, "Crouch", INPUT_CrouchStart, KeatsLib.Unity.Input.InputLevel.Gameplay)
-				.RegisterInput(Input.GetButtonUp, "Crouch", INPUT_CrouchStop, KeatsLib.Unity.Input.InputLevel.Gameplay)
+				.RegisterAxis(Input.GetAxis, input.moveSidewaysAxis, INPUT_LeftRightMovement, KeatsLib.Unity.Input.InputLevel.Gameplay)
+				.RegisterAxis(Input.GetAxis, input.moveBackFrontAxis, INPUT_ForwardBackMovement, KeatsLib.Unity.Input.InputLevel.Gameplay)
+				.RegisterAxis(Input.GetAxis, input.lookLeftRightAxis, INPUT_LookHorizontal, KeatsLib.Unity.Input.InputLevel.Gameplay)
+				.RegisterAxis(Input.GetAxis, input.lookUpDownAxis, INPUT_LookVertical, KeatsLib.Unity.Input.InputLevel.Gameplay)
+				.RegisterInput(Input.GetButtonDown, input.jumpButton, INPUT_Jump, KeatsLib.Unity.Input.InputLevel.Gameplay)
+				.RegisterInput(Input.GetButtonDown, input.crouchButton, INPUT_CrouchStart, KeatsLib.Unity.Input.InputLevel.Gameplay)
+				.RegisterInput(Input.GetButtonUp, input.crouchButton, INPUT_CrouchStop, KeatsLib.Unity.Input.InputLevel.Gameplay)
 				.EnableInputLevel(KeatsLib.Unity.Input.InputLevel.Gameplay);
 		}
 

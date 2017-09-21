@@ -7,6 +7,10 @@ public class GameplayUIManager : MonoSingleton<GameplayUIManager>, IGameplayUIMa
 	public static readonly int CLIP_TOTAL = "player_clip_total".GetHashCode();
 	public static readonly int PLAYER_HEALTH = "player_health_current".GetHashCode();
 
+	public static readonly int PLAYER1_SCORE = "player_1_score".GetHashCode();
+	public static readonly int PLAYER2_SCORE = "player_2_score".GetHashCode();
+	public static readonly int ARENA_ROUND_TIME = "arena_current_time".GetHashCode();
+
 	private Dictionary<int, WeakReference> mPropertyMap;
 
 	protected override void Awake()

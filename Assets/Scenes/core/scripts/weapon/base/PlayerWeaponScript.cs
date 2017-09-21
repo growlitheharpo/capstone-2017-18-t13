@@ -30,7 +30,7 @@ namespace FiringSquad.Gameplay
 
 		private void Start()
 		{
-			mAimRoot = Camera.main.transform;
+			mAimRoot = bearer.eye;
 			mPlayerEyeOffset = mAimRoot.InverseTransformPoint(transform.position);
 			EventManager.OnConfirmPartAttach += AttachNewPart;
 		}

@@ -27,7 +27,7 @@ namespace FiringSquad.Gameplay
 			EventManager.OnPlayerDied -= HandlePlayerDeath;
 		}
 
-		private void HandlePlayerDeath()
+		private void HandlePlayerDeath(ICharacter player)
 		{
 			if (FindObjectOfType<DebugMenu>().currentlyActive)
 				EventManager.UIToggle();

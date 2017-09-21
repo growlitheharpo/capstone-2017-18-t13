@@ -54,7 +54,15 @@ namespace KeatsLib.Unity
 			/// <inheritdoc />
 			public override bool Activated()
 			{
-				return mFunction(mValue);
+				try
+				{
+					return mFunction(mValue);
+				}
+				catch (ArgumentException)
+				{
+					Logger.Warn("Axis or button is not set up: " + mValue, Logger.System.Input);
+					return false;
+				}
 			}
 		}
 		
@@ -83,7 +91,15 @@ namespace KeatsLib.Unity
 			/// </summary>
 			public float CurrentValue()
 			{
-				return mFunction(mAxisName);
+				try
+				{
+					return mFunction(mAxisName);
+				}
+				catch (ArgumentException)
+				{
+					Logger.Warn("Axis or button is not set up: " + mAxisName, Logger.System.Input);
+					return 0.0f;
+				}
 			}
 		}
 
