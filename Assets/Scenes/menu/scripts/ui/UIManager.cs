@@ -38,7 +38,8 @@ public class UIManager : MonoBehaviour
 	private void LaunchProto3()
 	{
 		mMainElementHolder.SetActive(false);
-		EventManager.Notify(() => EventManager.RequestSceneChange(GamestateManager.PROTOTYPE3_SCENE));
+		EventManager.Notify(() => EventManager.RequestSceneChange(GamestateManager.BASE_WORLD));
+		EventManager.Notify(() => EventManager.RequestSceneChange(GamestateManager.PROTOTYPE3_SCENE, LoadSceneMode.Additive));
 	}
 
 	private void LaunchArtProto()
