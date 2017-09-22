@@ -61,6 +61,13 @@ public partial class EventManager
 		OnBoundPropertyCreated(property, propertyCode);
 	}
 
+	public static event Action<BoundProperty> OnBoundPropertyDestroyed = (p) => { LogEvent(); };
+
+	public static void BoundPropertyDestroyed(BoundProperty boundProperty)
+	{
+		OnBoundPropertyDestroyed(boundProperty);
+	}
+
 	public static event Action<ICharacter> OnPlayerDied = p => { LogEvent(); };
 
 	public static void PlayerDied(ICharacter player)

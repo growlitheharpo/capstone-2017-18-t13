@@ -11,6 +11,7 @@ public class BoundFloatField : MonoBehaviour
 	private BoundProperty<float> mProperty;
 	private UIText mTextElement;
 	private int mPropertyHash;
+	private bool mSearching;
 
 	private void Awake()
 	{
@@ -22,11 +23,12 @@ public class BoundFloatField : MonoBehaviour
 	private void Start()
 	{
 		mUIManagerRef = ServiceLocator.Get<IGameplayUIManager>();
-		StartCoroutine(CheckForProperty());
 	}
 
 	private IEnumerator CheckForProperty()
 	{
+		mSearching = true;
+
 		yield return new WaitForEndOfFrame();
 		yield return new WaitForEndOfFrame();
 		while (mProperty == null)
@@ -38,10 +40,25 @@ public class BoundFloatField : MonoBehaviour
 		AttachProperty();
 	}
 
+	private void Update()
+	{
+		if (mProperty == null && !mSearching)
+			StartCoroutine(CheckForProperty());
+	}
+
 	private void AttachProperty()
 	{
 		mProperty.ValueChanged += HandlePropertyChanged;
+		mProperty.BeingDestroyed += CleanupProperty;
 		HandlePropertyChanged();
+		mSearching = false;
+	}
+
+	private void CleanupProperty()
+	{
+		mProperty.ValueChanged -= HandlePropertyChanged;
+		mProperty.BeingDestroyed -= CleanupProperty;
+		mProperty = null;
 	}
 
 	private void HandlePropertyChanged()

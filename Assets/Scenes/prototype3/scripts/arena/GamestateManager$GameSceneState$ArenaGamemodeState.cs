@@ -12,10 +12,8 @@ public partial class GamestateManager
 {
 	private partial class GameSceneState
 	{
-		private class ArenaGamemodeState : IState//BaseState<GameSceneState>
+		private class ArenaGamemodeState : BaseStateMachine, IState
 		{
-			private GameSceneState mMachine;
-
 			private Gamemode.ArenaSettings mSettings;
 			public Gamemode.ArenaSettings settings { get { return mSettings; } }
 
@@ -27,7 +25,6 @@ public partial class GamestateManager
 
 			public ArenaGamemodeState(GameSceneState m)
 			{
-				mMachine = m;
 				mSettings = FindObjectOfType<Gamemode>().arenaSettings;
 			}
 
@@ -66,8 +63,9 @@ public partial class GamestateManager
 				}
 			}
 
-			public void Update()
+			public new void Update()
 			{
+				base.Update();
 				mRemainingTime.value -= Time.deltaTime;
 
 				if (mRemainingTime.value <= 0.0f)
@@ -114,6 +112,16 @@ public partial class GamestateManager
 			public IState GetTransition()
 			{
 				return this;
+			}
+
+			private class PlayingState : BaseState<ArenaGamemodeState>
+			{
+				public PlayingState(ArenaGamemodeState machine) : base(machine) { }
+
+				public override IState GetTransition()
+				{
+					return this;
+				}
 			}
 		}
 	}
