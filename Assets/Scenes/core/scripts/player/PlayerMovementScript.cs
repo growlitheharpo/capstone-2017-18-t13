@@ -23,6 +23,7 @@ namespace FiringSquad.Gameplay
 		private Vector3 mCumulativeMovement;
 		private Vector2 mRotationAmount;
 		private float mRecoilAmount;
+		private float mRotationY;
 		private bool mJump, mCrouching;
 
 		private const float STANDING_HEIGHT = 3.0f;
@@ -120,8 +121,6 @@ namespace FiringSquad.Gameplay
 			ApplyMovementForce();
 		}
 
-		private float mRotationY;
-
 		/// <summary>
 		/// Follow the mouse or joystick rotation.
 		/// Horizontal rotation is applied to this.transform.
@@ -132,7 +131,7 @@ namespace FiringSquad.Gameplay
 			Vector2 rotation = mRotationAmount * mMovementData.lookSpeed;
 			transform.RotateAround(transform.position, transform.up, rotation.x);
 
-			mRotationY += rotation.y + mRecoilAmount;
+			mRotationY += rotation.y + (mRecoilAmount * Time.deltaTime);
 
 			mRotationY = GenericExt.ClampAngle(mRotationY, -85.0f, 85.0f);
 			mMainCameraRef.localRotation = Quaternion.AngleAxis(mRotationY, Vector3.left);
@@ -173,7 +172,7 @@ namespace FiringSquad.Gameplay
 
 		public void AddRecoil(Vector3 direction, float amount)
 		{
-			mRecoilAmount = amount;
+			mRecoilAmount = amount * 60.0f;
 		}
 	}
 }
