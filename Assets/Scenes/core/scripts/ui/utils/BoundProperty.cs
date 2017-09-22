@@ -8,10 +8,21 @@ public class BoundProperty
 {
 	protected object mValue;
 	public event Action ValueChanged = () => { };
+	public event Action BeingDestroyed = () => { };
+
+	~BoundProperty()
+	{
+		Cleanup();
+	}
 
 	protected void OnValueChanged()
 	{
 		ValueChanged();
+	}
+
+	protected void OnDestroy()
+	{
+		BeingDestroyed();
 	}
 
 	/// <summary>
@@ -20,9 +31,13 @@ public class BoundProperty
 	/// <see cref="https://stackoverflow.com/a/298276"/>
 	public void Cleanup()
 	{
+		OnDestroy();
+
 		var delegates = ValueChanged.GetInvocationList();
 		foreach (Delegate d in delegates)
 			ValueChanged -= (Action)d;
+
+		EventManager.BoundPropertyDestroyed(this);
 	}
 }
 
@@ -42,6 +57,11 @@ public class BoundProperty<T> : BoundProperty
 			mValue = value;
 			OnValueChanged();
 		}
+	}
+
+	~BoundProperty()
+	{
+		Cleanup();
 	}
 
 	public BoundProperty()

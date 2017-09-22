@@ -1,11 +1,12 @@
 ﻿using System.Collections;
 using FiringSquad.Data;
+using KeatsLib.State;
 using UnityEngine;
 using Input = UnityEngine.Input;
 
 namespace FiringSquad.Gameplay
 {
-	public class PlayerGravGunWeapon : BaseStateMachine
+	public class PlayerGravGunWeapon : BaseStateMachineComponent
 	{
 		private const float SNAP_DISTANCE = 4.0f;
 

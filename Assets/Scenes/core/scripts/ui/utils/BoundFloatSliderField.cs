@@ -30,6 +30,8 @@ public class BoundFloatSliderField : MonoBehaviour
 
 	private IEnumerator CheckForProperty()
 	{
+		yield return null;
+
 		while (mProperty == null)
 		{
 			mProperty = mUIManagerRef.GetProperty<float>(mPropertyHash);
@@ -42,7 +44,15 @@ public class BoundFloatSliderField : MonoBehaviour
 	private void AttachProperty()
 	{
 		mProperty.ValueChanged += HandlePropertyChanged;
+		mProperty.BeingDestroyed += CleanupProperty;
 		HandlePropertyChanged();
+	}
+
+	private void CleanupProperty()
+	{
+		mProperty.ValueChanged -= HandlePropertyChanged;
+		mProperty.BeingDestroyed -= CleanupProperty;
+		StartCoroutine(CheckForProperty());
 	}
 
 	private void HandlePropertyChanged()

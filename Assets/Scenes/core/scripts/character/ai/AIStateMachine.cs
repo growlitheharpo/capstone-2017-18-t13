@@ -1,12 +1,13 @@
 ﻿using System;
 using FiringSquad.Data;
 using KeatsLib.Collections;
+using KeatsLib.State;
 using UnityEngine;
 using UnityEngine.AI;
 
 namespace FiringSquad.Gameplay.AI
 {
-	public class AIStateMachine : BaseStateMachine
+	public class AIStateMachine : BaseStateMachineComponent
 	{
 		[SerializeField] private StateMachineVariables mTweakables;
 		[Serializable] public class StateMachineVariables

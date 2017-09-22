@@ -1,10 +1,12 @@
 ﻿using System;
+using KeatsLib.State;
 
 public partial class GamestateManager
 {
 	/// <summary>
 	/// State used to initialize the game at start-up.
 	/// </summary>
+	/// <inheritdoc />
 	private class InitializeGameState : BaseGameState
 	{
 		private static bool kOccured;
@@ -31,7 +33,7 @@ public partial class GamestateManager
 		public override bool safeToTransition { get { return false; } }
 
 		/// <inheritdoc />
-		public override IGameState GetTransition()
+		public override IState GetTransition()
 		{
 			if (mSaveLoadComplete && mAudioLoadComplete)
 				return instance.ChooseStateByScene();

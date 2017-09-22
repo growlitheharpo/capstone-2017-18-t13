@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 public class GameplayUIManager : MonoSingleton<GameplayUIManager>, IGameplayUIManager
 {
@@ -22,16 +23,25 @@ public class GameplayUIManager : MonoSingleton<GameplayUIManager>, IGameplayUIMa
 	private void Start()
 	{
 		EventManager.OnBoundPropertyCreated += BoundPropertyCreated;
+		EventManager.OnBoundPropertyDestroyed += BoundPropertyDestroyed;
 	}
 
 	private void OnDestroy()
 	{
 		EventManager.OnBoundPropertyCreated -= BoundPropertyCreated;
+		EventManager.OnBoundPropertyDestroyed -= BoundPropertyDestroyed;
 	}
 
 	private void BoundPropertyCreated(BoundProperty boundProperty, int i)
 	{
 		mPropertyMap[i] = new WeakReference(boundProperty);
+	}
+
+	private void BoundPropertyDestroyed(BoundProperty obj)
+	{
+		var keys = mPropertyMap.Where(x => ReferenceEquals(x.Value.Target, obj)).Select(x => x.Key).ToArray();
+		foreach (int key in keys)
+			mPropertyMap.Remove(key);
 	}
 
 	public BoundProperty<T> GetProperty<T>(int hash)

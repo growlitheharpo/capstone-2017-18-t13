@@ -12,7 +12,6 @@ namespace FiringSquad.Gameplay
 		[SerializeField] private float mMaximumThrowTime;
 		[SerializeField] private int mMaxExistingItems;
 
-		private PlayerScript[] mPlayerList;
 		private GameObject[] mWeaponPrefabs;
 		private Vector3[] mMeshPoints;
 
@@ -38,7 +37,7 @@ namespace FiringSquad.Gameplay
 
 		private void CreatePlayerList()
 		{
-			mPlayerList = FindObjectsOfType<PlayerScript>();
+			FindObjectsOfType<PlayerScript>();
 		}
 
 		private void GenerateMeshPoints()

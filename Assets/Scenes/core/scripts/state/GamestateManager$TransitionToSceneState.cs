@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using KeatsLib.State;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -35,7 +36,7 @@ public partial class GamestateManager
 		}
 
 		/// <inheritdoc />
-		public override IGameState GetTransition()
+		public override IState GetTransition()
 		{
 			return mLoadingOperation != null && mLoadingOperation.isDone ? instance.ChooseStateByScene() : null;
 		}

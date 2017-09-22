@@ -1,41 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
+using KeatsLib.State;
 using UnityEngine.SceneManagement;
 
 /// <inheritdoc cref="IGamestateManager"/>
 public partial class GamestateManager : MonoSingleton<GamestateManager>, IGamestateManager
 {
-	/// <summary>
-	/// Interface used for a state.
-	/// </summary>
-	private interface IGameState
+	/// <inheritdoc />
+	private interface IGameState : IState
 	{
-		/// <summary>
-		/// Called when state is first entered.
-		/// </summary>
-		void OnEnter();
-
-		/// <summary>
-		/// Called every frame that state is active.
-		/// </summary>
-		void Update();
-
 		/// <summary>
 		/// Whether this state believes a transition is safe at this time.
 		/// </summary>
 		bool safeToTransition { get; }
-
-		/// <summary>
-		/// The state this state wants to transition to. Returns null if we should stay as we are.
-		/// </summary>
-		IGameState GetTransition();
-
-		/// <summary>
-		/// Called when state is exited.
-		/// </summary>
-		void OnExit();
 	}
 
+	/// <inheritdoc />
 	/// <summary>
 	/// Interior class used for game states.
 	/// </summary>
@@ -49,11 +29,10 @@ public partial class GamestateManager : MonoSingleton<GamestateManager>, IGamest
 
 		/// <inheritdoc />
 		public virtual bool safeToTransition { get { return true;  }}
-
-		/// <inheritdoc />
-		public virtual IGameState GetTransition()
+		
+		public virtual IState GetTransition()
 		{
-			return null;
+			return this;
 		}
 
 		/// <inheritdoc />
@@ -68,7 +47,7 @@ public partial class GamestateManager : MonoSingleton<GamestateManager>, IGamest
 	public const string PROTOTYPE2_SCENE = "prototype2";
 	public const string PROTOTYPE3_SCENE = "prototype3";
 	public const string ART_PROTOTYPE_SCENE = "artproto";
-	public const string DESIGN_TEST_SCENE = "p1&p2_testlevel";
+	public const string DESIGN_TEST_SCENE = "p1&p2_testLevel";
 
 	public enum Feature
 	{
@@ -99,12 +78,12 @@ public partial class GamestateManager : MonoSingleton<GamestateManager>, IGamest
 			{ MAIN_SCENE, new TransitionToSceneState(MENU_SCENE) },
 			{ MENU_SCENE, new MenuSceneState() },
 			{ GAME_SCENE, new GameSceneState() },
-			{ PROTOTYPE1_SCENE, new Prototype1State() },
 			{ PROTOTYPE1_SETUP_SCENE, new MenuSceneState() },
-			{ PROTOTYPE2_SCENE, new Prototype2State() },
-			{ PROTOTYPE3_SCENE, new GameSceneState() },
-			{ ART_PROTOTYPE_SCENE, new GameSceneState() },
-			{ DESIGN_TEST_SCENE, new Prototype2State() },
+			{ PROTOTYPE1_SCENE,			new GameSceneState() },
+			{ PROTOTYPE2_SCENE,			new GameSceneState() },
+			{ PROTOTYPE3_SCENE,			new GameSceneState() },
+			{ DESIGN_TEST_SCENE,		new GameSceneState() },
+			{ ART_PROTOTYPE_SCENE,	new MenuSceneState() },
 		};
 
 		EventManager.OnRequestSceneChange += ReceiveSceneChangeRequest;
@@ -140,14 +119,14 @@ public partial class GamestateManager : MonoSingleton<GamestateManager>, IGamest
 		}
 
 		mCurrentState.Update();
-		IGameState newState = mCurrentState.GetTransition();
+		IState newState = mCurrentState.GetTransition();
 
-		if (newState == null)
+		if (newState == mCurrentState || newState == null)
 			return;
 
 		mCurrentState.OnExit();
 		Logger.Info("Setting current state to " + newState + " because of a regular transition.", Logger.System.State);
-		mCurrentState = newState;
+		mCurrentState = (IGameState)newState;
 		mCurrentState.OnEnter();
 	}
 
@@ -192,12 +171,14 @@ public partial class GamestateManager : MonoSingleton<GamestateManager>, IGamest
 
 	public bool IsFeatureEnabled(Feature feat)
 	{
+		bool isStateGamestate = mCurrentState.GetType() == typeof(GameSceneState);
+
 		switch (feat)
 		{
 			case Feature.WeaponDrops:
-				return SceneManager.GetActiveScene().name == PROTOTYPE2_SCENE || mOverrideEnableDrops;
+				return mOverrideEnableDrops || (isStateGamestate && ((GameSceneState)mCurrentState).IsFeatureEnabled(feat));
 			case Feature.WeaponDurability:
-				return SceneManager.GetActiveScene().name == PROTOTYPE1_SCENE || mOverrideEnableDurability;
+				return mOverrideEnableDurability || (isStateGamestate && ((GameSceneState)mCurrentState).IsFeatureEnabled(feat));
 			default:
 				throw new ArgumentOutOfRangeException("feat", feat, null);
 		}
