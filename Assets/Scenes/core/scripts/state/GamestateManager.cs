@@ -47,7 +47,7 @@ public partial class GamestateManager : MonoSingleton<GamestateManager>, IGamest
 	public const string PROTOTYPE2_SCENE = "prototype2";
 	public const string PROTOTYPE3_SCENE = "prototype3";
 	public const string ART_PROTOTYPE_SCENE = "artproto";
-	public const string DESIGN_TEST_SCENE = "p1&p2_testlevel";
+	public const string DESIGN_TEST_SCENE = "p1&p2_testLevel";
 
 	public enum Feature
 	{
@@ -78,12 +78,12 @@ public partial class GamestateManager : MonoSingleton<GamestateManager>, IGamest
 			{ MAIN_SCENE, new TransitionToSceneState(MENU_SCENE) },
 			{ MENU_SCENE, new MenuSceneState() },
 			{ GAME_SCENE, new GameSceneState() },
-			{ PROTOTYPE1_SCENE, new Prototype1State() },
 			{ PROTOTYPE1_SETUP_SCENE, new MenuSceneState() },
-			{ PROTOTYPE2_SCENE, new Prototype2State() },
-			{ PROTOTYPE3_SCENE, new GameSceneState() },
-			{ ART_PROTOTYPE_SCENE, new GameSceneState() },
-			{ DESIGN_TEST_SCENE, new Prototype2State() },
+			{ PROTOTYPE1_SCENE,			new GameSceneState() },
+			{ PROTOTYPE2_SCENE,			new GameSceneState() },
+			{ PROTOTYPE3_SCENE,			new GameSceneState() },
+			{ DESIGN_TEST_SCENE,		new GameSceneState() },
+			{ ART_PROTOTYPE_SCENE,	new MenuSceneState() },
 		};
 
 		EventManager.OnRequestSceneChange += ReceiveSceneChangeRequest;
@@ -121,7 +121,7 @@ public partial class GamestateManager : MonoSingleton<GamestateManager>, IGamest
 		mCurrentState.Update();
 		IState newState = mCurrentState.GetTransition();
 
-		if (newState == mCurrentState)
+		if (newState == mCurrentState || newState == null)
 			return;
 
 		mCurrentState.OnExit();
