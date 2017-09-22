@@ -12,6 +12,7 @@ public class BoundFloatSliderField : MonoBehaviour
 	private BoundProperty<float> mProperty;
 	private UIFillBarScript mBar;
 	private int mPropertyHash;
+	private bool mSearching;
 
 	private void Awake()
 	{
@@ -30,6 +31,7 @@ public class BoundFloatSliderField : MonoBehaviour
 
 	private IEnumerator CheckForProperty()
 	{
+		mSearching = true;
 		yield return null;
 
 		while (mProperty == null)
@@ -41,18 +43,25 @@ public class BoundFloatSliderField : MonoBehaviour
 		AttachProperty();
 	}
 
+	private void Update()
+	{
+		if (mProperty == null && !mSearching)
+			StartCoroutine(CheckForProperty());
+	}
+
 	private void AttachProperty()
 	{
 		mProperty.ValueChanged += HandlePropertyChanged;
 		mProperty.BeingDestroyed += CleanupProperty;
 		HandlePropertyChanged();
+		mSearching = false;
 	}
 
 	private void CleanupProperty()
 	{
 		mProperty.ValueChanged -= HandlePropertyChanged;
 		mProperty.BeingDestroyed -= CleanupProperty;
-		StartCoroutine(CheckForProperty());
+		mProperty = null;
 	}
 
 	private void HandlePropertyChanged()

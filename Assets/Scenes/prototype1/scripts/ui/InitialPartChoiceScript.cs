@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using FiringSquad.Gameplay;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class InitialPartChoiceScript : MonoBehaviour
 {
@@ -83,7 +84,8 @@ public class InitialPartChoiceScript : MonoBehaviour
 		};
 		mPlay.OnClick += () =>
 		{
-			EventManager.RequestSceneChange(GamestateManager.PROTOTYPE1_SCENE);
+			EventManager.RequestSceneChange(GamestateManager.BASE_WORLD);
+			EventManager.RequestSceneChange(GamestateManager.PROTOTYPE1_SCENE, LoadSceneMode.Additive);
 		};
 	}
 

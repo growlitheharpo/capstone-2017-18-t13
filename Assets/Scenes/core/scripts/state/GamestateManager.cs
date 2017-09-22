@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using KeatsLib.State;
 using UnityEngine.SceneManagement;
@@ -39,9 +40,18 @@ public partial class GamestateManager : MonoSingleton<GamestateManager>, IGamest
 		public virtual void OnExit() { }
 	}
 
+	private class NullState : BaseGameState
+	{
+		public override IState GetTransition()
+		{
+			return instance.ChooseStateByScene();
+		}
+	}
+
 	public const string MAIN_SCENE = "main";
 	public const string MENU_SCENE = "menu";
 	public const string GAME_SCENE = "scene1";
+	public const string BASE_WORLD = "base_world";
 	public const string PROTOTYPE1_SCENE = "prototype1";
 	public const string PROTOTYPE1_SETUP_SCENE = "prototype1_intro";
 	public const string PROTOTYPE2_SCENE = "prototype2";
@@ -84,6 +94,7 @@ public partial class GamestateManager : MonoSingleton<GamestateManager>, IGamest
 			{ PROTOTYPE3_SCENE,			new GameSceneState() },
 			{ DESIGN_TEST_SCENE,		new GameSceneState() },
 			{ ART_PROTOTYPE_SCENE,	new MenuSceneState() },
+			{ BASE_WORLD, new NullState() },
 		};
 
 		EventManager.OnRequestSceneChange += ReceiveSceneChangeRequest;
@@ -138,13 +149,27 @@ public partial class GamestateManager : MonoSingleton<GamestateManager>, IGamest
 		return mBaseStates.TryGetValue(currentScene, out result) ? result : null;
 	}
 
-	private void ReceiveSceneChangeRequest(string sceneName)
+	private void ReceiveSceneChangeRequest(string sceneName, LoadSceneMode mode)
 	{
+		Logger.Info("Received a scene request!!!!!!!!! " + sceneName, Logger.System.State);
+		StartCoroutine(AttemptSceneChange(sceneName, mode));
+		/*
 		if (!mCurrentState.safeToTransition)
 			return;
 
 		mCurrentState.OnExit();
-		mCurrentState = new TransitionToSceneState(sceneName);
+		mCurrentState = new TransitionToSceneState(sceneName, mode);
+		Logger.Info("Setting current state to TransitionToSceneState because of an event.", Logger.System.State);
+		mCurrentState.OnEnter();*/
+	}
+
+	private IEnumerator AttemptSceneChange(string sceneName, LoadSceneMode mode)
+	{
+		while (!mCurrentState.safeToTransition)
+			yield return null;
+
+		mCurrentState.OnExit();
+		mCurrentState = new TransitionToSceneState(sceneName, mode);
 		Logger.Info("Setting current state to TransitionToSceneState because of an event.", Logger.System.State);
 		mCurrentState.OnEnter();
 	}

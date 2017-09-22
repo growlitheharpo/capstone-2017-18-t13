@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using UnityEngine.SceneManagement;
 
 #if !DEBUG && !DEVELOPMENT_BUILD
 using UnityEngine;
@@ -32,11 +33,11 @@ public partial class EventManager
 		OnInitialAudioLoadComplete();
 	}
 
-	public static event Action<string> OnRequestSceneChange = e => { LogEvent(); };
+	public static event Action<string, LoadSceneMode> OnRequestSceneChange = (e, m) => { LogEvent(); };
 
-	public static void RequestSceneChange(string sceneName)
+	public static void RequestSceneChange(string sceneName, LoadSceneMode mode = LoadSceneMode.Single)
 	{
-		OnRequestSceneChange(sceneName);
+		OnRequestSceneChange(sceneName, mode);
 	}
 
 	// PROTOTYPE 2
