@@ -90,6 +90,13 @@ public partial class EventManager
 		OnPlayerKilledEnemy(enemy);
 	}
 
+	public static event Action<string> OnShowGameoverPanel = e => { LogEvent(); };
+
+	public static void ShowGameoverPanel(string resultText)
+	{
+		OnShowGameoverPanel(resultText);
+	}
+
 	//!PROTOTYPE 2
 
 	public void Start()
@@ -126,4 +133,5 @@ public partial class EventManager
 		Debug.LogError("Firing events is not supported in a non-development build.");
 #endif
 	}
+
 }

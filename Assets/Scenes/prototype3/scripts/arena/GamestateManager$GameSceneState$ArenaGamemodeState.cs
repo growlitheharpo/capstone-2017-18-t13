@@ -6,6 +6,7 @@ using KeatsLib.Collections;
 using KeatsLib.State;
 using KeatsLib.Unity;
 using UnityEngine;
+using Input = KeatsLib.Unity.Input;
 
 public partial class GamestateManager
 {
@@ -156,6 +157,20 @@ public partial class GamestateManager
 			private class EndMatchState : BaseState<ArenaGamemodeState>
 			{
 				public EndMatchState(ArenaGamemodeState machine) : base(machine) { }
+
+				public override void OnEnter()
+				{
+					string resultText;
+					if (mMachine.mPlayer1Score.value > mMachine.mPlayer2Score.value)
+						resultText = "Player 1 Wins!";
+					else if (mMachine.mPlayer1Score.value < mMachine.mPlayer2Score.value)
+						resultText = "Player 2 Wins!";
+					else
+						resultText = "It's a tie!";
+
+					EventManager.Notify(() => EventManager.ShowGameoverPanel(resultText));
+					ServiceLocator.Get<IInput>().DisableInputLevel(Input.InputLevel.Gameplay);
+				}
 
 				public override IState GetTransition()
 				{
