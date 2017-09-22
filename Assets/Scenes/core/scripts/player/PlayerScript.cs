@@ -186,6 +186,8 @@ namespace FiringSquad.Gameplay
 		public void OverrideDefaultParts(GameObject mechanism, GameObject barrel, GameObject scope, GameObject grip)
 		{
 			mDefaultsOverride = new WeaponDefaultsData(mechanism, barrel, scope, grip);
+			InitializeValues();
+
 		}
 
 		/// <summary>
