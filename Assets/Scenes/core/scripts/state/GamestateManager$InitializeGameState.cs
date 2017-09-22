@@ -1,4 +1,5 @@
 ﻿using System;
+using KeatsLib.State;
 
 public partial class GamestateManager
 {
@@ -31,7 +32,7 @@ public partial class GamestateManager
 		public override bool safeToTransition { get { return false; } }
 
 		/// <inheritdoc />
-		public override IGameState GetTransition()
+		public override IState GetTransition()
 		{
 			if (mSaveLoadComplete && mAudioLoadComplete)
 				return instance.ChooseStateByScene();
