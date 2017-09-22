@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using UnityEngine;
 
 public class Gamemode : MonoBehaviour
@@ -31,6 +32,12 @@ public class Gamemode : MonoBehaviour
 		
 		[SerializeField] private bool mEnableDurability;
 		public bool enableDurability { get { return mEnableDurability; } }
+
+		[SerializeField] private GameObject mSpawnPointHolder;
+		public Transform[] spawnPoints { get { return mSpawnPointHolder.transform.Cast<Transform>().ToArray(); } }
+
+		[SerializeField] private GameObject mDeathParticles;
+		public GameObject deathParticles { get { return mDeathParticles; } }
 	}
 
 	public enum Mode

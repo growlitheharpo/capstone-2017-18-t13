@@ -6,6 +6,7 @@ public partial class GamestateManager
 	/// <summary>
 	/// State used to initialize the game at start-up.
 	/// </summary>
+	/// <inheritdoc />
 	private class InitializeGameState : BaseGameState
 	{
 		private static bool kOccured;

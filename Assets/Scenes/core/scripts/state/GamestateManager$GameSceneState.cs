@@ -8,7 +8,8 @@ public partial class GamestateManager
 	/// <summary>
 	/// State used when the game is in the game scene state.
 	/// </summary>
-	private class GameSceneState : BaseStateMachine, IGameState
+	/// <inheritdoc cref="IGameState" />
+	private partial class GameSceneState : BaseStateMachine, IGameState
 	{
 		public bool safeToTransition { get { return true; } }
 
@@ -118,7 +119,7 @@ public partial class GamestateManager
 
 		private class MyGunGamemodeState : BaseState<GameSceneState>
 		{
-			private Gamemode.MyGunSettings mSettings;
+			private readonly Gamemode.MyGunSettings mSettings;
 			public Gamemode.MyGunSettings settings { get { return mSettings; } }
 
 			public MyGunGamemodeState(GameSceneState m) : base(m)
@@ -134,28 +135,12 @@ public partial class GamestateManager
 
 		private class QuickdrawGamemodeState : BaseState<GameSceneState>
 		{
-			private Gamemode.QuickdrawSettings mSettings;
+			private readonly Gamemode.QuickdrawSettings mSettings;
 			public Gamemode.QuickdrawSettings settings { get { return mSettings; } }
 
 			public QuickdrawGamemodeState(GameSceneState m) : base(m)
 			{
 				mSettings = FindObjectOfType<Gamemode>().quickdrawSettings;
-			}
-
-			public override IState GetTransition()
-			{
-				return this;
-			}
-		}
-
-		private class ArenaGamemodeState : BaseState<GameSceneState>
-		{
-			private Gamemode.ArenaSettings mSettings;
-			public Gamemode.ArenaSettings settings { get { return mSettings; } }
-
-			public ArenaGamemodeState(GameSceneState m) : base(m)
-			{
-				mSettings = FindObjectOfType<Gamemode>().arenaSettings;
 			}
 
 			public override IState GetTransition()
