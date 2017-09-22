@@ -22,6 +22,7 @@ namespace FiringSquad.Gameplay
 		// mock the weapon interface
 		public IWeaponBearer bearer { get; set; }
 
+		[SerializeField] private LayerMask mGrabMask;
 		[SerializeField] [Range(0.0f, 1.0f)] private float mReelInSensitivity;
 		[SerializeField] private float mPullStrength;
 		[SerializeField] private float mThrowForce;
@@ -138,7 +139,7 @@ namespace FiringSquad.Gameplay
 				UnityEngine.Debug.DrawLine(ray.origin, ray.origin + ray.direction * 4000.0f, new Color(.6f, 0.0f, 1.0f), 0.2f);
 
 				RaycastHit hit;
-				if (!Physics.Raycast(ray, out hit, 4000.0f))
+				if (!Physics.Raycast(ray, out hit, 4000.0f, mMachine.mGrabMask))
 					return;
 
 				Rigidbody rb = hit.rigidbody;
