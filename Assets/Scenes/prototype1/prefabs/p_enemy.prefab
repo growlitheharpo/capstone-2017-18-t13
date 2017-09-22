@@ -248,8 +248,8 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1990981221914872}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: 4}
+  m_LocalRotation: {x: -0, y: 0.4427172, z: -0, w: 0.89666134}
+  m_LocalPosition: {x: -20.73, y: 1.5, z: -30.91}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4097651167779880}
@@ -257,7 +257,7 @@ Transform:
   - {fileID: 4747094446711290}
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 52.555004, z: 0}
 --- !u!23 &23562304024055448
 MeshRenderer:
   m_ObjectHideFlags: 1
@@ -426,15 +426,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mGunDefaultParts:
-    mScope: {fileID: 1289196357881978, guid: 363ec9baf39beb0458b6c51a5e07d379, type: 2}
-    mBarrel: {fileID: 1297151579918920, guid: ae2a9ffdc62cede43828d78624b9146c, type: 2}
+    mScope: {fileID: 1967676427755860, guid: 90411c74ce32c4d45b8fdd979d2001a4, type: 2}
+    mBarrel: {fileID: 1711722334057618, guid: ee84b24b05b85574cad2a56c257e292f, type: 2}
     mMechanism: {fileID: 1009224365190128, guid: ac89948562eb23e47810effcccae5243,
       type: 2}
     mGrip: {fileID: 1614481287065458, guid: bf400f714370ec646bb93b34e1e624d0, type: 2}
   mDeathParticlesPrefab: {fileID: 1038737599230904, guid: ac718ffd3fafb794cb9217b0d138316c,
     type: 2}
   mGunPrefab: {fileID: 1953974638818940, guid: 1dce9fbf896c24c40945cfd478905868, type: 2}
-  mDefaultHealth: 500
+  mDefaultHealth: 100
+  mDropWeights:
+    mMechanismWeight: 0.25
+    mBarrelWeight: 0.25
+    mScopeWeight: 0.25
+    mGripWeight: 0.25
 --- !u!114 &114352049684114196
 MonoBehaviour:
   m_ObjectHideFlags: 1
