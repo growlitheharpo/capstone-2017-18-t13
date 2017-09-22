@@ -73,6 +73,8 @@ namespace FiringSquad.Gameplay.AI
 		{
 			mCurrentHealth.value = float.MinValue;
 
+			EventManager.Notify(() => EventManager.PlayerKilledEnemy(this));
+
 			Destroy(mStateMachine);
 			Destroy(GetComponent<Collider>());
 

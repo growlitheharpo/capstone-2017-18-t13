@@ -1,4 +1,5 @@
 ﻿using System;
+using FiringSquad.Gameplay.AI;
 using KeatsLib.State;
 using UnityEngine;
 using Input = KeatsLib.Unity.Input;
@@ -122,9 +123,47 @@ public partial class GamestateManager
 			private readonly Gamemode.MyGunSettings mSettings;
 			public Gamemode.MyGunSettings settings { get { return mSettings; } }
 
+			private int mEnemyCount;
+
 			public MyGunGamemodeState(GameSceneState m) : base(m)
 			{
 				mSettings = FindObjectOfType<Gamemode>().mygunSettings;
+			}
+
+			public override void OnEnter()
+			{
+				EventManager.OnPlayerDied += HandlePlayerDeath;
+				EventManager.OnPlayerKilledEnemy += HandleEnemyDeath;
+
+				mEnemyCount = FindObjectsOfType<AICharacter>().Length;
+			}
+
+			private void HandlePlayerDeath(ICharacter obj)
+			{
+				EndGame("You died.");
+			}
+
+			private void HandleEnemyDeath(ICharacter obj)
+			{
+				mEnemyCount -= 1;
+
+				if (mEnemyCount <= 0)
+					EndGame("You win!");
+			}
+
+			private void EndGame(string msg)
+			{
+				Time.timeScale = 0.0f;
+				ServiceLocator.Get<IInput>().DisableInputLevel(Input.InputLevel.Gameplay);
+				EventManager.Notify(() => EventManager.ShowGameoverPanel(msg));
+			}
+
+			public override void OnExit()
+			{
+				EventManager.OnPlayerDied -= HandlePlayerDeath;
+				EventManager.OnPlayerKilledEnemy -= HandleEnemyDeath;
+
+				Time.timeScale = 1.0f;
 			}
 
 			public override IState GetTransition()
@@ -138,9 +177,47 @@ public partial class GamestateManager
 			private readonly Gamemode.QuickdrawSettings mSettings;
 			public Gamemode.QuickdrawSettings settings { get { return mSettings; } }
 
+			private int mEnemyCount;
+
 			public QuickdrawGamemodeState(GameSceneState m) : base(m)
 			{
 				mSettings = FindObjectOfType<Gamemode>().quickdrawSettings;
+			}
+
+			public override void OnEnter()
+			{
+				EventManager.OnPlayerDied += HandlePlayerDeath;
+				EventManager.OnPlayerKilledEnemy += HandleEnemyDeath;
+
+				mEnemyCount = FindObjectsOfType<AICharacter>().Length;
+			}
+
+			private void HandlePlayerDeath(ICharacter obj)
+			{
+				EndGame("You died.");
+			}
+
+			private void HandleEnemyDeath(ICharacter obj)
+			{
+				mEnemyCount -= 1;
+
+				if (mEnemyCount <= 0)
+					EndGame("You win!");
+			}
+
+			private void EndGame(string msg)
+			{
+				Time.timeScale = 0.0f;
+				ServiceLocator.Get<IInput>().DisableInputLevel(Input.InputLevel.Gameplay);
+				EventManager.Notify(() => EventManager.ShowGameoverPanel(msg));
+			}
+
+			public override void OnExit()
+			{
+				EventManager.OnPlayerDied -= HandlePlayerDeath;
+				EventManager.OnPlayerKilledEnemy -= HandleEnemyDeath;
+
+				Time.timeScale = 1.0f;
 			}
 
 			public override IState GetTransition()
