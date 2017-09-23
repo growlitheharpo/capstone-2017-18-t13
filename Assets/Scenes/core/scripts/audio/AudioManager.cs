@@ -148,6 +148,7 @@ public class AudioManager : MonoSingleton<AudioManager>, IAudioManager
 		if (profile == null)
 		{
 			Logger.Warn("Trying to play a null profile: " + e, Logger.System.Audio);
+			return null;
 		}
 
 		var clips = profile.GetClipInParents(e);
