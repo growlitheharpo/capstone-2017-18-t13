@@ -114,13 +114,21 @@ public class AudioManager : MonoSingleton<AudioManager>, IAudioManager
 
 			for (int i = 0; i < r.mSources.Count; i++)
 			{
-				// if !finished
+				if (r.mSources[i] == null)
+				{
+					r.mSources.RemoveAt(i);
+					r.mClipData.RemoveAt(i);
+					i--;
+					continue;
+				}
+
 				if (r.mSources[i].loop || !(r.mSources[i].time >= r.mSources[i].clip.length - Time.deltaTime))
 					continue;
 
 				Destroy(r.mSources[i].gameObject);
 				r.mSources.RemoveAt(i);
 				r.mClipData.RemoveAt(i);
+				i--;
 			}
 		}
 
@@ -137,6 +145,11 @@ public class AudioManager : MonoSingleton<AudioManager>, IAudioManager
 	/// <inheritdoc />
 	public IAudioReference PlaySound(AudioEvent e, IAudioProfile profile, Transform location, Vector3 offset)
 	{
+		if (profile == null)
+		{
+			Logger.Warn("Trying to play a null profile: " + e, Logger.System.Audio);
+		}
+
 		var clips = profile.GetClipInParents(e);
 		var sources = new List<AudioSource>();
 
