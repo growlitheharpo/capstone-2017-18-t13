@@ -28,6 +28,8 @@ namespace FiringSquad.Gameplay
 		/// </summary>
 		protected override void PlayShotEffect()
 		{
+			ServiceLocator.Get<IAudioManager>().PlaySound(AudioManager.AudioEvent.PrimaryEffect1, mAudioProfile, transform);
+
 			mShotParticles.Stop();
 			mShotParticles.time = 0.0f;
 			mShotParticles.Play();
