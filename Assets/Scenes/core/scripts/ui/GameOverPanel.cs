@@ -30,9 +30,15 @@ namespace FiringSquad.Gameplay
 
 		private void HandleRestart()
 		{
-			string scene = string.IsNullOrEmpty(mOverrideRestartSceneName) ? SceneManager.GetActiveScene().name : mOverrideRestartSceneName;
-			EventManager.Notify(() => EventManager.RequestSceneChange(GamestateManager.BASE_WORLD));
-			EventManager.Notify(() => EventManager.RequestSceneChange(scene, LoadSceneMode.Additive));
+			if (string.IsNullOrEmpty(mOverrideRestartSceneName))
+			{
+				EventManager.Notify(() => EventManager.RequestSceneChange(GamestateManager.BASE_WORLD));
+				EventManager.Notify(() => EventManager.RequestSceneChange(SceneManager.GetActiveScene().name, LoadSceneMode.Additive));
+			}
+			else
+			{
+				EventManager.Notify(() => EventManager.RequestSceneChange(mOverrideRestartSceneName));
+			}
 		}
 
 		private void HandleQuit()

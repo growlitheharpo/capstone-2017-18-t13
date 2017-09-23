@@ -151,16 +151,7 @@ public partial class GamestateManager : MonoSingleton<GamestateManager>, IGamest
 
 	private void ReceiveSceneChangeRequest(string sceneName, LoadSceneMode mode)
 	{
-		Logger.Info("Received a scene request!!!!!!!!! " + sceneName, Logger.System.State);
 		StartCoroutine(AttemptSceneChange(sceneName, mode));
-		/*
-		if (!mCurrentState.safeToTransition)
-			return;
-
-		mCurrentState.OnExit();
-		mCurrentState = new TransitionToSceneState(sceneName, mode);
-		Logger.Info("Setting current state to TransitionToSceneState because of an event.", Logger.System.State);
-		mCurrentState.OnEnter();*/
 	}
 
 	private IEnumerator AttemptSceneChange(string sceneName, LoadSceneMode mode)

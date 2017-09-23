@@ -70,7 +70,7 @@ namespace FiringSquad.Gameplay
 				SceneManager.activeSceneChanged -= HandleSceneChange;
 				Destroy(gameObject);
 			}
-			else if (arg1.name != GamestateManager.BASE_WORLD)
+			else if (arg1.name != GamestateManager.BASE_WORLD && arg1.name != GamestateManager.PROTOTYPE1_SETUP_SCENE)
 			{
 				UnityEngine.Debug.Log("Destroying because we're not in base world.");
 				SceneManager.activeSceneChanged -= HandleSceneChange;
