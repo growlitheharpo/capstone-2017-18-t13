@@ -174,10 +174,19 @@ namespace FiringSquad.Gameplay
 			mAmountInClip.value--;
 
 			PlayShotEffect();
-			Ray shot = CalculateShotDirection();
 
-			GameObject projectile = mProjectilePool.ReleaseNewItem();
-			projectile.GetComponent<IProjectile>().Instantiate(this, shot, mCurrentData, mProjectilePool);
+			var barrel = mCurrentAttachments[Attachment.Barrel] as WeaponPartScriptBarrel;
+			int count = barrel != null ? barrel.projectileCount : 1;
+
+			for (int i = 0; i < count; i++)
+			{
+				Ray shot = CalculateShotDirection();
+
+				GameObject projectile = mProjectilePool.ReleaseNewItem();
+				projectile.GetComponent<IProjectile>().Instantiate(this, shot, mCurrentData, mProjectilePool);
+			}
+
+			Logger.Info("Effective spread: " + mCurrentData.spread);
 
 			OnPostFireShot();
 

@@ -8,5 +8,8 @@ namespace FiringSquad.Gameplay
 
 		[SerializeField] private Transform mTip;
 		public Transform barrelTip { get { return mTip; } }
+
+		[SerializeField] private int mProjectileCount = 1;
+		public int projectileCount { get { return mProjectileCount; } }
 	}
 }
