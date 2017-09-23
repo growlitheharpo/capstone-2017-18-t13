@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.SceneManagement;
 
 /// <summary>
 /// Main menu UI manager.
@@ -24,19 +25,21 @@ public class UIManager : MonoBehaviour
 	private void LaunchProto1()
 	{
 		mMainElementHolder.SetActive(false);
-		EventManager.Notify(() => EventManager.RequestSceneChange(GamestateManager.PROTOTYPE1_SCENE));
+		EventManager.Notify(() => EventManager.RequestSceneChange(GamestateManager.PROTOTYPE1_SETUP_SCENE));
 	}
 	
 	private void LaunchProto2()
 	{
 		mMainElementHolder.SetActive(false);
-		EventManager.Notify(() => EventManager.RequestSceneChange(GamestateManager.PROTOTYPE2_SCENE));
+		EventManager.Notify(() => EventManager.RequestSceneChange(GamestateManager.BASE_WORLD));
+		EventManager.Notify(() => EventManager.RequestSceneChange(GamestateManager.PROTOTYPE2_SCENE, LoadSceneMode.Additive));
 	}
 
 	private void LaunchProto3()
 	{
 		mMainElementHolder.SetActive(false);
-		EventManager.Notify(() => EventManager.RequestSceneChange(GamestateManager.PROTOTYPE3_SCENE));
+		EventManager.Notify(() => EventManager.RequestSceneChange(GamestateManager.BASE_WORLD));
+		EventManager.Notify(() => EventManager.RequestSceneChange(GamestateManager.PROTOTYPE3_SCENE, LoadSceneMode.Additive));
 	}
 
 	private void LaunchArtProto()

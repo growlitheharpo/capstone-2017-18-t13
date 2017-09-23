@@ -331,7 +331,7 @@ namespace Plugins.Editor.JetBrains
         var riderPath = GetExternalScriptEditor();
         if (!RiderPathExist(riderPath))
         {
-          Log(LoggingLevel.Warning, "Rider plugin for Unity is present, but Rider executable was not found. Please update 'External Script Editor'.");
+          //Log(LoggingLevel.Warning, "Rider plugin for Unity is present, but Rider executable was not found. Please update 'External Script Editor'.");
           return null;
         }
 

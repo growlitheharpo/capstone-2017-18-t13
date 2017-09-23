@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 public class GameplayUIManager : MonoSingleton<GameplayUIManager>, IGameplayUIManager
 {
@@ -7,7 +8,10 @@ public class GameplayUIManager : MonoSingleton<GameplayUIManager>, IGameplayUIMa
 	public static readonly int CLIP_TOTAL = "player_clip_total".GetHashCode();
 	public static readonly int PLAYER_HEALTH = "player_health_current".GetHashCode();
 
-	private WeakReference mRef;
+	public static readonly int PLAYER1_SCORE = "player_1_score".GetHashCode();
+	public static readonly int PLAYER2_SCORE = "player_2_score".GetHashCode();
+	public static readonly int ARENA_ROUND_TIME = "arena_current_time".GetHashCode();
+
 	private Dictionary<int, WeakReference> mPropertyMap;
 
 	protected override void Awake()
@@ -19,16 +23,25 @@ public class GameplayUIManager : MonoSingleton<GameplayUIManager>, IGameplayUIMa
 	private void Start()
 	{
 		EventManager.OnBoundPropertyCreated += BoundPropertyCreated;
+		EventManager.OnBoundPropertyDestroyed += BoundPropertyDestroyed;
 	}
 
 	private void OnDestroy()
 	{
 		EventManager.OnBoundPropertyCreated -= BoundPropertyCreated;
+		EventManager.OnBoundPropertyDestroyed -= BoundPropertyDestroyed;
 	}
 
 	private void BoundPropertyCreated(BoundProperty boundProperty, int i)
 	{
 		mPropertyMap[i] = new WeakReference(boundProperty);
+	}
+
+	private void BoundPropertyDestroyed(BoundProperty obj)
+	{
+		var keys = mPropertyMap.Where(x => ReferenceEquals(x.Value.Target, obj)).Select(x => x.Key).ToArray();
+		foreach (int key in keys)
+			mPropertyMap.Remove(key);
 	}
 
 	public BoundProperty<T> GetProperty<T>(int hash)

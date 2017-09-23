@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using KeatsLib.State;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -12,12 +13,14 @@ public partial class GamestateManager
 	{
 		private readonly string mSceneName;
 		private AsyncOperation mLoadingOperation;
+		private LoadSceneMode mMode;
 
 		public override bool safeToTransition { get { return false; } }
 
-		public TransitionToSceneState(string sceneName)
+		public TransitionToSceneState(string sceneName, LoadSceneMode mode = LoadSceneMode.Single)
 		{
 			mSceneName = sceneName;
+			mMode = mode;
 		}
 
 		/// <inheritdoc />
@@ -28,14 +31,20 @@ public partial class GamestateManager
 
 		private IEnumerator LoadScene()
 		{
-			mLoadingOperation = SceneManager.LoadSceneAsync(mSceneName, LoadSceneMode.Single);
+			mLoadingOperation = SceneManager.LoadSceneAsync(mSceneName, mMode);
 
 			while (!mLoadingOperation.isDone)
 				yield return null;
 		}
 
+		public override void OnExit()
+		{
+			var scene = SceneManager.GetSceneByName(mSceneName);
+			SceneManager.SetActiveScene(scene);
+		}
+
 		/// <inheritdoc />
-		public override IGameState GetTransition()
+		public override IState GetTransition()
 		{
 			return mLoadingOperation != null && mLoadingOperation.isDone ? instance.ChooseStateByScene() : null;
 		}

@@ -38,6 +38,11 @@ public class NullServices
 		{
 			Logger.Info("NULL SERVICE: NullGamestateManager.RequestShutdown()", Logger.System.Services);
 		}
+
+		public bool IsFeatureEnabled(GamestateManager.Feature feat)
+		{
+			return false;
+		}
 	}
 
 	private class NullAudioManager : IAudioManager
@@ -86,6 +91,16 @@ public class NullServices
 		public IGameConsole RegisterCommand(string command, Action<string[]> handle)
 		{
 			Logger.Info("NULL SERVICE: IGameConsole.RegisterCommand()", Logger.System.Services);
+			return this;
+		}
+
+		public IGameConsole UnregisterCommand(string command)
+		{
+			return this;
+		}
+
+		public IGameConsole UnregisterCommand(Action<string[]> handle)
+		{
 			return this;
 		}
 

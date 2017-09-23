@@ -11,6 +11,7 @@ public class BoundIntField : MonoBehaviour
 	private BoundProperty<int> mProperty;
 	private UIText mTextElement;
 	private int mPropertyHash;
+	private bool mSearching;
 
 	private void Awake()
 	{
@@ -27,6 +28,10 @@ public class BoundIntField : MonoBehaviour
 
 	private IEnumerator CheckForProperty()
 	{
+		mSearching = true;
+
+		yield return new WaitForEndOfFrame();
+		yield return new WaitForEndOfFrame();
 		while (mProperty == null)
 		{
 			mProperty = mUIManagerRef.GetProperty<int>(mPropertyHash);
@@ -36,10 +41,25 @@ public class BoundIntField : MonoBehaviour
 		AttachProperty();
 	}
 
+	private void Update()
+	{
+		if (mProperty == null && !mSearching)
+			StartCoroutine(CheckForProperty());
+	}
+
 	private void AttachProperty()
 	{
 		mProperty.ValueChanged += HandlePropertyChanged;
+		mProperty.BeingDestroyed += CleanupProperty;
 		HandlePropertyChanged();
+		mSearching = false;
+	}
+
+	private void CleanupProperty()
+	{
+		mProperty.ValueChanged -= HandlePropertyChanged;
+		mProperty.BeingDestroyed -= CleanupProperty;
+		mProperty = null;
 	}
 
 	private void HandlePropertyChanged()

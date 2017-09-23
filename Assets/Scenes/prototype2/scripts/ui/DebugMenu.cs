@@ -74,7 +74,7 @@ namespace FiringSquad.Debug
 					label += "\n\n" + part.description;
 
 				if (GUILayout.Button(label, GUILayout.MaxHeight(100.0f)))
-					Instantiate(part.gameObject).GetComponent<WeaponPickupScript>().ConfirmAttach();
+					Instantiate(part.gameObject).GetComponent<WeaponPickupScript>().Interact();
 			}
 			GUILayout.EndArea();
 		}

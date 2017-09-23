@@ -17,11 +17,26 @@ namespace FiringSquad.Gameplay
 
 		public void Interact()
 		{
-			// TODO: Open a menu and give player the choice over whether or not to attach
-			ConfirmAttach();
+			Interact(null);
 		}
 
-		public void ConfirmAttach()
+		public void Interact(ICharacter source)
+		{
+			IWeaponBearer bearer = source as IWeaponBearer;
+
+			if (bearer != null)
+				ConfirmAttach(bearer.weapon);
+			else
+				ConfirmAttach();
+		}
+
+		public WeaponPickupScript OverrideDurability(int value)
+		{
+			mPart.durability = value;
+			return this;
+		}
+
+		private void ConfirmAttach()
 		{
 			EventManager.Notify(() => EventManager.ConfirmPartAttach(mPart));
 			Destroy(mPickupCollider.gameObject);

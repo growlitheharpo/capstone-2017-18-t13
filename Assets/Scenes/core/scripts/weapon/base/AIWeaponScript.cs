@@ -50,5 +50,13 @@ namespace FiringSquad.Gameplay
 			mAnimator.speed = 1.0f;
 			OnReloadComplete();
 		}
+
+		/// <summary>
+		/// Set the override eye to a particular transform.
+		/// </summary>
+		public void SetAimRoot(Transform eye)
+		{
+			mAimRoot = eye;
+		}
 	}
 }

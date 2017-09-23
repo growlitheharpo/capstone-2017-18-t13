@@ -124,21 +124,11 @@ namespace KeatsLib.Collections
 		/// <returns>A random item from the provided IEnumerable.</returns>
 		public static T ChooseRandom<T>(this IEnumerable<T> collection)
 		{
-			var iList = collection as IList<T>;
-			if (iList != null)
-			{
-				if (iList.Count == 0)
-					throw new ArgumentException("Trying to choose random item from an empty list!");
-
-				return iList[Random.Range(0, iList.Count)];
-			}
-
-			var arrayList = collection.ToArray();
-			if (arrayList.Length == 0)
+			var iList = collection as IList<T> ?? collection.ToArray();
+			if (iList.Count == 0)
 				throw new ArgumentException("Trying to choose random item from an empty list!");
 
-			int index = Random.Range(0, arrayList.Length);
-			return arrayList.ElementAt(index);
+			return iList[Random.Range(0, iList.Count)];
 		}
 
 		/// <summary>
@@ -198,6 +188,11 @@ namespace KeatsLib.Collections
 			T tmp = list[i];
 			list[i] = list[j];
 			list[j] = tmp;
+		}
+
+		public static T1 GetHighestValueKey<T1, T2>(this IDictionary<T1, T2> list) where T2 : IComparable
+		{
+			return list.Aggregate((l, r) => l.Value.CompareTo(r.Value) >= 0 ? l : r).Key;
 		}
 	}
 }

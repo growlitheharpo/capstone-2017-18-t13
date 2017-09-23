@@ -1,4 +1,5 @@
-﻿using KeatsLib;
+﻿using FiringSquad.Data;
+using KeatsLib;
 using KeatsLib.Unity;
 using UnityEngine;
 using Input = UnityEngine.Input;
@@ -22,32 +23,38 @@ namespace FiringSquad.Gameplay
 		private Vector3 mCumulativeMovement;
 		private Vector2 mRotationAmount;
 		private float mRecoilAmount;
+		private float mRotationY;
 		private bool mJump, mCrouching;
 
-		private const float STANDING_HEIGHT = 3.0f;
-		private const float STANDING_RADIUS = 0.75f;
+		private float mStandingHeight;
+		private float mStandingRadius;
+
 		private const float DOWNFORCE_MULT = 2.5f;
 
 		private void Awake()
 		{
 			mCollider = GetComponent<CapsuleCollider>();
 			mRigidbody = GetComponent<Rigidbody>();
-			mMainCameraRef = Camera.main.transform;
+			mMainCameraRef = GetComponentInChildren<Camera>().transform;
+
+			mStandingHeight = mCollider.height;
+			mStandingRadius = mCollider.radius;
+
 			mRecoilAmount = 0.0f;
 		}
 
 		private void Start()
 		{
+			PlayerInputMap input = GetComponent<PlayerScript>().inputMap;
+
 			ServiceLocator.Get<IInput>()
-				.RegisterAxis(Input.GetAxis, "Horizontal", INPUT_LeftRightMovement, KeatsLib.Unity.Input.InputLevel.Gameplay)
-				.RegisterAxis(Input.GetAxis, "Vertical", INPUT_ForwardBackMovement, KeatsLib.Unity.Input.InputLevel.Gameplay)
-				.RegisterAxis(Input.GetAxis, "Mouse X", INPUT_LookHorizontal, KeatsLib.Unity.Input.InputLevel.Gameplay)
-				.RegisterAxis(Input.GetAxis, "Mouse Y", INPUT_LookVertical, KeatsLib.Unity.Input.InputLevel.Gameplay)
-				.RegisterAxis(Input.GetAxis, "J1_RightStickH", INPUT_LookHorizontal, KeatsLib.Unity.Input.InputLevel.Gameplay)
-				.RegisterAxis(Input.GetAxis, "J1_RightStickV", INPUT_LookVertical, KeatsLib.Unity.Input.InputLevel.Gameplay)
-				.RegisterInput(Input.GetButtonDown, "Jump", INPUT_Jump, KeatsLib.Unity.Input.InputLevel.Gameplay)
-				.RegisterInput(Input.GetButtonDown, "Crouch", INPUT_CrouchStart, KeatsLib.Unity.Input.InputLevel.Gameplay)
-				.RegisterInput(Input.GetButtonUp, "Crouch", INPUT_CrouchStop, KeatsLib.Unity.Input.InputLevel.Gameplay)
+				.RegisterAxis(Input.GetAxis, input.moveSidewaysAxis, INPUT_LeftRightMovement, KeatsLib.Unity.Input.InputLevel.Gameplay)
+				.RegisterAxis(Input.GetAxis, input.moveBackFrontAxis, INPUT_ForwardBackMovement, KeatsLib.Unity.Input.InputLevel.Gameplay)
+				.RegisterAxis(Input.GetAxis, input.lookLeftRightAxis, INPUT_LookHorizontal, KeatsLib.Unity.Input.InputLevel.Gameplay)
+				.RegisterAxis(Input.GetAxis, input.lookUpDownAxis, INPUT_LookVertical, KeatsLib.Unity.Input.InputLevel.Gameplay)
+				.RegisterInput(Input.GetButtonDown, input.jumpButton, INPUT_Jump, KeatsLib.Unity.Input.InputLevel.Gameplay)
+				.RegisterInput(Input.GetButtonDown, input.crouchButton, INPUT_CrouchStart, KeatsLib.Unity.Input.InputLevel.Gameplay)
+				.RegisterInput(Input.GetButtonUp, input.crouchButton, INPUT_CrouchStop, KeatsLib.Unity.Input.InputLevel.Gameplay)
 				.EnableInputLevel(KeatsLib.Unity.Input.InputLevel.Gameplay);
 		}
 
@@ -88,7 +95,7 @@ namespace FiringSquad.Gameplay
 		private void INPUT_Jump()
 		{
 			Ray r = new Ray(transform.position + Vector3.up * 0.5f, Vector3.up * -1.0f);
-			const float dist = 0.51f;
+			const float dist = .55f;
 
 			UnityEngine.Debug.DrawLine(r.origin, r.origin + r.direction * dist, Color.green, 0.5f);
 
@@ -119,8 +126,6 @@ namespace FiringSquad.Gameplay
 			ApplyMovementForce();
 		}
 
-		private float mRotationY;
-
 		/// <summary>
 		/// Follow the mouse or joystick rotation.
 		/// Horizontal rotation is applied to this.transform.
@@ -131,7 +136,7 @@ namespace FiringSquad.Gameplay
 			Vector2 rotation = mRotationAmount * mMovementData.lookSpeed;
 			transform.RotateAround(transform.position, transform.up, rotation.x);
 
-			mRotationY += rotation.y + mRecoilAmount;
+			mRotationY += rotation.y + (mRecoilAmount * Time.deltaTime);
 
 			mRotationY = GenericExt.ClampAngle(mRotationY, -85.0f, 85.0f);
 			mMainCameraRef.localRotation = Quaternion.AngleAxis(mRotationY, Vector3.left);
@@ -146,9 +151,9 @@ namespace FiringSquad.Gameplay
 		private void UpdateCrouch()
 		{
 			float current = mCollider.height;
-			mCollider.height = Mathf.Lerp(current, mCrouching ? STANDING_HEIGHT * mMovementData.crouchHeight : STANDING_HEIGHT, Time.deltaTime * mMovementData.crouchSpeed);
+			mCollider.height = Mathf.Lerp(current, mCrouching ? mStandingHeight * mMovementData.crouchHeight : mStandingHeight, Time.deltaTime * mMovementData.crouchSpeed);
 			current = mCollider.radius;
-			mCollider.radius = Mathf.Lerp(current, mCrouching ? STANDING_RADIUS * mMovementData.crouchHeight : STANDING_RADIUS, Time.deltaTime * mMovementData.crouchSpeed);
+			mCollider.radius = Mathf.Lerp(current, mCrouching ? mStandingRadius * mMovementData.crouchHeight : mStandingRadius, Time.deltaTime * mMovementData.crouchSpeed);
 		}
 
 		/// <summary>
@@ -172,7 +177,7 @@ namespace FiringSquad.Gameplay
 
 		public void AddRecoil(Vector3 direction, float amount)
 		{
-			mRecoilAmount = amount;
+			mRecoilAmount = amount * 60.0f;
 		}
 	}
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using UnityEngine.SceneManagement;
 
 #if !DEBUG && !DEVELOPMENT_BUILD
 using UnityEngine;
@@ -32,11 +33,11 @@ public partial class EventManager
 		OnInitialAudioLoadComplete();
 	}
 
-	public static event Action<string> OnRequestSceneChange = e => { LogEvent(); };
+	public static event Action<string, LoadSceneMode> OnRequestSceneChange = (e, m) => { LogEvent(); };
 
-	public static void RequestSceneChange(string sceneName)
+	public static void RequestSceneChange(string sceneName, LoadSceneMode mode = LoadSceneMode.Single)
 	{
-		OnRequestSceneChange(sceneName);
+		OnRequestSceneChange(sceneName, mode);
 	}
 
 	// PROTOTYPE 2
@@ -61,11 +62,18 @@ public partial class EventManager
 		OnBoundPropertyCreated(property, propertyCode);
 	}
 
-	public static event Action OnPlayerDied = () => { LogEvent(); };
+	public static event Action<BoundProperty> OnBoundPropertyDestroyed = (p) => { LogEvent(); };
 
-	public static void PlayerDied()
+	public static void BoundPropertyDestroyed(BoundProperty boundProperty)
 	{
-		OnPlayerDied();
+		OnBoundPropertyDestroyed(boundProperty);
+	}
+
+	public static event Action<ICharacter> OnPlayerDied = p => { LogEvent(); };
+
+	public static void PlayerDied(ICharacter player)
+	{
+		OnPlayerDied(player);
 	}
 
 	public static event Action OnResetLevel = () => { LogEvent(); };
@@ -80,6 +88,13 @@ public partial class EventManager
 	public static void PlayerKilledEnemy(ICharacter enemy)
 	{
 		OnPlayerKilledEnemy(enemy);
+	}
+
+	public static event Action<string> OnShowGameoverPanel = e => { LogEvent(); };
+
+	public static void ShowGameoverPanel(string resultText)
+	{
+		OnShowGameoverPanel(resultText);
 	}
 
 	//!PROTOTYPE 2
@@ -118,4 +133,5 @@ public partial class EventManager
 		Debug.LogError("Firing events is not supported in a non-development build.");
 #endif
 	}
+
 }

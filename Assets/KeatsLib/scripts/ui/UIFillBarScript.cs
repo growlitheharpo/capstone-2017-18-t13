@@ -33,10 +33,17 @@ public class UIFillBarScript : MonoBehaviour
 	/// <param name="amount">The new amount.</param>
 	public void SetFillAmount(float amount)
 	{
-		mFillBar.fillAmount = amount;
-
 		StopAllCoroutines();
-		StartCoroutine(DrainRoutine(amount));
+		if (mFillBar.fillAmount > amount)
+		{
+			mFillBar.fillAmount = amount;
+			StartCoroutine(DrainRoutine(amount));
+		}
+		else
+		{
+			mDelayBar.fillAmount = amount;
+			StartCoroutine(FillRoutine(amount));
+		}
 	}
 
 	private IEnumerator DrainRoutine(float newAmount)
@@ -53,5 +60,21 @@ public class UIFillBarScript : MonoBehaviour
 		}
 
 		mDelayBar.fillAmount = newAmount;
+	}
+
+	private IEnumerator FillRoutine(float newAmount)
+	{
+		float startAmount = mFillBar.fillAmount;
+		float currentTime = 0.0f;
+
+		while (currentTime < mDelayTime)
+		{
+			mFillBar.fillAmount = Mathf.Lerp(startAmount, newAmount, Mathf.Sqrt(currentTime / mDelayTime));
+
+			currentTime += Time.deltaTime;
+			yield return null;
+		}
+
+		mFillBar.fillAmount = newAmount;
 	}
 }

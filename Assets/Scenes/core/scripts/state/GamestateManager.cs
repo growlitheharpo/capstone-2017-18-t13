@@ -1,40 +1,22 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using KeatsLib.State;
 using UnityEngine.SceneManagement;
 
 /// <inheritdoc cref="IGamestateManager"/>
 public partial class GamestateManager : MonoSingleton<GamestateManager>, IGamestateManager
 {
-	/// <summary>
-	/// Interface used for a state.
-	/// </summary>
-	private interface IGameState
+	/// <inheritdoc />
+	private interface IGameState : IState
 	{
-		/// <summary>
-		/// Called when state is first entered.
-		/// </summary>
-		void OnEnter();
-
-		/// <summary>
-		/// Called every frame that state is active.
-		/// </summary>
-		void Update();
-
 		/// <summary>
 		/// Whether this state believes a transition is safe at this time.
 		/// </summary>
 		bool safeToTransition { get; }
-
-		/// <summary>
-		/// The state this state wants to transition to. Returns null if we should stay as we are.
-		/// </summary>
-		IGameState GetTransition();
-
-		/// <summary>
-		/// Called when state is exited.
-		/// </summary>
-		void OnExit();
 	}
 
+	/// <inheritdoc />
 	/// <summary>
 	/// Interior class used for game states.
 	/// </summary>
@@ -48,24 +30,42 @@ public partial class GamestateManager : MonoSingleton<GamestateManager>, IGamest
 
 		/// <inheritdoc />
 		public virtual bool safeToTransition { get { return true;  }}
-
-		/// <inheritdoc />
-		public virtual IGameState GetTransition()
+		
+		public virtual IState GetTransition()
 		{
-			return null;
+			return this;
 		}
 
 		/// <inheritdoc />
 		public virtual void OnExit() { }
 	}
 
+	private class NullState : BaseGameState
+	{
+		public override IState GetTransition()
+		{
+			return instance.ChooseStateByScene();
+		}
+	}
+
 	public const string MAIN_SCENE = "main";
 	public const string MENU_SCENE = "menu";
 	public const string GAME_SCENE = "scene1";
+	public const string BASE_WORLD = "base_world";
 	public const string PROTOTYPE1_SCENE = "prototype1";
+	public const string PROTOTYPE1_SETUP_SCENE = "prototype1_intro";
 	public const string PROTOTYPE2_SCENE = "prototype2";
 	public const string PROTOTYPE3_SCENE = "prototype3";
 	public const string ART_PROTOTYPE_SCENE = "artproto";
+	public const string DESIGN_TEST_SCENE = "p1&p2_testLevel";
+
+	public enum Feature
+	{
+		WeaponDrops,
+		WeaponDurability,
+	}
+
+	private bool mOverrideEnableDrops, mOverrideEnableDurability;
 
 	private Dictionary<string, IGameState> mBaseStates;
 	private IGameState mCurrentState;
@@ -88,10 +88,13 @@ public partial class GamestateManager : MonoSingleton<GamestateManager>, IGamest
 			{ MAIN_SCENE, new TransitionToSceneState(MENU_SCENE) },
 			{ MENU_SCENE, new MenuSceneState() },
 			{ GAME_SCENE, new GameSceneState() },
-			{ PROTOTYPE1_SCENE, new Prototype1State() },
-			{ PROTOTYPE2_SCENE, new Prototype2State() },
-			{ PROTOTYPE3_SCENE, new GameSceneState() },
-			{ ART_PROTOTYPE_SCENE, new GameSceneState() },
+			{ PROTOTYPE1_SETUP_SCENE, new MenuSceneState() },
+			{ PROTOTYPE1_SCENE,			new GameSceneState() },
+			{ PROTOTYPE2_SCENE,			new GameSceneState() },
+			{ PROTOTYPE3_SCENE,			new GameSceneState() },
+			{ DESIGN_TEST_SCENE,		new GameSceneState() },
+			{ ART_PROTOTYPE_SCENE,	new MenuSceneState() },
+			{ BASE_WORLD, new NullState() },
 		};
 
 		EventManager.OnRequestSceneChange += ReceiveSceneChangeRequest;
@@ -109,7 +112,8 @@ public partial class GamestateManager : MonoSingleton<GamestateManager>, IGamest
 		mCurrentState.OnEnter();
 
 		ServiceLocator.Get<IGameConsole>()
-			.RegisterCommand("close", s => EventManager.Notify(() => EventManager.RequestSceneChange(MENU_SCENE)));
+			.RegisterCommand("close", s => EventManager.Notify(() => EventManager.RequestSceneChange(MENU_SCENE)))
+			.RegisterCommand("feature", HandleFeatureForceCommand);
 	}
 
 	private void Update()
@@ -126,14 +130,14 @@ public partial class GamestateManager : MonoSingleton<GamestateManager>, IGamest
 		}
 
 		mCurrentState.Update();
-		IGameState newState = mCurrentState.GetTransition();
+		IState newState = mCurrentState.GetTransition();
 
-		if (newState == null)
+		if (newState == mCurrentState || newState == null)
 			return;
 
 		mCurrentState.OnExit();
 		Logger.Info("Setting current state to " + newState + " because of a regular transition.", Logger.System.State);
-		mCurrentState = newState;
+		mCurrentState = (IGameState)newState;
 		mCurrentState.OnEnter();
 	}
 
@@ -145,14 +149,54 @@ public partial class GamestateManager : MonoSingleton<GamestateManager>, IGamest
 		return mBaseStates.TryGetValue(currentScene, out result) ? result : null;
 	}
 
-	private void ReceiveSceneChangeRequest(string sceneName)
+	private void ReceiveSceneChangeRequest(string sceneName, LoadSceneMode mode)
 	{
-		if (!mCurrentState.safeToTransition)
-			return;
+		StartCoroutine(AttemptSceneChange(sceneName, mode));
+	}
+
+	private IEnumerator AttemptSceneChange(string sceneName, LoadSceneMode mode)
+	{
+		while (!mCurrentState.safeToTransition)
+			yield return null;
 
 		mCurrentState.OnExit();
-		mCurrentState = new TransitionToSceneState(sceneName);
+		mCurrentState = new TransitionToSceneState(sceneName, mode);
 		Logger.Info("Setting current state to TransitionToSceneState because of an event.", Logger.System.State);
 		mCurrentState.OnEnter();
+	}
+
+	private void HandleFeatureForceCommand(string[] obj)
+	{
+		if (obj.Length != 2)
+			throw new ArgumentException("Invalid arguments for command \"feature\".");
+
+		string feat = obj[0].ToLower();
+		int val = int.Parse(obj[1]);
+
+		switch (feat) {
+			case "drops":
+				mOverrideEnableDrops = val == 1;
+				break;
+			case "durability":
+				mOverrideEnableDurability = val == 1;
+				break;
+			default:
+				throw new ArgumentException(obj[0] + " is not a valid feature.");
+		}
+	}
+
+	public bool IsFeatureEnabled(Feature feat)
+	{
+		bool isStateGamestate = mCurrentState.GetType() == typeof(GameSceneState);
+
+		switch (feat)
+		{
+			case Feature.WeaponDrops:
+				return mOverrideEnableDrops || (isStateGamestate && ((GameSceneState)mCurrentState).IsFeatureEnabled(feat));
+			case Feature.WeaponDurability:
+				return mOverrideEnableDurability || (isStateGamestate && ((GameSceneState)mCurrentState).IsFeatureEnabled(feat));
+			default:
+				throw new ArgumentOutOfRangeException("feat", feat, null);
+		}
 	}
 }

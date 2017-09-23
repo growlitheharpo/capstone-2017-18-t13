@@ -1,20 +1,34 @@
-﻿using FiringSquad.Data;
+﻿using System;
+using FiringSquad.Data;
 using KeatsLib;
 using UnityEngine;
+using InputLevel = KeatsLib.Unity.Input.InputLevel;
 
 namespace FiringSquad.Gameplay
 {
 	public class PlayerScript : MonoBehaviour, IWeaponBearer, IDamageReceiver
 	{
+		[SerializeField] private PlayerInputMap mInputMap;
 		[SerializeField] private PlayerDefaultsData mData;
+
+		[SerializeField] private string mOverrideUIName;
+		public string overrideUIName { get { return mOverrideUIName; } }
+
 		private Vector3 mDefaultPosition;
 
 		private PlayerGravGunWeapon mGravityGun;
 		private PlayerMovementScript mMovement;
 		private BoundProperty<float> mHealth;
 		private PlayerWeaponScript mWeapon;
-
+		private bool mGodmode;
 		private Transform mMainCameraRef;
+
+		Transform ICharacter.eye { get { return mMainCameraRef; } }
+		public IWeapon weapon { get { return mWeapon; } }
+		public WeaponDefaultsData defaultParts { get { return mDefaultsOverride ?? mData.defaultWeaponParts; } }
+		public PlayerInputMap inputMap { get { return mInputMap; } }
+
+		private WeaponDefaultsData mDefaultsOverride;
 		private const string INTERACTABLE_TAG = "interactable";
 
 		private void Awake()
@@ -43,17 +57,25 @@ namespace FiringSquad.Gameplay
 			if (mGravityGun != null)
 				mGravityGun.bearer = this;
 
-			mMainCameraRef = Camera.main.transform;
-			mHealth = new BoundProperty<float>(mData.defaultHealth, GameplayUIManager.PLAYER_HEALTH);
+			mMainCameraRef = GetComponentInChildren<Camera>().transform;
+
+			// TODO: GET RID OF THIS MESS
+			int val = string.IsNullOrEmpty(mOverrideUIName) ? GameplayUIManager.PLAYER_HEALTH : (mOverrideUIName + "-health").GetHashCode();
+			mHealth = new BoundProperty<float>(mData.defaultHealth, val);
 
 			ServiceLocator.Get<IInput>()
-				.RegisterInput(Input.GetButtonDown, "ToggleMenu", INPUT_ToggleUIElement, KeatsLib.Unity.Input.InputLevel.None)
-				.RegisterInput(Input.GetButton, "Fire1", INPUT_FireWeapon, KeatsLib.Unity.Input.InputLevel.Gameplay)
-				.RegisterInput(Input.GetButtonDown, "Reload", INPUT_ReloadWeapon, KeatsLib.Unity.Input.InputLevel.Gameplay)
-				.RegisterInput(Input.GetButtonDown, "Interact", INPUT_ActivateInteract, KeatsLib.Unity.Input.InputLevel.Gameplay);
+				.RegisterInput(Input.GetButtonDown, inputMap.toggleMenuButton, INPUT_ToggleUIElement, InputLevel.None)
+				.RegisterInput(Input.GetButton, inputMap.fireWeaponButton, INPUT_FireWeapon, InputLevel.Gameplay)
+				.RegisterInput(Input.GetButtonDown, inputMap.reloadButton, INPUT_ReloadWeapon, InputLevel.Gameplay)
+				.RegisterInput(Input.GetButtonDown, inputMap.interactButton, INPUT_ActivateInteract, InputLevel.Gameplay);
+
+			if (mGravityGun != null)
+				mGravityGun.RegisterInput(inputMap);
+
+			ServiceLocator.Get<IGameConsole>()
+				.RegisterCommand("godmode", CONSOLE_ToggleGodmode);
 
 			EventManager.OnResetLevel += ReceiveResetEvent;
-
 			InitializeValues();
 		}
 
@@ -65,34 +87,36 @@ namespace FiringSquad.Gameplay
 				.UnregisterInput(INPUT_ReloadWeapon)
 				.UnregisterInput(INPUT_FireWeapon);
 
+			ServiceLocator.Get<IGameConsole>()
+				.UnregisterCommand("godmode");
+
 			EventManager.OnResetLevel -= ReceiveResetEvent;
 			mHealth.Cleanup();
 		}
 
-		private void InitializeValues()
+		private void InitializeValues(bool reposition = false)
 		{
 			if (mData.makeParts)
 			{
-				WeaponDefaultsData defaults = mData.defaultWeaponParts;
+				WeaponDefaultsData defaults = defaultParts;
 
 				foreach (GameObject part in defaults)
-					Instantiate(part).GetComponent<WeaponPickupScript>().ConfirmAttach();
+				{
+					Instantiate(part)
+						.GetComponent<WeaponPickupScript>()
+						.OverrideDurability(WeaponPartScript.INFINITE_DURABILITY)
+						.ConfirmAttach(mWeapon);
+				}
 			}
 
 			mHealth.value = mData.defaultHealth;
-			transform.position = mDefaultPosition;
-			transform.rotation = Quaternion.identity;
 
-			ServiceLocator.Get<IInput>()
-				.EnableInputLevel(KeatsLib.Unity.Input.InputLevel.Gameplay);
+			if (reposition)
+			{
+				transform.position = mDefaultPosition;
+				transform.rotation = Quaternion.identity;
+			}
 		}
-
-		GameObject ICharacter.GetGameObject()
-		{
-			return gameObject;
-		}
-
-		Transform ICharacter.eye { get { return mMainCameraRef; } }
 
 		public void ApplyRecoil(Vector3 direction, float amount)
 		{
@@ -116,20 +140,40 @@ namespace FiringSquad.Gameplay
 
 		private void INPUT_ActivateInteract()
 		{
-			Ray ray = new Ray(mMainCameraRef.position, mMainCameraRef.forward);
-			
-			RaycastHit hit;
-			if (!Physics.Raycast(ray, out hit, mData.interactDistance) || !hit.collider.CompareTag(INTERACTABLE_TAG))
-				return;
+			IInteractable interactable = null;
 
-			IInteractable interactable = hit.transform.GetComponent<IInteractable>() ?? hit.transform.parent.GetComponent<IInteractable>();
+			if (mGravityGun != null)
+				interactable = mGravityGun.heldObject;
+
+			if (interactable == null)
+			{
+				Ray ray = new Ray(mMainCameraRef.position, mMainCameraRef.forward);
+			
+				RaycastHit hit;
+				if (!Physics.Raycast(ray, out hit, mData.interactDistance) || !hit.collider.CompareTag(INTERACTABLE_TAG))
+					return;
+
+				interactable = hit.GetInteractableComponent();
+			}
+
 			if (interactable != null)
-				interactable.Interact();
+				interactable.Interact(this);
+		}
+
+		private void CONSOLE_ToggleGodmode(string[] args)
+		{
+			if (args.Length > 0)
+				throw new ArgumentException("Invalid arguments for command 'godmode'");
+
+			ServiceLocator.Get<IGameConsole>()
+				.AssertCheatsEnabled();
+
+			mGodmode = !mGodmode;
 		}
 
 		public void ApplyDamage(float amount, Vector3 point, IDamageSource cause = null)
 		{
-			if (mHealth.value <= 0.0f)
+			if (mGodmode || mHealth.value <= 0.0f)
 				return;
 
 			if (cause != null && ReferenceEquals(cause.source, this))
@@ -138,10 +182,25 @@ namespace FiringSquad.Gameplay
 			mHealth.value = Mathf.Clamp(mHealth.value - amount, 0.0f, float.MaxValue);
 
 			if (mHealth.value <= 0.0f)
-				EventManager.Notify(EventManager.PlayerDied);
+				EventManager.Notify(() => EventManager.PlayerDied(this));
 		}
 
 		private void ReceiveResetEvent()
+		{
+			InitializeValues(true);
+		}
+
+		public void OverrideDefaultParts(GameObject mechanism, GameObject barrel, GameObject scope, GameObject grip)
+		{
+			mDefaultsOverride = new WeaponDefaultsData(mechanism, barrel, scope, grip);
+			InitializeValues();
+
+		}
+
+		/// <summary>
+		/// Resets the player's health and weapon.
+		/// </summary>
+		public void ResetArenaPlayer()
 		{
 			InitializeValues();
 		}

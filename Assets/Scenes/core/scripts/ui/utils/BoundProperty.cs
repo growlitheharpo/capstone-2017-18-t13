@@ -1,23 +1,48 @@
 ﻿using System;
 
+/// <summary>
+/// A class to bind data between classes, so that the listener (such as a UI element)
+/// can get notifications when the value changes.
+/// </summary>
 public class BoundProperty
 {
 	protected object mValue;
 	public event Action ValueChanged = () => { };
+	public event Action BeingDestroyed = () => { };
+
+	~BoundProperty()
+	{
+		Cleanup();
+	}
 
 	protected void OnValueChanged()
 	{
 		ValueChanged();
 	}
 
+	protected void OnDestroy()
+	{
+		BeingDestroyed();
+	}
+
+	/// <summary>
+	/// This is just to be nice. A listener will not keep a publisher alive.
+	/// </summary>
+	/// <see cref="https://stackoverflow.com/a/298276"/>
 	public void Cleanup()
 	{
+		OnDestroy();
+
 		var delegates = ValueChanged.GetInvocationList();
 		foreach (Delegate d in delegates)
 			ValueChanged -= (Action)d;
+
+		EventManager.BoundPropertyDestroyed(this);
 	}
 }
 
+/// <inheritdoc />
+/// <typeparam name="T">The type of object to store.</typeparam>
 public class BoundProperty<T> : BoundProperty
 {
 	public T value
@@ -32,6 +57,11 @@ public class BoundProperty<T> : BoundProperty
 			mValue = value;
 			OnValueChanged();
 		}
+	}
+
+	~BoundProperty()
+	{
+		Cleanup();
 	}
 
 	public BoundProperty()

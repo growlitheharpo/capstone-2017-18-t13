@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using FiringSquad.Data;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -31,11 +30,11 @@ namespace FiringSquad.Gameplay
 
 		private Dictionary<Attachment, Transform> mAttachPoints;
 		private Dictionary<Attachment, WeaponPartScript> mCurrentAttachments;
-		private WeaponData mCurrentData;
 		private bool mOverrideHitscanEye;
 
 		private GameObjectPool mProjectilePool;
 
+		protected WeaponData mCurrentData;
 		protected Transform mAimRoot;
 		protected BoundProperty<int> mClipSize;
 		protected BoundProperty<int> mAmountInClip;
@@ -77,6 +76,9 @@ namespace FiringSquad.Gameplay
 
 			if (part.attachPoint == Attachment.Mechanism || mCurrentData.clipSize != clipSize)
 			{
+				if (!mCurrentAttachments.ContainsKey(Attachment.Mechanism))
+					return;
+
 				WeaponPartScriptMechanism mech = (WeaponPartScriptMechanism)mCurrentAttachments[Attachment.Mechanism];
 				CreateNewProjectilePool(mech);
 				mOverrideHitscanEye = mech.overrideHitscanMethod;
@@ -166,6 +168,8 @@ namespace FiringSquad.Gameplay
 				return;
 			}
 
+			OnPreFireShot();
+
 			mShotTime = 1.0f / mCurrentData.fireRate;
 			mAmountInClip.value--;
 
@@ -175,8 +179,22 @@ namespace FiringSquad.Gameplay
 			GameObject projectile = mProjectilePool.ReleaseNewItem();
 			projectile.GetComponent<IProjectile>().Instantiate(this, shot, mCurrentData, mProjectilePool);
 
+			OnPostFireShot();
+
 			bearer.ApplyRecoil(Vector3.up, mCurrentData.recoil * Random.Range(0.75f, 1.25f));
 		}
+		
+		/// <summary>
+		/// Mini-event fired to subclasses when it's been confirmed we are going to shoot but haven't
+		/// created the IProjectile yet.
+		/// </summary>
+		protected virtual void OnPreFireShot() { }
+
+		/// <summary>
+		/// Mini-event fired to subclasses after we've created an IProjectile and have
+		/// fired the weapon.
+		/// </summary>
+		protected virtual void OnPostFireShot() { }
 
 		/// <summary>
 		/// To be implemented in child class. Play SFX, VFX, etc. for shot fired.
