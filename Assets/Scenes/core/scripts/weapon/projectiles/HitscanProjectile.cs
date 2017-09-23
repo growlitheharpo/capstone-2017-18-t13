@@ -78,6 +78,7 @@ namespace FiringSquad.Gameplay
 		private IEnumerator PlayEffectAndKillSelf(GameObjectPool pool, Vector3 hitPoint)
 		{
 			yield return mEffect.Flash(hitPoint);
+			yield return new WaitForAudio(mAudio);
 			KillSelf(pool);
 		}
 

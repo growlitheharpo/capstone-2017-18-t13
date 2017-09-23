@@ -18,6 +18,7 @@ public class AudioManager : MonoSingleton<AudioManager>, IAudioManager
 		PrimaryEffect1 = 1,
 		PrimaryEffect2 = 2,
 		PrimaryEffect3 = 3,
+		DeathSound = 10,
 	}
 
 	/// <summary>
@@ -65,6 +66,11 @@ public class AudioManager : MonoSingleton<AudioManager>, IAudioManager
 		{
 			for (int i = 0; i < mClipData.Count; i++)
 				mSources[i].pitch = pitch;
+		}
+
+		public bool isPlaying
+		{
+			get { return mSources.Any(x => x.loop || !(x.time >= x.clip.length - Time.deltaTime)); }
 		}
 	}
 
