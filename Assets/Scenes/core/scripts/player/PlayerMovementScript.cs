@@ -26,8 +26,9 @@ namespace FiringSquad.Gameplay
 		private float mRotationY;
 		private bool mJump, mCrouching;
 
-		private const float STANDING_HEIGHT = 3.0f;
-		private const float STANDING_RADIUS = 0.75f;
+		private float mStandingHeight;
+		private float mStandingRadius;
+
 		private const float DOWNFORCE_MULT = 2.5f;
 
 		private void Awake()
@@ -35,6 +36,10 @@ namespace FiringSquad.Gameplay
 			mCollider = GetComponent<CapsuleCollider>();
 			mRigidbody = GetComponent<Rigidbody>();
 			mMainCameraRef = GetComponentInChildren<Camera>().transform;
+
+			mStandingHeight = mCollider.height;
+			mStandingRadius = mCollider.radius;
+
 			mRecoilAmount = 0.0f;
 		}
 
@@ -90,7 +95,7 @@ namespace FiringSquad.Gameplay
 		private void INPUT_Jump()
 		{
 			Ray r = new Ray(transform.position + Vector3.up * 0.5f, Vector3.up * -1.0f);
-			const float dist = 0.51f;
+			const float dist = .55f;
 
 			UnityEngine.Debug.DrawLine(r.origin, r.origin + r.direction * dist, Color.green, 0.5f);
 
@@ -146,9 +151,9 @@ namespace FiringSquad.Gameplay
 		private void UpdateCrouch()
 		{
 			float current = mCollider.height;
-			mCollider.height = Mathf.Lerp(current, mCrouching ? STANDING_HEIGHT * mMovementData.crouchHeight : STANDING_HEIGHT, Time.deltaTime * mMovementData.crouchSpeed);
+			mCollider.height = Mathf.Lerp(current, mCrouching ? mStandingHeight * mMovementData.crouchHeight : mStandingHeight, Time.deltaTime * mMovementData.crouchSpeed);
 			current = mCollider.radius;
-			mCollider.radius = Mathf.Lerp(current, mCrouching ? STANDING_RADIUS * mMovementData.crouchHeight : STANDING_RADIUS, Time.deltaTime * mMovementData.crouchSpeed);
+			mCollider.radius = Mathf.Lerp(current, mCrouching ? mStandingRadius * mMovementData.crouchHeight : mStandingRadius, Time.deltaTime * mMovementData.crouchSpeed);
 		}
 
 		/// <summary>
