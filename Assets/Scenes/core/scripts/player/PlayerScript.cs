@@ -10,6 +10,10 @@ namespace FiringSquad.Gameplay
 	{
 		[SerializeField] private PlayerInputMap mInputMap;
 		[SerializeField] private PlayerDefaultsData mData;
+
+		[SerializeField] private string mOverrideUIName;
+		public string overrideUIName { get { return mOverrideUIName; } }
+
 		private Vector3 mDefaultPosition;
 
 		private PlayerGravGunWeapon mGravityGun;
@@ -54,7 +58,10 @@ namespace FiringSquad.Gameplay
 				mGravityGun.bearer = this;
 
 			mMainCameraRef = GetComponentInChildren<Camera>().transform;
-			mHealth = new BoundProperty<float>(mData.defaultHealth, GameplayUIManager.PLAYER_HEALTH);
+
+			// TODO: GET RID OF THIS MESS
+			int val = string.IsNullOrEmpty(mOverrideUIName) ? GameplayUIManager.PLAYER_HEALTH : (mOverrideUIName + "-health").GetHashCode();
+			mHealth = new BoundProperty<float>(mData.defaultHealth, val);
 
 			ServiceLocator.Get<IInput>()
 				.RegisterInput(Input.GetButtonDown, inputMap.toggleMenuButton, INPUT_ToggleUIElement, InputLevel.None)

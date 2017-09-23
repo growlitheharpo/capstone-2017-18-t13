@@ -24,12 +24,17 @@ namespace FiringSquad.Gameplay
 			base.Awake();
 			mAnimator = GetComponent<Animator>();
 
-			mClipSize = new BoundProperty<int>(0, GameplayUIManager.CLIP_TOTAL);
-			mAmountInClip = new BoundProperty<int>(0, GameplayUIManager.CLIP_CURRENT);
 		}
 
 		private void Start()
 		{
+			// TODO: GET RID OF THIS MESS
+			var overrideName = (bearer as PlayerScript).overrideUIName;
+			int val1 = string.IsNullOrEmpty(overrideName) ? GameplayUIManager.CLIP_TOTAL : (overrideName + "-cliptotal").GetHashCode();
+			int val2 = string.IsNullOrEmpty(overrideName) ? GameplayUIManager.CLIP_CURRENT : (overrideName + "-clipcurrent").GetHashCode();
+			mClipSize = new BoundProperty<int>(0, val1);
+			mAmountInClip = new BoundProperty<int>(0, val2);
+
 			mAimRoot = bearer.eye;
 			mPlayerEyeOffset = mAimRoot.InverseTransformPoint(transform.position);
 			EventManager.OnConfirmPartAttach += AttachNewPart;
