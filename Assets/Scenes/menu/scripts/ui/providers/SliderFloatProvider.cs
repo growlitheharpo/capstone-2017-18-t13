@@ -20,4 +20,9 @@ public class SliderFloatProvider : BaseFloatProvider
 	{
 		mSlider.value = val;
 	}
+	
+	public new void ValueChanged()
+	{
+		base.ValueChanged();
+	}
 }
