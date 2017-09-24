@@ -70,7 +70,7 @@ namespace KeatsLib.Persistence
 		private void DoInitialLoad()
 		{
 			//Check if filepath is ""!!
-			using (FileStream fileStream = File.OpenRead(Application.persistentDataPath + mFilepath)) { }
+			// using (FileStream fileStream = File.OpenRead(Application.persistentDataPath + mFilepath)) { }
 			//load the file from mFilepath
 		}
 	}
