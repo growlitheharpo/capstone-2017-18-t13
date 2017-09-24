@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 /// <summary>
 /// A UI helper class for providing a float value to a UI manager.
@@ -14,4 +15,14 @@ public abstract class BaseFloatProvider : MonoBehaviour
 	/// Set what the value represented in the UI should be.
 	/// </summary>
 	public abstract void SetValue(float val);
+
+	/// <summary>
+	/// Called when the value changes.
+	/// </summary>
+	public event Action<float> OnValueChange = f => { };
+
+	protected void ValueChanged()
+	{
+		OnValueChange(GetValue());
+	}
 }

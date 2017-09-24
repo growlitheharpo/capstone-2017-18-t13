@@ -22,6 +22,7 @@ namespace FiringSquad.Gameplay
 		private Vector2 mInput;
 		private Vector3 mMoveDirection;
 		private Vector2 mRotationAmount;
+		private float mMouseSensitivity;
 		private float mRecoilAmount;
 		private float mRotationY;
 		private bool mJump, mIsJumping, mIsRunning, mPreviouslyGrounded, mCrouching;
@@ -36,6 +37,7 @@ namespace FiringSquad.Gameplay
 			mController = GetComponent<CharacterController>();
 			mMainCameraRef = GetComponentInChildren<Camera>().transform;
 
+			mMouseSensitivity = 1.0f;
 			mStandingHeight = mCollider.height;
 			mStandingRadius = mCollider.radius;
 
@@ -57,7 +59,8 @@ namespace FiringSquad.Gameplay
 				.RegisterInput(Input.GetButtonDown, input.sprintButton, INPUT_SprintStart, KeatsLib.Unity.Input.InputLevel.Gameplay)
 				.RegisterInput(Input.GetButtonUp, input.sprintButton, INPUT_SprintStop, KeatsLib.Unity.Input.InputLevel.Gameplay)
 				.EnableInputLevel(KeatsLib.Unity.Input.InputLevel.Gameplay);
-			
+
+			EventManager.OnApplyOptionsData += ApplyOptionsData;
 			mInputBindings = input;
 		}
 
@@ -71,6 +74,8 @@ namespace FiringSquad.Gameplay
 				.UnregisterAxis(INPUT_LeftRightMovement)
 				.UnregisterAxis(INPUT_LookHorizontal)
 				.UnregisterAxis(INPUT_LookVertical);
+
+			EventManager.OnApplyOptionsData -= ApplyOptionsData;
 		}
 
 		#region Input Delegates
@@ -153,7 +158,7 @@ namespace FiringSquad.Gameplay
 		/// </summary>
 		private void HandleRotation()
 		{
-			Vector2 rotation = mRotationAmount * mMovementData.lookSpeed;
+			Vector2 rotation = mRotationAmount * mMovementData.lookSpeed * mMouseSensitivity;
 			transform.RotateAround(transform.position, transform.up, rotation.x);
 
 			mRotationY += rotation.y + (mRecoilAmount * Time.deltaTime);
@@ -225,6 +230,11 @@ namespace FiringSquad.Gameplay
 		public void AddRecoil(Vector3 direction, float amount)
 		{
 			mRecoilAmount = amount * 60.0f;
+		}
+		
+		private void ApplyOptionsData(IOptionsData settings)
+		{
+			mMouseSensitivity = settings.mouseSensitivity;
 		}
 	}
 }
