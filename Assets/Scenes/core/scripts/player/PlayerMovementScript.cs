@@ -1,6 +1,5 @@
 ﻿using FiringSquad.Data;
 using KeatsLib;
-using KeatsLib.Unity;
 using UnityEngine;
 using Input = UnityEngine.Input;
 
@@ -14,29 +13,31 @@ namespace FiringSquad.Gameplay
 	public class PlayerMovementScript : MonoBehaviour
 	{
 		[SerializeField] private CharacterMovementData mMovementData;
-		[SerializeField] private LayerMask mJumpLayermask;
 
 		private CapsuleCollider mCollider;
+		private CharacterController mController;
 		private Transform mMainCameraRef;
-		private Rigidbody mRigidbody;
 
-		private Vector3 mCumulativeMovement;
+		private PlayerInputMap mInputBindings;
+		private Vector2 mInput;
+		private Vector3 mMoveDirection;
 		private Vector2 mRotationAmount;
+		private float mMouseSensitivity;
 		private float mRecoilAmount;
 		private float mRotationY;
-		private bool mJump, mCrouching;
+		private bool mJump, mIsJumping, mIsRunning, mPreviouslyGrounded, mCrouching;
 
 		private float mStandingHeight;
 		private float mStandingRadius;
 
-		private const float DOWNFORCE_MULT = 2.5f;
-
 		private void Awake()
 		{
+			mMoveDirection = Vector3.zero;
 			mCollider = GetComponent<CapsuleCollider>();
-			mRigidbody = GetComponent<Rigidbody>();
+			mController = GetComponent<CharacterController>();
 			mMainCameraRef = GetComponentInChildren<Camera>().transform;
 
+			mMouseSensitivity = 1.0f;
 			mStandingHeight = mCollider.height;
 			mStandingRadius = mCollider.radius;
 
@@ -55,7 +56,12 @@ namespace FiringSquad.Gameplay
 				.RegisterInput(Input.GetButtonDown, input.jumpButton, INPUT_Jump, KeatsLib.Unity.Input.InputLevel.Gameplay)
 				.RegisterInput(Input.GetButtonDown, input.crouchButton, INPUT_CrouchStart, KeatsLib.Unity.Input.InputLevel.Gameplay)
 				.RegisterInput(Input.GetButtonUp, input.crouchButton, INPUT_CrouchStop, KeatsLib.Unity.Input.InputLevel.Gameplay)
+				.RegisterInput(Input.GetButtonDown, input.sprintButton, INPUT_SprintStart, KeatsLib.Unity.Input.InputLevel.Gameplay)
+				.RegisterInput(Input.GetButtonUp, input.sprintButton, INPUT_SprintStop, KeatsLib.Unity.Input.InputLevel.Gameplay)
 				.EnableInputLevel(KeatsLib.Unity.Input.InputLevel.Gameplay);
+
+			EventManager.OnApplyOptionsData += ApplyOptionsData;
+			mInputBindings = input;
 		}
 
 		private void OnDestroy()
@@ -68,18 +74,22 @@ namespace FiringSquad.Gameplay
 				.UnregisterAxis(INPUT_LeftRightMovement)
 				.UnregisterAxis(INPUT_LookHorizontal)
 				.UnregisterAxis(INPUT_LookVertical);
+
+			EventManager.OnApplyOptionsData -= ApplyOptionsData;
 		}
 
 		#region Input Delegates
 
 		private void INPUT_ForwardBackMovement(float val)
 		{
-			mCumulativeMovement += transform.forward * mMovementData.forwardSpeed * val;
+			//mCumulativeMovement += transform.forward * mMovementData.forwardSpeed * val;
+			mInput.y = val;
 		}
 
 		private void INPUT_LeftRightMovement(float val)
 		{
-			mCumulativeMovement += transform.right * val * mMovementData.strafeSpeed;
+			//mCumulativeMovement += transform.right * val * mMovementData.strafeSpeed;
+			mInput.x = val;
 		}
 
 		private void INPUT_LookHorizontal(float val)
@@ -94,13 +104,7 @@ namespace FiringSquad.Gameplay
 
 		private void INPUT_Jump()
 		{
-			Ray r = new Ray(transform.position + Vector3.up * 0.5f, Vector3.up * -1.0f);
-			const float dist = .55f;
-
-			UnityEngine.Debug.DrawLine(r.origin, r.origin + r.direction * dist, Color.green, 0.5f);
-
-			if (Physics.Raycast(r, dist, mJumpLayermask))
-				mJump = true;
+			mJump = true;
 		}
 
 		private void INPUT_CrouchStart()
@@ -113,12 +117,33 @@ namespace FiringSquad.Gameplay
 			mCrouching = false;
 		}
 
+		private void INPUT_SprintStart()
+		{
+			mIsRunning = true;
+		}
+		
+		private void INPUT_SprintStop()
+		{
+			if (!mInputBindings.stickySprint)
+				mIsRunning = false;
+		}
+
 		#endregion
 
 		private void Update()
 		{
 			HandleRotation();
 			UpdateCrouch();
+
+			if (!mPreviouslyGrounded && mController.isGrounded)
+			{
+				mMoveDirection.y = 0.0f;
+				// play landing sound
+				mIsJumping = false;
+			}
+			if (!mController.isGrounded && !mIsJumping && mPreviouslyGrounded)
+				mMoveDirection.y = 0.0f;
+			mPreviouslyGrounded = mController.isGrounded;
 		}
 
 		private void FixedUpdate()
@@ -133,7 +158,7 @@ namespace FiringSquad.Gameplay
 		/// </summary>
 		private void HandleRotation()
 		{
-			Vector2 rotation = mRotationAmount * mMovementData.lookSpeed;
+			Vector2 rotation = mRotationAmount * mMovementData.lookSpeed * mMouseSensitivity;
 			transform.RotateAround(transform.position, transform.up, rotation.x);
 
 			mRotationY += rotation.y + (mRecoilAmount * Time.deltaTime);
@@ -150,10 +175,15 @@ namespace FiringSquad.Gameplay
 		/// </summary>
 		private void UpdateCrouch()
 		{
-			float current = mCollider.height;
-			mCollider.height = Mathf.Lerp(current, mCrouching ? mStandingHeight * mMovementData.crouchHeight : mStandingHeight, Time.deltaTime * mMovementData.crouchSpeed);
-			current = mCollider.radius;
-			mCollider.radius = Mathf.Lerp(current, mCrouching ? mStandingRadius * mMovementData.crouchHeight : mStandingRadius, Time.deltaTime * mMovementData.crouchSpeed);
+			float currentHeight = mCollider.height;
+			float newHeight = Mathf.Lerp(currentHeight, mCrouching ? mStandingHeight * mMovementData.crouchHeight : mStandingHeight, Time.deltaTime * mMovementData.crouchSpeed);
+			mCollider.height = newHeight;
+			mController.height = newHeight;
+
+			float currentRadius = mCollider.radius;
+			float newRadius = Mathf.Lerp(currentRadius, mCrouching ? mStandingRadius * mMovementData.crouchHeight : mStandingRadius, Time.deltaTime * mMovementData.crouchSpeed);
+			mCollider.radius = newRadius;
+			mController.radius = newRadius;
 		}
 
 		/// <summary>
@@ -161,23 +191,50 @@ namespace FiringSquad.Gameplay
 		/// </summary>
 		private void ApplyMovementForce()
 		{
-			Vector3 movement = mCumulativeMovement.ClampMagnitude(mMovementData.forwardSpeed * Time.deltaTime);
-			mRigidbody.AddForce(movement, ForceMode.Acceleration);
+			Vector3 desiredMove = transform.forward * mInput.y + transform.right * mInput.x;
 
-			if (mJump)
+			RaycastHit hitInfo;
+			Physics.SphereCast(transform.position, mController.radius, Vector3.down, out hitInfo,
+				mController.height / 2.0f, Physics.AllLayers, QueryTriggerInteraction.Ignore);
+			desiredMove = Vector3.ProjectOnPlane(desiredMove, hitInfo.normal).normalized;
+
+			float speed = mMovementData.speed;
+			if (mIsRunning)
+				speed *= mMovementData.sprintMultiplier;
+
+			mMoveDirection.x = desiredMove.x * speed;
+			mMoveDirection.z = desiredMove.z * speed;
+
+			if (mController.isGrounded)
 			{
-				mRigidbody.AddForce(Vector3.up * mMovementData.jumpForce, ForceMode.Impulse);
-				mJump = false;
-			}
-			else if (mRigidbody.velocity.y < 0.0f)
-				mRigidbody.AddForce(Vector3.down * mMovementData.jumpForce * DOWNFORCE_MULT, ForceMode.Force);
+				mMoveDirection.y = -mMovementData.stickToGroundForce;
 
-			mCumulativeMovement = Vector3.zero;
+				if (mJump)
+				{
+					mMoveDirection.y = mMovementData.jumpForce;
+					// play jump sound
+					mJump = false;
+					mIsJumping = true;
+				}
+			}
+			else
+				mMoveDirection += Physics.gravity * mMovementData.gravityMultiplier * Time.fixedDeltaTime;
+
+			Vector3 oldPos = transform.position;
+			mController.Move(mMoveDirection * Time.fixedDeltaTime);
+
+			if (Vector3.Distance(oldPos, transform.position) < 0.1f)
+				mIsRunning = false;
 		}
 
 		public void AddRecoil(Vector3 direction, float amount)
 		{
 			mRecoilAmount = amount * 60.0f;
+		}
+		
+		private void ApplyOptionsData(IOptionsData settings)
+		{
+			mMouseSensitivity = settings.mouseSensitivity;
 		}
 	}
 }

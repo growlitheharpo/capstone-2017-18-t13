@@ -20,6 +20,8 @@ namespace FiringSquad.Data
 		[SerializeField] private string mLookLeftRightAxis;
 		[SerializeField] private string mJumpButton;
 		[SerializeField] private string mCrouchButton;
+		[SerializeField] private string mSprintButton;
+		[SerializeField] private bool mStickySprint;
 
 		public string toggleMenuButton { get { return mToggleMenuButton; } }
 		public string fireWeaponButton { get { return mFireWeaponButton; } }
@@ -33,5 +35,7 @@ namespace FiringSquad.Data
 		public string lookLeftRightAxis { get { return mLookLeftRightAxis; } }
 		public string jumpButton { get { return mJumpButton; } }
 		public string crouchButton { get { return mCrouchButton; } }
+		public string sprintButton { get { return mSprintButton; } }
+		public bool stickySprint { get { return mStickySprint; } }
 	}
 }

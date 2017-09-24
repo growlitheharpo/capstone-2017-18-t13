@@ -227,6 +227,16 @@ Prefab:
       propertyPath: mOverrideUIName
       value: player1
       objectReference: {fileID: 0}
+    - target: {fileID: 114532926038648210, guid: e4a500ab5eb85564ea26d9d9f3385e64,
+        type: 2}
+      propertyPath: mInputMap.mSprintButton
+      value: Sprint_P1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114532926038648210, guid: e4a500ab5eb85564ea26d9d9f3385e64,
+        type: 2}
+      propertyPath: mInputMap.mStickySprint
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: e4a500ab5eb85564ea26d9d9f3385e64, type: 2}
   m_IsPrefabParent: 0
@@ -743,6 +753,16 @@ Prefab:
         type: 2}
       propertyPath: mOverrideUIName
       value: player2
+      objectReference: {fileID: 0}
+    - target: {fileID: 114532926038648210, guid: e4a500ab5eb85564ea26d9d9f3385e64,
+        type: 2}
+      propertyPath: mInputMap.mSprintButton
+      value: Sprint_P2
+      objectReference: {fileID: 0}
+    - target: {fileID: 114532926038648210, guid: e4a500ab5eb85564ea26d9d9f3385e64,
+        type: 2}
+      propertyPath: mInputMap.mStickySprint
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: e4a500ab5eb85564ea26d9d9f3385e64, type: 2}
@@ -2158,7 +2178,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 1236694687591962, guid: a449b09cec40cec4793331b55edfd86d, type: 2}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: a449b09cec40cec4793331b55edfd86d, type: 2}
