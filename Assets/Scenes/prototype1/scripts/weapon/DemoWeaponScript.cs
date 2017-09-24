@@ -9,7 +9,7 @@ namespace FiringSquad.Gameplay
 
 		public WeaponData currentStats { get { return mCurrentData; } }
 
-		protected override void PlayShotEffect() { }
+		protected override void PlayShotEffect(Vector3 a) { }
 		protected override void PlayReloadEffect(float time) { }
 
 		protected override void Awake()

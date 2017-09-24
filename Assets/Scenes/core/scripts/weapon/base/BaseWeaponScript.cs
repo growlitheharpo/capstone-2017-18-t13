@@ -173,10 +173,11 @@ namespace FiringSquad.Gameplay
 			mShotTime = 1.0f / mCurrentData.fireRate;
 			mAmountInClip.value--;
 
-			PlayShotEffect();
 
 			var barrel = mCurrentAttachments[Attachment.Barrel] as WeaponPartScriptBarrel;
 			int count = barrel != null ? barrel.projectileCount : 1;
+			
+			PlayShotEffect(barrel != null ? barrel.barrelTip.position : transform.position);
 
 			for (int i = 0; i < count; i++)
 			{
@@ -208,7 +209,7 @@ namespace FiringSquad.Gameplay
 		/// <summary>
 		/// To be implemented in child class. Play SFX, VFX, etc. for shot fired.
 		/// </summary>
-		protected abstract void PlayShotEffect();
+		protected abstract void PlayShotEffect(Vector3 shotOrigin);
 
 		/// <summary>
 		/// Determine the direction of the shot based on spread, etc.
