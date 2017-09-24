@@ -17,11 +17,27 @@
 			public abstract IState GetTransition();
 		}
 
-		private IState mCurrentState;
+		protected class NullState : BaseState<BaseStateMachine>
+		{
+			public NullState() : base(null) {}
+
+			public override IState GetTransition()
+			{
+				return this;
+			}
+		}
+
+		private IState mCurrentState, mPushedState;
 		protected IState currentState { get { return mCurrentState; } }
 
 		protected virtual void Update()
 		{
+			if (mPushedState != null)
+			{
+				mPushedState.Update();
+				return;
+			}
+
 			if (mCurrentState == null)
 				return;
 
@@ -39,6 +55,19 @@
 
 			mCurrentState = newState;
 			mCurrentState.OnEnter();
+		}
+
+		protected void PushState(IState newState)
+		{
+			mPushedState = newState;
+			mPushedState.OnEnter();
+		}
+
+		protected void PopState()
+		{
+			if (mPushedState != null)
+				mPushedState.OnExit();
+			mPushedState = null;
 		}
 	}
 }
