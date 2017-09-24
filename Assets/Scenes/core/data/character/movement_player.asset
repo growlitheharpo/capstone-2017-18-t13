@@ -11,10 +11,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b4533908b3b8dee4680460518cd9f76c, type: 3}
   m_Name: movement_player
   m_EditorClassIdentifier: 
-  mForwardSpeed: 6000
-  mBackwardSpeed: -1
-  mStrafeSpeed: 4000
+  mSpeed: 6
   mCrouchSpeed: 15
   mCrouchPercent: 0.25
-  mJumpForce: 1750
+  mJumpForce: 9
+  mStickToGroundForce: 10
+  mGravityMultiplier: 3
   mLookSpeed: 5
+  mSprintMultiplier: 2
