@@ -187,8 +187,6 @@ namespace FiringSquad.Gameplay
 				projectile.GetComponent<IProjectile>().Instantiate(this, shot, mCurrentData, mProjectilePool);
 			}
 
-			Logger.Info("Effective spread: " + mCurrentData.spread);
-
 			OnPostFireShot();
 
 			bearer.ApplyRecoil(Vector3.up, mCurrentData.recoil * Random.Range(0.75f, 1.25f));
