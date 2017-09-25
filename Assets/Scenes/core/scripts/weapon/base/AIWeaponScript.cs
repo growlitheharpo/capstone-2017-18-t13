@@ -26,10 +26,11 @@ namespace FiringSquad.Gameplay
 		/// <summary>
 		/// Play any SFX and VFX associated with the weapon based on its current mods.
 		/// </summary>
-		protected override void PlayShotEffect()
+		protected override void PlayShotEffect(Vector3 origin)
 		{
 			mShotParticles.Stop();
 			mShotParticles.time = 0.0f;
+			mShotParticles.transform.position = origin;
 			mShotParticles.Play();
 		}
 

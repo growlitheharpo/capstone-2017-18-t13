@@ -23,9 +23,6 @@ namespace FiringSquad.Gameplay
 
 		private void OnCollisionEnter(Collision hit)
 		{
-			if (hit.gameObject.GetComponentUpwards<RocketProjectile>())
-				return;
-
 			IDamageReceiver component = hit.GetDamageReceiver();
 			if (component != null)
 			{
