@@ -3,6 +3,7 @@ using FiringSquad.Gameplay.AI;
 using KeatsLib.State;
 using UnityEngine;
 using Input = KeatsLib.Unity.Input;
+using FiringSquad.Gameplay;
 
 public partial class GamestateManager
 {
@@ -55,12 +56,12 @@ public partial class GamestateManager
 			TransitionStates(new FindGameModeState(this));
 		}
 
-		private void HandlePauseToggle()
+		private void HandlePauseToggle(PlayerScript requester)
 		{
 			if (mIsPaused)
 				PopState();
 			else
-				PushState(new PausedGameState(this));
+				PushState(new PausedGameState(this, requester));
 
 			mIsPaused = !mIsPaused;
 		}
@@ -100,14 +101,18 @@ public partial class GamestateManager
 
 		private class PausedGameState : BaseState<GameSceneState>
 		{
-			public PausedGameState(GameSceneState m) : base(m) { }
+			public PausedGameState(GameSceneState m, PlayerScript r) : base(m)
+			{
+				mRequester = r;
+			}
 
+			private PlayerScript mRequester;
 			private bool mOriginalGameplayState;
 			private float mOriginalTimescale;
 
 			public override void OnEnter()
 			{
-				EventManager.Notify(() => EventManager.ShowPausePanel(true));
+				EventManager.Notify(() => EventManager.ShowPausePanel(true, mRequester));
 
 				IInput input = ServiceLocator.Get<IInput>();
 				mOriginalGameplayState = input.IsInputEnabled(Input.InputLevel.Gameplay);
@@ -120,7 +125,7 @@ public partial class GamestateManager
 			public override void OnExit()
 			{
 				Time.timeScale = mOriginalTimescale;
-				EventManager.Notify(() => EventManager.ShowPausePanel(false));
+				EventManager.Notify(() => EventManager.ShowPausePanel(false, mRequester));
 				ServiceLocator.Get<IInput>().SetInputLevelState(Input.InputLevel.Gameplay, mOriginalGameplayState);
 			}
 

@@ -12,6 +12,7 @@ namespace FiringSquad.Data
 		[SerializeField] private string mFireGravGunButton;
 		[SerializeField] private string mReloadButton;
 		[SerializeField] private string mInteractButton;
+		[SerializeField] private string mPauseButton;
 
 		[Header("Movement")]
 		[SerializeField] private string mMoveBackFrontAxis;
@@ -28,6 +29,7 @@ namespace FiringSquad.Data
 		public string fireGravGunButton { get { return mFireGravGunButton; } }
 		public string reloadButton { get { return mReloadButton; } }
 		public string interactButton { get { return mInteractButton; } }
+		public string pauseButton { get { return mPauseButton; } }
 
 		public string moveBackFrontAxis { get { return mMoveBackFrontAxis; } }
 		public string moveSidewaysAxis { get { return mMoveSidewaysAxis; } }
@@ -37,5 +39,6 @@ namespace FiringSquad.Data
 		public string crouchButton { get { return mCrouchButton; } }
 		public string sprintButton { get { return mSprintButton; } }
 		public bool stickySprint { get { return mStickySprint; } }
+
 	}
 }

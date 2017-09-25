@@ -68,7 +68,7 @@ namespace FiringSquad.Gameplay
 				.RegisterInput(Input.GetButton, inputMap.fireWeaponButton, INPUT_FireWeapon, InputLevel.Gameplay)
 				.RegisterInput(Input.GetButtonDown, inputMap.reloadButton, INPUT_ReloadWeapon, InputLevel.Gameplay)
 				.RegisterInput(Input.GetButtonDown, inputMap.interactButton, INPUT_ActivateInteract, InputLevel.Gameplay)
-				.RegisterInput(Input.GetKeyDown, KeyCode.Escape, INPUT_TogglePause, InputLevel.PauseMenu);
+				.RegisterInput(Input.GetButtonDown, inputMap.pauseButton, INPUT_TogglePause, InputLevel.PauseMenu);
 
 			if (mGravityGun != null)
 				mGravityGun.RegisterInput(inputMap);
@@ -166,7 +166,7 @@ namespace FiringSquad.Gameplay
 		
 		private void INPUT_TogglePause()
 		{
-			EventManager.Notify(EventManager.TogglePauseState);
+			EventManager.Notify(() => EventManager.TogglePauseState(this));
 		}
 
 		private void CONSOLE_ToggleGodmode(string[] args)
@@ -199,7 +199,8 @@ namespace FiringSquad.Gameplay
 			InitializeValues(true);
 		}
 		
-		private void ApplyOptionsData(IOptionsData settings)
+		// TODO: Make this private again
+		public void ApplyOptionsData(IOptionsData settings)
 		{
 			mMainCameraRef.GetComponent<Camera>().fieldOfView = settings.fieldOfView;
 			AudioListener.volume = settings.masterVolume;

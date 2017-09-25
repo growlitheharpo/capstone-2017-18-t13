@@ -232,7 +232,8 @@ namespace FiringSquad.Gameplay
 			mRecoilAmount = amount * 60.0f;
 		}
 		
-		private void ApplyOptionsData(IOptionsData settings)
+		// TODO: Make this private again
+		public void ApplyOptionsData(IOptionsData settings)
 		{
 			mMouseSensitivity = settings.mouseSensitivity;
 		}
