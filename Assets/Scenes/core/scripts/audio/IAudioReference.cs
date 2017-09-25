@@ -29,4 +29,9 @@ public interface IAudioReference
 	/// Set the pitch of the sound to a new level.
 	/// </summary>
 	void SetPitch(float pitch);
+
+	/// <summary>
+	/// Returns true if the audio is currently playing.
+	/// </summary>
+	bool isPlaying { get; }
 }

@@ -53,6 +53,8 @@ namespace FiringSquad.Gameplay
 		/// </summary>
 		protected override void PlayShotEffect(Vector3 origin)
 		{
+			ServiceLocator.Get<IAudioManager>().PlaySound(AudioManager.AudioEvent.PrimaryEffect1, mAudioProfile, transform);
+
 			mShotParticles.Stop();
 			mShotParticles.time = 0.0f;
 			mShotParticles.transform.position = origin;

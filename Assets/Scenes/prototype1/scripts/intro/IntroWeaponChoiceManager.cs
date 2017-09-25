@@ -66,13 +66,11 @@ namespace FiringSquad.Gameplay
 			if (arg1.name == GamestateManager.PROTOTYPE1_SCENE)
 			{
 				ReferenceForwarder.get.player.GetComponent<PlayerScript>().OverrideDefaultParts(mMechanism, mBarrel, mScope, mGrip);
-				UnityEngine.Debug.Log("Destroying because we think we applied our settings.");
 				SceneManager.activeSceneChanged -= HandleSceneChange;
 				Destroy(gameObject);
 			}
 			else if (arg1.name != GamestateManager.BASE_WORLD && arg1.name != GamestateManager.PROTOTYPE1_SETUP_SCENE)
 			{
-				UnityEngine.Debug.Log("Destroying because we're not in base world.");
 				SceneManager.activeSceneChanged -= HandleSceneChange;
 				Destroy(gameObject);
 			}

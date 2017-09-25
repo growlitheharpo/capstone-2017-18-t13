@@ -145,7 +145,7 @@ public partial class EventManager
 
 		info.Invoke(this, realParameters.ToArray());
 #else
-		Debug.LogError("Firing events is not supported in a non-development build.");
+		Logger.Error("Firing events is not supported in a non-development build.", Logger.System.Event);
 #endif
 	}
 }

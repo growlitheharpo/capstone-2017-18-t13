@@ -11,7 +11,9 @@ namespace FiringSquad.Gameplay
 		public void PreDisable() {}
 		public void PostDisable() {}
 
+		[SerializeField] private AudioProfile mProfile;
 		private HitscanShootEffect mEffect;
+		private IAudioReference mAudio;
 
 		private void Awake()
 		{
@@ -45,11 +47,23 @@ namespace FiringSquad.Gameplay
 				return;
 			}
 
+			AudioManager.AudioEvent eventToPlay;
+
 			// Try to apply damage to it if we did
 			IDamageReceiver component = hit.GetDamageReceiver();
 			if (component != null)
+			{
 				component.ApplyDamage(data.damage, hit.point, this);
 
+				if (component is PlayerScript)
+					eventToPlay = AudioManager.AudioEvent.PrimaryEffect1;
+				else
+					eventToPlay = AudioManager.AudioEvent.PrimaryEffect2;
+			}
+			else
+				eventToPlay = AudioManager.AudioEvent.PrimaryEffect3;
+
+			mAudio = ServiceLocator.Get<IAudioManager>().PlaySound(eventToPlay, mProfile, transform, transform.InverseTransformPoint(hit.point));
 			StartCoroutine(PlayEffectAndKillSelf(pool, hit.point));
 		}
 		
@@ -64,11 +78,15 @@ namespace FiringSquad.Gameplay
 		private IEnumerator PlayEffectAndKillSelf(GameObjectPool pool, Vector3 hitPoint)
 		{
 			yield return mEffect.Flash(hitPoint);
+			yield return new WaitForAudio(mAudio);
 			KillSelf(pool);
 		}
 
 		private void KillSelf(GameObjectPool pool)
 		{
+			if (ServiceLocator.Get<IAudioManager>().CheckReferenceAlive(ref mAudio) != null)
+				mAudio.Kill();
+
 			if (pool != null)
 				pool.ReturnItem(gameObject);
 			else

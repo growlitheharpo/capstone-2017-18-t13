@@ -27,6 +27,7 @@ namespace FiringSquad.Gameplay
 		[SerializeField] private Transform mScopeAttach;
 		[SerializeField] private Transform mMechanismAttach;
 		[SerializeField] private Transform mGripAttach;
+		[SerializeField] protected AudioProfile mAudioProfile;
 
 		private Dictionary<Attachment, Transform> mAttachPoints;
 		private Dictionary<Attachment, WeaponPartScript> mCurrentAttachments;
@@ -174,7 +175,7 @@ namespace FiringSquad.Gameplay
 			mAmountInClip.value--;
 
 
-			var barrel = mCurrentAttachments[Attachment.Barrel] as WeaponPartScriptBarrel;
+			WeaponPartScriptBarrel barrel = mCurrentAttachments[Attachment.Barrel] as WeaponPartScriptBarrel;
 			int count = barrel != null ? barrel.projectileCount : 1;
 			
 			PlayShotEffect(barrel != null ? barrel.barrelTip.position : transform.position);
@@ -186,8 +187,6 @@ namespace FiringSquad.Gameplay
 				GameObject projectile = mProjectilePool.ReleaseNewItem();
 				projectile.GetComponent<IProjectile>().Instantiate(this, shot, mCurrentData, mProjectilePool);
 			}
-
-			Logger.Info("Effective spread: " + mCurrentData.spread);
 
 			OnPostFireShot();
 

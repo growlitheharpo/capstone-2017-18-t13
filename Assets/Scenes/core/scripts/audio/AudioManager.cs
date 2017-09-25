@@ -18,6 +18,7 @@ public class AudioManager : MonoSingleton<AudioManager>, IAudioManager
 		PrimaryEffect1 = 1,
 		PrimaryEffect2 = 2,
 		PrimaryEffect3 = 3,
+		DeathSound = 10,
 	}
 
 	/// <summary>
@@ -65,6 +66,11 @@ public class AudioManager : MonoSingleton<AudioManager>, IAudioManager
 		{
 			for (int i = 0; i < mClipData.Count; i++)
 				mSources[i].pitch = pitch;
+		}
+
+		public bool isPlaying
+		{
+			get { return mSources.Any(x => x.loop || !(x.time >= x.clip.length - Time.deltaTime)); }
 		}
 	}
 
@@ -114,13 +120,21 @@ public class AudioManager : MonoSingleton<AudioManager>, IAudioManager
 
 			for (int i = 0; i < r.mSources.Count; i++)
 			{
-				// if !finished
+				if (r.mSources[i] == null)
+				{
+					r.mSources.RemoveAt(i);
+					r.mClipData.RemoveAt(i);
+					i--;
+					continue;
+				}
+
 				if (r.mSources[i].loop || !(r.mSources[i].time >= r.mSources[i].clip.length - Time.deltaTime))
 					continue;
 
 				Destroy(r.mSources[i].gameObject);
 				r.mSources.RemoveAt(i);
 				r.mClipData.RemoveAt(i);
+				i--;
 			}
 		}
 
@@ -137,6 +151,12 @@ public class AudioManager : MonoSingleton<AudioManager>, IAudioManager
 	/// <inheritdoc />
 	public IAudioReference PlaySound(AudioEvent e, IAudioProfile profile, Transform location, Vector3 offset)
 	{
+		if (profile == null)
+		{
+			Logger.Warn("Trying to play a null profile: " + e, Logger.System.Audio);
+			return null;
+		}
+
 		var clips = profile.GetClipInParents(e);
 		var sources = new List<AudioSource>();
 

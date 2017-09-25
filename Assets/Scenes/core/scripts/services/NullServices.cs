@@ -54,6 +54,7 @@ public class NullServices
 			public void SetRepeat(bool repeat) { }
 			public void SetVolume(float vol) { }
 			public void SetPitch(float pitch) { }
+			public bool isPlaying { get { return false; } }
 		}
 
 		public void InitializeDatabase()
