@@ -1,4 +1,5 @@
-﻿using KeatsLib.Persistence;
+﻿using FiringSquad.Gameplay;
+using KeatsLib.Persistence;
 using UnityEngine;
 
 public class PauseGamePanel : MonoBehaviour
@@ -15,6 +16,8 @@ public class PauseGamePanel : MonoBehaviour
 	[SerializeField] private BaseFloatProvider mVolumeProvider;
 
 	[SerializeField] private ActionProvider mQuitButton;
+
+	private PlayerScript mPlayer;
 
 	private void Awake()
 	{
@@ -43,9 +46,10 @@ public class PauseGamePanel : MonoBehaviour
 		EventManager.OnShowPausePanel -= HandleToggle;
 	}
 	
-	private void HandleToggle(bool show)
+	private void HandleToggle(bool show, PlayerScript player)
 	{
 		gameObject.SetActive(show);
+		mPlayer = player;
 		
 		if (!show)
 			ApplySettings();
@@ -89,11 +93,13 @@ public class PauseGamePanel : MonoBehaviour
 		mData.masterVolume = mVolumeProvider.GetValue() / 100.0f;
 		mData.mouseSensitivity = mMouseSensitivityProvider.GetValue();
 
-		EventManager.Notify(() => EventManager.ApplyOptionsData(mData));
+		mPlayer.ApplyOptionsData(mData);
+		mPlayer.GetComponent<PlayerMovementScript>().ApplyOptionsData(mData);
 	}
 	
 	private void HandleQuit()
 	{
+		EventManager.Notify(() => EventManager.TogglePauseState(mPlayer));
 		EventManager.Notify(() => EventManager.RequestSceneChange(GamestateManager.MENU_SCENE));
 	}
 }

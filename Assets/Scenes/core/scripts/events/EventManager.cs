@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FiringSquad.Gameplay;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine.SceneManagement;
@@ -12,11 +13,11 @@ using UnityEngine;
 /// </summary>
 public partial class EventManager
 {
-	public static event Action OnTogglePauseState = () => { LogEvent(); };
+	public static event Action<PlayerScript> OnTogglePauseState = p => { LogEvent(); };
 
-	public static void TogglePauseState()
+	public static void TogglePauseState(PlayerScript p)
 	{
-		OnTogglePauseState();
+		OnTogglePauseState(p);
 	}
 
 	public static event Action<IOptionsData> OnApplyOptionsData = e => { LogEvent(); };
@@ -104,11 +105,11 @@ public partial class EventManager
 		OnShowGameoverPanel(resultText);
 	}
 
-	public static event Action<bool> OnShowPausePanel = b => { LogEvent(); };
+	public static event Action<bool, PlayerScript> OnShowPausePanel = (b, r) => { LogEvent(); };
 
-	public static void ShowPausePanel(bool show)
+	public static void ShowPausePanel(bool show, PlayerScript requester)
 	{
-		OnShowPausePanel(show);
+		OnShowPausePanel(show, requester);
 	}
 
 	//!PROTOTYPE 2
