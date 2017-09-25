@@ -7,6 +7,7 @@ namespace FiringSquad.Gameplay.AI
 {
 	public class AICharacter : MonoBehaviour, IWeaponBearer, IDamageReceiver
 	{
+		[SerializeField] private AudioProfile mAudioProfile;
 		[SerializeField] private WeaponDefaultsData mGunDefaultParts;
 		[SerializeField] private GameObject mDeathParticlesPrefab;
 		[SerializeField] private GameObject mGunPrefab;
@@ -107,10 +108,15 @@ namespace FiringSquad.Gameplay.AI
 			ps.transform.localPosition = Vector3.zero;
 			ps.Play();
 
+			IAudioReference audRef = ServiceLocator.Get<IAudioManager>()
+				.PlaySound(AudioManager.AudioEvent.DeathSound, mAudioProfile, ps.transform);
+
 			yield return null;
 			yield return null;
 			yield return new WaitForParticles(ps);
+			yield return new WaitForAudio(audRef);
 			yield return null;
+			audRef.Kill();
 			Destroy(gameObject);
 		}
 	}
