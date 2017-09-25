@@ -67,7 +67,8 @@ namespace FiringSquad.Gameplay
 				.RegisterInput(Input.GetButtonDown, inputMap.toggleMenuButton, INPUT_ToggleUIElement, InputLevel.None)
 				.RegisterInput(Input.GetButton, inputMap.fireWeaponButton, INPUT_FireWeapon, InputLevel.Gameplay)
 				.RegisterInput(Input.GetButtonDown, inputMap.reloadButton, INPUT_ReloadWeapon, InputLevel.Gameplay)
-				.RegisterInput(Input.GetButtonDown, inputMap.interactButton, INPUT_ActivateInteract, InputLevel.Gameplay);
+				.RegisterInput(Input.GetButtonDown, inputMap.interactButton, INPUT_ActivateInteract, InputLevel.Gameplay)
+				.RegisterInput(Input.GetKeyDown, KeyCode.Escape, INPUT_TogglePause, InputLevel.PauseMenu);
 
 			if (mGravityGun != null)
 				mGravityGun.RegisterInput(inputMap);
@@ -76,6 +77,7 @@ namespace FiringSquad.Gameplay
 				.RegisterCommand("godmode", CONSOLE_ToggleGodmode);
 
 			EventManager.OnResetLevel += ReceiveResetEvent;
+			EventManager.OnApplyOptionsData += ApplyOptionsData;
 			InitializeValues();
 		}
 
@@ -85,12 +87,14 @@ namespace FiringSquad.Gameplay
 				.UnregisterInput(INPUT_ActivateInteract)
 				.UnregisterInput(INPUT_ToggleUIElement)
 				.UnregisterInput(INPUT_ReloadWeapon)
-				.UnregisterInput(INPUT_FireWeapon);
+				.UnregisterInput(INPUT_FireWeapon)
+				.UnregisterInput(INPUT_TogglePause);
 
 			ServiceLocator.Get<IGameConsole>()
 				.UnregisterCommand("godmode");
 
 			EventManager.OnResetLevel -= ReceiveResetEvent;
+			EventManager.OnApplyOptionsData -= ApplyOptionsData;
 			mHealth.Cleanup();
 		}
 
@@ -159,6 +163,11 @@ namespace FiringSquad.Gameplay
 			if (interactable != null)
 				interactable.Interact(this);
 		}
+		
+		private void INPUT_TogglePause()
+		{
+			EventManager.Notify(EventManager.TogglePauseState);
+		}
 
 		private void CONSOLE_ToggleGodmode(string[] args)
 		{
@@ -189,12 +198,17 @@ namespace FiringSquad.Gameplay
 		{
 			InitializeValues(true);
 		}
+		
+		private void ApplyOptionsData(IOptionsData settings)
+		{
+			mMainCameraRef.GetComponent<Camera>().fieldOfView = settings.fieldOfView;
+			AudioListener.volume = settings.masterVolume;
+		}
 
 		public void OverrideDefaultParts(GameObject mechanism, GameObject barrel, GameObject scope, GameObject grip)
 		{
 			mDefaultsOverride = new WeaponDefaultsData(mechanism, barrel, scope, grip);
 			InitializeValues();
-
 		}
 
 		/// <summary>

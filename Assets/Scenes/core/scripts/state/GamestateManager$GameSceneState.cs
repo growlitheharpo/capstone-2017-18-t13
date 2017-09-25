@@ -13,6 +13,7 @@ public partial class GamestateManager
 	private partial class GameSceneState : BaseStateMachine, IGameState
 	{
 		public bool safeToTransition { get { return true; } }
+		private bool mIsPaused;
 
 		public bool IsFeatureEnabled(Feature feat)
 		{
@@ -42,14 +43,26 @@ public partial class GamestateManager
 		}
 
 		/// <inheritdoc />
-			public void OnEnter()
+		public void OnEnter()
 		{
 			EventManager.OnInputLevelChanged += HandleInputChange;
-			bool state = ServiceLocator.Get<IInput>().IsInputEnabled(Input.InputLevel.Gameplay);
-
+			EventManager.OnTogglePauseState += HandlePauseToggle;
+			
+			ServiceLocator.Get<IInput>().SetInputLevelState(Input.InputLevel.Gameplay | Input.InputLevel.PauseMenu, true);
+			SetCursorState(true);
+			
+			mIsPaused = false;
 			TransitionStates(new FindGameModeState(this));
+		}
 
-			SetCursorState(state);
+		private void HandlePauseToggle()
+		{
+			if (mIsPaused)
+				PopState();
+			else
+				PushState(new PausedGameState(this));
+
+			mIsPaused = !mIsPaused;
 		}
 
 		private void HandleInputChange(Input.InputLevel input, bool state)
@@ -73,9 +86,10 @@ public partial class GamestateManager
 
 		public void OnExit()
 		{
-			TransitionStates(new NullState(this));
+			TransitionStates(new NullState());
 
 			EventManager.OnInputLevelChanged -= HandleInputChange;
+			EventManager.OnTogglePauseState -= HandlePauseToggle;
 			SetCursorState(false);
 		}
 
@@ -84,16 +98,38 @@ public partial class GamestateManager
 			return this; //we never explicitly leave
 		}
 
-		private class NullState : BaseState<GameSceneState>
+		private class PausedGameState : BaseState<GameSceneState>
 		{
-			public NullState(GameSceneState m) : base(m) { }
+			public PausedGameState(GameSceneState m) : base(m) { }
+
+			private bool mOriginalGameplayState;
+			private float mOriginalTimescale;
+
+			public override void OnEnter()
+			{
+				EventManager.Notify(() => EventManager.ShowPausePanel(true));
+
+				IInput input = ServiceLocator.Get<IInput>();
+				mOriginalGameplayState = input.IsInputEnabled(Input.InputLevel.Gameplay);
+				input.DisableInputLevel(Input.InputLevel.Gameplay);
+
+				mOriginalTimescale = Time.timeScale;
+				Time.timeScale = 0.0f;
+			}
+
+			public override void OnExit()
+			{
+				Time.timeScale = mOriginalTimescale;
+				EventManager.Notify(() => EventManager.ShowPausePanel(false));
+				ServiceLocator.Get<IInput>().SetInputLevelState(Input.InputLevel.Gameplay, mOriginalGameplayState);
+			}
 
 			public override IState GetTransition()
 			{
 				return this;
 			}
 		}
-
+		
 		private class FindGameModeState : BaseState<GameSceneState>
 		{
 			public FindGameModeState(GameSceneState m) : base(m) { }
@@ -207,9 +243,9 @@ public partial class GamestateManager
 
 			private void EndGame(string msg)
 			{
-				Time.timeScale = 0.0f;
+				EventManager.ShowGameoverPanel(msg);
 				ServiceLocator.Get<IInput>().DisableInputLevel(Input.InputLevel.Gameplay);
-				EventManager.Notify(() => EventManager.ShowGameoverPanel(msg));
+				Time.timeScale = 0.0f;
 			}
 
 			public override void OnExit()

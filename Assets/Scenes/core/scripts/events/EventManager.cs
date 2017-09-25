@@ -12,6 +12,13 @@ using UnityEngine;
 /// </summary>
 public partial class EventManager
 {
+	public static event Action OnTogglePauseState = () => { LogEvent(); };
+
+	public static void TogglePauseState()
+	{
+		OnTogglePauseState();
+	}
+
 	public static event Action<IOptionsData> OnApplyOptionsData = e => { LogEvent(); };
 
 	public static void ApplyOptionsData(IOptionsData data)
@@ -97,6 +104,13 @@ public partial class EventManager
 		OnShowGameoverPanel(resultText);
 	}
 
+	public static event Action<bool> OnShowPausePanel = b => { LogEvent(); };
+
+	public static void ShowPausePanel(bool show)
+	{
+		OnShowPausePanel(show);
+	}
+
 	//!PROTOTYPE 2
 
 	public void Start()
@@ -133,5 +147,4 @@ public partial class EventManager
 		Debug.LogError("Firing events is not supported in a non-development build.");
 #endif
 	}
-
 }

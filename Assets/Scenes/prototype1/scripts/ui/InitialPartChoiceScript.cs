@@ -25,8 +25,8 @@ public class InitialPartChoiceScript : MonoBehaviour
 	public GameObject mMech1, mMech2;
 
 	[Header("Barrels")] public ActionProvider mBarrelButton1;
-	public ActionProvider mBarrelButton2, mBarrelButton3;
-	public GameObject mBarrel1, mBarrel2, mBarrel3;
+	public ActionProvider mBarrelButton2, mBarrelButton3, mBarrelButton4;
+	public GameObject mBarrel1, mBarrel2, mBarrel3, mBarrel4;
 
 	[Header("Scopes")] public ActionProvider mScopeButton1;
 	public ActionProvider mScopeButton2;
@@ -114,6 +114,10 @@ public class InitialPartChoiceScript : MonoBehaviour
 		mBarrelButton3.OnClick += () =>
 		{
 			mManager.AttachPart(mBarrel3);
+		};
+		mBarrelButton4.OnClick += () =>
+		{
+			mManager.AttachPart(mBarrel4);
 		};
 	}
 
