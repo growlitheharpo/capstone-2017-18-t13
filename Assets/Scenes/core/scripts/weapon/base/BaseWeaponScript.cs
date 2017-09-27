@@ -10,6 +10,14 @@ namespace FiringSquad.Gameplay
 	/// <inheritdoc cref="IWeapon" />
 	public abstract class BaseWeaponScript : MonoBehaviour, IWeapon
 	{
+		public static class DebugHelper
+		{
+			public static WeaponData GetWeaponData(BaseWeaponScript p)
+			{
+				return new WeaponData(p.mCurrentData);
+			}
+		}
+
 		public enum Attachment
 		{
 			Scope,
