@@ -320,6 +320,36 @@ Prefab:
       propertyPath: near clip plane
       value: 0.01
       objectReference: {fileID: 0}
+    - target: {fileID: 114532926038648210, guid: e4a500ab5eb85564ea26d9d9f3385e64,
+        type: 2}
+      propertyPath: mData.mBaseWeaponPrefab
+      value: 
+      objectReference: {fileID: 1953974638818940, guid: c317064bec958ca4eaffd7409ca82b67,
+        type: 2}
+    - target: {fileID: 114532926038648210, guid: e4a500ab5eb85564ea26d9d9f3385e64,
+        type: 2}
+      propertyPath: mData.mDefaultWeaponParts.mScope
+      value: 
+      objectReference: {fileID: 1289196357881978, guid: 975c9792ead689e4890e8005baf816be,
+        type: 2}
+    - target: {fileID: 114532926038648210, guid: e4a500ab5eb85564ea26d9d9f3385e64,
+        type: 2}
+      propertyPath: mData.mDefaultWeaponParts.mBarrel
+      value: 
+      objectReference: {fileID: 1297151579918920, guid: eefca402b2ebce94890c8e29686569ba,
+        type: 2}
+    - target: {fileID: 114532926038648210, guid: e4a500ab5eb85564ea26d9d9f3385e64,
+        type: 2}
+      propertyPath: mData.mDefaultWeaponParts.mMechanism
+      value: 
+      objectReference: {fileID: 1009224365190128, guid: 995bc422faf38e243a547380ab21ab34,
+        type: 2}
+    - target: {fileID: 114532926038648210, guid: e4a500ab5eb85564ea26d9d9f3385e64,
+        type: 2}
+      propertyPath: mData.mDefaultWeaponParts.mGrip
+      value: 
+      objectReference: {fileID: 1614481287065458, guid: 8b9ff7cc70856944499121bcc296f41a,
+        type: 2}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: e4a500ab5eb85564ea26d9d9f3385e64, type: 2}
   m_IsPrefabParent: 0
@@ -833,7 +863,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mConeMesh: {fileID: 4300000, guid: bc808bd80637df24c8cebf0b75342615, type: 3}
   mWireframe: {fileID: 2100000, guid: c0e9cbcedbef2b94b8174a9e9c63705c, type: 2}
-  mDotProduct: 0.5
+  mOverrideEye: 0
 --- !u!1 &732805537
 GameObject:
   m_ObjectHideFlags: 0
@@ -848,7 +878,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &732805538
 Transform:
   m_ObjectHideFlags: 0
@@ -1863,6 +1893,10 @@ Prefab:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1046945755581966, guid: 4717af5e04e790c4c8db4808b0cd971d, type: 2}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1777954920039924, guid: 4717af5e04e790c4c8db4808b0cd971d, type: 2}
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
