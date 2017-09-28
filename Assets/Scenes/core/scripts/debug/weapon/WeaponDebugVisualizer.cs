@@ -48,8 +48,6 @@ namespace FiringSquad.Debug
 
 		private void Update()
 		{
-			//Matrix4x4 transform = new Matrix4x4();
-			//transform.ToM
 			if (mCurrentScript == null)
 			{
 				mLineRenderer.positionCount = 0;
@@ -75,18 +73,18 @@ namespace FiringSquad.Debug
 
 		private void DrawLines(float scaleVal, Transform target)
 		{
-			List<Vector3> points = new List<Vector3>();
+			var points = new List<Vector3>();
 			for (float theta = 0; theta < 2 * Mathf.PI + 0.2f; theta += 0.1f)
 			{
 				Vector3 basePoint = new Vector3(Mathf.Cos(theta), Mathf.Sin(theta), 0.0f);
 				basePoint *= scaleVal;
 
-				Matrix4x4 rotation = Matrix4x4.Rotate(target.rotation);
-				Matrix4x4 bringInScale = Matrix4x4.Scale(Vector3.one * 0.5f);
 				Matrix4x4 translation1 = Matrix4x4.Translate(new Vector3(0.0f, 0.0f, 1.0f));
-				Matrix4x4 translation2 = Matrix4x4.Translate(target.position);
-				//basePoint = target.TransformPoint(basePoint);
-				basePoint = (translation2 * rotation * bringInScale * translation1).MultiplyPoint(basePoint);
+				Matrix4x4 bringInScale = Matrix4x4.Scale(Vector3.one * 0.5f);
+				//Matrix4x4 rotation = Matrix4x4.Rotate(target.rotation);
+				//Matrix4x4 translation2 = Matrix4x4.Translate(target.position);
+				Matrix4x4 targetTransform = target.localToWorldMatrix;
+				basePoint = (targetTransform * bringInScale * translation1).MultiplyPoint(basePoint);
 
 				points.Add(basePoint);
 			}
