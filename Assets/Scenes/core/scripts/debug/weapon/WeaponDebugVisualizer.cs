@@ -8,7 +8,6 @@ namespace FiringSquad.Debug
 	{
 		[SerializeField] private Mesh mConeMesh;
 		[SerializeField] private Material mWireframe;
-		[SerializeField] private float mDotProduct = 0.5f;
 		[SerializeField] private bool mOverrideEye;
 
 		private BaseWeaponScript mCurrentScript;
@@ -55,8 +54,7 @@ namespace FiringSquad.Debug
 
 			Vector3 hitPoint = GetHitPoint(target);
 
-
-			float scaleVal = Mathf.Tan(Mathf.Asin(mDotProduct));
+			float scaleVal = Mathf.Tan(Mathf.Asin(weaponStats.spread));
 
 			Matrix4x4 dotScale = Matrix4x4.Scale(new Vector3(scaleVal, scaleVal, 1.0f));
 			Matrix4x4 totalScale = Matrix4x4.Scale(Vector3.one * Vector3.Distance(target.position, hitPoint));

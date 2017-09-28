@@ -33,6 +33,11 @@ namespace FiringSquad.Gameplay
 
 				return p.bearer.eye;
 			}
+
+			public static void ForceApplySpreadMod(Modifier.Float val)
+			{
+				
+			}
 		}
 
 		public enum Attachment
@@ -60,13 +65,12 @@ namespace FiringSquad.Gameplay
 
 		private GameObjectPool mProjectilePool;
 
-		protected WeaponData mCurrentData;
+		[SerializeField] protected WeaponData mCurrentData;
+
 		protected Transform mAimRoot;
 		protected BoundProperty<int> mClipSize;
 		protected BoundProperty<int> mAmountInClip;
 		protected float mShotTime;
-
-		private const float DEFAULT_SPREAD_FACTOR = 0.001f;
 
 		protected virtual void Awake()
 		{
@@ -241,11 +245,13 @@ namespace FiringSquad.Gameplay
 		/// <returns>A new ray (origin + direction) for the next shot.</returns>
 		protected virtual Ray CalculateShotDirection()
 		{
-			float spreadFactor = DEFAULT_SPREAD_FACTOR * mCurrentData.spread;
-			Vector3 randomness = new Vector3(
+			//float spreadFactor = DEFAULT_SPREAD_FACTOR * mCurrentData.spread;
+			/*Vector3 randomness = new Vector3(
 				Random.Range(-spreadFactor, spreadFactor),
 				Random.Range(-spreadFactor, spreadFactor),
-				Random.Range(-spreadFactor, spreadFactor));
+				Random.Range(-spreadFactor, spreadFactor));*/
+
+			Vector3 randomness = Random.insideUnitSphere * mCurrentData.spread;
 
 			Transform root = GetAimRoot();
 			return new Ray(root.position, root.forward + randomness);

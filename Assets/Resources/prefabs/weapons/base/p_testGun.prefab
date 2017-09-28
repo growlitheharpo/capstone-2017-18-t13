@@ -166,7 +166,7 @@ GameObject:
   - component: {fileID: 95394249164853166}
   - component: {fileID: 114397685040299484}
   m_Layer: 9
-  m_Name: p_placeholderGun
+  m_Name: p_testGun
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -475,11 +475,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mBaseData:
     mSpread: 0.1
-    mDamage: 50
-    mFireRate: 2
-    mRecoil: 0.075
-    mReloadTime: 1
-    mClipSize: 10
+    mDamage: 0
+    mFireRate: 100
+    mRecoil: 0
+    mReloadTime: 0.1
+    mClipSize: 100
   mBarrelAttach: {fileID: 4096145057804758}
   mScopeAttach: {fileID: 4197488167877586}
   mMechanismAttach: {fileID: 4891504686318262}
