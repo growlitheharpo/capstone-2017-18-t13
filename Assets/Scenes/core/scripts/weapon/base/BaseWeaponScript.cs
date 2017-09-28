@@ -16,6 +16,23 @@ namespace FiringSquad.Gameplay
 			{
 				return new WeaponData(p.mCurrentData);
 			}
+
+			public static Dictionary<Attachment, WeaponPartScript> GetAttachments(BaseWeaponScript p)
+			{
+				return new Dictionary<Attachment, WeaponPartScript>(p.mCurrentAttachments);
+			}
+
+			public static Transform GetWeaponAimRoot(BaseWeaponScript p, bool forceBarrel = false)
+			{
+				if (!forceBarrel)
+					return p.GetAimRoot();
+
+				WeaponPartScript barrel;
+				if (p.mCurrentAttachments.TryGetValue(Attachment.Barrel, out barrel) && barrel is WeaponPartScriptBarrel)
+					return ((WeaponPartScriptBarrel)barrel).barrelTip;
+
+				return p.bearer.eye;
+			}
 		}
 
 		public enum Attachment
