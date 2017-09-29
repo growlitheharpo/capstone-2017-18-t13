@@ -16,9 +16,6 @@ namespace FiringSquad.Gameplay
 		[SerializeField] private PlayerInputMap mInputMap;
 		[SerializeField] private PlayerDefaultsData mData;
 
-		[SerializeField] private string mOverrideUIName;
-		public string overrideUIName { get { return mOverrideUIName; } }
-
 		private Vector3 mDefaultPosition;
 
 		private PlayerGravGunWeapon mGravityGun;
@@ -182,7 +179,7 @@ namespace FiringSquad.Gameplay
 		
 		private void INPUT_TogglePause()
 		{
-			EventManager.Notify(() => EventManager.TogglePauseState(this));
+			EventManager.Notify(EventManager.TogglePauseState);
 		}
 
 		private void CONSOLE_ToggleGodmode(string[] args)
@@ -215,10 +212,9 @@ namespace FiringSquad.Gameplay
 			InitializeValues(true);
 		}
 		
-		// TODO: Make this private again
-		public void ApplyOptionsData(IOptionsData settings)
+		private void ApplyOptionsData(IOptionsData settings)
 		{
-			mMainCameraRef.GetComponent<Camera>().fieldOfView = settings.fieldOfView;
+			mMainCameraRef.GetComponentInChildren<Camera>().fieldOfView = settings.fieldOfView;
 			AudioListener.volume = settings.masterVolume;
 		}
 
