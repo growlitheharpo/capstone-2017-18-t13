@@ -2,12 +2,14 @@
 using FiringSquad.Data;
 using KeatsLib;
 using UnityEngine;
+using UnityEngine.Networking;
 using InputLevel = KeatsLib.Unity.Input.InputLevel;
 
 namespace FiringSquad.Gameplay
 {
-	public class PlayerScript : MonoBehaviour, IWeaponBearer, IDamageReceiver
+	public class PlayerScript : NetworkBehaviour, IWeaponBearer, IDamageReceiver
 	{
+		[SerializeField] private GameObject mCameraPrefab;
 		[SerializeField] private PlayerInputMap mInputMap;
 		[SerializeField] private PlayerDefaultsData mData;
 
@@ -23,7 +25,7 @@ namespace FiringSquad.Gameplay
 		private bool mGodmode;
 		private Transform mMainCameraRef;
 
-		Transform ICharacter.eye { get { return mMainCameraRef; } }
+		public Transform eye { get { return mMainCameraRef; } }
 		public IWeapon weapon { get { return mWeapon; } }
 		public WeaponDefaultsData defaultParts { get { return mDefaultsOverride ?? mData.defaultWeaponParts; } }
 		public PlayerInputMap inputMap { get { return mInputMap; } }
@@ -33,6 +35,7 @@ namespace FiringSquad.Gameplay
 
 		private void Awake()
 		{
+			Logger.Info("AWAKE");
 			mDefaultPosition = transform.position;
 			mMovement = GetComponent<PlayerMovementScript>();
 
@@ -50,19 +53,8 @@ namespace FiringSquad.Gameplay
 			}
 		}
 
-		private void Start()
+		public override void OnStartLocalPlayer()
 		{
-			mWeapon.bearer = this;
-
-			if (mGravityGun != null)
-				mGravityGun.bearer = this;
-
-			mMainCameraRef = GetComponentInChildren<Camera>().transform;
-
-			// TODO: GET RID OF THIS MESS
-			int val = string.IsNullOrEmpty(mOverrideUIName) ? GameplayUIManager.PLAYER_HEALTH : (mOverrideUIName + "-health").GetHashCode();
-			mHealth = new BoundProperty<float>(mData.defaultHealth, val);
-
 			ServiceLocator.Get<IInput>()
 				.RegisterInput(Input.GetButtonDown, inputMap.toggleMenuButton, INPUT_ToggleUIElement, InputLevel.None)
 				.RegisterInput(Input.GetButton, inputMap.fireWeaponButton, INPUT_FireWeapon, InputLevel.Gameplay)
@@ -70,11 +62,24 @@ namespace FiringSquad.Gameplay
 				.RegisterInput(Input.GetButtonDown, inputMap.interactButton, INPUT_ActivateInteract, InputLevel.Gameplay)
 				.RegisterInput(Input.GetButtonDown, inputMap.pauseButton, INPUT_TogglePause, InputLevel.PauseMenu);
 
-			if (mGravityGun != null)
-				mGravityGun.RegisterInput(inputMap);
-
 			ServiceLocator.Get<IGameConsole>()
 				.RegisterCommand("godmode", CONSOLE_ToggleGodmode);
+
+			if (mGravityGun != null)
+				mGravityGun.RegisterInput(inputMap);
+		}
+
+		private void Start()
+		{
+			mMainCameraRef = transform.Find("CameraOffset");
+			if (isLocalPlayer)
+				Instantiate(mCameraPrefab, mMainCameraRef, false);
+
+			mWeapon.bearer = this;
+			mHealth = new BoundProperty<float>(mData.defaultHealth);
+
+			if (mGravityGun != null)
+				mGravityGun.bearer = this;
 
 			EventManager.OnResetLevel += ReceiveResetEvent;
 			EventManager.OnApplyOptionsData += ApplyOptionsData;
@@ -124,7 +129,8 @@ namespace FiringSquad.Gameplay
 
 		public void ApplyRecoil(Vector3 direction, float amount)
 		{
-			mMovement.AddRecoil(direction, amount);
+			if (mMovement != null)
+				mMovement.AddRecoil(direction, amount);
 		}
 
 		private void INPUT_ToggleUIElement()

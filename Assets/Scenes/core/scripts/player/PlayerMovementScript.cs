@@ -1,6 +1,7 @@
 ﻿using FiringSquad.Data;
 using KeatsLib;
 using UnityEngine;
+using UnityEngine.Networking;
 using Input = UnityEngine.Input;
 
 namespace FiringSquad.Gameplay
@@ -10,7 +11,7 @@ namespace FiringSquad.Gameplay
 	/// object through the game world.
 	/// </summary>
 	/// <inheritdoc />
-	public class PlayerMovementScript : MonoBehaviour
+	public class PlayerMovementScript : NetworkBehaviour
 	{
 		[SerializeField] private CharacterMovementData mMovementData;
 
@@ -35,7 +36,7 @@ namespace FiringSquad.Gameplay
 			mMoveDirection = Vector3.zero;
 			mCollider = GetComponent<CapsuleCollider>();
 			mController = GetComponent<CharacterController>();
-			mMainCameraRef = GetComponentInChildren<Camera>().transform;
+			mMainCameraRef = transform.Find("CameraOffset");
 
 			mMouseSensitivity = 1.0f;
 			mStandingHeight = mCollider.height;
@@ -46,6 +47,12 @@ namespace FiringSquad.Gameplay
 
 		private void Start()
 		{
+			if (!isLocalPlayer)
+			{
+				Destroy(this);
+				return;
+			}
+
 			PlayerInputMap input = GetComponent<PlayerScript>().inputMap;
 
 			ServiceLocator.Get<IInput>()
@@ -66,6 +73,9 @@ namespace FiringSquad.Gameplay
 
 		private void OnDestroy()
 		{
+			if (!isLocalPlayer)
+				return;
+
 			ServiceLocator.Get<IInput>()
 				.UnregisterInput(INPUT_Jump)
 				.UnregisterInput(INPUT_CrouchStart)
@@ -132,6 +142,9 @@ namespace FiringSquad.Gameplay
 
 		private void Update()
 		{
+			if (!isLocalPlayer)
+				return;
+
 			HandleRotation();
 			UpdateCrouch();
 
@@ -148,6 +161,9 @@ namespace FiringSquad.Gameplay
 
 		private void FixedUpdate()
 		{
+			if (!isLocalPlayer)
+				return;
+
 			ApplyMovementForce();
 		}
 
