@@ -16,6 +16,7 @@ public static class Logger
 		{ System.Event, "purple" },
 		{ System.Services, "olive" },
 		{ System.Input, "orange" },
+		{ System.Network, "maroon" },
 		{ System.Generic, "grey" },
 	};
 
@@ -27,6 +28,7 @@ public static class Logger
 		Event = 0x4,
 		Services = 0x8,
 		Input = 0x10,
+		Network = 0x20,
 		Generic = 0x10000,
 	}
 
@@ -80,8 +82,15 @@ public static class Logger
 
 	private static bool CheckLevel(System system)
 	{
-		System level = ServiceLocator.Get<IGameConsole>().enabledLogLevels;
-		return (level & system) == system;
+		try
+		{
+			System level = ServiceLocator.Get<IGameConsole>().enabledLogLevels;
+			return (level & system) == system;
+		}
+		catch (Exception)
+		{
+			return true;
+		}
 	}
 
 	private static SystemExtensions.Types.Pair<string, string> GetColorPair(System system)
