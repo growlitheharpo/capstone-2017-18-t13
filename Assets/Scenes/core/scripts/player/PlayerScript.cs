@@ -76,7 +76,9 @@ namespace FiringSquad.Gameplay
 				BindCamera();
 
 			mWeapon.bearer = this;
-			mHealth = new BoundProperty<float>(mData.defaultHealth, GameplayUIManager.PLAYER_HEALTH);
+
+			int label = isLocalPlayer ? GameplayUIManager.PLAYER_HEALTH : -1;
+			mHealth = new BoundProperty<float>(mData.defaultHealth, label);
 
 			if (mGravityGun != null)
 				mGravityGun.bearer = this;
