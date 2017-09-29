@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using FiringSquad.Data;
 using KeatsLib;
 using KeatsLib.Unity;
@@ -233,6 +234,32 @@ namespace FiringSquad.Gameplay
 		public void ResetArenaPlayer()
 		{
 			InitializeValues();
+		}
+
+		[Command]
+		public void CmdReflectWeaponFire(byte[] data)
+		{
+			RpcFireShotNow(data);
+		}
+
+		[ClientRpc]
+		public void RpcFireShotNow(byte[] data)
+		{
+			if (isLocalPlayer) // we already reflected this
+				return;
+
+			var shots = new List<Ray>();
+			NetworkReader reader = new NetworkReader(data);
+			int count = reader.ReadInt32();
+
+			for (int i = 0; i < count; i++)
+			{
+				Vector3 o = reader.ReadVector3();
+				Vector3 d = reader.ReadVector3();
+				shots.Add(new Ray(o, d));
+			}
+
+			weapon.FireShotImmediate(shots);
 		}
 	}
 }
