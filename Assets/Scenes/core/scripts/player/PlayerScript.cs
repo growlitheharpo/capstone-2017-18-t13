@@ -233,9 +233,25 @@ namespace FiringSquad.Gameplay
 		{
 			InitializeValues();
 		}
+		
+		#region Networking
+
+		public void ReflectWeaponFire(List<Ray> rays)
+		{
+			NetworkWriter writer = new NetworkWriter();
+			writer.Write(rays.Count);
+
+			foreach (Ray ray in rays)
+			{
+				writer.Write(ray.origin);
+				writer.Write(ray.direction);
+			}
+
+			CmdReflectWeaponFire(writer.AsArray());
+		}
 
 		[Command]
-		public void CmdReflectWeaponFire(byte[] data)
+		private void CmdReflectWeaponFire(byte[] data)
 		{
 			RpcFireShotNow(data);
 		}
@@ -251,9 +267,15 @@ namespace FiringSquad.Gameplay
 			int count = reader.ReadInt32();
 
 			for (int i = 0; i < count; i++)
-				shots.Add(reader.ReadRay());
+			{
+				Vector3 o = reader.ReadVector3();
+				Vector3 d = reader.ReadVector3();
+				shots.Add(new Ray(o, d));
+			}
 
 			weapon.FireShotImmediate(shots);
 		}
+
+		#endregion
 	}
 }

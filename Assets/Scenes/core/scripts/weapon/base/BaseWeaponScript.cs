@@ -176,18 +176,12 @@ namespace FiringSquad.Gameplay
 			WeaponPartScriptBarrel barrel = mCurrentAttachments[Attachment.Barrel] as WeaponPartScriptBarrel;
 			int count = barrel != null ? barrel.projectileCount : 1;
 
-			NetworkWriter writer = new NetworkWriter();
-			writer.Write(count);
 			var shots = new List<Ray>(count);
-
 			for (int i = 0; i < count; i++)
-			{
 				shots.Add(CalculateShotDirection());
-				writer.Write(shots[i]);
-			}
 
 			FireShotImmediate(shots);
-			((PlayerScript)bearer).CmdReflectWeaponFire(writer.ToArray());
+			((PlayerScript)bearer).ReflectWeaponFire(shots);
 		}
 
 		public void FireShotImmediate(List<Ray> shots)
