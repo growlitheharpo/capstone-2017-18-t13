@@ -1,8 +1,10 @@
 ﻿using System;
 using FiringSquad.Data;
 using KeatsLib;
+using KeatsLib.Unity;
 using UnityEngine;
 using UnityEngine.Networking;
+using Input = UnityEngine.Input;
 using InputLevel = KeatsLib.Unity.Input.InputLevel;
 
 namespace FiringSquad.Gameplay
@@ -73,7 +75,7 @@ namespace FiringSquad.Gameplay
 		{
 			mMainCameraRef = transform.Find("CameraOffset");
 			if (isLocalPlayer)
-				Instantiate(mCameraPrefab, mMainCameraRef, false);
+				BindCamera();
 
 			mWeapon.bearer = this;
 			mHealth = new BoundProperty<float>(mData.defaultHealth);
@@ -101,6 +103,13 @@ namespace FiringSquad.Gameplay
 			EventManager.OnResetLevel -= ReceiveResetEvent;
 			EventManager.OnApplyOptionsData -= ApplyOptionsData;
 			mHealth.Cleanup();
+		}
+
+		private void BindCamera()
+		{
+			Camera c = (Camera.main ?? FindObjectOfType<Camera>()) ?? Instantiate(mCameraPrefab).GetComponent<Camera>();
+			c.transform.SetParent(mMainCameraRef, false);
+			c.transform.ResetLocalValues();
 		}
 
 		private void InitializeValues(bool reposition = false)

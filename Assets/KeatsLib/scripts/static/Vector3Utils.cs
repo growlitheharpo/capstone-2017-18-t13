@@ -240,4 +240,15 @@ namespace KeatsLib.Unity
 			return new Rect(r.x, r.y + r.height, width, height);
 		}
 	}
+
+	public static class TransformExt
+	{
+		public static Transform ResetLocalValues(this Transform t)
+		{
+			t.localPosition = Vector3.zero;
+			t.localRotation = Quaternion.identity;
+			t.localScale = Vector3.one;
+			return t;
+		}
+	}
 }
