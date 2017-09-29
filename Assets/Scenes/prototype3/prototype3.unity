@@ -249,7 +249,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   manager: {fileID: 0}
   showGUI: 1
-  offsetX: 0
+  offsetX: 600
   offsetY: 0
 --- !u!114 &129147711
 MonoBehaviour:
@@ -994,6 +994,7 @@ GameObject:
   m_Component:
   - component: {fileID: 655255150}
   - component: {fileID: 655255149}
+  - component: {fileID: 655255146}
   m_Layer: 0
   m_Name: Camera
   m_TagString: MainCamera
@@ -1001,6 +1002,13 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!81 &655255146
+AudioListener:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 655255145}
+  m_Enabled: 1
 --- !u!20 &655255149
 Camera:
   m_ObjectHideFlags: 0
