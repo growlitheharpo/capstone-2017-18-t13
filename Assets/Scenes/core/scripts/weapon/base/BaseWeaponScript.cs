@@ -178,14 +178,12 @@ namespace FiringSquad.Gameplay
 
 			NetworkWriter writer = new NetworkWriter();
 			writer.Write(count);
-			var shots = new List<Ray>();
+			var shots = new List<Ray>(count);
 
 			for (int i = 0; i < count; i++)
 			{
-				Ray shot = CalculateShotDirection();
-				writer.Write(shot.origin);
-				writer.Write(shot.direction);
-				shots.Add(shot);
+				shots.Add(CalculateShotDirection());
+				writer.Write(shots[i]);
 			}
 
 			FireShotImmediate(shots);

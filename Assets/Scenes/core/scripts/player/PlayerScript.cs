@@ -249,11 +249,7 @@ namespace FiringSquad.Gameplay
 			int count = reader.ReadInt32();
 
 			for (int i = 0; i < count; i++)
-			{
-				Vector3 o = reader.ReadVector3();
-				Vector3 d = reader.ReadVector3();
-				shots.Add(new Ray(o, d));
-			}
+				shots.Add(reader.ReadRay());
 
 			weapon.FireShotImmediate(shots);
 		}
