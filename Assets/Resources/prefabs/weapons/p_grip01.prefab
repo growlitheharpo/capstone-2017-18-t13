@@ -56,6 +56,8 @@ GameObject:
   - component: {fileID: 114035792997203982}
   - component: {fileID: 114080148873222318}
   - component: {fileID: 54565695844076754}
+  - component: {fileID: 114668238183340610}
+  - component: {fileID: 114620695907616644}
   m_Layer: 0
   m_Name: p_grip01
   m_TagString: interactable
@@ -312,3 +314,56 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mPickupCollider: {fileID: 65819624777832710}
+--- !u!114 &114620695907616644
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1614481287065458}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1768714887, guid: dc443db3e92b4983b9738c1131f555cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_TransformSyncMode: 3
+  m_SendInterval: 0.05
+  m_SyncRotationAxis: 7
+  m_RotationSyncCompression: 0
+  m_SyncSpin: 1
+  m_MovementTheshold: 0.001
+  m_VelocityThreshold: 0.0001
+  m_SnapThreshold: 5
+  m_InterpolateRotation: 1
+  m_InterpolateMovement: 1
+--- !u!114 &114668238183340610
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1614481287065458}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 372142912, guid: dc443db3e92b4983b9738c1131f555cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SceneId:
+    m_Value: 0
+  m_AssetId:
+    i0: 191
+    i1: 64
+    i2: 15
+    i3: 113
+    i4: 67
+    i5: 112
+    i6: 236
+    i7: 100
+    i8: 107
+    i9: 185
+    i10: 59
+    i11: 52
+    i12: 225
+    i13: 230
+    i14: 36
+    i15: 208
+  m_ServerOnly: 0
+  m_LocalPlayerAuthority: 0

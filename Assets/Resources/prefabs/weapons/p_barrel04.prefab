@@ -70,6 +70,8 @@ GameObject:
   - component: {fileID: 114439042836857858}
   - component: {fileID: 114131211762786674}
   - component: {fileID: 54213356047996608}
+  - component: {fileID: 114569275844747430}
+  - component: {fileID: 114427818562697356}
   m_Layer: 10
   m_Name: p_barrel04
   m_TagString: interactable
@@ -397,6 +399,27 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mPickupCollider: {fileID: 65558307794834120}
+--- !u!114 &114427818562697356
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1711722334057618}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1768714887, guid: dc443db3e92b4983b9738c1131f555cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_TransformSyncMode: 3
+  m_SendInterval: 0.05
+  m_SyncRotationAxis: 7
+  m_RotationSyncCompression: 0
+  m_SyncSpin: 1
+  m_MovementTheshold: 0.001
+  m_VelocityThreshold: 0.0001
+  m_SnapThreshold: 5
+  m_InterpolateRotation: 1
+  m_InterpolateMovement: 1
 --- !u!114 &114439042836857858
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -420,3 +443,35 @@ MonoBehaviour:
   mDurability: 24
   mTip: {fileID: 4467395475359334}
   mProjectileCount: 5
+--- !u!114 &114569275844747430
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1711722334057618}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 372142912, guid: dc443db3e92b4983b9738c1131f555cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SceneId:
+    m_Value: 0
+  m_AssetId:
+    i0: 224
+    i1: 175
+    i2: 34
+    i3: 126
+    i4: 230
+    i5: 92
+    i6: 231
+    i7: 148
+    i8: 185
+    i9: 163
+    i10: 168
+    i11: 58
+    i12: 64
+    i13: 204
+    i14: 122
+    i15: 220
+  m_ServerOnly: 0
+  m_LocalPlayerAuthority: 0
