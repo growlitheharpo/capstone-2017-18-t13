@@ -45,16 +45,28 @@ namespace FiringSquad.Gameplay
 				GameObject newGun = UnityUtils.InstantiateIntoHolder(mData.baseWeaponPrefab, offset, true, true);
 				mWeapon = newGun.GetComponent<PlayerWeaponScript>();
 			}
+		}
+
+		[Command]
+		private void CmdSpawnGravityGun()
+		{
 			if (mData.makeGravGun && mData.gravityGunPrefab != null)
 			{
 				Transform offset = transform.Find("Gun2Offset");
 				GameObject newGun = UnityUtils.InstantiateIntoHolder(mData.gravityGunPrefab, offset, true, true);
 				mGravityGun = newGun.GetComponent<PlayerGravGunWeapon>();
+				mGravityGun.bearer = this;
+
+				NetworkServer.SpawnWithClientAuthority(newGun, gameObject);
+
+				mGravityGun.TargetRpcRegisterInput(connectionToClient, netId);
 			}
 		}
 
 		public override void OnStartLocalPlayer()
 		{
+			CmdSpawnGravityGun();
+
 			ServiceLocator.Get<IInput>()
 				.RegisterInput(Input.GetButtonDown, inputMap.toggleMenuButton, INPUT_ToggleUIElement, InputLevel.None)
 				.RegisterInput(Input.GetButton, inputMap.fireWeaponButton, INPUT_FireWeapon, InputLevel.Gameplay)
@@ -65,8 +77,8 @@ namespace FiringSquad.Gameplay
 			ServiceLocator.Get<IGameConsole>()
 				.RegisterCommand("godmode", CONSOLE_ToggleGodmode);
 
-			if (mGravityGun != null)
-				mGravityGun.RegisterInput(inputMap);
+			/*if (mGravityGun != null)
+				mGravityGun.RegisterInput(inputMap);*/
 		}
 
 		private void Start()
@@ -79,9 +91,6 @@ namespace FiringSquad.Gameplay
 
 			int label = isLocalPlayer ? GameplayUIManager.PLAYER_HEALTH : -1;
 			mHealth = new BoundProperty<float>(mData.defaultHealth, label);
-
-			if (mGravityGun != null)
-				mGravityGun.bearer = this;
 
 			EventManager.OnResetLevel += ReceiveResetEvent;
 			EventManager.OnApplyOptionsData += ApplyOptionsData;

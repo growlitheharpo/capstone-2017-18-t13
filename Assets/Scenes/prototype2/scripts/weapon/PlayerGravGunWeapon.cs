@@ -1,23 +1,17 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using FiringSquad.Data;
 using KeatsLib.State;
+using KeatsLib.Unity;
 using UnityEngine;
+using UnityEngine.Networking;
 using Input = UnityEngine.Input;
 
 namespace FiringSquad.Gameplay
 {
-	public class PlayerGravGunWeapon : BaseStateMachineComponent
+	public class PlayerGravGunWeapon : NetworkBehaviour
 	{
 		private const float SNAP_DISTANCE = 4.0f;
-
-		private abstract class GravGunState : BaseState<PlayerGravGunWeapon>
-		{
-			protected GravGunState(PlayerGravGunWeapon machine) : base(machine) { }
-
-			public virtual void OnInputPressed() { }
-			public virtual void OnInputHeld() { }
-			public virtual void OnInputReleased() { }
-		}
 
 		// mock the weapon interface
 		public IWeaponBearer bearer { get; set; }
@@ -31,15 +25,34 @@ namespace FiringSquad.Gameplay
 		public IInteractable heldObject { get { return mHoldTarget == null ? null : mHoldTarget.GetComponentUpwards<IInteractable>(); } }
 
 		private Rigidbody mHoldTarget;
-		private bool mGotInputThisFrame;
+
+		private GravGunStateMachine mMachine;
 
 		private void Start()
 		{
-			TransitionStates(new IdleState(this));
+			mMachine = new GravGunStateMachine(this);
 		}
-		
-		public void RegisterInput(PlayerInputMap input)
+
+		private void Update()
 		{
+			mMachine.Update();
+		}
+
+		[TargetRpc]
+		public void TargetRpcRegisterInput(NetworkConnection target, NetworkInstanceId playerId)
+		{
+			GameObject go = ClientScene.FindLocalObject(playerId);
+			if (go == null)
+				throw new ArgumentException("Could not attach gravity gun to a player: " + playerId);
+
+			PlayerScript playerScript = go.GetComponent<PlayerScript>();
+
+			bearer = playerScript;
+			transform.SetParent(go.transform, false);
+			transform.ResetLocalValues();
+
+			PlayerInputMap input = playerScript.inputMap;
+
 			ServiceLocator.Get<IInput>()
 				.RegisterInput(Input.GetButtonDown, input.fireGravGunButton, HandlePressed, KeatsLib.Unity.Input.InputLevel.Gameplay)
 				.RegisterInput(Input.GetButton, input.fireGravGunButton, HandleHeld, KeatsLib.Unity.Input.InputLevel.Gameplay)
@@ -56,230 +69,278 @@ namespace FiringSquad.Gameplay
 
 		private void HandlePressed()
 		{
-			GravGunState realState = currentState as GravGunState;
+			GravGunStateMachine.IGravGunState realState = mMachine.currentGravState;
 			if (realState != null)
 				realState.OnInputPressed();
 		}
 
 		private void HandleHeld()
 		{
-			GravGunState realState = currentState as GravGunState;
+			GravGunStateMachine.IGravGunState realState = mMachine.currentGravState;
 			if (realState != null)
 				realState.OnInputHeld();
 		}
 
 		private void HandleReleased()
 		{
-			GravGunState realState = currentState as GravGunState;
+			GravGunStateMachine.IGravGunState realState = mMachine.currentGravState;
 			if (realState != null)
 				realState.OnInputReleased();
 		}
 
-		private class IdleState : GravGunState
+		[Command]
+		private void CmdAddForceToObject(NetworkInstanceId id, Vector3 force)
 		{
-			public IdleState(PlayerGravGunWeapon m) : base(m) { }
+			GameObject go = NetworkServer.FindLocalObject(id);
+			go.transform.SetParent(null);
 
-			private bool mPressed;
-
-			public override void OnInputPressed()
-			{
-				mPressed = true;
-			}
-
-			public override IState GetTransition()
-			{
-				if (mPressed)
-					return new TryDrawObjectState(mMachine);
-				return this;
-			}
+			Rigidbody rb = go.GetComponent<Rigidbody>();
+			rb.AddForce(force, ForceMode.Impulse);
 		}
 
-		private class TryDrawObjectState : GravGunState
+		private class GravGunStateMachine : BaseStateMachine
 		{
-			public TryDrawObjectState(PlayerGravGunWeapon m) : base(m) { }
+			public IGravGunState currentGravState { get { return currentState as GravGunState; } }
+			private PlayerGravGunWeapon mScript;
 
-			private Rigidbody mPullTarget;
-			private bool mCancelled;
-
-			private bool objectInRange
+			public GravGunStateMachine(PlayerGravGunWeapon script)
 			{
-				get {
-					return mPullTarget != null
-							&& Vector3.Distance(mPullTarget.transform.position, mMachine.transform.position) <= SNAP_DISTANCE;
-				}
+				mScript = script;
+				TransitionStates(new IdleState(this));
 			}
 
-			public override void OnInputReleased()
+			public new void Update()
 			{
-				mCancelled = true;
+				base.Update();
 			}
 
-			public override void OnEnter()
+			public interface IGravGunState
 			{
-				mPullTarget = null;
+				void OnInputPressed();
+				void OnInputHeld();
+				void OnInputReleased();
 			}
 
-			public override void Update()
+			private abstract class GravGunState : BaseState<GravGunStateMachine>, IGravGunState
 			{
-				if (mPullTarget == null)
-					TryGrabObject();
-				else
+				protected GravGunState(GravGunStateMachine machine) : base(machine) { }
+
+				public virtual void OnInputPressed() { }
+				public virtual void OnInputHeld() { }
+				public virtual void OnInputReleased() { }
+			}
+
+			private class IdleState : GravGunState
+			{
+				public IdleState(GravGunStateMachine m) : base(m) { }
+
+				private bool mPressed;
+
+				public override void OnInputPressed()
 				{
-					if (CheckStillLooking())
-						ReelObjectIn();
+					mPressed = true;
+				}
+
+				public override IState GetTransition()
+				{
+					if (mPressed)
+						return new TryDrawObjectState(mMachine);
+					return this;
 				}
 			}
 
-			private void TryGrabObject()
+			private class TryDrawObjectState : GravGunState
 			{
-				// this is where we raycast
-				Transform eye = mMachine.bearer.eye;
+				public TryDrawObjectState(GravGunStateMachine m) : base(m) { }
 
-				Ray ray = new Ray(eye.position, eye.forward);
-				UnityEngine.Debug.DrawLine(ray.origin, ray.origin + ray.direction * 4000.0f, new Color(.6f, 0.0f, 1.0f), 0.2f);
+				private NetworkIdentity mPullTarget;
+				private bool mCancelled;
 
-				RaycastHit hit;
-				if (!Physics.Raycast(ray, out hit, 4000.0f, mMachine.mGrabMask))
-					return;
+				private bool objectInRange
+				{
+					get
+					{
+						return mPullTarget != null
+								&& Vector3.Distance(mPullTarget.transform.position, mMachine.mScript.transform.position) <= SNAP_DISTANCE;
+					}
+				}
 
-				Rigidbody rb = hit.rigidbody;
-				if (rb == null)
-					return;
+				public override void OnInputReleased()
+				{
+					mCancelled = true;
+				}
 
-				mPullTarget = rb;
-			}
-			
-			private bool CheckStillLooking()
-			{
-				if (mPullTarget == null)
-					return false;
-
-				Vector3 direction = mPullTarget.position - mMachine.bearer.eye.position;
-				Vector3 looking = mMachine.bearer.eye.forward;
-
-				float dot = Vector3.Dot(direction.normalized, looking.normalized);
-				if (dot < mMachine.mReelInSensitivity)
+				public override void OnEnter()
 				{
 					mPullTarget = null;
-					return false;
 				}
 
-				return true;
-			}
-
-			private void ReelObjectIn()
-			{
-				Vector3 direction = mMachine.transform.position - mPullTarget.position;
-				mPullTarget.AddForce(direction * Time.deltaTime * mMachine.mPullStrength, ForceMode.Impulse);
-			}
-
-			public override IState GetTransition()
-			{
-				if (objectInRange)
+				public override void Update()
 				{
-					mMachine.mHoldTarget = mPullTarget;
-					return new GrabAndHoldState(mMachine);
+					if (mPullTarget == null)
+						TryGrabObject();
+					else
+					{
+						if (CheckStillLooking())
+							ReelObjectIn();
+					}
 				}
-				if (mCancelled)
-					return new IdleState(mMachine);
 
-				return this;
-			}
-		}
-
-		private class GrabAndHoldState : GravGunState
-		{
-			public GrabAndHoldState(PlayerGravGunWeapon m) : base(m) { }
-
-			private RigidbodyConstraints mOriginalConstraints;
-
-			private Transform mPreviousParent;
-			private Coroutine mGrabRoutine;
-			private bool mReleasedOnce, mExit;
-			private float mHoldTime;
-			private Vector3 mEndForce;
-
-			public override void OnEnter()
-			{
-				mOriginalConstraints = mMachine.mHoldTarget.constraints;
-				mMachine.mHoldTarget.constraints = RigidbodyConstraints.FreezeAll;
-
-				mPreviousParent = mMachine.mHoldTarget.transform.parent;
-				mMachine.mHoldTarget.transform.SetParent(mMachine.transform);
-
-				mGrabRoutine = mMachine.StartCoroutine(LerpToMyPosition());
-			}
-			
-			private IEnumerator LerpToMyPosition(float time = 0.3f)
-			{
-				Vector3 originalPos = mMachine.mHoldTarget.transform.position;
-				float currentTime = 0.0f;
-
-				while (currentTime < time)
+				private void TryGrabObject()
 				{
-					if (mMachine.mHoldTarget == null)
-						yield break;
+					// this is where we raycast
+					Transform eye = mMachine.mScript.bearer.eye;
 
-					mMachine.mHoldTarget.transform.position = Vector3.Lerp(originalPos, mMachine.transform.position, currentTime / time);
-					currentTime += Time.deltaTime;
+					Ray ray = new Ray(eye.position, eye.forward);
+					UnityEngine.Debug.DrawLine(ray.origin, ray.origin + ray.direction * 4000.0f, new Color(.6f, 0.0f, 1.0f), 0.2f);
 
-					yield return null;
+					RaycastHit hit;
+					if (!Physics.Raycast(ray, out hit, 4000.0f, mMachine.mScript.mGrabMask))
+						return;
+
+					Rigidbody rb = hit.rigidbody;
+					if (rb == null)
+						return;
+
+					NetworkIdentity id = rb.GetComponent<NetworkIdentity>();
+					if (id == null)
+						return;
+
+					mPullTarget = id;
+				}
+
+				private bool CheckStillLooking()
+				{
+					if (mPullTarget == null)
+						return false;
+
+					Vector3 direction = mPullTarget.transform.position - mMachine.mScript.bearer.eye.position;
+					Vector3 looking = mMachine.mScript.bearer.eye.forward;
+
+					float dot = Vector3.Dot(direction.normalized, looking.normalized);
+					if (dot < mMachine.mScript.mReelInSensitivity)
+					{
+						mPullTarget = null;
+						return false;
+					}
+
+					return true;
+				}
+
+				private void ReelObjectIn()
+				{
+					Vector3 direction = mMachine.mScript.transform.position - mPullTarget.transform.position;
+					mMachine.mScript.CmdAddForceToObject(mPullTarget.netId, direction * Time.deltaTime * mMachine.mScript.mPullStrength);
+				}
+
+				public override IState GetTransition()
+				{
+					if (objectInRange)
+					{
+						mMachine.mScript.mHoldTarget = mPullTarget.GetComponent<Rigidbody>();
+						return new GrabAndHoldState(mMachine);
+					}
+					if (mCancelled)
+						return new IdleState(mMachine);
+
+					return this;
 				}
 			}
 
-			public override void OnInputHeld()
+			private class GrabAndHoldState : GravGunState
 			{
-				if (mReleasedOnce)
-					mHoldTime += Time.deltaTime;
-			}
+				public GrabAndHoldState(GravGunStateMachine m) : base(m) { }
 
-			public override void OnInputReleased()
-			{
-				if (!mReleasedOnce)
-					mReleasedOnce = true;
-				else
-					HandleTriggerRelease();
-			}
-			
-			private void HandleTriggerRelease()
-			{
-				if (mMachine.mHoldTarget == null)
-					return;
+				private RigidbodyConstraints mOriginalConstraints;
 
-				if (mHoldTime < mMachine.mHoldForThrowTime)
-					mEndForce = Vector3.zero;
-				else
-					mEndForce = mMachine.bearer.eye.forward * mMachine.mHoldTarget.mass * mMachine.mThrowForce;
+				private Transform mPreviousParent;
+				private Coroutine mGrabRoutine;
+				private bool mReleasedOnce, mExit;
+				private float mHoldTime;
+				private Vector3 mEndForce;
 
-				if (mGrabRoutine != null)
-					mMachine.StopCoroutine(mGrabRoutine);
+				public override void OnEnter()
+				{
+					mOriginalConstraints = mMachine.mScript.mHoldTarget.constraints;
+					mMachine.mScript.mHoldTarget.constraints = RigidbodyConstraints.FreezeAll;
 
-				mExit = true;
-			}
+					mPreviousParent = mMachine.mScript.mHoldTarget.transform.parent;
+					mMachine.mScript.mHoldTarget.transform.SetParent(mMachine.mScript.transform);
 
-			public override void Update()
-			{
-				if (mMachine.mHoldTarget == null)
+					mGrabRoutine = mMachine.mScript.StartCoroutine(LerpToMyPosition());
+				}
+
+				private IEnumerator LerpToMyPosition(float time = 0.3f)
+				{
+					Vector3 originalPos = mMachine.mScript.mHoldTarget.transform.position;
+					float currentTime = 0.0f;
+
+					while (currentTime < time)
+					{
+						if (mMachine.mScript.mHoldTarget == null)
+							yield break;
+
+						mMachine.mScript.mHoldTarget.transform.position = Vector3.Lerp(originalPos, mMachine.mScript.transform.position, currentTime / time);
+						currentTime += Time.deltaTime;
+
+						yield return null;
+					}
+				}
+
+				public override void OnInputHeld()
+				{
+					if (mReleasedOnce)
+						mHoldTime += Time.deltaTime;
+				}
+
+				public override void OnInputReleased()
+				{
+					if (!mReleasedOnce)
+						mReleasedOnce = true;
+					else
+						HandleTriggerRelease();
+				}
+
+				private void HandleTriggerRelease()
+				{
+					if (mMachine.mScript.mHoldTarget == null)
+						return;
+
+					if (mHoldTime < mMachine.mScript.mHoldForThrowTime)
+						mEndForce = Vector3.zero;
+					else
+						mEndForce = mMachine.mScript.bearer.eye.forward * mMachine.mScript.mHoldTarget.mass * mMachine.mScript.mThrowForce;
+
+					if (mGrabRoutine != null)
+						mMachine.mScript.StopCoroutine(mGrabRoutine);
+
 					mExit = true;
-			}
+				}
 
-			public override void OnExit()
-			{
-				if (mMachine.mHoldTarget == null)
-					return;
+				public override void Update()
+				{
+					if (mMachine.mScript.mHoldTarget == null)
+						mExit = true;
+				}
 
-				mMachine.mHoldTarget.constraints = mOriginalConstraints;
-				mMachine.mHoldTarget.AddForce(mEndForce, ForceMode.Impulse);
-				mMachine.mHoldTarget.transform.SetParent(mPreviousParent);
-				mMachine.mHoldTarget = null;
-			}
+				public override void OnExit()
+				{
+					if (mMachine.mScript.mHoldTarget == null)
+						return;
 
-			public override IState GetTransition()
-			{
-				if (mExit)
-					return new IdleState(mMachine);
+					mMachine.mScript.mHoldTarget.constraints = mOriginalConstraints;
+					mMachine.mScript.mHoldTarget.AddForce(mEndForce, ForceMode.Impulse);
+					mMachine.mScript.mHoldTarget.transform.SetParent(mPreviousParent);
+					mMachine.mScript.mHoldTarget = null;
+				}
 
-				return this;
+				public override IState GetTransition()
+				{
+					if (mExit)
+						return new IdleState(mMachine);
+
+					return this;
+				}
 			}
 		}
 	}
