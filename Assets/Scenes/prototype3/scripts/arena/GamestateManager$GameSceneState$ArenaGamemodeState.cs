@@ -30,25 +30,26 @@ public partial class GamestateManager
 
 			public void OnEnter()
 			{
-				mPlayer1Score = new BoundProperty<int>(0, GameplayUIManager.PLAYER1_SCORE);
+				/*mPlayer1Score = new BoundProperty<int>(0, GameplayUIManager.PLAYER1_SCORE);
 				mPlayer2Score = new BoundProperty<int>(0, GameplayUIManager.PLAYER2_SCORE);
-				mRemainingTime = new BoundProperty<float>(mSettings.roundTime, GameplayUIManager.ARENA_ROUND_TIME);
+				mRemainingTime = new BoundProperty<float>(mSettings.roundTime, GameplayUIManager.ARENA_ROUND_TIME);*/
 
-				TransitionStates(new StartGameState(this));
+				//TransitionStates(new StartGameState(this));
 			}
 
 			public new void Update()
 			{
-				base.Update();
+				//base.Update();
 			}
 
 			public void OnExit()
 			{
-				currentState.OnExit();
+				if (currentState != null)
+					currentState.OnExit();
 
-				mPlayer1Score.Cleanup();
+				/*mPlayer1Score.Cleanup();
 				mPlayer2Score.Cleanup();
-				mRemainingTime.Cleanup();
+				mRemainingTime.Cleanup();*/
 			}
 
 			public IState GetTransition()
