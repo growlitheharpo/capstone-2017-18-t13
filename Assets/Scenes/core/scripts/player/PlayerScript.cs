@@ -20,6 +20,15 @@ namespace FiringSquad.Gameplay
 		private Vector3 mDefaultPosition;
 
 		private PlayerGravGunWeapon mGravityGun;
+		private PlayerGravGunWeapon gravityGun
+		{
+			get
+			{
+				mGravityGun = mGravityGun ?? GetComponentInChildren<PlayerGravGunWeapon>();
+				return mGravityGun;
+			}
+		}
+
 		private PlayerMovementScript mMovement;
 		private BoundProperty<float> mHealth;
 		private PlayerWeaponScript mWeapon;
@@ -63,7 +72,7 @@ namespace FiringSquad.Gameplay
 				mGravityGun.TargetRpcRegisterInput(connectionToClient, netId, offset.localPosition);
 			}
 		}
-
+		
 		public override void OnStartLocalPlayer()
 		{
 			CmdSpawnGravityGun();
@@ -172,7 +181,7 @@ namespace FiringSquad.Gameplay
 			IInteractable interactable = null;
 			RaycastHit hit;
 
-			if (mGravityGun != null)
+			if (gravityGun != null)
 				interactable = mGravityGun.heldObject;
 
 			if (interactable == null && mGravityGun != null)

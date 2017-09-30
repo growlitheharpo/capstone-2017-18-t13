@@ -24,7 +24,28 @@ namespace FiringSquad.Gameplay
 
 		private Coroutine mLerpObjectRoutine;
 
-		public IInteractable heldObject { get { return mHoldTarget == null ? null : mHoldTarget.GetComponentUpwards<IInteractable>(); } }
+		public IInteractable heldObject
+		{
+			get
+			{
+				IInteractable i = null;
+
+				if (mHoldTarget != null)
+					i = mHoldTarget.GetComponentUpwards<IInteractable>();
+
+				if (i != null)
+					return i;
+
+				foreach (Transform t in transform)
+				{
+					i = t.GetComponentUpwards<IInteractable>();
+					if (i != null)
+						return i;
+				}
+
+				return null;
+			}
+		}
 
 		private Rigidbody mHoldTarget;
 
