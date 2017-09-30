@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using FiringSquad.Gameplay;
 using KeatsLib.Collections;
 using KeatsLib.State;
-using KeatsLib.Unity;
 using UnityEngine;
 using Input = KeatsLib.Unity.Input;
 
@@ -77,6 +75,9 @@ public partial class GamestateManager
 
 				public override void OnEnter()
 				{
+					ServiceLocator.Get<IInput>()
+						.DisableInputLevel(Input.InputLevel.Gameplay);
+
 					mReady = false;
 					EventManager.OnAllPlayersReady += HandleAllPlayersReady;
 				}
@@ -89,6 +90,9 @@ public partial class GamestateManager
 
 				public override void OnExit()
 				{
+					ServiceLocator.Get<IInput>()
+						.EnableInputLevel(Input.InputLevel.Gameplay);
+
 					EventManager.OnAllPlayersReady -= HandleAllPlayersReady;
 				}
 
