@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using FiringSquad.Gameplay;
 using KeatsLib.Collections;
 using KeatsLib.State;
-using KeatsLib.Unity;
 using UnityEngine;
 using Input = KeatsLib.Unity.Input;
 
@@ -17,11 +15,13 @@ public partial class GamestateManager
 			private Gamemode.ArenaSettings mSettings;
 			public Gamemode.ArenaSettings settings { get { return mSettings; } }
 
-			private BoundProperty<int> mPlayer1Score;
-			private BoundProperty<int> mPlayer2Score;
+			private BoundProperty<int> mPlayerKills;
+			private BoundProperty<int> mPlayerDeaths;
 			private BoundProperty<float> mRemainingTime;
-			private PlayerScript[] mPlayerList;
 			private Transform[] mSpawnPoints;
+
+			private PlayerScript mLocalPlayer;
+			private long mRoundEndTime;
 
 			public ArenaGamemodeState(GameSceneState m)
 			{
@@ -30,11 +30,11 @@ public partial class GamestateManager
 
 			public void OnEnter()
 			{
-				mPlayer1Score = new BoundProperty<int>(0, GameplayUIManager.PLAYER1_SCORE);
-				mPlayer2Score = new BoundProperty<int>(0, GameplayUIManager.PLAYER2_SCORE);
+				mPlayerKills = new BoundProperty<int>(0, GameplayUIManager.PLAYER_KILLS);
+				mPlayerDeaths = new BoundProperty<int>(0, GameplayUIManager.PLAYER_DEATHS);
 				mRemainingTime = new BoundProperty<float>(mSettings.roundTime, GameplayUIManager.ARENA_ROUND_TIME);
 
-				TransitionStates(new StartGameState(this));
+				TransitionStates(new WaitingForNetworkState(this));
 			}
 
 			public new void Update()
@@ -44,10 +44,11 @@ public partial class GamestateManager
 
 			public void OnExit()
 			{
-				currentState.OnExit();
+				if (currentState != null)
+					currentState.OnExit();
 
-				mPlayer1Score.Cleanup();
-				mPlayer2Score.Cleanup();
+				mPlayerKills.Cleanup();
+				mPlayerDeaths.Cleanup();
 				mRemainingTime.Cleanup();
 			}
 
@@ -56,7 +57,53 @@ public partial class GamestateManager
 				return this;
 			}
 
+			private float CalculateTimer()
+			{
+				long now = DateTime.UtcNow.Ticks;
+				long span = mRoundEndTime - now;
+
+				return (float)span / TimeSpan.TicksPerSecond;
+			}
+
 			#region States
+
+			private class WaitingForNetworkState : BaseState<ArenaGamemodeState>
+			{
+				public WaitingForNetworkState(ArenaGamemodeState machine) : base(machine) { }
+
+				private bool mReady;
+
+				public override void OnEnter()
+				{
+					ServiceLocator.Get<IInput>()
+						.DisableInputLevel(Input.InputLevel.Gameplay);
+
+					mReady = false;
+					EventManager.OnAllPlayersReady += HandleAllPlayersReady;
+				}
+
+				private void HandleAllPlayersReady(long time)
+				{
+					mReady = true;
+					mMachine.mRoundEndTime = time;
+				}
+
+				public override void OnExit()
+				{
+					ServiceLocator.Get<IInput>()
+						.EnableInputLevel(Input.InputLevel.Gameplay);
+
+					EventManager.OnAllPlayersReady -= HandleAllPlayersReady;
+				}
+
+				public override IState GetTransition()
+				{
+					if (mReady)
+						return new StartGameState(mMachine);
+
+					return this;
+				}
+			}
 
 			private class StartGameState : BaseState<ArenaGamemodeState>
 			{
@@ -64,9 +111,9 @@ public partial class GamestateManager
 
 				public override void OnEnter()
 				{
-					mMachine.mRemainingTime.value = mMachine.settings.roundTime;
-					mMachine.mPlayer1Score.value = 0;
-					mMachine.mPlayer2Score.value = 0;
+					mMachine.mRemainingTime.value = mMachine.CalculateTimer();
+					mMachine.mPlayerKills.value = 0;
+					mMachine.mPlayerDeaths.value = 0;
 
 					GeneratePlayerList();
 					GenerateSpawnList();
@@ -76,7 +123,10 @@ public partial class GamestateManager
 
 				private void GeneratePlayerList()
 				{
-					mMachine.mPlayerList = FindObjectsOfType<PlayerScript>().OrderBy(x => x.name).ToArray();
+					//mMachine.mPlayerList = FindObjectsOfType<PlayerScript>().OrderBy(x => x.name).ToArray();
+
+					var players = FindObjectsOfType<PlayerScript>();
+					mMachine.mLocalPlayer = players.First(x => x.isLocalPlayer);
 				}
 
 				private void GenerateSpawnList()
@@ -86,7 +136,7 @@ public partial class GamestateManager
 
 				private void MovePlayersToSpawn()
 				{
-					var spawnsCopy = new List<Transform>(mMachine.mSpawnPoints);
+					/*var spawnsCopy = new List<Transform>(mMachine.mSpawnPoints);
 					foreach (PlayerScript player in mMachine.mPlayerList)
 					{
 						Transform t = spawnsCopy.ChooseRandom();
@@ -94,7 +144,10 @@ public partial class GamestateManager
 
 						player.transform.position = t.position;
 						player.transform.rotation = t.rotation;
-					}
+					}*/
+
+					// TODO: Make this decided by the server to make sure players don't start in the same place!
+					mMachine.mLocalPlayer.transform.position = mMachine.mSpawnPoints.ChooseRandom().position;
 				}
 
 				public override IState GetTransition()
@@ -114,15 +167,15 @@ public partial class GamestateManager
 
 				public override void Update()
 				{
-					mMachine.mRemainingTime.value -= Time.deltaTime;
+					mMachine.mRemainingTime.value = mMachine.CalculateTimer();
 				}
 
 				private void HandlePlayerDeath(ICharacter obj)
 				{
-					if (ReferenceEquals(obj, mMachine.mPlayerList[0]))
-						mMachine.mPlayer2Score.value += 1;
+					/*if (ReferenceEquals(obj, mMachine.mPlayerList[0]))
+						mMachine.mPlayerDeaths.value += 1;
 					else if (ReferenceEquals(obj, mMachine.mPlayerList[1]))
-						mMachine.mPlayer1Score.value += 1;
+						mMachine.mPlayerKills.value += 1;
 					else
 						throw new ArgumentException("We got an invalid player from OnPlayerDied!");
 
@@ -140,7 +193,25 @@ public partial class GamestateManager
 					player.transform.position = t.position;
 					player.transform.rotation = t.rotation;
 
-					player.ResetArenaPlayer();
+					player.ResetArenaPlayer();*/
+					if (!ReferenceEquals(obj, mMachine.mLocalPlayer))
+					{
+						mMachine.mPlayerKills.value += 1;
+						return;
+					}
+
+					Transform s;
+					do
+					{
+						s = mMachine.mSpawnPoints.ChooseRandom();
+					} while (Vector3.Distance(s.position, mMachine.mLocalPlayer.transform.position) < 5.0f);
+
+
+					mMachine.mLocalPlayer.transform.position = s.position;
+					mMachine.mLocalPlayer.transform.rotation = s.rotation;
+
+					mMachine.mLocalPlayer.ResetArenaPlayer();
+					mMachine.mPlayerDeaths.value += 1;
 				}
 
 				public override IState GetTransition()
@@ -161,10 +232,10 @@ public partial class GamestateManager
 				public override void OnEnter()
 				{
 					string resultText;
-					if (mMachine.mPlayer1Score.value > mMachine.mPlayer2Score.value)
-						resultText = "Player 1 Wins!";
-					else if (mMachine.mPlayer1Score.value < mMachine.mPlayer2Score.value)
-						resultText = "Player 2 Wins!";
+					if (mMachine.mPlayerKills.value > mMachine.mPlayerDeaths.value)
+						resultText = "You win!";
+					else if (mMachine.mPlayerKills.value < mMachine.mPlayerDeaths.value)
+						resultText = "You lost.";
 					else
 						resultText = "It's a tie!";
 

@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using KeatsLib.Collections;
 using UnityEngine;
+using UnityEngine.Networking;
 
 namespace FiringSquad.Gameplay
 {
-	public class ArenaPartThrower : MonoBehaviour
+	public class ArenaPartThrower : NetworkBehaviour
 	{
 		[SerializeField] private float mMinimumThrowTime;
 		[SerializeField] private float mMaximumThrowTime;
@@ -17,14 +18,24 @@ namespace FiringSquad.Gameplay
 
 		private List<GameObject> mSpawnedObjects;
 
+		private void Awake()
+		{
+			LoadWeaponPrefabs();
+
+#if UNITY_EDITOR
+			GenerateMeshPoints();
+#endif
+		}
+
 		private void Start()
 		{
 			mSpawnedObjects = new List<GameObject>();
 
-			LoadWeaponPrefabs();
-			CreatePlayerList();
-			GenerateMeshPoints();
-			StartCoroutine(ThrowPartTimer());
+			if (isServer)
+			{
+				GenerateMeshPoints();
+				StartCoroutine(ThrowPartTimer());
+			}
 		}
 
 		private void LoadWeaponPrefabs()
@@ -33,13 +44,14 @@ namespace FiringSquad.Gameplay
 			mWeaponPrefabs = allObjects
 				.Where(x => x.GetComponent<WeaponPartScript>() != null)
 				.ToArray();
-		}
 
-		private void CreatePlayerList()
-		{
-			FindObjectsOfType<PlayerScript>();
+			foreach (GameObject prefab in mWeaponPrefabs)
+			{
+				Logger.Info("Registering part for spawn: " + prefab.name, Logger.System.Network);
+				ClientScene.RegisterPrefab(prefab);
+			}
 		}
-
+		
 		private void GenerateMeshPoints()
 		{
 			MeshFilter mesh = GetComponent<MeshFilter>();
@@ -51,7 +63,7 @@ namespace FiringSquad.Gameplay
 #if UNITY_EDITOR
 		private void OnDrawGizmos()
 		{
-			if (!UnityEditor.EditorApplication.isPlaying)
+			if (!UnityEditor.EditorApplication.isPlaying || mMeshPoints == null)
 				return;
 
 			Gizmos.color = Color.blue;
@@ -71,21 +83,29 @@ namespace FiringSquad.Gameplay
 				if (mSpawnedObjects.Count >= mMaxExistingItems)
 					continue;
 
-				Vector3 point = mMeshPoints.ChooseRandom();
 				GameObject prefab = mWeaponPrefabs.ChooseRandom();
-
-				Vector3 direction = (transform.position - point).normalized + Vector3.up * 2.0f;
-				
-				GameObject instance = Instantiate(prefab, point, Quaternion.identity);
-				instance.GetComponent<Rigidbody>().AddForce(direction.normalized * 20.0f, ForceMode.Impulse);
-
+				GameObject instance = InstantiatePart(prefab);
 				mSpawnedObjects.Add(instance);
 			}
 		}
 
+		private GameObject InstantiatePart(GameObject prefab)
+		{
+			Vector3 point = mMeshPoints.ChooseRandom();
+			Vector3 direction = (transform.position - point).normalized + Vector3.up * 2.0f;
+
+			GameObject instance = Instantiate(prefab, point, Quaternion.identity);
+			instance.name = prefab.name;
+
+			instance.GetComponent<Rigidbody>().AddForce(direction.normalized * 20.0f, ForceMode.Impulse);
+			NetworkServer.Spawn(instance);
+
+			return instance;
+		}
+
 		private void CleanupInstanceList()
 		{
-			mSpawnedObjects = mSpawnedObjects.Where(x => x.GetComponent<WeaponPickupScript>() != null).ToList();
+			mSpawnedObjects = mSpawnedObjects.Where(x => x != null && x.GetComponent<WeaponPickupScript>() != null).ToList();
 		}
 	}
 }

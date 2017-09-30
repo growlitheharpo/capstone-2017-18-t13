@@ -1,9 +1,11 @@
 ﻿using System.Collections;
+using KeatsLib.Unity;
 using UnityEngine;
+using UnityEngine.Networking;
 
 namespace FiringSquad.Gameplay
 {
-	public class WeaponPickupScript : MonoBehaviour, IInteractable
+	public class WeaponPickupScript : NetworkBehaviour, IInteractable
 	{
 		[SerializeField] private Collider mPickupCollider;
 		private Rigidbody mPickupRigidbody;
@@ -15,19 +17,12 @@ namespace FiringSquad.Gameplay
 			mPart = GetComponent<WeaponPartScript>();
 		}
 
-		public void Interact()
-		{
-			Interact(null);
-		}
-
 		public void Interact(ICharacter source)
 		{
-			IWeaponBearer bearer = source as IWeaponBearer;
+			PlayerScript bearer = source as PlayerScript;
 
 			if (bearer != null)
-				ConfirmAttach(bearer.weapon);
-			else
-				ConfirmAttach();
+				bearer.CmdPickupNewPart(netId);
 		}
 
 		public WeaponPickupScript OverrideDurability(int value)
@@ -35,27 +30,17 @@ namespace FiringSquad.Gameplay
 			mPart.durability = value;
 			return this;
 		}
-
-		private void ConfirmAttach()
-		{
-			EventManager.Notify(() => EventManager.ConfirmPartAttach(mPart));
-			Destroy(mPickupCollider.gameObject);
-			Destroy(mPickupRigidbody);
-			Destroy(this);
-		}
-
+		
 		public void ConfirmAttach(IWeapon weapon)
 		{
 			Destroy(mPickupCollider.gameObject);
 			Destroy(mPickupRigidbody);
-			StartCoroutine(DirectAttach(weapon));
-		}
 
-		private IEnumerator DirectAttach(IWeapon weapon)
-		{
-			yield return null; //wait one tick
-			weapon.AttachNewPart(mPart);
-			Destroy(this);
+			StartCoroutine(Coroutines.WaitOneFrame(() =>
+			{
+				weapon.AttachNewPart(mPart);
+				Destroy(this);
+			}));
 		}
 	}
 }

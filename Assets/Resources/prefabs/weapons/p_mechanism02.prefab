@@ -39,6 +39,8 @@ GameObject:
   - component: {fileID: 114425948192369884}
   - component: {fileID: 114229191565977614}
   - component: {fileID: 54780434231497908}
+  - component: {fileID: 114621984505897094}
+  - component: {fileID: 114705840406921796}
   m_Layer: 10
   m_Name: p_mechanism02
   m_TagString: interactable
@@ -384,7 +386,60 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 1da68329dc66bb441bd318b4ffd71c09, type: 2}
   - {fileID: 11400000, guid: 3d3f52b166178b74fb3978188f27852f, type: 2}
   mDescription: 'Fires impact grenades: 100 damage.'
-  mDurability: 50
+  mDurability: 25
   mProjectilePrefab: {fileID: 1122678007204700, guid: 153ed538bd19d5646851811f1589f10f,
     type: 2}
   mFireFromBarrelTip: 1
+--- !u!114 &114621984505897094
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1009224365190128}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 372142912, guid: dc443db3e92b4983b9738c1131f555cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SceneId:
+    m_Value: 0
+  m_AssetId:
+    i0: 50
+    i1: 118
+    i2: 253
+    i3: 195
+    i4: 11
+    i5: 173
+    i6: 75
+    i7: 36
+    i8: 105
+    i9: 47
+    i10: 178
+    i11: 8
+    i12: 94
+    i13: 173
+    i14: 22
+    i15: 7
+  m_ServerOnly: 0
+  m_LocalPlayerAuthority: 0
+--- !u!114 &114705840406921796
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1009224365190128}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1768714887, guid: dc443db3e92b4983b9738c1131f555cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_TransformSyncMode: 3
+  m_SendInterval: 0.05
+  m_SyncRotationAxis: 7
+  m_RotationSyncCompression: 0
+  m_SyncSpin: 1
+  m_MovementTheshold: 0.001
+  m_VelocityThreshold: 0.0001
+  m_SnapThreshold: 5
+  m_InterpolateRotation: 1
+  m_InterpolateMovement: 1

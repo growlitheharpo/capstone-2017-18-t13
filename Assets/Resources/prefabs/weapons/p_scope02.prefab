@@ -105,6 +105,8 @@ GameObject:
   - component: {fileID: 114399899229538148}
   - component: {fileID: 54741395447935080}
   - component: {fileID: 114412117028516678}
+  - component: {fileID: 114838912858948322}
+  - component: {fileID: 114911966320516162}
   m_Layer: 0
   m_Name: p_scope02
   m_TagString: interactable
@@ -382,4 +384,57 @@ MonoBehaviour:
   mData:
   - {fileID: 11400000, guid: a58720100eaa9c44d821e77c21d33531, type: 2}
   mDescription: A sniper scope. Decreases spread.
-  mDurability: 45
+  mDurability: 20
+--- !u!114 &114838912858948322
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1967676427755860}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 372142912, guid: dc443db3e92b4983b9738c1131f555cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SceneId:
+    m_Value: 0
+  m_AssetId:
+    i0: 144
+    i1: 65
+    i2: 28
+    i3: 116
+    i4: 206
+    i5: 50
+    i6: 196
+    i7: 212
+    i8: 91
+    i9: 143
+    i10: 221
+    i11: 151
+    i12: 157
+    i13: 32
+    i14: 1
+    i15: 164
+  m_ServerOnly: 0
+  m_LocalPlayerAuthority: 0
+--- !u!114 &114911966320516162
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1967676427755860}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1768714887, guid: dc443db3e92b4983b9738c1131f555cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_TransformSyncMode: 3
+  m_SendInterval: 0.05
+  m_SyncRotationAxis: 7
+  m_RotationSyncCompression: 0
+  m_SyncSpin: 1
+  m_MovementTheshold: 0.001
+  m_VelocityThreshold: 0.0001
+  m_SnapThreshold: 5
+  m_InterpolateRotation: 1
+  m_InterpolateMovement: 1

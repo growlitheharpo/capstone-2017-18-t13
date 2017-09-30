@@ -72,6 +72,8 @@ GameObject:
   - component: {fileID: 114733143786983432}
   - component: {fileID: 54483242839088912}
   - component: {fileID: 114756210916309946}
+  - component: {fileID: 114797771502676396}
+  - component: {fileID: 114490438522106582}
   m_Layer: 10
   m_Name: p_scope01
   m_TagString: interactable
@@ -496,6 +498,27 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
+--- !u!114 &114490438522106582
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1289196357881978}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1768714887, guid: dc443db3e92b4983b9738c1131f555cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_TransformSyncMode: 3
+  m_SendInterval: 0.05
+  m_SyncRotationAxis: 7
+  m_RotationSyncCompression: 0
+  m_SyncSpin: 1
+  m_MovementTheshold: 0.001
+  m_VelocityThreshold: 0.0001
+  m_SnapThreshold: 5
+  m_InterpolateRotation: 1
+  m_InterpolateMovement: 1
 --- !u!114 &114733143786983432
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -522,3 +545,35 @@ MonoBehaviour:
   mData: []
   mDescription: Square sights.
   mDurability: -1
+--- !u!114 &114797771502676396
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1289196357881978}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 372142912, guid: dc443db3e92b4983b9738c1131f555cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SceneId:
+    m_Value: 0
+  m_AssetId:
+    i0: 54
+    i1: 62
+    i2: 201
+    i3: 186
+    i4: 243
+    i5: 155
+    i6: 235
+    i7: 4
+    i8: 88
+    i9: 182
+    i10: 197
+    i11: 26
+    i12: 94
+    i13: 7
+    i14: 211
+    i15: 121
+  m_ServerOnly: 0
+  m_LocalPlayerAuthority: 0

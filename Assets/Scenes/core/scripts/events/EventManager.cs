@@ -13,11 +13,11 @@ using UnityEngine;
 /// </summary>
 public partial class EventManager
 {
-	public static event Action<PlayerScript> OnTogglePauseState = p => { LogEvent(); };
+	public static event Action OnTogglePauseState = () => { LogEvent(); };
 
-	public static void TogglePauseState(PlayerScript p)
+	public static void TogglePauseState()
 	{
-		OnTogglePauseState(p);
+		OnTogglePauseState();
 	}
 
 	public static event Action<IOptionsData> OnApplyOptionsData = e => { LogEvent(); };
@@ -105,11 +105,18 @@ public partial class EventManager
 		OnShowGameoverPanel(resultText);
 	}
 
-	public static event Action<bool, PlayerScript> OnShowPausePanel = (b, r) => { LogEvent(); };
+	public static event Action<bool> OnShowPausePanel = b => { LogEvent(); };
 
-	public static void ShowPausePanel(bool show, PlayerScript requester)
+	public static void ShowPausePanel(bool show)
 	{
-		OnShowPausePanel(show, requester);
+		OnShowPausePanel(show);
+	}
+
+	public static event Action<long> OnAllPlayersReady = (t) => { LogEvent(); };
+
+	public static void AllPlayersReady(long endTime)
+	{
+		OnAllPlayersReady(endTime);
 	}
 
 	//!PROTOTYPE 2

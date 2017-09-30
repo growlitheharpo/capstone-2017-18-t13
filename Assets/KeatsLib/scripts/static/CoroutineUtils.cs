@@ -1,5 +1,7 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace KeatsLib.Unity
 {
@@ -211,6 +213,12 @@ namespace KeatsLib.Unity
 			yield return null;
 
 			Object.Destroy(destroyGameObject ? (Object)ps.gameObject : ps);
+		}
+
+		public static IEnumerator WaitOneFrame(Action doAfterWait)
+		{
+			yield return null;
+			doAfterWait.Invoke();
 		}
 	}
 }
