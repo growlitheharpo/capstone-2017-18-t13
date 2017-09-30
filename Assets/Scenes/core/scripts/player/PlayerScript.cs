@@ -170,15 +170,23 @@ namespace FiringSquad.Gameplay
 		private void INPUT_ActivateInteract()
 		{
 			IInteractable interactable = null;
+			RaycastHit hit;
 
 			if (mGravityGun != null)
 				interactable = mGravityGun.heldObject;
+
+			if (interactable == null && mGravityGun != null)
+			{
+				var result = Physics.OverlapSphere(mGravityGun.transform.position, 1.0f);
+				Collider col = result.FirstOrDefault(x => x.GetComponentUpwards<IInteractable>() != null);
+				if (col != null)
+					interactable = col.GetComponent<IInteractable>();
+			}
 
 			if (interactable == null)
 			{
 				Ray ray = new Ray(mMainCameraRef.position, mMainCameraRef.forward);
 			
-				RaycastHit hit;
 				if (!Physics.Raycast(ray, out hit, mData.interactDistance) || !hit.collider.CompareTag(INTERACTABLE_TAG))
 					return;
 
