@@ -17,8 +17,8 @@ public partial class GamestateManager
 			private Gamemode.ArenaSettings mSettings;
 			public Gamemode.ArenaSettings settings { get { return mSettings; } }
 
-			private BoundProperty<int> mPlayer1Score;
-			private BoundProperty<int> mPlayer2Score;
+			private BoundProperty<int> mPlayerKills;
+			private BoundProperty<int> mPlayerDeaths;
 			private BoundProperty<float> mRemainingTime;
 			private Transform[] mSpawnPoints;
 
@@ -32,8 +32,8 @@ public partial class GamestateManager
 
 			public void OnEnter()
 			{
-				mPlayer1Score = new BoundProperty<int>(0, GameplayUIManager.PLAYER1_SCORE);
-				mPlayer2Score = new BoundProperty<int>(0, GameplayUIManager.PLAYER2_SCORE);
+				mPlayerKills = new BoundProperty<int>(0, GameplayUIManager.PLAYER_KILLS);
+				mPlayerDeaths = new BoundProperty<int>(0, GameplayUIManager.PLAYER_DEATHS);
 				mRemainingTime = new BoundProperty<float>(mSettings.roundTime, GameplayUIManager.ARENA_ROUND_TIME);
 
 				TransitionStates(new WaitingForNetworkState(this));
@@ -49,8 +49,8 @@ public partial class GamestateManager
 				if (currentState != null)
 					currentState.OnExit();
 
-				mPlayer1Score.Cleanup();
-				mPlayer2Score.Cleanup();
+				mPlayerKills.Cleanup();
+				mPlayerDeaths.Cleanup();
 				mRemainingTime.Cleanup();
 			}
 
@@ -108,8 +108,8 @@ public partial class GamestateManager
 				public override void OnEnter()
 				{
 					mMachine.mRemainingTime.value = mMachine.CalculateTimer();
-					mMachine.mPlayer1Score.value = 0;
-					mMachine.mPlayer2Score.value = 0;
+					mMachine.mPlayerKills.value = 0;
+					mMachine.mPlayerDeaths.value = 0;
 
 					GeneratePlayerList();
 					GenerateSpawnList();
@@ -169,9 +169,9 @@ public partial class GamestateManager
 				private void HandlePlayerDeath(ICharacter obj)
 				{
 					/*if (ReferenceEquals(obj, mMachine.mPlayerList[0]))
-						mMachine.mPlayer2Score.value += 1;
+						mMachine.mPlayerDeaths.value += 1;
 					else if (ReferenceEquals(obj, mMachine.mPlayerList[1]))
-						mMachine.mPlayer1Score.value += 1;
+						mMachine.mPlayerKills.value += 1;
 					else
 						throw new ArgumentException("We got an invalid player from OnPlayerDied!");
 
@@ -191,7 +191,10 @@ public partial class GamestateManager
 
 					player.ResetArenaPlayer();*/
 					if (!ReferenceEquals(obj, mMachine.mLocalPlayer))
+					{
+						mMachine.mPlayerKills.value += 1;
 						return;
+					}
 
 					Transform s;
 					do
@@ -204,6 +207,7 @@ public partial class GamestateManager
 					mMachine.mLocalPlayer.transform.rotation = s.rotation;
 
 					mMachine.mLocalPlayer.ResetArenaPlayer();
+					mMachine.mPlayerDeaths.value += 1;
 				}
 
 				public override IState GetTransition()
@@ -224,9 +228,9 @@ public partial class GamestateManager
 				public override void OnEnter()
 				{
 					string resultText;
-					if (mMachine.mPlayer1Score.value > mMachine.mPlayer2Score.value)
+					if (mMachine.mPlayerKills.value > mMachine.mPlayerDeaths.value)
 						resultText = "Player 1 Wins!";
-					else if (mMachine.mPlayer1Score.value < mMachine.mPlayer2Score.value)
+					else if (mMachine.mPlayerKills.value < mMachine.mPlayerDeaths.value)
 						resultText = "Player 2 Wins!";
 					else
 						resultText = "It's a tie!";

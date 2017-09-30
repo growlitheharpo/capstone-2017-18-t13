@@ -330,6 +330,7 @@ namespace FiringSquad.Gameplay
 			StartCoroutine(Coroutines.WaitAndDestroyParticleSystem(instance));
 
 			ResetArenaPlayer();
+			EventManager.Notify(() => EventManager.PlayerDied(this));
 		}
 
 		#endregion
