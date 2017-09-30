@@ -12,10 +12,16 @@ namespace FiringSquad.Gameplay
 		private Rigidbody mPickupRigidbody;
 		private WeaponPartScript mPart;
 
+		private Transform mView, mRotator;
+
 		private void Awake()
 		{
 			mPickupRigidbody = GetComponent<Rigidbody>();
 			mPart = GetComponent<WeaponPartScript>();
+			mView = transform.Find("View");
+
+			mRotator = new GameObject("Rotator", typeof(RotatorUtilityScript)).transform;
+			mRotator.SetParent(transform, false);
 		}
 
 		private void Start()
@@ -29,12 +35,21 @@ namespace FiringSquad.Gameplay
 
 				ps.transform.SetParent(mPickupCollider.transform, false);
 				ps.transform.position = mPickupCollider.bounds.center;
+
+				mRotator.position = mPickupCollider.bounds.center;
+				mView.SetParent(mRotator, true);
 			}));
 		}
 
 		private void OnDestroy()
 		{
 			StopAllCoroutines();
+			mView.SetParent(transform);
+			mView.localPosition = Vector3.zero;
+			mView.localRotation = Quaternion.identity;
+			mView.localScale = Vector3.one;
+
+			Destroy(mRotator.gameObject);
 		}
 		
 		public void Interact()
