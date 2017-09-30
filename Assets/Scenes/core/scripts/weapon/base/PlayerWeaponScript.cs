@@ -83,6 +83,8 @@ namespace FiringSquad.Gameplay
 				.OverrideDurability(WeaponPartScript.INFINITE_DURABILITY)
 				.ConfirmAttach(this);
 
+			Logger.Warn("Durability system is currently not network-aware!", Logger.System.Network);
+
 			ParticleSystem ps = Instantiate(mPartBreakParticlesPrefab, part.transform.position, Quaternion.identity).GetComponent<ParticleSystem>();
 			StartCoroutine(Coroutines.WaitAndDestroyParticleSystem(ps));
 		}

@@ -95,6 +95,7 @@ namespace FiringSquad.Gameplay
 			Vector3 direction = (transform.position - point).normalized + Vector3.up * 2.0f;
 
 			GameObject instance = Instantiate(prefab, point, Quaternion.identity);
+			instance.name = prefab.name;
 
 			instance.GetComponent<Rigidbody>().AddForce(direction.normalized * 20.0f, ForceMode.Impulse);
 			NetworkServer.Spawn(instance);
@@ -104,7 +105,7 @@ namespace FiringSquad.Gameplay
 
 		private void CleanupInstanceList()
 		{
-			mSpawnedObjects = mSpawnedObjects.Where(x => x.GetComponent<WeaponPickupScript>() != null).ToList();
+			mSpawnedObjects = mSpawnedObjects.Where(x => x != null && x.GetComponent<WeaponPickupScript>() != null).ToList();
 		}
 	}
 }

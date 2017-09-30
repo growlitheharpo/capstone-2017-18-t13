@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using FiringSquad.Data;
 using KeatsLib;
 using KeatsLib.Unity;
@@ -283,6 +284,32 @@ namespace FiringSquad.Gameplay
 			}
 
 			weapon.FireShotImmediate(shots);
+		}
+
+		[Command]
+		public void CmdPickupNewPart(NetworkInstanceId partId)
+		{
+			GameObject go = NetworkServer.FindLocalObject(partId);
+			string id = go.name;
+			NetworkServer.Destroy(go);
+
+			RpcAttachPartFromServer(id);
+		}
+
+		[ClientRpc]
+		private void RpcAttachPartFromServer(string partId)
+		{
+			// TODO: This can and should be made WAY better
+			var allObjects = Resources.LoadAll<GameObject>("prefabs/weapons");
+			var weaponPrefabs = allObjects
+				.Where(x => x.GetComponent<WeaponPartScript>() != null)
+				.ToArray();
+
+			GameObject part = weaponPrefabs.First(x => x.name == partId);
+			Instantiate(part)
+				.GetComponent<WeaponPickupScript>()
+				.OverrideDurability(WeaponPartScript.INFINITE_DURABILITY)
+				.ConfirmAttach(mWeapon);
 		}
 
 		#endregion
