@@ -29,15 +29,11 @@ namespace FiringSquad.Gameplay
 		private Rigidbody mHoldTarget;
 
 		private GravGunStateMachine mMachine;
-
-		private void Start()
-		{
-			mMachine = new GravGunStateMachine(this);
-		}
-
+		
 		private void Update()
 		{
-			mMachine.Update();
+			if (mMachine != null)
+				mMachine.Update();
 		}
 
 		[TargetRpc]
@@ -55,6 +51,8 @@ namespace FiringSquad.Gameplay
 			transform.localPosition = localPos;
 
 			PlayerInputMap input = playerScript.inputMap;
+
+			mMachine = new GravGunStateMachine(this);
 
 			ServiceLocator.Get<IInput>()
 				.RegisterInput(Input.GetButtonDown, input.fireGravGunButton, HandlePressed, KeatsLib.Unity.Input.InputLevel.Gameplay)
@@ -95,7 +93,6 @@ namespace FiringSquad.Gameplay
 		private void CmdAddForceToObject(NetworkInstanceId id, Vector3 force)
 		{
 			GameObject go = NetworkServer.FindLocalObject(id);
-			CmdReleaseObject(id);
 
 			Rigidbody rb = go.GetComponent<Rigidbody>();
 			rb.AddForce(force, ForceMode.Impulse);
@@ -105,22 +102,49 @@ namespace FiringSquad.Gameplay
 		private void CmdGrabObject(NetworkInstanceId id)
 		{
 			GameObject go = NetworkServer.FindLocalObject(id);
-			Rigidbody rb = go.GetComponent<Rigidbody>();
-
-			go.transform.SetParent(transform);
-			rb.useGravity = false;
-			rb.constraints = RigidbodyConstraints.FreezeAll;
-
-			StartCoroutine(Coroutines.LerpPosition(go.transform, Vector3.zero, 0.3f));
+			LockObject(go);
+			RpcGrabObjectClient(id);
 		}
 
 		[Command]
 		private void CmdReleaseObject(NetworkInstanceId id)
 		{
+			GameObject go = NetworkServer.FindLocalObject(id);
+			ReleaseObject(go);
+			RpcReleaseObjectClient(id);
+		}
+
+		[ClientRpc]
+		private void RpcGrabObjectClient(NetworkInstanceId part)
+		{
+			GameObject go = ClientScene.FindLocalObject(part);
+			LockObject(go);
+			mHoldTarget = go.GetComponent<Rigidbody>();
+		}
+
+		[ClientRpc]
+		private void RpcReleaseObjectClient(NetworkInstanceId part)
+		{
+			GameObject go = ClientScene.FindLocalObject(part);
+			ReleaseObject(go);
+			mHoldTarget = null;
+		}
+
+		private void LockObject(GameObject go)
+		{
+			Rigidbody rb = go.GetComponent<Rigidbody>();
+
+			go.transform.SetParent(transform);
+			rb.useGravity = false;
+			rb.constraints = RigidbodyConstraints.FreezeAll;
+			StartCoroutine(Coroutines.LerpPosition(go.transform, Vector3.zero, 0.3f));
+		}
+
+		private void ReleaseObject(GameObject go)
+		{
 			if (mLerpObjectRoutine != null)
 				StopCoroutine(mLerpObjectRoutine);
 
-			GameObject go = NetworkServer.FindLocalObject(id);
 			Rigidbody rb = go.GetComponent<Rigidbody>();
 
 			go.transform.SetParent(null);
@@ -260,6 +284,8 @@ namespace FiringSquad.Gameplay
 				private void ReelObjectIn()
 				{
 					Vector3 direction = mMachine.mScript.transform.position - mPullTarget.transform.position;
+
+					mMachine.mScript.CmdReleaseObject(mPullTarget.netId);
 					mMachine.mScript.CmdAddForceToObject(mPullTarget.netId, direction * Time.deltaTime * mMachine.mScript.mPullStrength);
 				}
 
