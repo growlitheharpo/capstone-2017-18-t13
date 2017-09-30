@@ -229,9 +229,9 @@ public partial class GamestateManager
 				{
 					string resultText;
 					if (mMachine.mPlayerKills.value > mMachine.mPlayerDeaths.value)
-						resultText = "Player 1 Wins!";
+						resultText = "You win!";
 					else if (mMachine.mPlayerKills.value < mMachine.mPlayerDeaths.value)
-						resultText = "Player 2 Wins!";
+						resultText = "You lost.";
 					else
 						resultText = "It's a tie!";
 
