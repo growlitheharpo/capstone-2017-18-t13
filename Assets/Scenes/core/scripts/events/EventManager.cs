@@ -112,6 +112,13 @@ public partial class EventManager
 		OnShowPausePanel(show);
 	}
 
+	public static event Action<long> OnAllPlayersReady = (t) => { LogEvent(); };
+
+	public static void AllPlayersReady(long endTime)
+	{
+		OnAllPlayersReady(endTime);
+	}
+
 	//!PROTOTYPE 2
 
 	public void Start()

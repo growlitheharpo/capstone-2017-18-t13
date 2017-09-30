@@ -215,8 +215,12 @@ namespace FiringSquad.Gameplay
 
 			mHealth.value = Mathf.Clamp(mHealth.value - amount, 0.0f, float.MaxValue);
 
-			if (mHealth.value <= 0.0f)
+			if (mHealth.value <= 0.0f && isLocalPlayer)
+			{
+				var myManager = FindObjectsOfType<NetworkClientGameManager>().First(x => x.hasAuthority);
+				myManager.CmdNotifyPlayerDied(netId, transform.position);
 				EventManager.Notify(() => EventManager.PlayerDied(this));
+			}
 		}
 
 		private void ReceiveResetEvent()
@@ -310,6 +314,22 @@ namespace FiringSquad.Gameplay
 				.GetComponent<WeaponPickupScript>()
 				.OverrideDurability(WeaponPartScript.INFINITE_DURABILITY)
 				.ConfirmAttach(mWeapon);
+		}
+
+		[ClientRpc]
+		public void RpcHandleRemoteDeath(Vector3 deathPosition)
+		{
+			if (isLocalPlayer)
+				return;
+
+			Gamemode.ArenaSettings arenaSettings = FindObjectOfType<Gamemode>().arenaSettings;
+			GameObject ps = arenaSettings.deathParticles;
+
+			ParticleSystem instance = Instantiate(ps, deathPosition, Quaternion.identity).GetComponent<ParticleSystem>();
+			instance.Play();
+			StartCoroutine(Coroutines.WaitAndDestroyParticleSystem(instance));
+
+			ResetArenaPlayer();
 		}
 
 		#endregion

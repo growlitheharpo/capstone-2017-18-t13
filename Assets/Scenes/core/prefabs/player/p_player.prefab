@@ -58,6 +58,7 @@ GameObject:
   - component: {fileID: 143958714872970462}
   - component: {fileID: 114532926038648210}
   - component: {fileID: 114909073156038942}
+  - component: {fileID: 114577962709023190}
   m_Layer: 9
   m_Name: p_player
   m_TagString: Player
@@ -284,7 +285,17 @@ MonoBehaviour:
     mShouldInstantiateWeapon: 1
     mShouldInstantiateGravityGun: 1
     mInstantiateParts: 1
-  mOverrideUIName: 
+--- !u!114 &114577962709023190
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1665910216302330}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3644d7c977df03b47b4cfc7b195f0f0e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &114808626134700502
 MonoBehaviour:
   m_ObjectHideFlags: 1
