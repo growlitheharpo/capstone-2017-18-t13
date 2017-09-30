@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using FiringSquad.Data;
 using UnityEngine;
+using UnityEngine.Networking;
 using Random = UnityEngine.Random;
 
 namespace FiringSquad.Gameplay
@@ -169,21 +170,29 @@ namespace FiringSquad.Gameplay
 				return;
 			}
 
-			OnPreFireShot();
-
 			mShotTime = 1.0f / mCurrentData.fireRate;
 			mAmountInClip.value--;
 
-
 			WeaponPartScriptBarrel barrel = mCurrentAttachments[Attachment.Barrel] as WeaponPartScriptBarrel;
 			int count = barrel != null ? barrel.projectileCount : 1;
-			
+
+			var shots = new List<Ray>(count);
+			for (int i = 0; i < count; i++)
+				shots.Add(CalculateShotDirection());
+
+			FireShotImmediate(shots);
+			((PlayerScript)bearer).ReflectWeaponFire(shots);
+		}
+
+		public void FireShotImmediate(List<Ray> shots)
+		{
+			OnPreFireShot();
+
+			WeaponPartScriptBarrel barrel = mCurrentAttachments[Attachment.Barrel] as WeaponPartScriptBarrel;
 			PlayShotEffect(barrel != null ? barrel.barrelTip.position : transform.position);
 
-			for (int i = 0; i < count; i++)
+			foreach (Ray shot in shots)
 			{
-				Ray shot = CalculateShotDirection();
-
 				GameObject projectile = mProjectilePool.ReleaseNewItem();
 				projectile.GetComponent<IProjectile>().Instantiate(this, shot, mCurrentData, mProjectilePool);
 			}

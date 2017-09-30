@@ -183,7 +183,7 @@ Prefab:
     - target: {fileID: 224639446783123652, guid: 96b483a1e5b7d9e49b6f418a4c5c2484,
         type: 2}
       propertyPath: m_AnchorMin.y
-      value: 0.25
+      value: 0.75
       objectReference: {fileID: 0}
     - target: {fileID: 224639446783123652, guid: 96b483a1e5b7d9e49b6f418a4c5c2484,
         type: 2}
@@ -193,7 +193,7 @@ Prefab:
     - target: {fileID: 224639446783123652, guid: 96b483a1e5b7d9e49b6f418a4c5c2484,
         type: 2}
       propertyPath: m_AnchorMax.y
-      value: 0.5
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 224639446783123652, guid: 96b483a1e5b7d9e49b6f418a4c5c2484,
         type: 2}
@@ -208,7 +208,7 @@ Prefab:
     - target: {fileID: 114525772595385032, guid: 96b483a1e5b7d9e49b6f418a4c5c2484,
         type: 2}
       propertyPath: m_Text
-      value: Prototype 3
+      value: Start Game
       objectReference: {fileID: 0}
     - target: {fileID: 114525772595385032, guid: 96b483a1e5b7d9e49b6f418a4c5c2484,
         type: 2}
@@ -479,6 +479,10 @@ Prefab:
       propertyPath: m_Name
       value: Proto1
       objectReference: {fileID: 0}
+    - target: {fileID: 1110876172334604, guid: 96b483a1e5b7d9e49b6f418a4c5c2484, type: 2}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 96b483a1e5b7d9e49b6f418a4c5c2484, type: 2}
   m_IsPrefabParent: 0
@@ -660,6 +664,10 @@ Prefab:
         type: 2}
       propertyPath: m_LocalScale.z
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1110876172334604, guid: 96b483a1e5b7d9e49b6f418a4c5c2484, type: 2}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 96b483a1e5b7d9e49b6f418a4c5c2484, type: 2}
@@ -1089,7 +1097,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1134776214
 RectTransform:
   m_ObjectHideFlags: 0

@@ -20,6 +20,8 @@ GameObject:
   m_Component:
   - component: {fileID: 4962306035921946}
   - component: {fileID: 114615841784039900}
+  - component: {fileID: 114097128908438238}
+  - component: {fileID: 114915643417014074}
   m_Layer: 9
   m_Name: p_gravityGun
   m_TagString: Untagged
@@ -40,6 +42,38 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &114097128908438238
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1669731964624448}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 372142912, guid: dc443db3e92b4983b9738c1131f555cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SceneId:
+    m_Value: 0
+  m_AssetId:
+    i0: 34
+    i1: 56
+    i2: 196
+    i3: 144
+    i4: 222
+    i5: 22
+    i6: 101
+    i7: 68
+    i8: 171
+    i9: 57
+    i10: 200
+    i11: 81
+    i12: 168
+    i13: 32
+    i14: 15
+    i15: 54
+  m_ServerOnly: 0
+  m_LocalPlayerAuthority: 1
 --- !u!114 &114615841784039900
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -58,3 +92,24 @@ MonoBehaviour:
   mPullStrength: 8
   mThrowForce: 35
   mHoldForThrowTime: 1
+--- !u!114 &114915643417014074
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1669731964624448}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1768714887, guid: dc443db3e92b4983b9738c1131f555cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_TransformSyncMode: 1
+  m_SendInterval: 0.05882353
+  m_SyncRotationAxis: 7
+  m_RotationSyncCompression: 0
+  m_SyncSpin: 0
+  m_MovementTheshold: 0.001
+  m_VelocityThreshold: 0.0001
+  m_SnapThreshold: 5
+  m_InterpolateRotation: 1
+  m_InterpolateMovement: 1

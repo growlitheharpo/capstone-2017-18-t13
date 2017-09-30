@@ -27,9 +27,15 @@ namespace FiringSquad.Gameplay
 		void AttachNewPart(WeaponPartScript part);
 
 		/// <summary>
-		/// Instantiate and fire a projectile from this weapon.
+		/// Instantiate and fire a projectile from this weapon. Notifies network.
 		/// </summary>
 		void FireWeapon();
+
+		/// <summary>
+		/// Instantiate and fire projectiles immediately.
+		/// </summary>
+		/// <param name="shotDirections"></param>
+		void FireShotImmediate(List<Ray> shotDirections);
 
 		/// <summary>
 		/// Reset the amount of ammo in the clip and play some sort of animation.

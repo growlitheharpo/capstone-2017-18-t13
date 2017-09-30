@@ -17,8 +17,6 @@ public class PauseGamePanel : MonoBehaviour
 
 	[SerializeField] private ActionProvider mQuitButton;
 
-	private PlayerScript mPlayer;
-
 	private void Awake()
 	{
 		EventManager.OnInitialPersistenceLoadComplete += HandleInitialLoad;
@@ -46,10 +44,9 @@ public class PauseGamePanel : MonoBehaviour
 		EventManager.OnShowPausePanel -= HandleToggle;
 	}
 	
-	private void HandleToggle(bool show, PlayerScript player)
+	private void HandleToggle(bool show)
 	{
 		gameObject.SetActive(show);
-		mPlayer = player;
 		
 		if (!show)
 			ApplySettings();
@@ -93,13 +90,12 @@ public class PauseGamePanel : MonoBehaviour
 		mData.masterVolume = mVolumeProvider.GetValue() / 100.0f;
 		mData.mouseSensitivity = mMouseSensitivityProvider.GetValue();
 
-		mPlayer.ApplyOptionsData(mData);
-		mPlayer.GetComponent<PlayerMovementScript>().ApplyOptionsData(mData);
+		EventManager.Notify(() => EventManager.ApplyOptionsData(mData));
 	}
 	
 	private void HandleQuit()
 	{
-		EventManager.Notify(() => EventManager.TogglePauseState(mPlayer));
+		EventManager.Notify(() => EventManager.TogglePauseState());
 		EventManager.Notify(() => EventManager.RequestSceneChange(GamestateManager.MENU_SCENE));
 	}
 }

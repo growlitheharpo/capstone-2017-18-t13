@@ -56,12 +56,12 @@ public partial class GamestateManager
 			TransitionStates(new FindGameModeState(this));
 		}
 
-		private void HandlePauseToggle(PlayerScript requester)
+		private void HandlePauseToggle()
 		{
 			if (mIsPaused)
 				PopState();
 			else
-				PushState(new PausedGameState(this, requester));
+				PushState(new PausedGameState(this));
 
 			mIsPaused = !mIsPaused;
 		}
@@ -101,31 +101,29 @@ public partial class GamestateManager
 
 		private class PausedGameState : BaseState<GameSceneState>
 		{
-			public PausedGameState(GameSceneState m, PlayerScript r) : base(m)
+			public PausedGameState(GameSceneState m) : base(m)
 			{
-				mRequester = r;
 			}
 
-			private PlayerScript mRequester;
 			private bool mOriginalGameplayState;
-			private float mOriginalTimescale;
+			//private float mOriginalTimescale;
 
 			public override void OnEnter()
 			{
-				EventManager.Notify(() => EventManager.ShowPausePanel(true, mRequester));
+				EventManager.Notify(() => EventManager.ShowPausePanel(true));
 
 				IInput input = ServiceLocator.Get<IInput>();
 				mOriginalGameplayState = input.IsInputEnabled(Input.InputLevel.Gameplay);
 				input.DisableInputLevel(Input.InputLevel.Gameplay);
 
-				mOriginalTimescale = Time.timeScale;
-				Time.timeScale = 0.0f;
+				/*mOriginalTimescale = Time.timeScale;
+				Time.timeScale = 0.0f;*/
 			}
 
 			public override void OnExit()
 			{
-				Time.timeScale = mOriginalTimescale;
-				EventManager.Notify(() => EventManager.ShowPausePanel(false, mRequester));
+				//Time.timeScale = mOriginalTimescale;
+				EventManager.Notify(() => EventManager.ShowPausePanel(false));
 				ServiceLocator.Get<IInput>().SetInputLevelState(Input.InputLevel.Gameplay, mOriginalGameplayState);
 			}
 
