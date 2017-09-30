@@ -22,6 +22,8 @@ namespace FiringSquad.Gameplay
 		[SerializeField] private float mThrowForce;
 		[SerializeField] private float mHoldForThrowTime;
 
+		private Coroutine mLerpObjectRoutine;
+
 		public IInteractable heldObject { get { return mHoldTarget == null ? null : mHoldTarget.GetComponentUpwards<IInteractable>(); } }
 
 		private Rigidbody mHoldTarget;
@@ -39,7 +41,7 @@ namespace FiringSquad.Gameplay
 		}
 
 		[TargetRpc]
-		public void TargetRpcRegisterInput(NetworkConnection target, NetworkInstanceId playerId)
+		public void TargetRpcRegisterInput(NetworkConnection target, NetworkInstanceId playerId, Vector3 localPos)
 		{
 			GameObject go = ClientScene.FindLocalObject(playerId);
 			if (go == null)
@@ -50,6 +52,7 @@ namespace FiringSquad.Gameplay
 			bearer = playerScript;
 			transform.SetParent(go.transform, false);
 			transform.ResetLocalValues();
+			transform.localPosition = localPos;
 
 			PlayerInputMap input = playerScript.inputMap;
 
@@ -92,10 +95,37 @@ namespace FiringSquad.Gameplay
 		private void CmdAddForceToObject(NetworkInstanceId id, Vector3 force)
 		{
 			GameObject go = NetworkServer.FindLocalObject(id);
-			go.transform.SetParent(null);
+			CmdReleaseObject(id);
 
 			Rigidbody rb = go.GetComponent<Rigidbody>();
 			rb.AddForce(force, ForceMode.Impulse);
+		}
+
+		[Command]
+		private void CmdGrabObject(NetworkInstanceId id)
+		{
+			GameObject go = NetworkServer.FindLocalObject(id);
+			Rigidbody rb = go.GetComponent<Rigidbody>();
+
+			go.transform.SetParent(transform);
+			rb.useGravity = false;
+			rb.constraints = RigidbodyConstraints.FreezeAll;
+
+			StartCoroutine(Coroutines.LerpPosition(go.transform, Vector3.zero, 0.3f));
+		}
+
+		[Command]
+		private void CmdReleaseObject(NetworkInstanceId id)
+		{
+			if (mLerpObjectRoutine != null)
+				StopCoroutine(mLerpObjectRoutine);
+
+			GameObject go = NetworkServer.FindLocalObject(id);
+			Rigidbody rb = go.GetComponent<Rigidbody>();
+
+			go.transform.SetParent(null);
+			rb.useGravity = true;
+			rb.constraints = RigidbodyConstraints.None;
 		}
 
 		private class GravGunStateMachine : BaseStateMachine
@@ -261,16 +291,16 @@ namespace FiringSquad.Gameplay
 
 				public override void OnEnter()
 				{
+					/*mPreviousParent = mMachine.mScript.mHoldTarget.transform.parent;
 					mOriginalConstraints = mMachine.mScript.mHoldTarget.constraints;
 					mMachine.mScript.mHoldTarget.constraints = RigidbodyConstraints.FreezeAll;
 
-					mPreviousParent = mMachine.mScript.mHoldTarget.transform.parent;
-					mMachine.mScript.mHoldTarget.transform.SetParent(mMachine.mScript.transform);
-
-					mGrabRoutine = mMachine.mScript.StartCoroutine(LerpToMyPosition());
+					/*mMachine.mScript.mHoldTarget.transform.SetParent(mMachine.mScript.transform);
+					mGrabRoutine = mMachine.mScript.StartCoroutine(LerpToMyPosition());*/
+					mMachine.mScript.CmdGrabObject(mMachine.mScript.mHoldTarget.GetComponent<NetworkIdentity>().netId);
 				}
 
-				private IEnumerator LerpToMyPosition(float time = 0.3f)
+				/*private IEnumerator LerpToMyPosition(float time = 0.3f)
 				{
 					Vector3 originalPos = mMachine.mScript.mHoldTarget.transform.position;
 					float currentTime = 0.0f;
@@ -285,7 +315,7 @@ namespace FiringSquad.Gameplay
 
 						yield return null;
 					}
-				}
+				}*/
 
 				public override void OnInputHeld()
 				{
@@ -328,10 +358,15 @@ namespace FiringSquad.Gameplay
 					if (mMachine.mScript.mHoldTarget == null)
 						return;
 
-					mMachine.mScript.mHoldTarget.constraints = mOriginalConstraints;
+					/*mMachine.mScript.mHoldTarget.constraints = mOriginalConstraints;
 					mMachine.mScript.mHoldTarget.AddForce(mEndForce, ForceMode.Impulse);
 					mMachine.mScript.mHoldTarget.transform.SetParent(mPreviousParent);
-					mMachine.mScript.mHoldTarget = null;
+					mMachine.mScript.mHoldTarget = null;*/
+
+					NetworkInstanceId id = mMachine.mScript.mHoldTarget.GetComponent<NetworkIdentity>().netId;
+
+					mMachine.mScript.CmdReleaseObject(id);
+					mMachine.mScript.CmdAddForceToObject(id, mEndForce);
 				}
 
 				public override IState GetTransition()

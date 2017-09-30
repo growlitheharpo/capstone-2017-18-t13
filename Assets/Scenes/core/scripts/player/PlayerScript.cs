@@ -60,7 +60,7 @@ namespace FiringSquad.Gameplay
 
 				NetworkServer.SpawnWithClientAuthority(newGun, gameObject);
 
-				mGravityGun.TargetRpcRegisterInput(connectionToClient, netId);
+				mGravityGun.TargetRpcRegisterInput(connectionToClient, netId, offset.localPosition);
 			}
 		}
 
