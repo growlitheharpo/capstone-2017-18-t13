@@ -1,11 +1,14 @@
 ﻿using System.Collections;
+using KeatsLib.Unity;
 using UnityEngine;
 
 namespace FiringSquad.Gameplay
 {
 	public class WeaponPickupScript : MonoBehaviour, IInteractable
 	{
+		[SerializeField] private float mPickupScale = 2.0f;
 		[SerializeField] private Collider mPickupCollider;
+		
 		private Rigidbody mPickupRigidbody;
 		private WeaponPartScript mPart;
 
@@ -15,6 +18,25 @@ namespace FiringSquad.Gameplay
 			mPart = GetComponent<WeaponPartScript>();
 		}
 
+		private void Start()
+		{
+			StartCoroutine(Coroutines.InvokeAfterFrames(3, () =>
+			{
+				transform.localScale = Vector3.one * mPickupScale;
+
+				GameObject psPrefab = Resources.Load<GameObject>("prefabs/weapons/effects/p_pickupEffectPack");
+				GameObject ps = Instantiate(psPrefab);
+
+				ps.transform.SetParent(mPickupCollider.transform, false);
+				ps.transform.position = mPickupCollider.bounds.center;
+			}));
+		}
+
+		private void OnDestroy()
+		{
+			StopAllCoroutines();
+		}
+		
 		public void Interact()
 		{
 			Interact(null);

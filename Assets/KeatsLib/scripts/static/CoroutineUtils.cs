@@ -1,5 +1,7 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace KeatsLib.Unity
 {
@@ -199,6 +201,31 @@ namespace KeatsLib.Unity
 
 			if (callback != null)
 				callback();
+		}
+
+		/// <summary>
+		/// Wait a certain number of frames, than activate the given callback.
+		/// </summary>
+		/// <param name="numberFrames">Number of frames to wait for.</param>
+		/// <param name="callback">The action to invoke after the number of frames have passed.</param>
+		public static IEnumerator InvokeAfterFrames(uint numberFrames, Action callback)
+		{
+			for (int i = 0; i < numberFrames; i++)
+				yield return null;
+
+			callback.Invoke();
+		}
+
+		/// <summary>
+		/// Wait a certain number of seconds, then activate the given callback.
+		/// </summary>
+		/// <param name="seconds">Length of time in seconds to wait for.</param>
+		/// <param name="callback">The action to invoke after the time has passed.</param>
+		public static IEnumerator InvokeAfterSeconds(float seconds, Action callback)
+		{
+			yield return new WaitForSeconds(seconds);
+
+			callback.Invoke();
 		}
 
 		/// <summary>
