@@ -11,6 +11,36 @@ namespace FiringSquad.Gameplay
 	/// <inheritdoc cref="IWeapon" />
 	public abstract class BaseWeaponScript : MonoBehaviour, IWeapon
 	{
+		public static class DebugHelper
+		{
+			public static WeaponData GetWeaponData(BaseWeaponScript p)
+			{
+				return new WeaponData(p.mCurrentData);
+			}
+
+			public static Dictionary<Attachment, WeaponPartScript> GetAttachments(BaseWeaponScript p)
+			{
+				return new Dictionary<Attachment, WeaponPartScript>(p.mCurrentAttachments);
+			}
+
+			public static Transform GetWeaponAimRoot(BaseWeaponScript p, bool forceBarrel = false)
+			{
+				if (!forceBarrel)
+					return p.GetAimRoot();
+
+				WeaponPartScript barrel;
+				if (p.mCurrentAttachments.TryGetValue(Attachment.Barrel, out barrel) && barrel is WeaponPartScriptBarrel)
+					return ((WeaponPartScriptBarrel)barrel).barrelTip;
+
+				return p.bearer.eye;
+			}
+
+			public static void ForceApplySpreadMod(Modifier.Float val)
+			{
+				
+			}
+		}
+
 		public enum Attachment
 		{
 			Scope,
@@ -36,13 +66,12 @@ namespace FiringSquad.Gameplay
 
 		private GameObjectPool mProjectilePool;
 
-		protected WeaponData mCurrentData;
+		[SerializeField] protected WeaponData mCurrentData;
+
 		protected Transform mAimRoot;
 		protected BoundProperty<int> mClipSize;
 		protected BoundProperty<int> mAmountInClip;
 		protected float mShotTime;
-
-		private const float DEFAULT_SPREAD_FACTOR = 0.001f;
 
 		protected virtual void Awake()
 		{
@@ -225,11 +254,13 @@ namespace FiringSquad.Gameplay
 		/// <returns>A new ray (origin + direction) for the next shot.</returns>
 		protected virtual Ray CalculateShotDirection()
 		{
-			float spreadFactor = DEFAULT_SPREAD_FACTOR * mCurrentData.spread;
-			Vector3 randomness = new Vector3(
+			//float spreadFactor = DEFAULT_SPREAD_FACTOR * mCurrentData.spread;
+			/*Vector3 randomness = new Vector3(
 				Random.Range(-spreadFactor, spreadFactor),
 				Random.Range(-spreadFactor, spreadFactor),
-				Random.Range(-spreadFactor, spreadFactor));
+				Random.Range(-spreadFactor, spreadFactor));*/
+
+			Vector3 randomness = Random.insideUnitSphere * mCurrentData.spread;
 
 			Transform root = GetAimRoot();
 			return new Ray(root.position, root.forward + randomness);
