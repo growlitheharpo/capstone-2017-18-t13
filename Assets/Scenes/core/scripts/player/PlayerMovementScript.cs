@@ -17,6 +17,8 @@ namespace FiringSquad.Gameplay
 
 		private CapsuleCollider mCollider;
 		private CharacterController mController;
+		//private Transform mMainCameraRef;
+
 		private IWeaponBearer mPlayer;
 
 		private PlayerInputMap mInputBindings;
