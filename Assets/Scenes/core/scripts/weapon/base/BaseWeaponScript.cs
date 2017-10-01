@@ -187,8 +187,21 @@ namespace FiringSquad.Gameplay
 
 		#region Fire Weapon
 
-		/// <inheritdoc />
-		public void FireWeapon()
+		public void FireWeaponDown()
+		{
+			// for now, we'll ignore this.
+		}
+
+		public void FireWeaponHold()
+		{
+			DoWeaponFire();
+		}
+
+		public void FireWeaponUp()
+		{
+		}
+
+		private void DoWeaponFire()
 		{
 			if (mShotTime > 0.0f)
 				return;

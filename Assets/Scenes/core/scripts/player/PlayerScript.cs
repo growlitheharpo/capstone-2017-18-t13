@@ -79,7 +79,11 @@ namespace FiringSquad.Gameplay
 
 			ServiceLocator.Get<IInput>()
 				.RegisterInput(Input.GetButtonDown, inputMap.toggleMenuButton, INPUT_ToggleUIElement, InputLevel.None)
-				.RegisterInput(Input.GetButton, inputMap.fireWeaponButton, INPUT_FireWeapon, InputLevel.Gameplay)
+
+				.RegisterInput(Input.GetButtonDown, inputMap.fireWeaponButton, mWeapon.FireWeaponDown, InputLevel.Gameplay)
+				.RegisterInput(Input.GetButton, inputMap.fireWeaponButton, mWeapon.FireWeaponHold, InputLevel.Gameplay)
+				.RegisterInput(Input.GetButtonUp, inputMap.fireWeaponButton, mWeapon.FireWeaponUp, InputLevel.Gameplay)
+
 				.RegisterInput(Input.GetButtonDown, inputMap.reloadButton, INPUT_ReloadWeapon, InputLevel.Gameplay)
 				.RegisterInput(Input.GetButtonDown, inputMap.interactButton, INPUT_ActivateInteract, InputLevel.Gameplay)
 				.RegisterInput(Input.GetButtonDown, inputMap.pauseButton, INPUT_TogglePause, InputLevel.PauseMenu);
@@ -113,7 +117,11 @@ namespace FiringSquad.Gameplay
 				.UnregisterInput(INPUT_ActivateInteract)
 				.UnregisterInput(INPUT_ToggleUIElement)
 				.UnregisterInput(INPUT_ReloadWeapon)
-				.UnregisterInput(INPUT_FireWeapon)
+
+				.UnregisterInput(mWeapon.FireWeaponDown)
+				.UnregisterInput(mWeapon.FireWeaponHold)
+				.UnregisterInput(mWeapon.FireWeaponUp)
+
 				.UnregisterInput(INPUT_TogglePause);
 
 			ServiceLocator.Get<IGameConsole>()
@@ -166,11 +174,11 @@ namespace FiringSquad.Gameplay
 			EventManager.Notify(EventManager.UIToggle);
 		}
 
-		private void INPUT_FireWeapon()
+	   /* private void INPUT_FireWeapon()
 		{
 			mWeapon.FireWeapon();
 		}
-		
+		*/
 		private void INPUT_ReloadWeapon()
 		{
 			mWeapon.Reload();
