@@ -73,6 +73,8 @@ namespace FiringSquad.Gameplay
 		protected BoundProperty<int> mAmountInClip;
 		protected float mShotTime;
 
+		private bool mHolding, mFirstShot;
+
 		protected virtual void Awake()
 		{
 			mAttachPoints = new Dictionary<Attachment, Transform>
@@ -194,11 +196,15 @@ namespace FiringSquad.Gameplay
 
 		public void FireWeaponHold()
 		{
+			mHolding = true;
 			DoWeaponFire();
+			mFirstShot = false;
 		}
 
 		public void FireWeaponUp()
 		{
+			mHolding = false;
+			mFirstShot = true;
 		}
 
 		private void DoWeaponFire()
@@ -220,7 +226,10 @@ namespace FiringSquad.Gameplay
 
 			var shots = new List<Ray>(count);
 			for (int i = 0; i < count; i++)
+			{
 				shots.Add(CalculateShotDirection());
+				mFirstShot = false;
+			}
 
 			FireShotImmediate(shots);
 			((PlayerScript)bearer).ReflectWeaponFire(shots);
@@ -274,6 +283,9 @@ namespace FiringSquad.Gameplay
 				Random.Range(-spreadFactor, spreadFactor));*/
 
 			Vector3 randomness = Random.insideUnitSphere * mCurrentData.spread;
+
+			if (mFirstShot)
+				randomness *= 0;
 
 			Transform root = GetAimRoot();
 			return new Ray(root.position, root.forward + randomness);
