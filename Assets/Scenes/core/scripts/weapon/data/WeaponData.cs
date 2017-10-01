@@ -1,19 +1,22 @@
 ﻿using System;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace FiringSquad.Data
 {
 	[Serializable]
 	public struct WeaponData
 	{
-		[SerializeField] private float mSpread;
+		[FormerlySerializedAs("mSpread")][SerializeField] private float mMinimumDispersion;
+		[SerializeField] private float mMaximumDispersion;
 		[SerializeField] private float mDamage;
 		[SerializeField] private float mFireRate;
 		[SerializeField] private float mRecoil;
 		[SerializeField] private float mReloadTime;
 		[SerializeField] private int mClipSize;
 
-		public float spread { get { return mSpread; } }
+		public float minimumDispersion { get { return mMinimumDispersion; } }
+		public float maximumDispersion { get { return mMaximumDispersion; } }
 		public float damage { get { return mDamage; } }
 		public float fireRate { get { return mFireRate; } }
 		public float recoil { get { return mRecoil; } }
@@ -22,7 +25,8 @@ namespace FiringSquad.Data
 
 		public WeaponData(WeaponData other)
 		{
-			mSpread = other.mSpread;
+			mMinimumDispersion = other.mMinimumDispersion;
+			mMaximumDispersion = other.mMaximumDispersion;
 			mDamage = other.mDamage;
 			mRecoil = other.mRecoil;
 			mFireRate = other.mFireRate;
@@ -33,7 +37,8 @@ namespace FiringSquad.Data
 		public WeaponData(WeaponData other, WeaponPartData data)
 		{
 			mDamage = data.damageModifier.Apply(other.mDamage);
-			mSpread = data.spreadModifier.Apply(other.mSpread);
+			mMinimumDispersion = data.minDispersionModifier.Apply(other.mMinimumDispersion);
+			mMaximumDispersion = data.maxDispersionModifier.Apply(other.mMaximumDispersion);
 			mRecoil = data.recoilModifier.Apply(other.mRecoil);
 			mClipSize = data.clipModifier.Apply(other.mClipSize);
 			mFireRate = data.fireRateModifier.Apply(other.mFireRate);
@@ -42,7 +47,7 @@ namespace FiringSquad.Data
 
 		public override string ToString()
 		{
-			return string.Format("Spread: {0}, Damage: {1}, FireRate: {2} ClipSize: {3}, Recoil: {4}, Reload: {5}", mSpread, mDamage, mFireRate, mClipSize, mRecoil, mReloadTime);
+			return string.Format("Spread: {0}, Damage: {1}, FireRate: {2} ClipSize: {3}, Recoil: {4}, Reload: {5}", mMinimumDispersion, mDamage, mFireRate, mClipSize, mRecoil, mReloadTime);
 		}
 	}
 }

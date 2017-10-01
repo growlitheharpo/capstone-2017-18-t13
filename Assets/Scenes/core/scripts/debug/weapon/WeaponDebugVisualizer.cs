@@ -59,7 +59,7 @@ namespace FiringSquad.Debug
 
 			Vector3 hitPoint = GetHitPoint(target);
 
-			float scaleVal = Mathf.Tan(Mathf.Asin(weaponStats.spread));
+			float scaleVal = Mathf.Tan(Mathf.Asin(weaponStats.minimumDispersion));
 			float lengthScale = Vector3.Distance(target.position, hitPoint);
 
 			Matrix4x4 dotScale = Matrix4x4.Scale(new Vector3(scaleVal, scaleVal, 1.0f));

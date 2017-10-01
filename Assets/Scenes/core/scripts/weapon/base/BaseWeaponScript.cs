@@ -271,18 +271,18 @@ namespace FiringSquad.Gameplay
 		protected abstract void PlayShotEffect(Vector3 shotOrigin);
 
 		/// <summary>
-		/// Determine the direction of the shot based on spread, etc.
+		/// Determine the direction of the shot based on minimumDispersion, etc.
 		/// </summary>
 		/// <returns>A new ray (origin + direction) for the next shot.</returns>
 		protected virtual Ray CalculateShotDirection()
 		{
-			//float spreadFactor = DEFAULT_SPREAD_FACTOR * mCurrentData.spread;
+			//float spreadFactor = DEFAULT_SPREAD_FACTOR * mCurrentData.minimumDispersion;
 			/*Vector3 randomness = new Vector3(
 				Random.Range(-spreadFactor, spreadFactor),
 				Random.Range(-spreadFactor, spreadFactor),
 				Random.Range(-spreadFactor, spreadFactor));*/
 
-			Vector3 randomness = Random.insideUnitSphere * mCurrentData.spread;
+			Vector3 randomness = Random.insideUnitSphere * mCurrentData.minimumDispersion;
 
 			if (mFirstShot)
 				randomness *= 0;
