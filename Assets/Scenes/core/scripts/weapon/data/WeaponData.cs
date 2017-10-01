@@ -9,6 +9,7 @@ namespace FiringSquad.Data
 	{
 		[FormerlySerializedAs("mSpread")][SerializeField] private float mMinimumDispersion;
 		[SerializeField] private float mMaximumDispersion;
+		[SerializeField] private float mDispersionRamp;
 		[SerializeField] private float mDamage;
 		[SerializeField] private float mFireRate;
 		[SerializeField] private float mRecoil;
@@ -17,6 +18,7 @@ namespace FiringSquad.Data
 
 		public float minimumDispersion { get { return mMinimumDispersion; } }
 		public float maximumDispersion { get { return mMaximumDispersion; } }
+		public float dispersionRamp { get { return mDispersionRamp; } }
 		public float damage { get { return mDamage; } }
 		public float fireRate { get { return mFireRate; } }
 		public float recoil { get { return mRecoil; } }
@@ -27,6 +29,7 @@ namespace FiringSquad.Data
 		{
 			mMinimumDispersion = other.mMinimumDispersion;
 			mMaximumDispersion = other.mMaximumDispersion;
+			mDispersionRamp = other.mDispersionRamp;
 			mDamage = other.mDamage;
 			mRecoil = other.mRecoil;
 			mFireRate = other.mFireRate;
@@ -39,6 +42,7 @@ namespace FiringSquad.Data
 			mDamage = data.damageModifier.Apply(other.mDamage);
 			mMinimumDispersion = data.minDispersionModifier.Apply(other.mMinimumDispersion);
 			mMaximumDispersion = data.maxDispersionModifier.Apply(other.mMaximumDispersion);
+			mDispersionRamp = data.dispersionRampModifier.Apply(other.mDispersionRamp);
 			mRecoil = data.recoilModifier.Apply(other.mRecoil);
 			mClipSize = data.clipModifier.Apply(other.mClipSize);
 			mFireRate = data.fireRateModifier.Apply(other.mFireRate);
