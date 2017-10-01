@@ -163,12 +163,6 @@ namespace FiringSquad.Gameplay
 			}
 		}
 
-		public void ApplyRecoil(Vector3 direction, float amount)
-		{
-			if (mMovement != null)
-				mMovement.AddRecoil(direction, amount);
-		}
-
 		private void INPUT_ToggleUIElement()
 		{
 			EventManager.Notify(EventManager.UIToggle);

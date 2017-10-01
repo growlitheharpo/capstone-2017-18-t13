@@ -17,14 +17,13 @@ namespace FiringSquad.Gameplay
 
 		private CapsuleCollider mCollider;
 		private CharacterController mController;
-		private Transform mMainCameraRef;
+		private IWeaponBearer mPlayer;
 
 		private PlayerInputMap mInputBindings;
 		private Vector2 mInput;
 		private Vector3 mMoveDirection;
 		private Vector2 mRotationAmount;
 		private float mMouseSensitivity;
-		private float mRecoilAmount;
 		private float mRotationY;
 		private bool mJump, mIsJumping, mIsRunning, mPreviouslyGrounded, mCrouching;
 
@@ -36,13 +35,11 @@ namespace FiringSquad.Gameplay
 			mMoveDirection = Vector3.zero;
 			mCollider = GetComponent<CapsuleCollider>();
 			mController = GetComponent<CharacterController>();
-			mMainCameraRef = transform.Find("CameraOffset");
+			mPlayer = GetComponent<PlayerScript>();
 
 			mMouseSensitivity = 1.0f;
 			mStandingHeight = mCollider.height;
 			mStandingRadius = mCollider.radius;
-
-			mRecoilAmount = 0.0f;
 		}
 
 		private void Start()
@@ -177,13 +174,13 @@ namespace FiringSquad.Gameplay
 			Vector2 rotation = mRotationAmount * mMovementData.lookSpeed * mMouseSensitivity;
 			transform.RotateAround(transform.position, transform.up, rotation.x);
 
-			mRotationY += rotation.y + (mRecoilAmount * Time.deltaTime);
-
+			mRotationY += rotation.y;// + (mRecoilAmount * Time.deltaTime);
 			mRotationY = GenericExt.ClampAngle(mRotationY, -85.0f, 85.0f);
-			mMainCameraRef.localRotation = Quaternion.AngleAxis(mRotationY, Vector3.left);
+
+			float realRotation = mRotationY + mPlayer.weapon.GetCurrentRecoil();
+			mPlayer.eye.localRotation = Quaternion.AngleAxis(realRotation, Vector3.left);
 
 			mRotationAmount = Vector2.zero;
-			mRecoilAmount = Mathf.Lerp(mRecoilAmount, 0.0f, Time.deltaTime * 20.0f);
 		}
 
 		/// <summary>
@@ -243,11 +240,6 @@ namespace FiringSquad.Gameplay
 				mIsRunning = false;
 		}
 
-		public void AddRecoil(Vector3 direction, float amount)
-		{
-			mRecoilAmount = amount * 60.0f;
-		}
-		
 		// TODO: Make this private again
 		public void ApplyOptionsData(IOptionsData settings)
 		{

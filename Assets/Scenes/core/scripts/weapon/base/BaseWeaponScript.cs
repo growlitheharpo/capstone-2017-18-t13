@@ -334,5 +334,12 @@ namespace FiringSquad.Gameplay
 		protected abstract void PlayReloadEffect(float time);
 
 		#endregion
+
+		public float GetCurrentRecoil()
+		{
+			float value = 0.0f;
+
+			return value * mCurrentData.recoilAmount;
+		}
 	}
 }
