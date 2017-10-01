@@ -27,9 +27,20 @@ namespace FiringSquad.Gameplay
 		void AttachNewPart(WeaponPartScript part);
 
 		/// <summary>
+		/// Notify the weapon that the trigger has been pressed.
 		/// Instantiate and fire a projectile from this weapon. Notifies network.
 		/// </summary>
-		void FireWeapon();
+		void FireWeaponDown();
+
+		/// <summary>
+		/// Notify the weapon every frame the trigger is held.
+		/// </summary>
+		void FireWeaponHold();
+
+		/// <summary>
+		/// Notify the weapon when the trigger is released.
+		/// </summary>
+		void FireWeaponUp();
 
 		/// <summary>
 		/// Instantiate and fire projectiles immediately.

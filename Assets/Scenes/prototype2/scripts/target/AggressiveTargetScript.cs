@@ -50,7 +50,7 @@ namespace FiringSquad.Gameplay
 				if (mHealthProp.value <= 0.0f)
 					continue;
 
-				mWeapon.FireWeapon();
+				mWeapon.FireWeaponHold();
 			}
 		}
 		

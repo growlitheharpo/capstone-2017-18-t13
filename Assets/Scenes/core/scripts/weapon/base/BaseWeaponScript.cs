@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using FiringSquad.Data;
 using UnityEngine;
-using UnityEngine.Networking;
 using Random = UnityEngine.Random;
 
 namespace FiringSquad.Gameplay
@@ -35,9 +34,9 @@ namespace FiringSquad.Gameplay
 				return p.bearer.eye;
 			}
 
-			public static void ForceApplySpreadMod(Modifier.Float val)
+			public static float GetCurrentDispersion(BaseWeaponScript p)
 			{
-				
+				return p.GetCurrentDispersionFactor();
 			}
 		}
 
@@ -63,6 +62,7 @@ namespace FiringSquad.Gameplay
 		private Dictionary<Attachment, Transform> mAttachPoints;
 		private Dictionary<Attachment, WeaponPartScript> mCurrentAttachments;
 		private bool mOverrideHitscanEye;
+		private float mHeldTime;
 
 		private GameObjectPool mProjectilePool;
 
@@ -72,6 +72,8 @@ namespace FiringSquad.Gameplay
 		protected BoundProperty<int> mClipSize;
 		protected BoundProperty<int> mAmountInClip;
 		protected float mShotTime;
+
+		private bool mFirstShot;
 
 		protected virtual void Awake()
 		{
@@ -187,8 +189,25 @@ namespace FiringSquad.Gameplay
 
 		#region Fire Weapon
 
-		/// <inheritdoc />
-		public void FireWeapon()
+		public void FireWeaponDown()
+		{
+			// for now, we'll ignore this.
+		}
+
+		public void FireWeaponHold()
+		{
+			DoWeaponFire();
+			mFirstShot = false;
+			mHeldTime += Time.deltaTime;
+		}
+
+		public void FireWeaponUp()
+		{
+			mFirstShot = true;
+			mHeldTime = 0.0f;
+		}
+
+		private void DoWeaponFire()
 		{
 			if (mShotTime > 0.0f)
 				return;
@@ -207,7 +226,10 @@ namespace FiringSquad.Gameplay
 
 			var shots = new List<Ray>(count);
 			for (int i = 0; i < count; i++)
+			{
 				shots.Add(CalculateShotDirection());
+				mFirstShot = false;
+			}
 
 			FireShotImmediate(shots);
 			((PlayerScript)bearer).ReflectWeaponFire(shots);
@@ -249,21 +271,30 @@ namespace FiringSquad.Gameplay
 		protected abstract void PlayShotEffect(Vector3 shotOrigin);
 
 		/// <summary>
-		/// Determine the direction of the shot based on spread, etc.
+		/// Determine the direction of the shot based on minimumDispersion, etc.
 		/// </summary>
 		/// <returns>A new ray (origin + direction) for the next shot.</returns>
 		protected virtual Ray CalculateShotDirection()
 		{
-			//float spreadFactor = DEFAULT_SPREAD_FACTOR * mCurrentData.spread;
+			//float spreadFactor = DEFAULT_SPREAD_FACTOR * mCurrentData.minimumDispersion;
 			/*Vector3 randomness = new Vector3(
 				Random.Range(-spreadFactor, spreadFactor),
 				Random.Range(-spreadFactor, spreadFactor),
 				Random.Range(-spreadFactor, spreadFactor));*/
 
-			Vector3 randomness = Random.insideUnitSphere * mCurrentData.spread;
+			float dispersionFactor = GetCurrentDispersionFactor();
+			Vector3 randomness = Random.insideUnitSphere * dispersionFactor;
 
 			Transform root = GetAimRoot();
 			return new Ray(root.position, root.forward + randomness);
+		}
+
+		private float GetCurrentDispersionFactor()
+		{
+			if (mFirstShot)
+				return 0.0f;
+
+			return Mathf.Lerp(mCurrentData.minimumDispersion, mCurrentData.maximumDispersion, mHeldTime / mCurrentData.dispersionRamp);
 		}
 		
 		/// <summary>
