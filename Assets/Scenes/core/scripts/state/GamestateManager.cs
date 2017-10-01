@@ -94,6 +94,7 @@ public partial class GamestateManager : MonoSingleton<GamestateManager>, IGamest
 			{ PROTOTYPE3_SCENE,			new GameSceneState() },
 			{ DESIGN_TEST_SCENE,		new GameSceneState() },
 			{ "sandbox",				new GameSceneState() },
+			{ "sandbox_networked",		new GameSceneState() },
 			{ ART_PROTOTYPE_SCENE,	new MenuSceneState() },
 			{ BASE_WORLD, new NullState() },
 		};
