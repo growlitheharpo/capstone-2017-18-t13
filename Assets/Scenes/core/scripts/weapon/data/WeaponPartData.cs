@@ -1,19 +1,23 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.Serialization;
 
 namespace FiringSquad.Data
 {
-	[CreateAssetMenu(menuName = "Weapons/Weapon Part Data")]
-	public class WeaponPartData : ScriptableObject
+	[Serializable]
+	public class WeaponPartData
 	{
+		[Header("Dispersion")]
 		[FormerlySerializedAs("mSpreadModifier")] [SerializeField] private Modifier.Float mMinDispersionModifier;
 		[SerializeField] private Modifier.Float mMaxDispersionModifier;
 		[SerializeField] private Modifier.Float mDispersionRampModifier;
 
+		[Header("Recoil")]
 		[FormerlySerializedAs("mRecoilModifier")]
 		[SerializeField] private Modifier.Float mRecoilAmountModifier;
 		[SerializeField] private Modifier.Float mRecoilTimeModifier;
 
+		[Header("Other")]
 		[SerializeField] private Modifier.Float mFireRateModifier;
 		[SerializeField] private Modifier.Float mDamageModifier;
 		[SerializeField] private Modifier.Float mReloadTimeModifier;
