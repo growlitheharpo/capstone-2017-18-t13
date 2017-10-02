@@ -243,7 +243,7 @@ namespace FiringSquad.Gameplay.AI
 
 				UnityEngine.Debug.DrawLine(eye.position, eye.position + eye.forward * 20.0f, Color.yellow);
 
-				mMachine.mCharacter.weapon.FireWeapon();
+				mMachine.mCharacter.weapon.FireWeaponHold();
 			}
 
 			public override IState GetTransition()

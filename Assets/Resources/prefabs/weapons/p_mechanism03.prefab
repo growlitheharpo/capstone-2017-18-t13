@@ -369,6 +369,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 86bff5b46561ab240983a85ab11a9bda, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mPickupScale: 2.5
   mPickupCollider: {fileID: 65984160468053518}
 --- !u!114 &114262107658183670
 MonoBehaviour:
@@ -403,9 +404,33 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mData:
-  - {fileID: 11400000, guid: 1da68329dc66bb441bd318b4ffd71c09, type: 2}
-  - {fileID: 11400000, guid: 1da68329dc66bb441bd318b4ffd71c09, type: 2}
-  - {fileID: 11400000, guid: 3d3f52b166178b74fb3978188f27852f, type: 2}
+    mMinDispersionModifier:
+      mAmount: 0
+      mType: 0
+    mMaxDispersionModifier:
+      mAmount: 0
+      mType: 0
+    mDispersionRampModifier:
+      mAmount: 0
+      mType: 0
+    mRecoilAmountModifier:
+      mAmount: 12
+      mType: 3
+    mRecoilTimeModifier:
+      mAmount: 2.5
+      mType: 3
+    mFireRateModifier:
+      mAmount: 0.5
+      mType: 3
+    mDamageModifier:
+      mAmount: 0.4
+      mType: 2
+    mReloadTimeModifier:
+      mAmount: 2.5
+      mType: 3
+    mClipSizeModifier:
+      mAmount: 0
+      mType: 0
   mDescription: I'm a rocket man.
   mDurability: 10
   mProjectilePrefab: {fileID: 1122678007204700, guid: 84b80f5ee9fffc84998972c5e7fc9d50,

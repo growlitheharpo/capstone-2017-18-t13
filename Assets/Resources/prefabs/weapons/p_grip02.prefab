@@ -38,7 +38,7 @@ GameObject:
   - component: {fileID: 4670232869659136}
   m_Layer: 0
   m_Name: View
-  m_TagString: Untagged
+  m_TagString: interactable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -56,7 +56,7 @@ GameObject:
   - component: {fileID: 95647292757116168}
   m_Layer: 0
   m_Name: mesh_verticalGrip
-  m_TagString: Untagged
+  m_TagString: interactable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -76,7 +76,7 @@ GameObject:
   - component: {fileID: 114227575621444936}
   m_Layer: 0
   m_Name: p_grip02
-  m_TagString: Untagged
+  m_TagString: interactable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -92,7 +92,7 @@ GameObject:
   - component: {fileID: 65148379894121520}
   m_Layer: 0
   m_Name: PickupCollider
-  m_TagString: Untagged
+  m_TagString: interactable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -353,8 +353,33 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mData:
-  - {fileID: 11400000, guid: 6f0cd9a664905814c8c23308d1f0f675, type: 2}
-  - {fileID: 11400000, guid: 6f0cd9a664905814c8c23308d1f0f675, type: 2}
+    mMinDispersionModifier:
+      mAmount: 0.75
+      mType: 3
+    mMaxDispersionModifier:
+      mAmount: 0.75
+      mType: 3
+    mDispersionRampModifier:
+      mAmount: 0
+      mType: 0
+    mRecoilAmountModifier:
+      mAmount: 0.5
+      mType: 3
+    mRecoilTimeModifier:
+      mAmount: 0
+      mType: 0
+    mFireRateModifier:
+      mAmount: 0
+      mType: 0
+    mDamageModifier:
+      mAmount: 0
+      mType: 0
+    mReloadTimeModifier:
+      mAmount: 0
+      mType: 0
+    mClipSizeModifier:
+      mAmount: 0
+      mType: 0
   mDescription: Standard grip, lowers recoil.
   mDurability: 20
 --- !u!114 &114869716292652946
@@ -368,4 +393,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 86bff5b46561ab240983a85ab11a9bda, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mPickupScale: 2.5
   mPickupCollider: {fileID: 65148379894121520}

@@ -363,6 +363,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 86bff5b46561ab240983a85ab11a9bda, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mPickupScale: 2.5
   mPickupCollider: {fileID: 65771015034761112}
 --- !u!114 &114623667425927558
 MonoBehaviour:
@@ -376,10 +377,59 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mData:
-  - {fileID: 11400000, guid: 1da68329dc66bb441bd318b4ffd71c09, type: 2}
-  - {fileID: 11400000, guid: 1da68329dc66bb441bd318b4ffd71c09, type: 2}
-  - {fileID: 11400000, guid: 86b414181ae66734492e9083b7b52bfb, type: 2}
+    mMinDispersionModifier:
+      mAmount: 0
+      mType: 0
+    mMaxDispersionModifier:
+      mAmount: 0
+      mType: 0
+    mDispersionRampModifier:
+      mAmount: 0
+      mType: 0
+    mRecoilAmountModifier:
+      mAmount: 0
+      mType: 0
+    mRecoilTimeModifier:
+      mAmount: 0
+      mType: 0
+    mFireRateModifier:
+      mAmount: 0
+      mType: 0
+    mDamageModifier:
+      mAmount: 0
+      mType: 0
+    mReloadTimeModifier:
+      mAmount: 0.5
+      mType: 3
+    mClipSizeModifier:
+      mAmount: 0
+      mType: 0
   mDescription: A standard single-shot barrel.
   mDurability: -1
   mTip: {fileID: 4501483128918090}
   mProjectileCount: 1
+  mOverrideRecoilCurve: 0
+  mRecoilCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 2
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    - serializedVersion: 2
+      time: 0.1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    - serializedVersion: 2
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 0

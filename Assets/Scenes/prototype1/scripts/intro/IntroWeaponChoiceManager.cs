@@ -80,8 +80,8 @@ namespace FiringSquad.Gameplay
 		{
 			WeaponData data = mDemoWeapon.currentStats;
 
-			mSpread.value = data.spread;
-			mRecoil.value = data.recoil;
+			mSpread.value = data.minimumDispersion;
+			mRecoil.value = data.recoilAmount;
 			mReload.value = data.reloadTime;
 			mFireRate.value = data.fireRate;
 			mDamage.value = data.damage;

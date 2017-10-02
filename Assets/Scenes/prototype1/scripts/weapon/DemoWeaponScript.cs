@@ -20,9 +20,8 @@ namespace FiringSquad.Gameplay
 			mAmountInClip = new BoundProperty<int>(0, GameplayUIManager.CLIP_CURRENT);
 		}
 
-		protected override void Update()
+		protected void Update()
 		{
-			base.Update();
 			transform.Rotate(Vector3.up, mRotationRate * Time.deltaTime);
 		}
 	}

@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using FiringSquad.Gameplay;
+using UnityEngine;
 
 namespace FiringSquad.Gameplay
 {
@@ -11,5 +12,10 @@ namespace FiringSquad.Gameplay
 
 		[SerializeField] private int mProjectileCount = 1;
 		public int projectileCount { get { return mProjectileCount; } }
+
+		[SerializeField] private bool mOverrideRecoilCurve;
+
+		[HideInInspector] [SerializeField] private AnimationCurve mRecoilCurve;
+		public AnimationCurve recoilCurve { get { return mOverrideRecoilCurve ? mRecoilCurve : null; } }
 	}
 }

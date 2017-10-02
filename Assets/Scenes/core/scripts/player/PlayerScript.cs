@@ -29,7 +29,6 @@ namespace FiringSquad.Gameplay
 			}
 		}
 
-		private PlayerMovementScript mMovement;
 		private BoundProperty<float> mHealth;
 		private PlayerWeaponScript mWeapon;
 		private bool mGodmode;
@@ -47,7 +46,6 @@ namespace FiringSquad.Gameplay
 		{
 			Logger.Info("AWAKE");
 			mDefaultPosition = transform.position;
-			mMovement = GetComponent<PlayerMovementScript>();
 
 			if (mData.makeWeaponGun && mData.baseWeaponPrefab != null)
 			{
@@ -79,7 +77,11 @@ namespace FiringSquad.Gameplay
 
 			ServiceLocator.Get<IInput>()
 				.RegisterInput(Input.GetButtonDown, inputMap.toggleMenuButton, INPUT_ToggleUIElement, InputLevel.None)
-				.RegisterInput(Input.GetButton, inputMap.fireWeaponButton, INPUT_FireWeapon, InputLevel.Gameplay)
+
+				.RegisterInput(Input.GetButtonDown, inputMap.fireWeaponButton, mWeapon.FireWeaponDown, InputLevel.Gameplay)
+				.RegisterInput(Input.GetButton, inputMap.fireWeaponButton, mWeapon.FireWeaponHold, InputLevel.Gameplay)
+				.RegisterInput(Input.GetButtonUp, inputMap.fireWeaponButton, mWeapon.FireWeaponUp, InputLevel.Gameplay)
+
 				.RegisterInput(Input.GetButtonDown, inputMap.reloadButton, INPUT_ReloadWeapon, InputLevel.Gameplay)
 				.RegisterInput(Input.GetButtonDown, inputMap.interactButton, INPUT_ActivateInteract, InputLevel.Gameplay)
 				.RegisterInput(Input.GetButtonDown, inputMap.pauseButton, INPUT_TogglePause, InputLevel.PauseMenu);
@@ -113,7 +115,11 @@ namespace FiringSquad.Gameplay
 				.UnregisterInput(INPUT_ActivateInteract)
 				.UnregisterInput(INPUT_ToggleUIElement)
 				.UnregisterInput(INPUT_ReloadWeapon)
-				.UnregisterInput(INPUT_FireWeapon)
+
+				.UnregisterInput(mWeapon.FireWeaponDown)
+				.UnregisterInput(mWeapon.FireWeaponHold)
+				.UnregisterInput(mWeapon.FireWeaponUp)
+
 				.UnregisterInput(INPUT_TogglePause);
 
 			ServiceLocator.Get<IGameConsole>()
@@ -155,22 +161,16 @@ namespace FiringSquad.Gameplay
 			}
 		}
 
-		public void ApplyRecoil(Vector3 direction, float amount)
-		{
-			if (mMovement != null)
-				mMovement.AddRecoil(direction, amount);
-		}
-
 		private void INPUT_ToggleUIElement()
 		{
 			EventManager.Notify(EventManager.UIToggle);
 		}
 
-		private void INPUT_FireWeapon()
+	   /* private void INPUT_FireWeapon()
 		{
 			mWeapon.FireWeapon();
 		}
-		
+		*/
 		private void INPUT_ReloadWeapon()
 		{
 			mWeapon.Reload();

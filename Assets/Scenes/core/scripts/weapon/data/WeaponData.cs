@@ -1,30 +1,48 @@
 ﻿using System;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace FiringSquad.Data
 {
 	[Serializable]
 	public struct WeaponData
 	{
-		[SerializeField] private float mSpread;
+		[FormerlySerializedAs("mSpread")]
+		[SerializeField] private float mMinimumDispersion;
+		[SerializeField] private float mMaximumDispersion;
+		[SerializeField] private float mDispersionRamp;
+
+		[FormerlySerializedAs("mRecoil")] [SerializeField] private float mRecoilAmount;
+		[SerializeField] private float mRecoilTime;
+		[SerializeField] private AnimationCurve mRecoilCurve;
+
 		[SerializeField] private float mDamage;
 		[SerializeField] private float mFireRate;
-		[SerializeField] private float mRecoil;
 		[SerializeField] private float mReloadTime;
 		[SerializeField] private int mClipSize;
 
-		public float spread { get { return mSpread; } }
+		public float minimumDispersion { get { return mMinimumDispersion; } }
+		public float maximumDispersion { get { return mMaximumDispersion; } }
+		public float dispersionRamp { get { return mDispersionRamp; } }
+
+		public float recoilAmount { get { return mRecoilAmount; } }
+		public float recoilTime { get { return mRecoilTime; }}
+		public AnimationCurve recoilCurve { get { return mRecoilCurve; } }
+
 		public float damage { get { return mDamage; } }
 		public float fireRate { get { return mFireRate; } }
-		public float recoil { get { return mRecoil; } }
 		public float reloadTime { get { return mReloadTime; } }
 		public int clipSize { get { return mClipSize; } }
 
 		public WeaponData(WeaponData other)
 		{
-			mSpread = other.mSpread;
+			mMinimumDispersion = other.mMinimumDispersion;
+			mMaximumDispersion = other.mMaximumDispersion;
+			mDispersionRamp = other.mDispersionRamp;
+			mRecoilAmount = other.mRecoilAmount;
+			mRecoilTime = other.mRecoilTime;
+			mRecoilCurve = new AnimationCurve(other.mRecoilCurve.keys);
 			mDamage = other.mDamage;
-			mRecoil = other.mRecoil;
 			mFireRate = other.mFireRate;
 			mClipSize = other.mClipSize;
 			mReloadTime = other.mReloadTime;
@@ -33,8 +51,12 @@ namespace FiringSquad.Data
 		public WeaponData(WeaponData other, WeaponPartData data)
 		{
 			mDamage = data.damageModifier.Apply(other.mDamage);
-			mSpread = data.spreadModifier.Apply(other.mSpread);
-			mRecoil = data.recoilModifier.Apply(other.mRecoil);
+			mMinimumDispersion = data.minDispersionModifier.Apply(other.mMinimumDispersion);
+			mMaximumDispersion = data.maxDispersionModifier.Apply(other.mMaximumDispersion);
+			mDispersionRamp = data.dispersionRampModifier.Apply(other.mDispersionRamp);
+			mRecoilAmount = data.recoilAmountModifier.Apply(other.mRecoilAmount);
+			mRecoilTime = data.recoilTimeModifier.Apply(other.mRecoilTime);
+			mRecoilCurve = new AnimationCurve(other.mRecoilCurve.keys);
 			mClipSize = data.clipModifier.Apply(other.mClipSize);
 			mFireRate = data.fireRateModifier.Apply(other.mFireRate);
 			mReloadTime = data.reloadModifier.Apply(other.mReloadTime);
@@ -42,7 +64,7 @@ namespace FiringSquad.Data
 
 		public override string ToString()
 		{
-			return string.Format("Spread: {0}, Damage: {1}, FireRate: {2} ClipSize: {3}, Recoil: {4}, Reload: {5}", mSpread, mDamage, mFireRate, mClipSize, mRecoil, mReloadTime);
+			return string.Format("Spread: {0}, Damage: {1}, FireRate: {2} ClipSize: {3}, Recoil: {4}, Reload: {5}", mMinimumDispersion, mDamage, mFireRate, mClipSize, mRecoilAmount, mReloadTime);
 		}
 	}
 }
