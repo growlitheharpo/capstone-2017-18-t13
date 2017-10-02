@@ -66,7 +66,7 @@ namespace FiringSquad.Gameplay
 
 		private GameObjectPool mProjectilePool;
 
-		[SerializeField] protected WeaponData mCurrentData;
+		protected WeaponData mCurrentData;
 
 		protected Transform mAimRoot;
 		protected BoundProperty<int> mClipSize;
