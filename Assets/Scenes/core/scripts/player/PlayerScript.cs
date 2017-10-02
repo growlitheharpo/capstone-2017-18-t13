@@ -29,7 +29,6 @@ namespace FiringSquad.Gameplay
 			}
 		}
 
-		private PlayerMovementScript mMovement;
 		private BoundProperty<float> mHealth;
 		private PlayerWeaponScript mWeapon;
 		private bool mGodmode;
@@ -47,7 +46,6 @@ namespace FiringSquad.Gameplay
 		{
 			Logger.Info("AWAKE");
 			mDefaultPosition = transform.position;
-			mMovement = GetComponent<PlayerMovementScript>();
 
 			if (mData.makeWeaponGun && mData.baseWeaponPrefab != null)
 			{
