@@ -42,6 +42,7 @@ namespace FiringSquad.Gameplay
 		{
 			var allObjects = Resources.LoadAll<GameObject>("prefabs/weapons");
 			mWeaponPrefabs = allObjects
+				.Where(x => !x.name.Contains("debug"))
 				.Where(x => x.GetComponent<WeaponPartScript>() != null)
 				.ToArray();
 
