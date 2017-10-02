@@ -383,9 +383,33 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mData:
-  - {fileID: 11400000, guid: 1da68329dc66bb441bd318b4ffd71c09, type: 2}
-  - {fileID: 11400000, guid: 1da68329dc66bb441bd318b4ffd71c09, type: 2}
-  - {fileID: 11400000, guid: 3d3f52b166178b74fb3978188f27852f, type: 2}
+    mMinDispersionModifier:
+      mAmount: 0
+      mType: 0
+    mMaxDispersionModifier:
+      mAmount: 0
+      mType: 0
+    mDispersionRampModifier:
+      mAmount: 0
+      mType: 0
+    mRecoilAmountModifier:
+      mAmount: 0
+      mType: 0
+    mRecoilTimeModifier:
+      mAmount: 0
+      mType: 0
+    mFireRateModifier:
+      mAmount: 0
+      mType: 0
+    mDamageModifier:
+      mAmount: 0.2
+      mType: 2
+    mReloadTimeModifier:
+      mAmount: 1.5
+      mType: 3
+    mClipSizeModifier:
+      mAmount: 0
+      mType: 0
   mDescription: 'Fires impact grenades: 100 damage.'
   mDurability: 25
   mProjectilePrefab: {fileID: 1122678007204700, guid: 153ed538bd19d5646851811f1589f10f,

@@ -433,14 +433,33 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mData:
-  - {fileID: 11400000, guid: b9d94b976af787e49a4936c9b012296b, type: 2}
-  - {fileID: 11400000, guid: 1da68329dc66bb441bd318b4ffd71c09, type: 2}
-  - {fileID: 11400000, guid: 77686c1cbcc238c48b88feb69df51afc, type: 2}
-  - {fileID: 11400000, guid: 64ef63a4b57491a4cbde66ac51fda3f6, type: 2}
-  - {fileID: 11400000, guid: 84e174c34d9e22244bed2da90f39d4b6, type: 2}
-  - {fileID: 11400000, guid: ae3d2ee9fb619aa48941c137c3adcb39, type: 2}
-  - {fileID: 11400000, guid: ae3d2ee9fb619aa48941c137c3adcb39, type: 2}
-  - {fileID: 11400000, guid: 71b2424c08f6b374cb232949e5159fe5, type: 2}
+    mMinDispersionModifier:
+      mAmount: 2
+      mType: 3
+    mMaxDispersionModifier:
+      mAmount: 2.25
+      mType: 3
+    mDispersionRampModifier:
+      mAmount: 0.8
+      mType: 3
+    mRecoilAmountModifier:
+      mAmount: 10
+      mType: 3
+    mRecoilTimeModifier:
+      mAmount: 2
+      mType: 3
+    mFireRateModifier:
+      mAmount: 0.75
+      mType: 3
+    mDamageModifier:
+      mAmount: -0.6
+      mType: 2
+    mReloadTimeModifier:
+      mAmount: 0
+      mType: 0
+    mClipSizeModifier:
+      mAmount: 0
+      mType: 0
   mDescription: A buckshot shotgun.
   mDurability: 24
   mTip: {fileID: 4467395475359334}

@@ -8,8 +8,8 @@ namespace FiringSquad.Gameplay
 	{
 		public const int INFINITE_DURABILITY = -1;
 
-		[SerializeField] private WeaponPartData[] mData;
-		public WeaponPartData[] data { get { return mData; } }
+		[SerializeField] private WeaponPartData mData;
+		public WeaponPartData[] data { get { return new [] { mData }; } }
 
 		[SerializeField] private string mDescription;
 		public string description { get { return mDescription; } }
