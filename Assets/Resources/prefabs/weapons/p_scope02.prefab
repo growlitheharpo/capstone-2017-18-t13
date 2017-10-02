@@ -102,9 +102,9 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4065866548179430}
+  - component: {fileID: 114412117028516678}
   - component: {fileID: 114399899229538148}
   - component: {fileID: 54741395447935080}
-  - component: {fileID: 114412117028516678}
   - component: {fileID: 114838912858948322}
   - component: {fileID: 114911966320516162}
   m_Layer: 0
@@ -383,7 +383,33 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mData:
-  - {fileID: 11400000, guid: a58720100eaa9c44d821e77c21d33531, type: 2}
+    mMinDispersionModifier:
+      mAmount: 0.1
+      mType: 3
+    mMaxDispersionModifier:
+      mAmount: 0.1
+      mType: 3
+    mDispersionRampModifier:
+      mAmount: 0
+      mType: 0
+    mRecoilAmountModifier:
+      mAmount: 0
+      mType: 0
+    mRecoilTimeModifier:
+      mAmount: 0
+      mType: 0
+    mFireRateModifier:
+      mAmount: 0
+      mType: 0
+    mDamageModifier:
+      mAmount: 0
+      mType: 0
+    mReloadTimeModifier:
+      mAmount: 0
+      mType: 0
+    mClipSizeModifier:
+      mAmount: 0
+      mType: 0
   mDescription: A sniper scope. Decreases spread.
   mDurability: 20
 --- !u!114 &114838912858948322

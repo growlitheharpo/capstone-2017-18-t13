@@ -444,11 +444,33 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mData:
-  - {fileID: 11400000, guid: 06b8b61fca1a095499745bb6b1deba75, type: 2}
-  - {fileID: 11400000, guid: 06b8b61fca1a095499745bb6b1deba75, type: 2}
-  - {fileID: 11400000, guid: 71c8c469516b52a458add2074133ef06, type: 2}
-  - {fileID: 11400000, guid: 64ef63a4b57491a4cbde66ac51fda3f6, type: 2}
-  - {fileID: 11400000, guid: e9fb8245e6128b34c974047f4b6d464b, type: 2}
+    mMinDispersionModifier:
+      mAmount: 0
+      mType: 0
+    mMaxDispersionModifier:
+      mAmount: 0
+      mType: 0
+    mDispersionRampModifier:
+      mAmount: 0
+      mType: 0
+    mRecoilAmountModifier:
+      mAmount: 10
+      mType: 3
+    mRecoilTimeModifier:
+      mAmount: 1.5
+      mType: 3
+    mFireRateModifier:
+      mAmount: 2
+      mType: 3
+    mDamageModifier:
+      mAmount: -0.2
+      mType: 2
+    mReloadTimeModifier:
+      mAmount: 0
+      mType: 0
+    mClipSizeModifier:
+      mAmount: 0
+      mType: 0
   mDescription: A rapid-fire barrel with high recoil.
   mDurability: 70
   mTip: {fileID: 4914017821098816}

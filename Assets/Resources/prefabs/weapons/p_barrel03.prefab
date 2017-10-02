@@ -415,12 +415,33 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mData:
-  - {fileID: 11400000, guid: b9d94b976af787e49a4936c9b012296b, type: 2}
-  - {fileID: 11400000, guid: dc6c5a4aae61ec0459ba60a7b9d6ee07, type: 2}
-  - {fileID: 11400000, guid: 79ea0beb73cfb85458d0d664285739f4, type: 2}
-  - {fileID: 11400000, guid: 1c11676fbf427854f86f077280071e46, type: 2}
-  - {fileID: 11400000, guid: afb5db208e150474dae7f499056bd562, type: 2}
-  - {fileID: 11400000, guid: afb5db208e150474dae7f499056bd562, type: 2}
+    mMinDispersionModifier:
+      mAmount: 0.5
+      mType: 3
+    mMaxDispersionModifier:
+      mAmount: 0.5
+      mType: 3
+    mDispersionRampModifier:
+      mAmount: 0
+      mType: 0
+    mRecoilAmountModifier:
+      mAmount: 2
+      mType: 3
+    mRecoilTimeModifier:
+      mAmount: 2
+      mType: 3
+    mFireRateModifier:
+      mAmount: 0.4
+      mType: 3
+    mDamageModifier:
+      mAmount: 0.75
+      mType: 2
+    mReloadTimeModifier:
+      mAmount: 0
+      mType: 0
+    mClipSizeModifier:
+      mAmount: 0
+      mType: 0
   mDescription: A single shot, sniper rifle barrel
   mDurability: 32
   mTip: {fileID: 4467395475359334}
