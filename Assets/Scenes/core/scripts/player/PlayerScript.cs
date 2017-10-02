@@ -29,7 +29,6 @@ namespace FiringSquad.Gameplay
 			}
 		}
 
-		private PlayerMovementScript mMovement;
 		private BoundProperty<float> mHealth;
 		private PlayerWeaponScript mWeapon;
 		private bool mGodmode;
@@ -47,7 +46,6 @@ namespace FiringSquad.Gameplay
 		{
 			Logger.Info("AWAKE");
 			mDefaultPosition = transform.position;
-			mMovement = GetComponent<PlayerMovementScript>();
 
 			if (mData.makeWeaponGun && mData.baseWeaponPrefab != null)
 			{
@@ -161,12 +159,6 @@ namespace FiringSquad.Gameplay
 				transform.position = mDefaultPosition;
 				transform.rotation = Quaternion.identity;
 			}
-		}
-
-		public void ApplyRecoil(Vector3 direction, float amount)
-		{
-			if (mMovement != null)
-				mMovement.AddRecoil(direction, amount);
 		}
 
 		private void INPUT_ToggleUIElement()

@@ -12,7 +12,7 @@ namespace FiringSquad.Debug
 		[SerializeField] private Material mWireframe;
 		[SerializeField] private bool mOverrideEye;
 
-		private LineRenderer mLineRenderer;
+		private LineRenderer[] mLineRenderers;
 		private BaseWeaponScript mCurrentScript;
 		private bool mEnabled;
 
@@ -23,7 +23,7 @@ namespace FiringSquad.Debug
 			ServiceLocator.Get<IInput>()
 				.RegisterInput(Input.GetKeyDown, KeyCode.F5, INPUT_ToggleState, KeatsLib.Unity.Input.InputLevel.None);
 
-			mLineRenderer = GetComponent<LineRenderer>();
+			mLineRenderers = GetComponentsInChildren<LineRenderer>();
 
 			mMinMat = new Material(mWireframe);
 			mMaxMat = new Material(mWireframe);
@@ -32,6 +32,10 @@ namespace FiringSquad.Debug
 			mMinMat.SetColor("_LineColor", Color.green);
 			mMaxMat.SetColor("_LineColor", Color.red);
 			mCurMat.SetColor("_LineColor", new Color(0.0f, 0.4f, 1.0f));
+
+			mLineRenderers[0].material.SetColor("_LineColor", Color.green);
+			mLineRenderers[1].material.SetColor("_LineColor", Color.red);
+			mLineRenderers[2].material.SetColor("_LineColor", new Color(0.0f, 0.4f, 1.0f));
 		}
 
 		private void INPUT_ToggleState()
@@ -59,9 +63,11 @@ namespace FiringSquad.Debug
 
 		private void Update()
 		{
+			foreach (LineRenderer l in mLineRenderers)
+				l.SetPositions(new Vector3[] { });
+
 			if (mCurrentScript == null)
 			{
-				mLineRenderer.positionCount = 0;
 				return;
 			}
 
@@ -86,14 +92,12 @@ namespace FiringSquad.Debug
 			Graphics.DrawMesh(mConeMesh, translation * rotation * totalScale * dotScaleMax, mMaxMat, 0);
 			Graphics.DrawMesh(mConeMesh, translation * rotation * totalScale * dotScaleCur, mCurMat, 0);
 
-			mLineRenderer.positionCount = 0;
-			mLineRenderer.SetPositions(new Vector3[]{});
-
-			DrawLines(scaleVal1, target);
-			DrawLines(scaleVal2, target);
+			DrawLines(scaleVal1, target, 0);
+			DrawLines(scaleVal2, target, 1);
+			DrawLines(scaleVal3, target, 2);
 		}
 
-		private void DrawLines(float scaleVal, Transform target)
+		private void DrawLines(float scaleVal, Transform target, int whichRenderer)
 		{
 			var points = new List<Vector3>();
 			for (float theta = 0; theta < 2 * Mathf.PI + 0.2f; theta += 0.1f)
@@ -109,13 +113,8 @@ namespace FiringSquad.Debug
 				points.Add(basePoint);
 			}
 
-			var oldPoints = new Vector3[mLineRenderer.positionCount];
-			mLineRenderer.GetPositions(oldPoints);
-
-			points.AddRange(oldPoints);
-
-			mLineRenderer.positionCount = points.Count;
-			mLineRenderer.SetPositions(points.ToArray());
+			mLineRenderers[whichRenderer].positionCount = points.Count;
+			mLineRenderers[whichRenderer].SetPositions(points.ToArray());
 		}
 
 		private Vector3 GetHitPoint(Transform target)

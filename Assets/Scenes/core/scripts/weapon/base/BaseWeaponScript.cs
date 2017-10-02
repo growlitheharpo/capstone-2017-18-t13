@@ -66,17 +66,22 @@ namespace FiringSquad.Gameplay
 
 		private GameObjectPool mProjectilePool;
 
-		[SerializeField] protected WeaponData mCurrentData;
+		protected WeaponData mCurrentData;
 
 		protected Transform mAimRoot;
 		protected BoundProperty<int> mClipSize;
 		protected BoundProperty<int> mAmountInClip;
-		protected float mShotTime;
+
+		private List<float> mRecentShotTimes;
+		private float timePerShot { get { return 1.0f / mCurrentData.fireRate; } }
+		private bool mReloading;
 
 		private bool mFirstShot;
 
 		protected virtual void Awake()
 		{
+			mRecentShotTimes = new List<float> { -1.0f };
+
 			mAttachPoints = new Dictionary<Attachment, Transform>
 			{
 				{ Attachment.Scope, mScopeAttach },
@@ -89,12 +94,7 @@ namespace FiringSquad.Gameplay
 			mCurrentData = new WeaponData(mBaseData);
 			mProjectilePool = null;
 		}
-
-		protected virtual void Update()
-		{
-			mShotTime -= Time.deltaTime;
-		}
-
+		
 		#region Part Attachment
 
 		/// <inheritdoc />
@@ -209,7 +209,8 @@ namespace FiringSquad.Gameplay
 
 		private void DoWeaponFire()
 		{
-			if (mShotTime > 0.0f)
+			float lastShotTime = mRecentShotTimes[mRecentShotTimes.Count - 1];
+			if (mReloading || Time.time - lastShotTime < timePerShot)
 				return;
 
 			if (mAmountInClip.value <= 0)
@@ -218,7 +219,8 @@ namespace FiringSquad.Gameplay
 				return;
 			}
 
-			mShotTime = 1.0f / mCurrentData.fireRate;
+			//mLastShotTime = Time.time;
+			mRecentShotTimes.Add(Time.time);
 			mAmountInClip.value--;
 
 			WeaponPartScriptBarrel barrel = mCurrentAttachments[Attachment.Barrel] as WeaponPartScriptBarrel;
@@ -249,8 +251,6 @@ namespace FiringSquad.Gameplay
 			}
 
 			OnPostFireShot();
-
-			bearer.ApplyRecoil(Vector3.up, mCurrentData.recoil * Random.Range(0.75f, 1.25f));
 		}
 		
 		/// <summary>
@@ -276,12 +276,6 @@ namespace FiringSquad.Gameplay
 		/// <returns>A new ray (origin + direction) for the next shot.</returns>
 		protected virtual Ray CalculateShotDirection()
 		{
-			//float spreadFactor = DEFAULT_SPREAD_FACTOR * mCurrentData.minimumDispersion;
-			/*Vector3 randomness = new Vector3(
-				Random.Range(-spreadFactor, spreadFactor),
-				Random.Range(-spreadFactor, spreadFactor),
-				Random.Range(-spreadFactor, spreadFactor));*/
-
 			float dispersionFactor = GetCurrentDispersionFactor();
 			Vector3 randomness = Random.insideUnitSphere * dispersionFactor;
 
@@ -318,21 +312,35 @@ namespace FiringSquad.Gameplay
 
 		public void Reload()
 		{
-			if (mShotTime >= float.MaxValue - 1.0f)
+			if (mReloading)
 				return;
 
-			mShotTime = float.MaxValue; //no shooting while reloading.
+			mReloading = true;
 			PlayReloadEffect(mCurrentData.reloadTime);
 		}
 
 		public void OnReloadComplete()
 		{
 			mAmountInClip.value = mClipSize.value;
-			mShotTime = -1.0f;
+			mReloading = false;
 		}
 
 		protected abstract void PlayReloadEffect(float time);
 
 		#endregion
+
+		public float GetCurrentRecoil()
+		{
+			float value = 0.0f;
+			foreach (float v in mRecentShotTimes)
+			{
+				float timeSinceShot = Time.time - v;
+				float percent = Mathf.Clamp(timeSinceShot / mCurrentData.recoilTime, 0.0f, 1.0f);
+				float sample = mCurrentData.recoilCurve.Evaluate(percent);
+				value += sample;
+			}
+
+			return value * mCurrentData.recoilAmount;
+		}
 	}
 }

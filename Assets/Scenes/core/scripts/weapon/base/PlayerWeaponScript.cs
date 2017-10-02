@@ -107,9 +107,8 @@ namespace FiringSquad.Gameplay
 			OnReloadComplete();
 		}
 		
-		protected override void Update()
+		protected void Update()
 		{
-			base.Update();
 			FollowCamera();
 		}
 

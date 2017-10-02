@@ -57,5 +57,10 @@ namespace FiringSquad.Gameplay
 		/// The underlying transform property for the weapon.
 		/// </summary>
 		Transform transform { get; }
+
+		/// <summary>
+		/// Gets the current recoil amount.
+		/// </summary>
+		float GetCurrentRecoil();
 	}
 }
