@@ -445,34 +445,34 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mData:
     mMinDispersionModifier:
-      mAmount: 0
-      mType: 0
+      mAmount: 1.5
+      mType: 3
     mMaxDispersionModifier:
-      mAmount: 0
-      mType: 0
+      mAmount: 2
+      mType: 3
     mDispersionRampModifier:
-      mAmount: 0
+      mAmount: 0.5
       mType: 0
     mRecoilAmountModifier:
-      mAmount: 10
+      mAmount: 8
       mType: 3
     mRecoilTimeModifier:
       mAmount: 1.5
       mType: 3
     mFireRateModifier:
-      mAmount: 2
+      mAmount: 5
       mType: 3
     mDamageModifier:
-      mAmount: -0.2
+      mAmount: 0.5
       mType: 2
     mReloadTimeModifier:
       mAmount: 0
       mType: 0
     mClipSizeModifier:
-      mAmount: 0
+      mAmount: 40
       mType: 0
-  mDescription: A rapid-fire barrel with high recoil.
-  mDurability: 70
+  mDescription: High powered mini-gun
+  mDurability: 50
   mTip: {fileID: 4914017821098816}
   mProjectileCount: 1
   mOverrideRecoilCurve: 0
