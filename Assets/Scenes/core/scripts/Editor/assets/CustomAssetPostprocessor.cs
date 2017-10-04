@@ -31,12 +31,12 @@ public class CustomAssetPostprocessor : AssetPostprocessor
 		string folderPath = Path.GetDirectoryName(assetImporter.assetPath) ?? "";
 		string fileName = Path.GetFileNameWithoutExtension(assetImporter.assetPath) ?? "";
 
-		// Don't create extra materials for kit items
-		if (folderPath.ToLower().Contains("kit"))
-			return null;
-
 		string trimmedFileName = new Regex("(?<=(mesh_))(.)+").Match(fileName).Value;
 		string materialPath = folderPath + "/mat_" + trimmedFileName + ".mat";
+
+		// Don't create extra materials for kit items
+		if (folderPath.ToLower().Contains("kit") || File.Exists(materialPath))
+			return null;
 
 		Shader correctShader = Shader.Find("StandardCustom");
 		if (correctShader)
