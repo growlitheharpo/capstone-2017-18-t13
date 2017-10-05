@@ -127,8 +127,14 @@ namespace FiringSquad.Gameplay
 		{
 			StartCoroutine(CleanupDeadPool(mProjectilePool));
 
+			float count = mCurrentData.clipSize * 1.25f;
+
+			WeaponPartScriptBarrel barrel = mCurrentAttachments[Attachment.Barrel] as WeaponPartScriptBarrel;
+			if (barrel != null)
+				count *= barrel.projectileCount;
+
 			GameObject newPrefab = part.projectilePrefab;
-			mProjectilePool = new GameObjectPool(Mathf.CeilToInt(mCurrentData.clipSize * 1.25f), newPrefab, transform);
+			mProjectilePool = new GameObjectPool(Mathf.CeilToInt(count), newPrefab, transform);
 		}
 
 		/// <summary>
