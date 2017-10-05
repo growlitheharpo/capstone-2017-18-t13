@@ -13,6 +13,9 @@ namespace FiringSquad.Gameplay
 		[SerializeField] private int mProjectileCount = 1;
 		public int projectileCount { get { return mProjectileCount; } }
 
+		[SerializeField] private int mShotsPerClick = -1;
+		public int shotsPerClick { get { return mShotsPerClick; } }
+
 		[SerializeField] private bool mOverrideRecoilCurve;
 
 		[HideInInspector] [SerializeField] private AnimationCurve mRecoilCurve;

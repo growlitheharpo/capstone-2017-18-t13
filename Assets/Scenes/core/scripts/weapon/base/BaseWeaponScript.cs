@@ -77,6 +77,7 @@ namespace FiringSquad.Gameplay
 		private bool mReloading;
 
 		private bool mFirstShot;
+		private int mShotsSinceRelease;
 
 		protected virtual void Awake()
 		{
@@ -204,13 +205,19 @@ namespace FiringSquad.Gameplay
 		public void FireWeaponUp()
 		{
 			mFirstShot = true;
+			mShotsSinceRelease = 0;
 			mHeldTime = 0.0f;
 		}
 
 		private void DoWeaponFire()
 		{
+			WeaponPartScriptBarrel barrel = mCurrentAttachments[Attachment.Barrel] as WeaponPartScriptBarrel;
+
 			float lastShotTime = mRecentShotTimes[mRecentShotTimes.Count - 1];
 			if (mReloading || Time.time - lastShotTime < timePerShot)
+				return;
+
+			if (barrel != null && (barrel.shotsPerClick > 0 && mShotsSinceRelease >= barrel.shotsPerClick))
 				return;
 
 			if (mAmountInClip.value <= 0)
@@ -219,11 +226,10 @@ namespace FiringSquad.Gameplay
 				return;
 			}
 
-			//mLastShotTime = Time.time;
 			mRecentShotTimes.Add(Time.time);
 			mAmountInClip.value--;
+			mShotsSinceRelease++;
 
-			WeaponPartScriptBarrel barrel = mCurrentAttachments[Attachment.Barrel] as WeaponPartScriptBarrel;
 			int count = barrel != null ? barrel.projectileCount : 1;
 
 			var shots = new List<Ray>(count);
