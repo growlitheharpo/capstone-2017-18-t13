@@ -30,8 +30,8 @@ namespace FiringSquad.Gameplay
 		{
 			UIImage image = GetComponent<UIImage>();
 
-			mVisibleColor = image.color;
-			mHiddenColor = new Color(image.color.r, image.color.g, image.color.b, 0.0f);
+			mVisibleColor = mHiddenColor = image.color;
+			mHiddenColor.a = 0.0f;
 			image.color = mHiddenColor;
 		}
 
@@ -55,21 +55,20 @@ namespace FiringSquad.Gameplay
 			if (mIndicatorPool.usePercentage >= 1.0f)
 				return;
 
+			GameObject newObj = mIndicatorPool.ReleaseNewItem();
+			RectTransform t = newObj.GetComponent<RectTransform>().ResetEverything(100.0f);
+
+			Vector3 cam = receiver.gameObject.transform.forward;
 			Vector3 a = receiver.gameObject.transform.position;
 			Vector3 b = source.gameObject.transform.position;
 			Vector3 dir = b - a;
-			float angle = Mathf.Atan2(dir.z, dir.x) * Mathf.Rad2Deg;
 
-			Vector3 cam = receiver.gameObject.transform.forward;
-			float camAngle = Mathf.Atan2(cam.z, cam.x) * Mathf.Rad2Deg;
+			cam = new Vector3(cam.x, 0.0f, cam.z);
+			dir = new Vector3(dir.x, 0.0f, dir.z);
 
-			GameObject newObj = mIndicatorPool.ReleaseNewItem();
-			RectTransform t = newObj.GetComponent<RectTransform>();
-
-			t.ResetEverything(100.0f).rotation =
-				Quaternion.Euler(0.0f, 0.0f, angle)
-				* Quaternion.Euler(0.0f, 0.0f, camAngle);
-
+			float angle = Vector3.SignedAngle(cam.normalized, dir.normalized, Vector3.down);
+			t.rotation = Quaternion.Euler(0.0f, 0.0f, angle);
+			
 			StartCoroutine(FadeOutColor(newObj));
 		}
 
