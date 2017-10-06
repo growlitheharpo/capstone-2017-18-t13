@@ -20,6 +20,7 @@ namespace FiringSquad.Gameplay.AI
 		private AIWeaponScript mWeapon;
 		private Transform mFakeEye;
 
+		public bool isCurrentPlayer { get { return false; } }
 		public Transform eye { get { return mFakeEye; } }
 		public IWeapon weapon { get { return mWeapon; } }
 		public WeaponDefaultsData defaultParts { get { return mGunDefaultParts; } }

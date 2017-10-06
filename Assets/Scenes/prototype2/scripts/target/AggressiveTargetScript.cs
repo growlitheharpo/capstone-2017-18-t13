@@ -14,6 +14,7 @@ namespace FiringSquad.Gameplay
 
 		private BoundProperty<float> mHealthProp;
 		public IWeapon weapon { get { return mWeapon; } }
+		public bool isCurrentPlayer { get { return false; } }
 		public WeaponDefaultsData defaultParts { get { throw new System.NotSupportedException("Aggressive target cannot break its weapon."); }}
 
 		// Use this for initialization

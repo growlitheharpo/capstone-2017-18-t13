@@ -34,6 +34,7 @@ namespace FiringSquad.Gameplay
 		private bool mGodmode;
 		private Transform mMainCameraRef;
 
+		public bool isCurrentPlayer { get { return isLocalPlayer; } }
 		public Transform eye { get { return mMainCameraRef; } }
 		public IWeapon weapon { get { return mWeapon; } }
 		public WeaponDefaultsData defaultParts { get { return mDefaultsOverride ?? mData.defaultWeaponParts; } }
@@ -318,11 +319,11 @@ namespace FiringSquad.Gameplay
 		}
 
 		[Command]
-		public void CmdPickupNewPart(NetworkInstanceId partId)
+		public void CmdPickupNewPart(NetworkInstanceId partId, string id)
 		{
 			GameObject go = NetworkServer.FindLocalObject(partId);
-			string id = go.name;
-			NetworkServer.Destroy(go);
+			if (go != null)
+				NetworkServer.Destroy(go);
 
 			RpcAttachPartFromServer(id);
 		}
@@ -337,10 +338,12 @@ namespace FiringSquad.Gameplay
 				.ToArray();
 
 			GameObject part = weaponPrefabs.First(x => x.name == partId);
-			Instantiate(part)
-				.GetComponent<WeaponPickupScript>()
-				.OverrideDurability(WeaponPartScript.INFINITE_DURABILITY)
-				.ConfirmAttach(mWeapon);
+			WeaponPickupScript instance = Instantiate(part).GetComponent<WeaponPickupScript>();
+
+			if (defaultParts[instance.attachPoint].name == part.name)
+				instance.OverrideDurability(WeaponPartScript.INFINITE_DURABILITY);
+
+			instance.ConfirmAttach(weapon);
 		}
 
 		[ClientRpc]
