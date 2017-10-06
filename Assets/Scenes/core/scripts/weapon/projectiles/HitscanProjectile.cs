@@ -53,7 +53,7 @@ namespace FiringSquad.Gameplay
 			IDamageReceiver component = hit.GetDamageReceiver();
 			if (component != null)
 			{
-				component.ApplyDamage(data.damage, hit.point, this);
+				component.ApplyDamage(data.damage, hit.point, hit.normal, this);
 
 				if (component is PlayerScript)
 					eventToPlay = AudioManager.AudioEvent.PrimaryEffect1;

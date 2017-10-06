@@ -38,6 +38,9 @@ public class Gamemode : MonoBehaviour
 
 		[SerializeField] private GameObject mDeathParticles;
 		public GameObject deathParticles { get { return mDeathParticles; } }
+
+		[SerializeField] private GameObject mHitParticles;
+		public GameObject hitParticles { get { return mHitParticles; } }
 	}
 
 	public enum Mode

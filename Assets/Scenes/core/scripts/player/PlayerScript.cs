@@ -230,13 +230,16 @@ namespace FiringSquad.Gameplay
 			mGodmode = !mGodmode;
 		}
 
-		public void ApplyDamage(float amount, Vector3 point, IDamageSource cause = null)
+		public void ApplyDamage(float amount, Vector3 point, Vector3 normal, IDamageSource cause = null)
 		{
-			if (mGodmode || mHealth.value <= 0.0f)
+			if (mGodmode)
 				return;
 
 			if (cause != null && ReferenceEquals(cause.source, this))
 				amount /= 2.0f;
+
+			if (!isLocalPlayer)
+				SpawnHitParticles(point, normal);
 
 			mHealth.value = Mathf.Clamp(mHealth.value - amount, 0.0f, float.MaxValue);
 			
@@ -249,6 +252,18 @@ namespace FiringSquad.Gameplay
 				myManager.CmdNotifyPlayerDied(netId, transform.position);
 				EventManager.Notify(() => EventManager.PlayerDied(this));
 			}
+		}
+
+		private void SpawnHitParticles(Vector3 point, Vector3 normal)
+		{
+			Gamemode.ArenaSettings arenaSettings = FindObjectOfType<Gamemode>().arenaSettings;
+			GameObject ps = arenaSettings.hitParticles;
+
+			if (ps == null)
+				return;
+
+			GameObject instance = Instantiate(ps, point, Quaternion.LookRotation(normal, transform.up));
+			StartCoroutine(Coroutines.WaitAndDestroyParticleSystem(instance.GetComponent<ParticleSystem>()));
 		}
 
 		private void ReceiveResetEvent()
