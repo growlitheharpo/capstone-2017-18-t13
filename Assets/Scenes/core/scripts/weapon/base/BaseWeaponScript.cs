@@ -294,6 +294,9 @@ namespace FiringSquad.Gameplay
 			foreach (float shot in mRecentShotTimes)
 			{
 				float timeSinceShot = Time.time - shot;
+				if (timeSinceShot > inverseFireRate * 2.0f)
+					continue;
+
 				float p = Mathf.Pow(Mathf.Clamp(inverseFireRate / timeSinceShot, 0.0f, 1.0f), 2);
 				percentage += p * mCurrentData.dispersionRamp;
 			}
@@ -358,7 +361,7 @@ namespace FiringSquad.Gameplay
 
 		private void CleanupRecentShots()
 		{
-			float inverseFireRate = (1.0f / mCurrentData.fireRate) * 2.0f;
+			float inverseFireRate = (1.0f / mCurrentData.fireRate) * 10.0f;
 
 			for (int i = 0; i < mRecentShotTimes.Count; i++)
 			{
