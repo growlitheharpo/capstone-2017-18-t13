@@ -11,7 +11,9 @@ namespace FiringSquad.Gameplay
 		public void PreDisable() {}
 		public void PostDisable() {}
 
+		[SerializeField] private AnimationCurve mFalloffCurve;
 		[SerializeField] private AudioProfile mProfile;
+
 		private HitscanShootEffect mEffect;
 		private IAudioReference mAudio;
 
@@ -53,7 +55,8 @@ namespace FiringSquad.Gameplay
 			IDamageReceiver component = hit.GetDamageReceiver();
 			if (component != null)
 			{
-				component.ApplyDamage(data.damage, hit.point, hit.normal, this);
+				float damage = GetDamage(data, Vector3.Distance(transform.position, hit.point));
+				component.ApplyDamage(damage, hit.point, hit.normal, this);
 
 				if (component is PlayerScript)
 					eventToPlay = AudioManager.AudioEvent.PrimaryEffect1;
@@ -66,7 +69,13 @@ namespace FiringSquad.Gameplay
 			mAudio = ServiceLocator.Get<IAudioManager>().PlaySound(eventToPlay, mProfile, transform, transform.InverseTransformPoint(hit.point));
 			StartCoroutine(PlayEffectAndKillSelf(pool, hit.point));
 		}
-		
+
+		private float GetDamage(WeaponData data, float distance)
+		{
+			float distancePercent = Mathf.Clamp(distance / data.damageFalloffDistance, 0.0f, 1.0f);
+			return mFalloffCurve.Evaluate(distancePercent) * data.damage;
+		}
+
 		private void SetupShot(IWeapon weapon)
 		{
 			sourceWeapon = weapon;

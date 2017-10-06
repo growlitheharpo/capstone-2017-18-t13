@@ -17,9 +17,12 @@ namespace FiringSquad.Data
 		[SerializeField] private Modifier.Float mRecoilAmountModifier;
 		[SerializeField] private Modifier.Float mRecoilTimeModifier;
 
+		[Header("Damage")]
+		[SerializeField] private Modifier.Float mDamageModifier;
+		[SerializeField] private Modifier.Float mDamageFalloffDistanceModifier;
+
 		[Header("Other")]
 		[SerializeField] private Modifier.Float mFireRateModifier;
-		[SerializeField] private Modifier.Float mDamageModifier;
 		[SerializeField] private Modifier.Float mReloadTimeModifier;
 		[SerializeField] private Modifier.Int mClipSizeModifier;
 
@@ -28,8 +31,9 @@ namespace FiringSquad.Data
 		public Modifier.Float dispersionRampModifier { get { return mDispersionRampModifier; } }
 		public Modifier.Float recoilAmountModifier { get { return mRecoilAmountModifier; } }
 		public Modifier.Float recoilTimeModifier { get { return mRecoilTimeModifier; } }
-		public Modifier.Float fireRateModifier { get { return mFireRateModifier; } }
 		public Modifier.Float damageModifier { get { return mDamageModifier; } }
+		public Modifier.Float damageFalloffDistanceModifier { get { return mDamageFalloffDistanceModifier; } }
+		public Modifier.Float fireRateModifier { get { return mFireRateModifier; } }
 		public Modifier.Float reloadModifier { get { return mReloadTimeModifier; } }
 		public Modifier.Int clipModifier { get { return mClipSizeModifier; } }
 	}
