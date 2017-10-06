@@ -46,7 +46,7 @@ public class GameObjectPool
 			mObjects[i].name = prefab.name;
 
 			if (objectPoolHolder != null)
-				mObjects[i].transform.parent = objectPoolHolder;
+				mObjects[i].transform.SetParent(objectPoolHolder);
 
 			mObjectPoolableComponents[mObjects[i]] = mObjects[i].GetComponents<IPoolable>().ToArray();
 
@@ -115,7 +115,7 @@ public class GameObjectPool
 		item.SetActive(false);
 		item.transform.rotation = Quaternion.identity;
 		item.transform.position = HIDDEN_POSITION;
-		item.transform.parent = mHolder;
+		item.transform.SetParent(mHolder);
 
 		//Swap the newly returned item with the last item in use.
 		mNextEmptyIndex--;
