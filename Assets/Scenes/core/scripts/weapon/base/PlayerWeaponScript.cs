@@ -58,7 +58,7 @@ namespace FiringSquad.Gameplay
 
 		protected override void OnPreFireShot()
 		{
-			if (ServiceLocator.Get<IGamestateManager>().IsFeatureEnabled(GamestateManager.Feature.WeaponDurability))
+			if (ServiceLocator.Get<IGamestateManager>().IsFeatureEnabled(GamestateManager.Feature.WeaponDurability) && bearer.isCurrentPlayer)
 				DegradeWeapon();
 		}
 
@@ -78,12 +78,12 @@ namespace FiringSquad.Gameplay
 		private void BreakPart(WeaponPartScript part)
 		{
 			GameObject defaultPart = bearer.defaultParts[part.attachPoint];
-			Instantiate(defaultPart)
+			WeaponPickupScript instance = Instantiate(defaultPart)
 				.GetComponent<WeaponPickupScript>()
-				.OverrideDurability(WeaponPartScript.INFINITE_DURABILITY)
-				.ConfirmAttach(this);
+				.OverrideDurability(WeaponPartScript.INFINITE_DURABILITY);
 
-			Logger.Warn("Durability system is currently not network-aware!", Logger.System.Network);
+			instance.name = defaultPart.name;
+			instance.Interact(bearer);
 
 			ParticleSystem ps = Instantiate(mPartBreakParticlesPrefab, part.transform.position, Quaternion.identity).GetComponent<ParticleSystem>();
 			StartCoroutine(Coroutines.WaitAndDestroyParticleSystem(ps));
