@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using KeatsLib.Unity;
 using UnityEngine;
+using UnityEngine.PostProcessing;
 using UIImage = UnityEngine.UI.Image;
 
 namespace FiringSquad.Gameplay
@@ -20,19 +21,26 @@ namespace FiringSquad.Gameplay
 
 	public class PlayerHitIndicator : MonoBehaviour, IPlayerHitIndicator
 	{
-		private const float FADE_OUT_TIME = 0.25f;
-
-		private Color mVisibleColor, mHiddenColor;
-
+		private UIImage mVignetteImage;
 		private GameObjectPool mIndicatorPool;
+		private Color mVisibleRadColor, mHiddenRadColor, mVisibleVinColor, mHiddenVinColor;
+		private Coroutine mFadeVignetteRoutine;
+
+		private const float FADE_OUT_TIME = 0.25f;
 
 		private void Awake()
 		{
+			mVignetteImage = transform.Find("Vignette").GetComponent<UIImage>();
+			mVisibleVinColor = mHiddenVinColor = mVignetteImage.color;
+			mHiddenVinColor.a = 0.0f;
+
 			UIImage image = GetComponent<UIImage>();
 
-			mVisibleColor = mHiddenColor = image.color;
-			mHiddenColor.a = 0.0f;
-			image.color = mHiddenColor;
+			mVisibleRadColor = mHiddenRadColor = image.color;
+			mHiddenRadColor.a = 0.0f;
+
+			image.color = mHiddenRadColor;
+			mVignetteImage.color = mHiddenVinColor;
 		}
 
 		private void Start()
@@ -55,6 +63,12 @@ namespace FiringSquad.Gameplay
 			if (mIndicatorPool.usePercentage >= 1.0f)
 				return;
 
+			SpawnHitIndicator(receiver, source, amount);
+			FlashScreenVignette();
+		}
+
+		private void SpawnHitIndicator(ICharacter receiver, ICharacter source, float amount)
+		{
 			GameObject newObj = mIndicatorPool.ReleaseNewItem();
 			RectTransform t = newObj.GetComponent<RectTransform>().ResetEverything(100.0f);
 
@@ -68,25 +82,36 @@ namespace FiringSquad.Gameplay
 
 			float angle = Vector3.SignedAngle(cam.normalized, dir.normalized, Vector3.down);
 			t.rotation = Quaternion.Euler(0.0f, 0.0f, angle);
-			
-			StartCoroutine(FadeOutColor(newObj));
+
+			StartCoroutine(FadeOutColor(newObj.GetComponent<UIImage>(), mVisibleRadColor, mHiddenRadColor, FADE_OUT_TIME * 1.75f, true));
 		}
 
-		private IEnumerator FadeOutColor(GameObject obj)
+		private void FlashScreenVignette()
 		{
-			UIImage image = obj.GetComponent<UIImage>();
+			if (mFadeVignetteRoutine != null)
+				StopCoroutine(mFadeVignetteRoutine);
 
+			mVignetteImage.color = mVisibleVinColor;
+			mFadeVignetteRoutine = StartCoroutine(FadeOutColor(mVignetteImage, mVisibleVinColor, mHiddenVinColor, FADE_OUT_TIME, false));
+		}
+
+		private IEnumerator FadeOutColor(UIImage image, Color a, Color b, float time, bool returnToPool)
+		{
 			float currentTime = 0.0f;
-			while (currentTime < FADE_OUT_TIME)
+			while (currentTime < time)
 			{
-				image.color = Color.Lerp(mVisibleColor, mHiddenColor, currentTime / FADE_OUT_TIME);
+				image.color = Color.Lerp(a, b, currentTime / time);
 				currentTime += Time.deltaTime;
 				yield return null;
 			}
 
-			image.color = mHiddenColor;
-			mIndicatorPool.ReturnItem(obj);
-			image.color = mVisibleColor;
+			image.color = b;
+
+			if (returnToPool)
+			{
+				mIndicatorPool.ReturnItem(image.gameObject);
+				image.color = a;
+			}
 		}
 	}
 }
