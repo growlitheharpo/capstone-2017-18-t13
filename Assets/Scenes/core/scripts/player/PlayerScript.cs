@@ -230,7 +230,7 @@ namespace FiringSquad.Gameplay
 			mGodmode = !mGodmode;
 		}
 
-		public void ApplyDamage(float amount, Vector3 point, IDamageSource cause = null)
+		public void ApplyDamage(float amount, Vector3 point, Vector3 normal, IDamageSource cause = null)
 		{
 			if (mGodmode || mHealth.value <= 0.0f)
 				return;
