@@ -53,6 +53,30 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4043a8477c9d32848ab38fe661d3f42c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mFalloffCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 2
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    - serializedVersion: 2
+      time: 0.5
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    - serializedVersion: 2
+      time: 1
+      value: 0.05
+      inSlope: -3.7598782
+      outSlope: -3.7598782
+      tangentMode: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 0
   mProfile: {fileID: 11400000, guid: ff1bc487f8d1c7149a18b49983616e05, type: 2}
 --- !u!114 &114765406182020964
 MonoBehaviour:
