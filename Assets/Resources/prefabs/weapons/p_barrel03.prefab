@@ -518,12 +518,15 @@ MonoBehaviour:
     mRecoilTimeModifier:
       mAmount: 2
       mType: 3
-    mFireRateModifier:
-      mAmount: 0.4
-      mType: 3
     mDamageModifier:
       mAmount: 0.75
       mType: 2
+    mDamageFalloffDistanceModifier:
+      mAmount: 75
+      mType: 0
+    mFireRateModifier:
+      mAmount: 0.4
+      mType: 3
     mReloadTimeModifier:
       mAmount: 0
       mType: 0
@@ -534,6 +537,7 @@ MonoBehaviour:
   mDurability: 8
   mTip: {fileID: 4467395475359334}
   mProjectileCount: 1
+  mShotsPerClick: 1
   mOverrideRecoilCurve: 0
   mRecoilCurve:
     serializedVersion: 2
