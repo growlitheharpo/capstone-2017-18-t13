@@ -44,10 +44,11 @@ namespace FiringSquad.Gameplay.AI
 
 			foreach (GameObject part in mGunDefaultParts)
 			{
-				Instantiate(part)
+				var instance = Instantiate(part)
 					.GetComponent<WeaponPickupScript>()
-					.OverrideDurability(WeaponPartScript.INFINITE_DURABILITY)
-					.ConfirmAttach(mWeapon);
+					.OverrideDurability(WeaponPartScript.INFINITE_DURABILITY);
+				instance.name = part.name;
+				instance.ConfirmAttach(weapon);
 			}
 		}
 

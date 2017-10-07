@@ -153,10 +153,11 @@ namespace FiringSquad.Gameplay
 
 				foreach (GameObject part in defaults)
 				{
-					Instantiate(part)
+					var instance = Instantiate(part)
 						.GetComponent<WeaponPickupScript>()
-						.OverrideDurability(WeaponPartScript.INFINITE_DURABILITY)
-						.ConfirmAttach(mWeapon);
+						.OverrideDurability(WeaponPartScript.INFINITE_DURABILITY);
+					instance.name = part.name;
+					instance.ConfirmAttach(mWeapon);
 				}
 			}
 
@@ -273,6 +274,9 @@ namespace FiringSquad.Gameplay
 		
 		private void ApplyOptionsData(IOptionsData settings)
 		{
+			if (!isCurrentPlayer)
+				return;
+
 			mMainCameraRef.GetComponentInChildren<Camera>().fieldOfView = settings.fieldOfView;
 			AudioListener.volume = settings.masterVolume;
 		}
@@ -352,8 +356,12 @@ namespace FiringSquad.Gameplay
 				.Where(x => x.GetComponent<WeaponPartScript>() != null)
 				.ToArray();
 
+			if (partId.Contains("(Clone)"))
+				partId = partId.Substring(0, partId.IndexOf("(C", StringComparison.Ordinal));
+
 			GameObject part = weaponPrefabs.First(x => x.name == partId);
 			WeaponPickupScript instance = Instantiate(part).GetComponent<WeaponPickupScript>();
+			instance.name = partId;
 
 			if (defaultParts[instance.attachPoint].name == part.name)
 				instance.OverrideDurability(WeaponPartScript.INFINITE_DURABILITY);
