@@ -22,8 +22,6 @@ namespace FiringSquad.Gameplay
 		[SerializeField] private float mThrowForce;
 		[SerializeField] private float mHoldForThrowTime;
 
-		private Coroutine mLerpObjectRoutine;
-
 		public IInteractable heldObject
 		{
 			get
@@ -163,9 +161,6 @@ namespace FiringSquad.Gameplay
 
 		private void ReleaseObject(GameObject go)
 		{
-			if (mLerpObjectRoutine != null)
-				StopCoroutine(mLerpObjectRoutine);
-
 			Rigidbody rb = go.GetComponent<Rigidbody>();
 
 			go.transform.SetParent(null);

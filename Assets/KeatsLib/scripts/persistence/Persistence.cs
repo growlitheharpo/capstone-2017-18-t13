@@ -1,7 +1,4 @@
-﻿using System.IO;
-using UnityEngine;
-
-namespace KeatsLib.Persistence
+﻿namespace KeatsLib.Persistence
 {
 	/// <summary>
 	/// Main section of the Persistence class.
@@ -29,8 +26,6 @@ namespace KeatsLib.Persistence
 			}
 		}
 
-		private string mFilepath;
-
 		/// <summary>
 		/// Does this Persistence instance have data that needs to be saved?
 		/// </summary>
@@ -43,7 +38,7 @@ namespace KeatsLib.Persistence
 		/// <returns>The loaded data instance.</returns>
 		public static Persistence Load(string filepath)
 		{
-			Persistence obj = new Persistence { mFilepath = filepath };
+			Persistence obj = new Persistence();
 			obj.DoInitialLoad();
 
 			return obj;
@@ -56,7 +51,7 @@ namespace KeatsLib.Persistence
 		/// <returns>The created data instance.</returns>
 		public static Persistence Create(string filepath)
 		{
-			return new Persistence { mFilepath = filepath };
+			return new Persistence();
 		}
 
 		/// <summary>

@@ -102,11 +102,6 @@ namespace FiringSquad.Gameplay
 		private void Die()
 		{
 			mMesh.SetActive(false);
-
-			ICharacter characterComponent = GetComponent<AggressiveTargetScript>();
-			if (characterComponent != null)
-				EventManager.Notify(() => EventManager.PlayerKilledEnemy(characterComponent));
-
 			mDeathParticles.Play();
 		}
 	}
