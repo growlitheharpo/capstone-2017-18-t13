@@ -10,6 +10,170 @@ public partial class GamestateManager
 {
 	private partial class GameSceneState
 	{
+		private class ArenaModeHostState : BaseStateMachine, IState
+		{
+			private ArenaModeServerState mServer;
+			private ArenaModeClientState mClient;
+
+			public void OnEnter()
+			{
+				mServer = new ArenaModeServerState();
+				mClient = new ArenaModeClientState();
+
+				mServer.OnEnter();
+				mClient.OnEnter();
+			}
+
+			public new void Update()
+			{
+				mServer.Update();
+				mClient.Update();
+			}
+
+			public void OnExit()
+			{
+				mServer.OnExit();
+				mClient.OnExit();
+			}
+
+			public IState GetTransition()
+			{
+				return this;
+			}
+		}
+
+		private class ArenaModeServerState : BaseStateMachine, IState
+		{
+			public void OnEnter()
+			{
+				TransitionStates(new WaitingForPlayers(this));
+			}
+
+			public new void Update()
+			{
+				base.Update();
+			}
+
+			public void OnExit()
+			{
+				if (currentState != null)
+					currentState.OnExit();
+			}
+
+			public IState GetTransition()
+			{
+				return this;
+			}
+
+			private class WaitingForPlayers : BaseState<ArenaModeServerState>
+			{
+				public WaitingForPlayers(ArenaModeServerState machine) : base(machine) { }
+				public override IState GetTransition()
+				{
+					return this;
+				}
+			}
+
+			private class StartGame : BaseState<ArenaModeServerState>
+			{
+				public StartGame(ArenaModeServerState machine) : base(machine) { }
+				public override IState GetTransition()
+				{
+					return this;
+				}
+			}
+
+			private class InGame : BaseState<ArenaModeServerState>
+			{
+				public InGame(ArenaModeServerState machine) : base(machine) { }
+				public override IState GetTransition()
+				{
+					return this;
+				}
+			}
+
+			private class EndGame : BaseState<ArenaModeServerState>
+			{
+				public EndGame(ArenaModeServerState machine) : base(machine) { }
+				public override IState GetTransition()
+				{
+					return new WaitingForPlayers(mMachine);
+				}
+			}
+		}
+
+		private class ArenaModeClientState : BaseStateMachine, IState
+		{
+			private BoundProperty<int> mPlayerKills;
+			private BoundProperty<int> mPlayerDeaths;
+			private BoundProperty<float> mRemainingTime;
+
+			public void OnEnter()
+			{
+				mPlayerKills = new BoundProperty<int>(0, GameplayUIManager.PLAYER_KILLS);
+				mPlayerDeaths = new BoundProperty<int>(0, GameplayUIManager.PLAYER_DEATHS);
+				mRemainingTime = new BoundProperty<float>(0, GameplayUIManager.ARENA_ROUND_TIME);
+
+				TransitionStates(new WaitingForConnect(this));
+			}
+
+			public new void Update()
+			{
+				base.Update();
+			}
+
+			public void OnExit()
+			{
+				if (currentState != null)
+					currentState.OnExit();
+
+				mPlayerKills.Cleanup();
+				mPlayerDeaths.Cleanup();
+				mRemainingTime.Cleanup();
+			}
+
+			public IState GetTransition()
+			{
+				return this;
+			}
+
+			private class WaitingForConnect : BaseState<ArenaModeClientState>
+			{
+				public WaitingForConnect(ArenaModeClientState machine) : base(machine) { }
+				public override IState GetTransition()
+				{
+					return this;
+				}
+			}
+
+			private class WaitingForPlayers : BaseState<ArenaModeClientState>
+			{
+				public WaitingForPlayers(ArenaModeClientState machine) : base(machine) { }
+				public override IState GetTransition()
+				{
+					return this;
+				}
+			}
+
+			private class PlayingGame : BaseState<ArenaModeClientState>
+			{
+				public PlayingGame(ArenaModeClientState machine) : base(machine) { }
+				public override IState GetTransition()
+				{
+					return this;
+				}
+			}
+
+			private class EndGame : BaseState<ArenaModeClientState>
+			{
+				public EndGame(ArenaModeClientState machine) : base(machine) { }
+				public override IState GetTransition()
+				{
+					return this;
+				}
+			}
+		}
+
 		private class ArenaGamemodeState : BaseStateMachine, IState
 		{
 			private Gamemode.ArenaSettings mSettings;

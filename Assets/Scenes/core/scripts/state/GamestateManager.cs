@@ -87,13 +87,8 @@ public partial class GamestateManager : MonoSingleton<GamestateManager>, IGamest
 		{
 			{ MAIN_SCENE, new TransitionToSceneState(MENU_SCENE) },
 			{ MENU_SCENE, new MenuSceneState() },
-			{ GAME_SCENE, new GameSceneState() },
-			{ PROTOTYPE1_SETUP_SCENE, new MenuSceneState() },
-			{ PROTOTYPE1_SCENE,			new GameSceneState() },
-			{ PROTOTYPE2_SCENE,			new GameSceneState() },
 			{ PROTOTYPE3_SCENE,			new GameSceneState() },
 			{ DESIGN_TEST_SCENE,		new GameSceneState() },
-			{ "sandbox",				new GameSceneState() },
 			{ "sandbox_networked",		new GameSceneState() },
 			{ ART_PROTOTYPE_SCENE,	new MenuSceneState() },
 			{ BASE_WORLD, new NullState() },
@@ -184,21 +179,6 @@ public partial class GamestateManager : MonoSingleton<GamestateManager>, IGamest
 				break;
 			default:
 				throw new ArgumentException(obj[0] + " is not a valid feature.");
-		}
-	}
-
-	public bool IsFeatureEnabled(Feature feat)
-	{
-		bool isStateGamestate = mCurrentState.GetType() == typeof(GameSceneState);
-
-		switch (feat)
-		{
-			case Feature.WeaponDrops:
-				return mOverrideEnableDrops || (isStateGamestate && ((GameSceneState)mCurrentState).IsFeatureEnabled(feat));
-			case Feature.WeaponDurability:
-				return mOverrideEnableDurability || (isStateGamestate && ((GameSceneState)mCurrentState).IsFeatureEnabled(feat));
-			default:
-				throw new ArgumentOutOfRangeException("feat", feat, null);
 		}
 	}
 }
