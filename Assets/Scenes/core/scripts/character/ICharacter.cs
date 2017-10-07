@@ -7,4 +7,6 @@ public interface ICharacter
 {
 	GameObject gameObject { get; }
 	Transform eye { get; }
+
+	bool isCurrentPlayer { get; }
 }

@@ -26,7 +26,7 @@ namespace FiringSquad.Gameplay
 			IDamageReceiver component = hit.GetDamageReceiver();
 			if (component != null)
 			{
-				component.ApplyDamage(mData.damage, hit.contacts[0].point, this);
+				component.ApplyDamage(mData.damage, hit.contacts[0].point, hit.contacts[0].normal, this);
 				mDirectHit = hit.transform;
 			}
 
@@ -50,7 +50,7 @@ namespace FiringSquad.Gameplay
 
 				IDamageReceiver component = hit.GetDamageReceiver();
 				if (component != null)
-					component.ApplyDamage(mData.damage / 2.0f, hit.point, this);
+					component.ApplyDamage(mData.damage / 2.0f, hit.point, hit.normal, this);
 			}
 		}
 

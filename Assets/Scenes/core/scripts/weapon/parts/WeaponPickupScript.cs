@@ -9,6 +9,8 @@ namespace FiringSquad.Gameplay
 	{
 		[SerializeField] private float mPickupScale = 2.0f;
 		[SerializeField] private Collider mPickupCollider;
+
+		public BaseWeaponScript.Attachment attachPoint { get { return mPart.attachPoint; } }
 		
 		private Rigidbody mPickupRigidbody;
 		private WeaponPartScript mPart;
@@ -58,7 +60,7 @@ namespace FiringSquad.Gameplay
 			PlayerScript bearer = source as PlayerScript;
 
 			if (bearer != null)
-				bearer.CmdPickupNewPart(netId);
+				bearer.CmdPickupNewPart(netId, this.name);
 		}
 
 		public WeaponPickupScript OverrideDurability(int value)

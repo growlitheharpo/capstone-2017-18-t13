@@ -250,5 +250,14 @@ namespace KeatsLib.Unity
 			t.localScale = Vector3.one;
 			return t;
 		}
+
+		public static RectTransform ResetEverything(this RectTransform t, float size)
+		{
+			t.anchorMax = new Vector2(0.5f, 0.5f);
+			t.anchorMin = new Vector2(0.5f, 0.5f);
+			t.anchoredPosition = Vector2.zero;
+			t.sizeDelta = new Vector2(size, size);
+			return t;
+		}
 	}
 }

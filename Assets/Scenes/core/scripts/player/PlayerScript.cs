@@ -34,10 +34,13 @@ namespace FiringSquad.Gameplay
 		private bool mGodmode;
 		private Transform mMainCameraRef;
 
+		public bool isCurrentPlayer { get { return isLocalPlayer; } }
 		public Transform eye { get { return mMainCameraRef; } }
 		public IWeapon weapon { get { return mWeapon; } }
 		public WeaponDefaultsData defaultParts { get { return mDefaultsOverride ?? mData.defaultWeaponParts; } }
 		public PlayerInputMap inputMap { get { return mInputMap; } }
+
+		private IPlayerHitIndicator mHitIndicator;
 
 		private WeaponDefaultsData mDefaultsOverride;
 		private const string INTERACTABLE_TAG = "interactable";
@@ -95,6 +98,11 @@ namespace FiringSquad.Gameplay
 
 		private void Start()
 		{
+			if (isLocalPlayer && FindObjectOfType<PlayerHitIndicator>() != null)
+				mHitIndicator = FindObjectOfType<PlayerHitIndicator>();
+			else
+				mHitIndicator = new NullHitIndicator();
+
 			mMainCameraRef = transform.Find("CameraOffset");
 			if (isLocalPlayer)
 				BindCamera();
@@ -222,22 +230,40 @@ namespace FiringSquad.Gameplay
 			mGodmode = !mGodmode;
 		}
 
-		public void ApplyDamage(float amount, Vector3 point, IDamageSource cause = null)
+		public void ApplyDamage(float amount, Vector3 point, Vector3 normal, IDamageSource cause = null)
 		{
-			if (mGodmode || mHealth.value <= 0.0f)
+			if (mGodmode)
 				return;
 
 			if (cause != null && ReferenceEquals(cause.source, this))
 				amount /= 2.0f;
 
+			if (!isLocalPlayer)
+				SpawnHitParticles(point, normal);
+
 			mHealth.value = Mathf.Clamp(mHealth.value - amount, 0.0f, float.MaxValue);
+			
+			if (cause != null)
+				mHitIndicator.NotifyHit(this, cause.source, amount);
 
 			if (mHealth.value <= 0.0f && isLocalPlayer)
 			{
-				var myManager = FindObjectsOfType<NetworkClientGameManager>().First(x => x.hasAuthority);
+				NetworkClientGameManager myManager = FindObjectsOfType<NetworkClientGameManager>().First(x => x.hasAuthority);
 				myManager.CmdNotifyPlayerDied(netId, transform.position);
 				EventManager.Notify(() => EventManager.PlayerDied(this));
 			}
+		}
+
+		private void SpawnHitParticles(Vector3 point, Vector3 normal)
+		{
+			Gamemode.ArenaSettings arenaSettings = FindObjectOfType<Gamemode>().arenaSettings;
+			GameObject ps = arenaSettings.hitParticles;
+
+			if (ps == null)
+				return;
+
+			GameObject instance = Instantiate(ps, point, Quaternion.LookRotation(normal, transform.up));
+			StartCoroutine(Coroutines.WaitAndDestroyParticleSystem(instance.GetComponent<ParticleSystem>()));
 		}
 
 		private void ReceiveResetEvent()
@@ -308,11 +334,11 @@ namespace FiringSquad.Gameplay
 		}
 
 		[Command]
-		public void CmdPickupNewPart(NetworkInstanceId partId)
+		public void CmdPickupNewPart(NetworkInstanceId partId, string id)
 		{
 			GameObject go = NetworkServer.FindLocalObject(partId);
-			string id = go.name;
-			NetworkServer.Destroy(go);
+			if (go != null)
+				NetworkServer.Destroy(go);
 
 			RpcAttachPartFromServer(id);
 		}
@@ -327,10 +353,12 @@ namespace FiringSquad.Gameplay
 				.ToArray();
 
 			GameObject part = weaponPrefabs.First(x => x.name == partId);
-			Instantiate(part)
-				.GetComponent<WeaponPickupScript>()
-				.OverrideDurability(WeaponPartScript.INFINITE_DURABILITY)
-				.ConfirmAttach(mWeapon);
+			WeaponPickupScript instance = Instantiate(part).GetComponent<WeaponPickupScript>();
+
+			if (defaultParts[instance.attachPoint].name == part.name)
+				instance.OverrideDurability(WeaponPartScript.INFINITE_DURABILITY);
+
+			instance.ConfirmAttach(weapon);
 		}
 
 		[ClientRpc]

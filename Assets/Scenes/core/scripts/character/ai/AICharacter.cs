@@ -20,6 +20,7 @@ namespace FiringSquad.Gameplay.AI
 		private AIWeaponScript mWeapon;
 		private Transform mFakeEye;
 
+		public bool isCurrentPlayer { get { return false; } }
 		public Transform eye { get { return mFakeEye; } }
 		public IWeapon weapon { get { return mWeapon; } }
 		public WeaponDefaultsData defaultParts { get { return mGunDefaultParts; } }
@@ -60,7 +61,7 @@ namespace FiringSquad.Gameplay.AI
 			// TODO: How will the AI respond to recoil?
 		}
 
-		public void ApplyDamage(float amount, Vector3 point, IDamageSource cause)
+		public void ApplyDamage(float amount, Vector3 point, Vector3 normal, IDamageSource cause)
 		{
 			mStateMachine.NotifyAttackedByPlayer();
 			mCurrentHealth.value -= amount;

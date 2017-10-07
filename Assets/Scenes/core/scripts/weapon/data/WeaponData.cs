@@ -17,6 +17,7 @@ namespace FiringSquad.Data
 		[SerializeField] private AnimationCurve mRecoilCurve;
 
 		[SerializeField] private float mDamage;
+		[SerializeField] private float mDamageFalloffDistance;
 		[SerializeField] private float mFireRate;
 		[SerializeField] private float mReloadTime;
 		[SerializeField] private int mClipSize;
@@ -30,6 +31,7 @@ namespace FiringSquad.Data
 		public AnimationCurve recoilCurve { get { return mRecoilCurve; } }
 
 		public float damage { get { return mDamage; } }
+		public float damageFalloffDistance { get { return mDamageFalloffDistance; } }
 		public float fireRate { get { return mFireRate; } }
 		public float reloadTime { get { return mReloadTime; } }
 		public int clipSize { get { return mClipSize; } }
@@ -43,6 +45,7 @@ namespace FiringSquad.Data
 			mRecoilTime = other.mRecoilTime;
 			mRecoilCurve = new AnimationCurve(other.mRecoilCurve.keys);
 			mDamage = other.mDamage;
+			mDamageFalloffDistance = other.mDamageFalloffDistance;
 			mFireRate = other.mFireRate;
 			mClipSize = other.mClipSize;
 			mReloadTime = other.mReloadTime;
@@ -51,6 +54,7 @@ namespace FiringSquad.Data
 		public WeaponData(WeaponData other, WeaponPartData data)
 		{
 			mDamage = data.damageModifier.Apply(other.mDamage);
+			mDamageFalloffDistance = data.damageFalloffDistanceModifier.Apply(other.mDamageFalloffDistance);
 			mMinimumDispersion = data.minDispersionModifier.Apply(other.mMinimumDispersion);
 			mMaximumDispersion = data.maxDispersionModifier.Apply(other.mMaximumDispersion);
 			mDispersionRamp = data.dispersionRampModifier.Apply(other.mDispersionRamp);

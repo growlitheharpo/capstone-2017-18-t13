@@ -149,7 +149,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1656454345110016}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0, y: 0, z: 0}
+  m_LocalPosition: {x: -0.19, y: -0.06, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 4634444397280166}
@@ -398,10 +398,13 @@ MonoBehaviour:
     mRecoilTimeModifier:
       mAmount: 0
       mType: 0
-    mFireRateModifier:
-      mAmount: 0
-      mType: 0
     mDamageModifier:
+      mAmount: 0.2
+      mType: 2
+    mDamageFalloffDistanceModifier:
+      mAmount: 25
+      mType: 0
+    mFireRateModifier:
       mAmount: 0
       mType: 0
     mReloadTimeModifier:
@@ -411,7 +414,7 @@ MonoBehaviour:
       mAmount: 0
       mType: 0
   mDescription: A sniper scope. Decreases spread.
-  mDurability: 20
+  mDurability: 10
 --- !u!114 &114838912858948322
 MonoBehaviour:
   m_ObjectHideFlags: 1

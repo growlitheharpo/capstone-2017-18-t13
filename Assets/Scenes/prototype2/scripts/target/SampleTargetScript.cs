@@ -62,7 +62,7 @@ namespace FiringSquad.Gameplay
 			}
 		}
 
-		public void ApplyDamage(float amount, Vector3 point, IDamageSource cause = null)
+		public void ApplyDamage(float amount, Vector3 point, Vector3 normal, IDamageSource cause = null)
 		{
 			StopAllCoroutines();
 			mHealth.value = Mathf.Clamp(mHealth.value - amount, 0.0f, float.MaxValue);
