@@ -1,5 +1,4 @@
-﻿using FiringSquad.Gameplay;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Networking;
 
 public class NetworkClientGameManager : NetworkBehaviour

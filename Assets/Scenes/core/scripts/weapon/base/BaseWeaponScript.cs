@@ -193,6 +193,7 @@ namespace FiringSquad.Gameplay
 
 		#region Fire Weapon
 
+		/*
 		public void FireWeaponDown()
 		{
 			// for now, we'll ignore this.
@@ -239,7 +240,7 @@ namespace FiringSquad.Gameplay
 			FireShotImmediate(shots);
 			((PlayerScript)bearer).ReflectWeaponFire(shots);
 		}
-
+		
 		public void FireShotImmediate(List<Ray> shots)
 		{
 			OnPreFireShot();
@@ -284,7 +285,7 @@ namespace FiringSquad.Gameplay
 
 			Transform root = GetAimRoot();
 			return new Ray(root.position, root.forward + randomness);
-		}
+		}*/
 
 		private float GetCurrentDispersionFactor(bool forceNotZero = false)
 		{

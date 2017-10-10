@@ -1,10 +1,4 @@
-﻿using System;
-using System.Linq;
-using FiringSquad.Gameplay;
-using KeatsLib.Collections;
-using KeatsLib.State;
-using UnityEngine;
-using Input = KeatsLib.Unity.Input;
+﻿using KeatsLib.State;
 
 public partial class GamestateManager
 {
@@ -174,6 +168,7 @@ public partial class GamestateManager
 			}
 		}
 
+		/*
 		private class ArenaGamemodeState : BaseStateMachine, IState
 		{
 			private Gamemode.ArenaSettings mSettings;
@@ -308,7 +303,7 @@ public partial class GamestateManager
 
 						player.transform.position = t.position;
 						player.transform.rotation = t.rotation;
-					}*/
+					}
 
 					// TODO: Make this decided by the server to make sure players don't start in the same place!
 					mMachine.mLocalPlayer.transform.position = mMachine.mSpawnPoints.ChooseRandom().position;
@@ -357,7 +352,7 @@ public partial class GamestateManager
 					player.transform.position = t.position;
 					player.transform.rotation = t.rotation;
 
-					player.ResetArenaPlayer();*/
+					player.ResetArenaPlayer();
 					if (!ReferenceEquals(obj, mMachine.mLocalPlayer))
 					{
 						mMachine.mPlayerKills.value += 1;
@@ -413,6 +408,6 @@ public partial class GamestateManager
 				}
 			}
 			#endregion
-		}
+		}*/
 	}
 }

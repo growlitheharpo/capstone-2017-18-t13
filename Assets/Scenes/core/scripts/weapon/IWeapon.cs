@@ -15,6 +15,7 @@ namespace FiringSquad.Gameplay
 		/// The base data for this weapon.
 		/// </summary>
 		WeaponData baseData { get; }
+
 		/// <summary>
 		/// The currently attached part modifiers.
 		/// </summary>
@@ -25,25 +26,9 @@ namespace FiringSquad.Gameplay
 		/// </summary>
 		/// <param name="part">The part to be attached.</param>
 		void AttachNewPart(WeaponPartScript part);
-
+		
 		/// <summary>
-		/// Notify the weapon that the trigger has been pressed.
-		/// Instantiate and fire a projectile from this weapon. Notifies network.
-		/// </summary>
-		void FireWeaponDown();
-
-		/// <summary>
-		/// Notify the weapon every frame the trigger is held.
-		/// </summary>
-		void FireWeaponHold();
-
-		/// <summary>
-		/// Notify the weapon when the trigger is released.
-		/// </summary>
-		void FireWeaponUp();
-
-		/// <summary>
-		/// Instantiate and fire projectiles immediately.
+		/// Instantiate and fire a projectile immediately with no rule checking.
 		/// </summary>
 		/// <param name="shotDirections"></param>
 		void FireShotImmediate(List<Ray> shotDirections);
@@ -59,7 +44,7 @@ namespace FiringSquad.Gameplay
 		Transform transform { get; }
 
 		/// <summary>
-		/// Gets the current recoil amount.
+		/// Gets the current recoil to apply to the bearer's view.
 		/// </summary>
 		float GetCurrentRecoil();
 	}
