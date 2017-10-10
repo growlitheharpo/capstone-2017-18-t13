@@ -17,11 +17,6 @@ namespace FiringSquad.Gameplay
 		WeaponData baseData { get; }
 
 		/// <summary>
-		/// The currently attached part modifiers.
-		/// </summary>
-		IEnumerable<WeaponPartScript> parts { get; }
-
-		/// <summary>
 		/// Attach a new part to this weapon.
 		/// </summary>
 		/// <param name="part">The part to be attached.</param>
