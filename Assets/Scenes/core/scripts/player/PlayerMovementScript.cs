@@ -14,6 +14,7 @@ namespace FiringSquad.Gameplay
 	public class PlayerMovementScript : NetworkBehaviour
 	{
 		[SerializeField] private CharacterMovementData mMovementData;
+		[SerializeField] private Animator mAnimator;
 
 		private CapsuleCollider mCollider;
 		private CharacterController mController;
@@ -47,10 +48,7 @@ namespace FiringSquad.Gameplay
 		private void Start()
 		{
 			if (!isLocalPlayer)
-			{
-				Destroy(this);
 				return;
-			}
 
 			PlayerInputMap input = GetComponent<PlayerScript>().inputMap;
 
@@ -139,6 +137,7 @@ namespace FiringSquad.Gameplay
 
 		#endregion
 
+		[ClientCallback]
 		private void Update()
 		{
 			if (!isLocalPlayer)
@@ -156,8 +155,11 @@ namespace FiringSquad.Gameplay
 			if (!mController.isGrounded && !mIsJumping && mPreviouslyGrounded)
 				mMoveDirection.y = 0.0f;
 			mPreviouslyGrounded = mController.isGrounded;
+
+			UpdateAnimatorState();
 		}
 
+		[ClientCallback]
 		private void FixedUpdate()
 		{
 			if (!isLocalPlayer)
@@ -201,6 +203,51 @@ namespace FiringSquad.Gameplay
 			mController.radius = newRadius;
 		}
 
+		private void UpdateAnimatorState()
+		{
+			if (mAnimator == null)
+				return;
+
+			//VelocityX, VelocityY, Crouch -> values. Jump, Fire -> triggers
+			Vector3 relativeVel = mController.velocity / mMovementData.speed;
+			relativeVel = transform.InverseTransformDirection(relativeVel);
+			Vector2 vel = new Vector2(relativeVel.x, relativeVel.z);
+
+			CmdSendAnimatorState(vel.x, vel.y, mCrouching);
+		}
+
+		[Command]
+		private void CmdSendAnimatorState(float velX, float velY, bool crouch)
+		{
+			RpcClientUpdateAnimatorState(velX, velY, crouch);
+		}
+
+		[Command]
+		private void CmdStartJumpAnimation()
+		{
+			RpcStartJumpAnim();
+		}
+
+		[ClientRpc]
+		private void RpcClientUpdateAnimatorState(float velX, float velY, bool crouch)
+		{
+			if (mAnimator == null)
+				return;
+
+			mAnimator.SetFloat("VelocityX", Mathf.Lerp(mAnimator.GetFloat("VelocityX"), velX, Time.deltaTime * 3.0f));
+			mAnimator.SetFloat("VelocityY", Mathf.Lerp(mAnimator.GetFloat("VelocityY"), velY, Time.deltaTime * 3.0f));
+			mAnimator.SetBool("Crouch", crouch);
+		}
+
+		[ClientRpc]
+		private void RpcStartJumpAnim()
+		{
+			if (mAnimator == null)
+				return;
+
+			mAnimator.SetTrigger("Jump");
+		}
+
 		/// <summary>
 		/// Apply movement based on the input we received this frame.
 		/// </summary>
@@ -228,6 +275,7 @@ namespace FiringSquad.Gameplay
 				{
 					mMoveDirection.y = mMovementData.jumpForce;
 					// play jump sound
+					CmdStartJumpAnimation();
 					mJump = false;
 					mIsJumping = true;
 				}
