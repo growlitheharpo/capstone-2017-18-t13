@@ -56,7 +56,10 @@ namespace FiringSquad.Gameplay
 			if (component != null)
 			{
 				float damage = GetDamage(data, Vector3.Distance(transform.position, hit.point));
-				component.ApplyDamage(damage, hit.point, hit.normal, this);
+
+				// TODO: This must be done server-side
+
+				//component.ApplyDamage(damage, hit.point, hit.normal, this);
 
 				/*if (component is PlayerScript)
 					eventToPlay = AudioManager.AudioEvent.PrimaryEffect1;

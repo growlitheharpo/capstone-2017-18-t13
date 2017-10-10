@@ -23,10 +23,11 @@ namespace FiringSquad.Gameplay
 
 		private void OnCollisionEnter(Collision hit)
 		{
+			// TODO: This must be done server-side
 			IDamageReceiver component = hit.GetDamageReceiver();
 			if (component != null)
 			{
-				component.ApplyDamage(mData.damage, hit.contacts[0].point, hit.contacts[0].normal, this);
+				//component.ApplyDamage(mData.damage, hit.contacts[0].point, hit.contacts[0].normal, this);
 				mDirectHit = hit.transform;
 			}
 
@@ -49,8 +50,9 @@ namespace FiringSquad.Gameplay
 					continue;
 
 				IDamageReceiver component = hit.GetDamageReceiver();
-				if (component != null)
-					component.ApplyDamage(mData.damage / 2.0f, hit.point, hit.normal, this);
+				// TODO: This must be done server-side
+				/*if (component != null)
+					component.ApplyDamage(mData.damage / 2.0f, hit.point, hit.normal, this);*/
 			}
 		}
 
