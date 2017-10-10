@@ -17,7 +17,7 @@ public partial class GamestateManager
 		public void OnEnter()
 		{
 			EventManager.OnInputLevelChanged += HandleInputChange;
-			EventManager.OnTogglePauseState += HandlePauseToggle;
+			EventManager.Local.OnTogglePause += HandlePauseToggle;
 			
 			ServiceLocator.Get<IInput>().SetInputLevelState(Input.InputLevel.Gameplay | Input.InputLevel.PauseMenu, true);
 			SetCursorState(true);
@@ -59,7 +59,7 @@ public partial class GamestateManager
 			TransitionStates(new NullState());
 
 			EventManager.OnInputLevelChanged -= HandleInputChange;
-			EventManager.OnTogglePauseState -= HandlePauseToggle;
+			EventManager.Local.OnTogglePause -= HandlePauseToggle;
 			SetCursorState(false);
 		}
 
@@ -78,7 +78,7 @@ public partial class GamestateManager
 
 			public override void OnEnter()
 			{
-				EventManager.Notify(() => EventManager.ShowPausePanel(true));
+				EventManager.Notify(() => EventManager.LocalGUI.TogglePauseMenu(true));
 
 				IInput input = ServiceLocator.Get<IInput>();
 				mOriginalGameplayState = input.IsInputEnabled(Input.InputLevel.Gameplay);
@@ -87,7 +87,7 @@ public partial class GamestateManager
 
 			public override void OnExit()
 			{
-				EventManager.Notify(() => EventManager.ShowPausePanel(false));
+				EventManager.Notify(() => EventManager.LocalGUI.TogglePauseMenu(false));
 				ServiceLocator.Get<IInput>().SetInputLevelState(Input.InputLevel.Gameplay, mOriginalGameplayState);
 			}
 

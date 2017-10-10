@@ -20,18 +20,6 @@ public class GameplayUIManager : MonoSingleton<GameplayUIManager>, IGameplayUIMa
 		mPropertyMap = new Dictionary<int, WeakReference>();
 	}
 
-	private void Start()
-	{
-		EventManager.OnBoundPropertyCreated += BoundPropertyCreated;
-		EventManager.OnBoundPropertyDestroyed += BoundPropertyDestroyed;
-	}
-
-	private void OnDestroy()
-	{
-		EventManager.OnBoundPropertyCreated -= BoundPropertyCreated;
-		EventManager.OnBoundPropertyDestroyed -= BoundPropertyDestroyed;
-	}
-
 	private void BoundPropertyCreated(BoundProperty boundProperty, int i)
 	{
 		mPropertyMap[i] = new WeakReference(boundProperty);

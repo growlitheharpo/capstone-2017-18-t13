@@ -36,7 +36,7 @@ namespace FiringSquad.Gameplay
 			mMoveDirection = Vector3.zero;
 			mCollider = GetComponent<CapsuleCollider>();
 			mController = GetComponent<CharacterController>();
-			mPlayer = GetComponent<PlayerScript>();
+			mPlayer = null;//GetComponent<PlayerScript>();
 
 			mMouseSensitivity = 1.0f;
 			mStandingHeight = mCollider.height;
@@ -51,7 +51,7 @@ namespace FiringSquad.Gameplay
 				return;
 			}
 
-			PlayerInputMap input = GetComponent<PlayerScript>().inputMap;
+			PlayerInputMap input = null;//GetComponent<PlayerScript>().inputMap;
 
 			ServiceLocator.Get<IInput>()
 				.RegisterAxis(Input.GetAxis, input.moveSidewaysAxis, INPUT_LeftRightMovement, KeatsLib.Unity.Input.InputLevel.Gameplay)
@@ -65,7 +65,7 @@ namespace FiringSquad.Gameplay
 				.RegisterInput(Input.GetButtonUp, input.sprintButton, INPUT_SprintStop, KeatsLib.Unity.Input.InputLevel.Gameplay)
 				.EnableInputLevel(KeatsLib.Unity.Input.InputLevel.Gameplay);
 
-			EventManager.OnApplyOptionsData += ApplyOptionsData;
+			EventManager.Local.OnApplyOptionsData += ApplyOptionsData;
 			mInputBindings = input;
 		}
 
@@ -83,7 +83,7 @@ namespace FiringSquad.Gameplay
 				.UnregisterAxis(INPUT_LookHorizontal)
 				.UnregisterAxis(INPUT_LookVertical);
 
-			EventManager.OnApplyOptionsData -= ApplyOptionsData;
+			EventManager.Local.OnApplyOptionsData -= ApplyOptionsData;
 		}
 
 		#region Input Delegates

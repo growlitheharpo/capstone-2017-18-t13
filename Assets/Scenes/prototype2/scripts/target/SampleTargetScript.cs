@@ -25,8 +25,6 @@ namespace FiringSquad.Gameplay
 		{
 			ServiceLocator.Get<IGameConsole>()
 				.RegisterCommand("target", CONSOLE_Reset);
-
-			EventManager.OnResetLevel += HandleResetEvent;
 		}
 
 		private void OnDestroy()
@@ -34,7 +32,6 @@ namespace FiringSquad.Gameplay
 			ServiceLocator.Get<IGameConsole>()
 				.UnregisterCommand("target");
 
-			EventManager.OnResetLevel -= HandleResetEvent;
 			mHealth.Cleanup();
 		}
 
@@ -92,13 +89,7 @@ namespace FiringSquad.Gameplay
 
 			yield return null;
 		}
-
-		private void HandleResetEvent()
-		{
-			mHealth.value = mStartHealth;
-			mMesh.SetActive(true);
-		}
-
+		
 		private void Die()
 		{
 			mMesh.SetActive(false);

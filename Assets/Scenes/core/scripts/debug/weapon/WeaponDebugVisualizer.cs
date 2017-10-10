@@ -54,8 +54,8 @@ namespace FiringSquad.Debug
 			if (target != null)
 				mCurrentScript = target.GetComponentUpwards<BaseWeaponScript>();
 
-			if (mCurrentScript == null)
-				mCurrentScript = FindObjectOfType<PlayerWeaponScript>();
+			/*if (mCurrentScript == null)
+				mCurrentScript = FindObjectOfType<PlayerWeaponScript>();*/
 #else
 			mCurrentScript = FindObjectOfType<PlayerWeaponScript>();
 #endif

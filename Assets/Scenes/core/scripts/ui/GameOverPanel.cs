@@ -13,7 +13,7 @@ namespace FiringSquad.Gameplay
 
 		private void Start()
 		{
-			EventManager.OnShowGameoverPanel += HandleGameover;
+			EventManager.LocalGUI.OnShowGameoverPanel += HandleGameover;
 
 			mRestartButton.OnClick += HandleRestart;
 			mQuitButton.OnClick += HandleQuit;
@@ -23,7 +23,7 @@ namespace FiringSquad.Gameplay
 
 		private void OnDestroy()
 		{
-			EventManager.OnShowGameoverPanel -= HandleGameover;
+			EventManager.LocalGUI.OnShowGameoverPanel -= HandleGameover;
 			mRestartButton.OnClick -= HandleRestart;
 			mQuitButton.OnClick -= HandleQuit;
 		}
@@ -32,18 +32,18 @@ namespace FiringSquad.Gameplay
 		{
 			if (string.IsNullOrEmpty(mOverrideRestartSceneName))
 			{
-				EventManager.Notify(() => EventManager.RequestSceneChange(GamestateManager.BASE_WORLD));
-				EventManager.Notify(() => EventManager.RequestSceneChange(SceneManager.GetActiveScene().name, LoadSceneMode.Additive));
+				//EventManager.Notify(() => EventManager.RequestSceneChange(GamestateManager.BASE_WORLD));
+				//EventManager.Notify(() => EventManager.RequestSceneChange(SceneManager.GetActiveScene().name, LoadSceneMode.Additive));
 			}
 			else
 			{
-				EventManager.Notify(() => EventManager.RequestSceneChange(mOverrideRestartSceneName));
+				//EventManager.Notify(() => EventManager.RequestSceneChange(mOverrideRestartSceneName));
 			}
 		}
 
 		private void HandleQuit()
 		{
-			EventManager.Notify(() => EventManager.RequestSceneChange(GamestateManager.MENU_SCENE));
+			//EventManager.Notify(() => EventManager.RequestSceneChange(GamestateManager.MENU_SCENE));
 		}
 
 		private void HandleGameover(string whoWins)

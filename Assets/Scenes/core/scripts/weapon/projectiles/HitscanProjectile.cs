@@ -58,9 +58,9 @@ namespace FiringSquad.Gameplay
 				float damage = GetDamage(data, Vector3.Distance(transform.position, hit.point));
 				component.ApplyDamage(damage, hit.point, hit.normal, this);
 
-				if (component is PlayerScript)
+				/*if (component is PlayerScript)
 					eventToPlay = AudioManager.AudioEvent.PrimaryEffect1;
-				else
+				else*/
 					eventToPlay = AudioManager.AudioEvent.PrimaryEffect2;
 			}
 			else

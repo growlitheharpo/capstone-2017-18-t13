@@ -106,7 +106,7 @@ namespace FiringSquad.Gameplay
 
 		private void CleanupInstanceList()
 		{
-			mSpawnedObjects = mSpawnedObjects.Where(x => x != null && x.GetComponent<WeaponPickupScript>() != null).ToList();
+			//mSpawnedObjects = mSpawnedObjects.Where(x => x != null && x.GetComponent<WeaponPickupScript>() != null).ToList();
 		}
 	}
 }

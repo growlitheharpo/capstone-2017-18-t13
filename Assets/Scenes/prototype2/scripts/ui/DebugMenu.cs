@@ -31,12 +31,14 @@ namespace FiringSquad.Debug
 		private void Start()
 		{
 			RefreshWeaponList();
-			EventManager.OnUIToggle += ToggleUI;
+			ServiceLocator.Get<IInput>()
+				.RegisterInput(Input.GetKeyDown, KeyCode.Tab, ToggleUI, KeatsLib.Unity.Input.InputLevel.None);
 		}
 
 		private void OnDestroy()
 		{
-			EventManager.OnUIToggle -= ToggleUI;
+			ServiceLocator.Get<IInput>()
+				.UnregisterInput(ToggleUI);
 		}
 
 		private void ToggleUI()
@@ -73,8 +75,8 @@ namespace FiringSquad.Debug
 				if (part.description != "")
 					label += "\n\n" + part.description;
 
-				if (GUILayout.Button(label, GUILayout.MaxHeight(100.0f)))
-					Instantiate(part.gameObject).GetComponent<WeaponPickupScript>().ConfirmAttach(FindObjectOfType<PlayerScript>().weapon);
+				/*if (GUILayout.Button(label, GUILayout.MaxHeight(100.0f)))
+					Instantiate(part.gameObject).GetComponent<WeaponPickupScript>().ConfirmAttach(FindObjectOfType<PlayerScript>().weapon);*/
 			}
 			GUILayout.EndArea();
 		}

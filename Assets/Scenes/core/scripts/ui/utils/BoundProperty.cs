@@ -37,7 +37,7 @@ public class BoundProperty
 		foreach (Delegate d in delegates)
 			ValueChanged -= (Action)d;
 
-		EventManager.BoundPropertyDestroyed(this);
+		//EventManager.BoundPropertyDestroyed(this);
 	}
 }
 
@@ -77,6 +77,8 @@ public class BoundProperty<T> : BoundProperty
 	public BoundProperty(T value, int property)
 	{
 		this.value = value;
-		EventManager.Notify(() => EventManager.BoundPropertyCreated(this, property));
+		// TODO: Bind this directly to the GameUIManager through the service locator.
+		// This is unnecessarily decoupled.
+		//EventManager.Notify(() => EventManager.BoundPropertyCreated(this, property));
 	}
 }

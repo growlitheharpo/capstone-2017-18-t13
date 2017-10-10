@@ -88,12 +88,12 @@ public partial class GamestateManager : MonoSingleton<GamestateManager>, IGamest
 			{ BASE_WORLD, new NullState() },
 		};
 
-		EventManager.OnRequestSceneChange += ReceiveSceneChangeRequest;
+		//EventManager.OnRequestSceneChange += ReceiveSceneChangeRequest;
 	}
 
 	private void OnDestroy()
 	{
-		EventManager.OnRequestSceneChange -= ReceiveSceneChangeRequest;
+		//EventManager.OnRequestSceneChange -= ReceiveSceneChangeRequest;
 	}
 
 	private void Start()
@@ -102,8 +102,8 @@ public partial class GamestateManager : MonoSingleton<GamestateManager>, IGamest
 		Logger.Info("Setting current state to InitializeGameState", Logger.System.State);
 		mCurrentState.OnEnter();
 
-		ServiceLocator.Get<IGameConsole>()
-			.RegisterCommand("close", s => EventManager.Notify(() => EventManager.RequestSceneChange(MENU_SCENE)));
+		/*ServiceLocator.Get<IGameConsole>()
+			.RegisterCommand("close", s => EventManager.Notify(() => EventManager.RequestSceneChange(MENU_SCENE)));*/
 	}
 
 	private void Update()

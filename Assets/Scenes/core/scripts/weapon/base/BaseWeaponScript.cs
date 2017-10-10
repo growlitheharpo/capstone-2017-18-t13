@@ -10,6 +10,11 @@ namespace FiringSquad.Gameplay
 	/// <inheritdoc cref="IWeapon" />
 	public abstract class BaseWeaponScript : MonoBehaviour, IWeapon
 	{
+		public void FireShotImmediate(List<Ray> shotDirections)
+		{
+			throw new NotImplementedException();
+		}
+
 		public static class DebugHelper
 		{
 			public static WeaponData GetWeaponData(BaseWeaponScript p)
