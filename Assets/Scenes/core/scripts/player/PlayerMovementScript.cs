@@ -50,6 +50,13 @@ namespace FiringSquad.Gameplay
 			if (!isLocalPlayer)
 				return;
 
+			// Remove the view for the local player.
+			if (mAnimator != null)
+			{
+				Destroy(mAnimator.gameObject);
+				mAnimator = null;
+			}
+
 			PlayerInputMap input = GetComponent<PlayerScript>().inputMap;
 
 			ServiceLocator.Get<IInput>()
@@ -205,10 +212,6 @@ namespace FiringSquad.Gameplay
 
 		private void UpdateAnimatorState()
 		{
-			if (mAnimator == null)
-				return;
-
-			//VelocityX, VelocityY, Crouch -> values. Jump, Fire -> triggers
 			Vector3 relativeVel = mController.velocity / mMovementData.speed;
 			relativeVel = transform.InverseTransformDirection(relativeVel);
 			Vector2 vel = new Vector2(relativeVel.x, relativeVel.z);
@@ -234,6 +237,7 @@ namespace FiringSquad.Gameplay
 			if (mAnimator == null)
 				return;
 
+			//VelocityX, VelocityY, Crouch -> values. Jump, Fire -> triggers
 			mAnimator.SetFloat("VelocityX", Mathf.Lerp(mAnimator.GetFloat("VelocityX"), velX, Time.deltaTime * 3.0f));
 			mAnimator.SetFloat("VelocityY", Mathf.Lerp(mAnimator.GetFloat("VelocityY"), velY, Time.deltaTime * 3.0f));
 			mAnimator.SetBool("Crouch", crouch);
