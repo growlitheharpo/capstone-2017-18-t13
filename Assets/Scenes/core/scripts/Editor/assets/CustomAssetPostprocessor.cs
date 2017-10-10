@@ -35,7 +35,7 @@ public class CustomAssetPostprocessor : AssetPostprocessor
 		string materialPath = folderPath + "/mat_" + trimmedFileName + ".mat";
 
 		// Don't create extra materials for kit items
-		if (folderPath.ToLower().Contains("kit") || File.Exists(materialPath))
+		if (folderPath.ToLower().Contains("kit") || File.Exists(materialPath) || assetImporter.assetPath.Contains("@"))
 			return null;
 
 		Shader correctShader = Shader.Find("StandardCustom");
