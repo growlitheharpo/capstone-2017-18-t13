@@ -6,6 +6,8 @@ namespace FiringSquad.Gameplay
 {
 	public class RocketProjectile : MonoBehaviour, IProjectile
 	{
+		[SerializeField] private AudioProfile mAudioProfile;
+
 		[SerializeField] private ParticleSystem mHitParticles;
 		[SerializeField] private float mSpeed;
 
@@ -50,7 +52,25 @@ namespace FiringSquad.Gameplay
 
 				IDamageReceiver component = hit.GetDamageReceiver();
 				if (component != null)
+				{
 					component.ApplyDamage(mData.damage / 2.0f, hit.point, hit.normal, this);
+
+					if (component is PlayerScript && ((PlayerScript)component).isCurrentPlayer)
+					{
+						ServiceLocator.Get<IAudioManager>()
+							.PlaySound(AudioManager.AudioEvent.ImpactCurrentPlayer, mAudioProfile, transform);
+					}
+					else
+					{
+						ServiceLocator.Get<IAudioManager>()
+							.PlaySound(AudioManager.AudioEvent.ImpactOtherPlayer, mAudioProfile, transform);
+					}
+				}
+				else
+				{
+					ServiceLocator.Get<IAudioManager>()
+						.PlaySound(AudioManager.AudioEvent.ImpactWall, mAudioProfile, transform);
+				}
 			}
 		}
 

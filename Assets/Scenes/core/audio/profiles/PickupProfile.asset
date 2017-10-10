@@ -9,17 +9,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9ef86b9d3e9a60b4bb9c755363f4bce5, type: 3}
-  m_Name: RocketProfile
+  m_Name: PickupProfile
   m_EditorClassIdentifier: 
   mParent: {fileID: 11400000, guid: 4bd979dee78bfff48a35481c999b1209, type: 2}
-  mId: RocketProfile
+  mId: PickupProfile
   mProfile: 0
   mClipsArray:
-  - mEvent: 20
-    mClips: []
-  - mEvent: 60
-    mClips: []
-  - mEvent: 65
-    mClips: []
-  - mEvent: 70
-    mClips: []
+  - mEvent: 50
+    mClips:
+    - {fileID: 11400000, guid: 9b9aed3fb97538841802b531228e25a2, type: 2}
