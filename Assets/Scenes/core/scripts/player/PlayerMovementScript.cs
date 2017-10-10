@@ -13,6 +13,7 @@ namespace FiringSquad.Gameplay
 	/// <inheritdoc />
 	public class PlayerMovementScript : NetworkBehaviour
 	{
+		[SerializeField] private AudioProfile mAudioProfile;
 		[SerializeField] private CharacterMovementData mMovementData;
 		[SerializeField] private Animator mAnimator;
 
@@ -32,6 +33,8 @@ namespace FiringSquad.Gameplay
 
 		private float mStandingHeight;
 		private float mStandingRadius;
+
+		private IAudioReference mWalkingSound;
 
 		private void Awake()
 		{
@@ -96,14 +99,34 @@ namespace FiringSquad.Gameplay
 
 		private void INPUT_ForwardBackMovement(float val)
 		{
-			//mCumulativeMovement += transform.forward * mMovementData.forwardSpeed * val;
 			mInput.y = val;
+
+			if (mInput.magnitude > 0.1f && mWalkingSound == null)
+			{
+				mWalkingSound = ServiceLocator.Get<IAudioManager>()
+					.PlaySound(AudioManager.AudioEvent.LoopWalking, mAudioProfile, transform);
+			}
+			else if (mInput.magnitude <= 0.1f && mWalkingSound != null)
+			{
+				mWalkingSound.Kill();
+				mWalkingSound = null;
+			}
 		}
 
 		private void INPUT_LeftRightMovement(float val)
 		{
-			//mCumulativeMovement += transform.right * val * mMovementData.strafeSpeed;
 			mInput.x = val;
+
+			if (mInput.magnitude > 0.1f && mWalkingSound == null)
+			{
+				mWalkingSound = ServiceLocator.Get<IAudioManager>()
+					.PlaySound(AudioManager.AudioEvent.LoopWalking, mAudioProfile, transform);
+			}
+			else if (mInput.magnitude <= 0.1f && mWalkingSound != null)
+			{
+				mWalkingSound.Kill();
+				mWalkingSound = null;
+			}
 		}
 
 		private void INPUT_LookHorizontal(float val)

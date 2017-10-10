@@ -58,13 +58,13 @@ namespace FiringSquad.Gameplay
 				float damage = GetDamage(data, Vector3.Distance(transform.position, hit.point));
 				component.ApplyDamage(damage, hit.point, hit.normal, this);
 
-				if (component is PlayerScript)
-					eventToPlay = AudioManager.AudioEvent.PrimaryEffect1;
+				if (component is PlayerScript && ((PlayerScript)component).isCurrentPlayer)
+					eventToPlay = AudioManager.AudioEvent.ImpactCurrentPlayer;
 				else
-					eventToPlay = AudioManager.AudioEvent.PrimaryEffect2;
+					eventToPlay = AudioManager.AudioEvent.ImpactOtherPlayer;
 			}
 			else
-				eventToPlay = AudioManager.AudioEvent.PrimaryEffect3;
+				eventToPlay = AudioManager.AudioEvent.ImpactWall;
 
 			mAudio = ServiceLocator.Get<IAudioManager>().PlaySound(eventToPlay, mProfile, transform, transform.InverseTransformPoint(hit.point));
 			StartCoroutine(PlayEffectAndKillSelf(pool, hit.point));

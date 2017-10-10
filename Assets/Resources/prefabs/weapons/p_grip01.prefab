@@ -403,10 +403,13 @@ MonoBehaviour:
     mRecoilTimeModifier:
       mAmount: 0
       mType: 0
-    mFireRateModifier:
+    mDamageModifier:
       mAmount: 0
       mType: 0
-    mDamageModifier:
+    mDamageFalloffDistanceModifier:
+      mAmount: 0
+      mType: 0
+    mFireRateModifier:
       mAmount: 0
       mType: 0
     mReloadTimeModifier:
@@ -428,6 +431,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 86bff5b46561ab240983a85ab11a9bda, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mPickupAudioProfile: {fileID: 11400000, guid: 592dfa2f2e077964aa7c201eddbac54e,
+    type: 2}
   mPickupScale: 2.5
   mPickupCollider: {fileID: 65819624777832710}
 --- !u!114 &114620695907616644

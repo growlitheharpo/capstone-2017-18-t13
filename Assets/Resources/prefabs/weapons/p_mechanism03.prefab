@@ -457,6 +457,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 86bff5b46561ab240983a85ab11a9bda, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mPickupAudioProfile: {fileID: 11400000, guid: 592dfa2f2e077964aa7c201eddbac54e,
+    type: 2}
   mPickupScale: 2.5
   mPickupCollider: {fileID: 65984160468053518}
 --- !u!114 &114262107658183670
@@ -507,12 +509,15 @@ MonoBehaviour:
     mRecoilTimeModifier:
       mAmount: 2.5
       mType: 3
-    mFireRateModifier:
-      mAmount: 0.5
-      mType: 3
     mDamageModifier:
       mAmount: 0.4
       mType: 2
+    mDamageFalloffDistanceModifier:
+      mAmount: 0
+      mType: 0
+    mFireRateModifier:
+      mAmount: 0.5
+      mType: 3
     mReloadTimeModifier:
       mAmount: 2.5
       mType: 3
@@ -521,6 +526,7 @@ MonoBehaviour:
       mType: 0
   mDescription: I'm a rocket man.
   mDurability: 10
+  mAudioOverride: {fileID: 11400000, guid: c8de2752739058b488168e4afbe1309d, type: 2}
   mProjectilePrefab: {fileID: 1122678007204700, guid: 84b80f5ee9fffc84998972c5e7fc9d50,
     type: 2}
   mFireFromBarrelTip: 1

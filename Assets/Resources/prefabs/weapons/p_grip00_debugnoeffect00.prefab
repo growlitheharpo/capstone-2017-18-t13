@@ -297,7 +297,37 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1406262094f95a14e9d41ec93c20cd19, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mData: []
+  mData:
+    mMinDispersionModifier:
+      mAmount: 0
+      mType: 0
+    mMaxDispersionModifier:
+      mAmount: 0
+      mType: 0
+    mDispersionRampModifier:
+      mAmount: 0
+      mType: 0
+    mRecoilAmountModifier:
+      mAmount: 0
+      mType: 0
+    mRecoilTimeModifier:
+      mAmount: 0
+      mType: 0
+    mDamageModifier:
+      mAmount: 0
+      mType: 0
+    mDamageFalloffDistanceModifier:
+      mAmount: 0
+      mType: 0
+    mFireRateModifier:
+      mAmount: 0
+      mType: 0
+    mReloadTimeModifier:
+      mAmount: 0
+      mType: 0
+    mClipSizeModifier:
+      mAmount: 0
+      mType: 0
   mDescription: No grip.
   mDurability: -1
 --- !u!114 &114080148873222318
@@ -311,5 +341,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 86bff5b46561ab240983a85ab11a9bda, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mPickupAudioProfile: {fileID: 11400000, guid: 592dfa2f2e077964aa7c201eddbac54e,
+    type: 2}
   mPickupScale: 2.5
   mPickupCollider: {fileID: 65819624777832710}

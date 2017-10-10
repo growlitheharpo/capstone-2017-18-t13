@@ -22,6 +22,8 @@ namespace FiringSquad.Gameplay
 		[SerializeField] private float mThrowForce;
 		[SerializeField] private float mHoldForThrowTime;
 
+		[SerializeField] private AudioProfile mAudioProfile;
+
 		private Coroutine mLerpObjectRoutine;
 
 		public IInteractable heldObject
@@ -231,6 +233,8 @@ namespace FiringSquad.Gameplay
 				private NetworkIdentity mPullTarget;
 				private bool mCancelled;
 
+				private IAudioReference mDrawSound;
+
 				private bool objectInRange
 				{
 					get
@@ -247,6 +251,9 @@ namespace FiringSquad.Gameplay
 
 				public override void OnEnter()
 				{
+					mDrawSound = ServiceLocator.Get<IAudioManager>()
+						.PlaySound(AudioManager.AudioEvent.LoopGravGun, mMachine.mScript.mAudioProfile, mMachine.mScript.transform);
+
 					mPullTarget = null;
 				}
 
@@ -308,6 +315,11 @@ namespace FiringSquad.Gameplay
 
 					mMachine.mScript.CmdReleaseObject(mPullTarget.netId);
 					mMachine.mScript.CmdAddForceToObject(mPullTarget.netId, direction * Time.deltaTime * mMachine.mScript.mPullStrength);
+				}
+
+				public override void OnExit()
+				{
+					mDrawSound.Kill();	
 				}
 
 				public override IState GetTransition()
