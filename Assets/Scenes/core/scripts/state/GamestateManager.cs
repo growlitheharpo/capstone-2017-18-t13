@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using KeatsLib.State;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 
 /// <inheritdoc cref="IGamestateManager"/>
@@ -78,6 +79,7 @@ public partial class GamestateManager : MonoSingleton<GamestateManager>, IGamest
 	{
 		//TODO: Transition to shutdown state
 		// (save persistence, etc.)
+		Application.Quit();
 	}
 
 	protected override void Awake()

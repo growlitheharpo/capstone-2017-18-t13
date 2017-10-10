@@ -69,6 +69,7 @@ namespace KeatsLib
 				throw new ArgumentException("Invalid combination of arguments!");
 
 			GameObject newItem = Object.Instantiate(prefab);
+			newItem.name = prefab.name;
 
 			if (dontParent)
 			{
