@@ -7,6 +7,7 @@ namespace FiringSquad.Gameplay
 {
 	public class WeaponPickupScript : NetworkBehaviour, IInteractable
 	{
+		[SerializeField] private AudioProfile mPickupAudioProfile;
 		[SerializeField] private float mPickupScale = 2.0f;
 		[SerializeField] private Collider mPickupCollider;
 
@@ -57,6 +58,9 @@ namespace FiringSquad.Gameplay
 		
 		public void Interact(ICharacter source)
 		{
+			ServiceLocator.Get<IAudioManager>()
+				.PlaySound(AudioManager.AudioEvent.InteractReceive, mPickupAudioProfile, transform);
+
 			PlayerScript bearer = source as PlayerScript;
 
 			if (bearer != null)

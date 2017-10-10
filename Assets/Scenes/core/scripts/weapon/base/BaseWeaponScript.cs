@@ -59,6 +59,15 @@ namespace FiringSquad.Gameplay
 		[SerializeField] private Transform mGripAttach;
 		[SerializeField] protected AudioProfile mAudioProfile;
 
+		private AudioProfile audioProfile
+		{
+			get
+			{
+				WeaponPartScriptMechanism mech = mCurrentAttachments[Attachment.Mechanism] as WeaponPartScriptMechanism;
+				return mech != null ? mech.audioOverride : mAudioProfile;
+			}
+		}
+
 		private Dictionary<Attachment, Transform> mAttachPoints;
 		private Dictionary<Attachment, WeaponPartScript> mCurrentAttachments;
 		private bool mOverrideHitscanEye;
@@ -236,6 +245,9 @@ namespace FiringSquad.Gameplay
 			mAmountInClip.value--;
 			mShotsSinceRelease++;
 
+			ServiceLocator.Get<IAudioManager>()
+				.PlaySound(AudioManager.AudioEvent.Shoot, audioProfile, transform);
+
 			FireShotImmediate(shots);
 			((PlayerScript)bearer).ReflectWeaponFire(shots);
 		}
@@ -330,6 +342,9 @@ namespace FiringSquad.Gameplay
 		{
 			if (mReloading)
 				return;
+
+			ServiceLocator.Get<IAudioManager>()
+				.PlaySound(AudioManager.AudioEvent.Reload, audioProfile, transform);
 
 			mReloading = true;
 			PlayReloadEffect(mCurrentData.reloadTime);
