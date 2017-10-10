@@ -9,11 +9,13 @@ public class CltPlayer : NetworkBehaviour
 
 	public override void OnStartClient()
 	{
-		// register for client events
+		// register for local events that should effect all players (might not be any?)
 
 		if (isLocalPlayer)
 		{
 			// instantiate the local player stuff
+
+			// register for local-player only client events
 		}
 	}
 }
