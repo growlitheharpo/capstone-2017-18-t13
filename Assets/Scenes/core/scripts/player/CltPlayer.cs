@@ -65,6 +65,8 @@ public class CltPlayer : NetworkBehaviour, IWeaponBearer, IDamageReceiver
 		// find attach spot in view and set parent
 		wep.transform.SetParent(mGun1Offset);
 		wep.transform.ResetLocalValues();
+		wep.positionOffset = eye.InverseTransformPoint(mGun1Offset.position);
+		wep.transform.SetParent(transform);
 		wep.bearer = this;
 		weapon = wep;
 	}

@@ -42,6 +42,7 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 	public IWeaponBearer bearer { get; set; }
 	private CltPlayer realBearer { get { return bearer as CltPlayer; } }
 	public Transform aimRoot { get; set; }
+	public Vector3 positionOffset { get; set; }
 
 	[SerializeField] private WeaponData mDefaultData;
 	public WeaponData baseData { get { return mDefaultData; } }
@@ -56,6 +57,8 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 	private int mShotsSinceRelease;
 	private List<float> mRecentShotTimes;
 
+	private const float CAMERA_FOLLOW_FACTOR = 10.0f;
+
 	[ServerCallback]
 	private void Awake()
 	{
@@ -63,10 +66,23 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 		mRecentShotTimes = new List<float>();
 	}
 
-	[ServerCallback]
+	// [Client] AND [Server]
 	private void Update()
 	{
 		SetDirtyBit(99999);
+
+		// Follow my player
+		if (bearer == null || bearer.eye == null)
+			return;
+
+		Vector3 location = transform.position;
+		Vector3 targetLocation = bearer.eye.TransformPoint(positionOffset);
+
+		Quaternion rot = transform.rotation;
+		Quaternion targetRot = bearer.eye.rotation;
+
+		transform.position = Vector3.Lerp(location, targetLocation, Time.deltaTime * CAMERA_FOLLOW_FACTOR);
+		transform.rotation = Quaternion.Lerp(rot, targetRot, Time.deltaTime * CAMERA_FOLLOW_FACTOR);
 	}
 
 	#region Serialization
