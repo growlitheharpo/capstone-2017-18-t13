@@ -20,7 +20,7 @@ namespace FiringSquad.Gameplay
 		/// Attach a new part to this weapon.
 		/// </summary>
 		/// <param name="part">The part to be attached.</param>
-		//void AttachNewPart(WeaponPartScript part);
+		void AttachNewPart(WeaponPartScript part);
 		
 		/// <summary>
 		/// Instantiate and fire a projectile immediately with no rule checking.

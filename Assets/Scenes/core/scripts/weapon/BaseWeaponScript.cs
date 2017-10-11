@@ -131,7 +131,10 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 
 	#region Part Attachment
 
-
+	public void AttachNewPart(WeaponPartScript part)
+	{
+		
+	}
 
 	#endregion
 
