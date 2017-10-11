@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using FiringSquad.Data;
@@ -139,7 +140,19 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 	[Server]
 	public void Reload()
 	{
-		
+		if (mReloading)
+			return;
+
+		mReloading = true;
+		RpcPlayReloadEffect(mCurrentData.reloadTime);
+
+		Invoke("FinishReload", mCurrentData.reloadTime);
+	}
+
+	[Server]
+	private void FinishReload()
+	{
+		mReloading = false;
 	}
 
 	#endregion
@@ -305,6 +318,23 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 		}
 
 		return value * mCurrentData.recoilAmount;
+	}
+
+	[ClientRpc]
+	private void RpcPlayReloadEffect(float time)
+	{
+		AnimationUtility.PlayAnimation(gameObject, "reload");
+		StartCoroutine(WaitForReload(time));
+	}
+
+	[Client]
+	private IEnumerator WaitForReload(float time)
+	{
+		yield return null;
+		Animator anim = GetComponent<Animator>();
+		anim.speed = 1.0f / time;
+		yield return new WaitForAnimation(anim);
+		anim.speed = 1.0f;
 	}
 
 	#endregion
