@@ -69,7 +69,6 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4689653199301460}
-  - component: {fileID: 114733143786983432}
   - component: {fileID: 54483242839088912}
   - component: {fileID: 114756210916309946}
   m_Layer: 10
@@ -496,19 +495,6 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
---- !u!114 &114733143786983432
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1289196357881978}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 86bff5b46561ab240983a85ab11a9bda, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mPickupScale: 2.5
-  mPickupCollider: {fileID: 65730670620813582}
 --- !u!114 &114756210916309946
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -520,6 +506,36 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1f72922dda36b554ba8f1e37d8e306fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mData: []
+  mData:
+    mMinDispersionModifier:
+      mAmount: 0
+      mType: 0
+    mMaxDispersionModifier:
+      mAmount: 0
+      mType: 0
+    mDispersionRampModifier:
+      mAmount: 0
+      mType: 0
+    mRecoilAmountModifier:
+      mAmount: 0
+      mType: 0
+    mRecoilTimeModifier:
+      mAmount: 0
+      mType: 0
+    mDamageModifier:
+      mAmount: 0
+      mType: 0
+    mDamageFalloffDistanceModifier:
+      mAmount: 0
+      mType: 0
+    mFireRateModifier:
+      mAmount: 0
+      mType: 0
+    mReloadTimeModifier:
+      mAmount: 0
+      mType: 0
+    mClipSizeModifier:
+      mAmount: 0
+      mType: 0
   mDescription: Square sights.
   mDurability: -1

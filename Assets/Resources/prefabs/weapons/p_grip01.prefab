@@ -54,7 +54,6 @@ GameObject:
   m_Component:
   - component: {fileID: 4857695072118034}
   - component: {fileID: 114035792997203982}
-  - component: {fileID: 114080148873222318}
   - component: {fileID: 54565695844076754}
   - component: {fileID: 114668238183340610}
   - component: {fileID: 114620695907616644}
@@ -403,10 +402,13 @@ MonoBehaviour:
     mRecoilTimeModifier:
       mAmount: 0
       mType: 0
-    mFireRateModifier:
+    mDamageModifier:
       mAmount: 0
       mType: 0
-    mDamageModifier:
+    mDamageFalloffDistanceModifier:
+      mAmount: 0
+      mType: 0
+    mFireRateModifier:
       mAmount: 0
       mType: 0
     mReloadTimeModifier:
@@ -417,19 +419,6 @@ MonoBehaviour:
       mType: 0
   mDescription: No grip.
   mDurability: -1
---- !u!114 &114080148873222318
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1614481287065458}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 86bff5b46561ab240983a85ab11a9bda, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mPickupScale: 2.5
-  mPickupCollider: {fileID: 65819624777832710}
 --- !u!114 &114620695907616644
 MonoBehaviour:
   m_ObjectHideFlags: 1

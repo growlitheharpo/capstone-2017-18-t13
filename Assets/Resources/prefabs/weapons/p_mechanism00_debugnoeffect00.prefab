@@ -20,7 +20,6 @@ GameObject:
   m_Component:
   - component: {fileID: 4925652034940832}
   - component: {fileID: 114425948192369884}
-  - component: {fileID: 114229191565977614}
   - component: {fileID: 54780434231497908}
   m_Layer: 10
   m_Name: p_mechanism00_debugnoeffect00
@@ -286,19 +285,6 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
---- !u!114 &114229191565977614
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1009224365190128}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 86bff5b46561ab240983a85ab11a9bda, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mPickupScale: 2.5
-  mPickupCollider: {fileID: 65984160468053518}
 --- !u!114 &114425948192369884
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -311,7 +297,36 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mData:
-  - {fileID: 11400000, guid: 551d3f66a53dbba4189b8daecac1575b, type: 2}
+    mMinDispersionModifier:
+      mAmount: 0
+      mType: 0
+    mMaxDispersionModifier:
+      mAmount: 0
+      mType: 0
+    mDispersionRampModifier:
+      mAmount: 0
+      mType: 0
+    mRecoilAmountModifier:
+      mAmount: 0
+      mType: 0
+    mRecoilTimeModifier:
+      mAmount: 0
+      mType: 0
+    mDamageModifier:
+      mAmount: 0
+      mType: 0
+    mDamageFalloffDistanceModifier:
+      mAmount: 0
+      mType: 0
+    mFireRateModifier:
+      mAmount: 0
+      mType: 0
+    mReloadTimeModifier:
+      mAmount: 0
+      mType: 0
+    mClipSizeModifier:
+      mAmount: 0
+      mType: 0
   mDescription: 'Fires bullets: 50 damage.'
   mDurability: -1
   mProjectilePrefab: {fileID: 1546697341052326, guid: 37046d5bb3731fa488c846503629ad6f,

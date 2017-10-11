@@ -88,7 +88,6 @@ GameObject:
   m_Component:
   - component: {fileID: 4984639821833232}
   - component: {fileID: 114606895374649628}
-  - component: {fileID: 114869716292652946}
   - component: {fileID: 54356089947820408}
   - component: {fileID: 114443978184745684}
   - component: {fileID: 114227575621444936}
@@ -473,16 +472,3 @@ MonoBehaviour:
       mType: 0
   mDescription: Standard grip, lowers recoil.
   mDurability: 50
---- !u!114 &114869716292652946
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1947324984120202}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 86bff5b46561ab240983a85ab11a9bda, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mPickupScale: 2.5
-  mPickupCollider: {fileID: 65148379894121520}

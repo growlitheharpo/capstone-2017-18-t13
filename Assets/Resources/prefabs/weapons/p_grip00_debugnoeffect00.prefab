@@ -54,7 +54,6 @@ GameObject:
   m_Component:
   - component: {fileID: 4857695072118034}
   - component: {fileID: 114035792997203982}
-  - component: {fileID: 114080148873222318}
   - component: {fileID: 54565695844076754}
   m_Layer: 0
   m_Name: p_grip00_debugnoeffect00
@@ -297,19 +296,36 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1406262094f95a14e9d41ec93c20cd19, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mData: []
+  mData:
+    mMinDispersionModifier:
+      mAmount: 0
+      mType: 0
+    mMaxDispersionModifier:
+      mAmount: 0
+      mType: 0
+    mDispersionRampModifier:
+      mAmount: 0
+      mType: 0
+    mRecoilAmountModifier:
+      mAmount: 0
+      mType: 0
+    mRecoilTimeModifier:
+      mAmount: 0
+      mType: 0
+    mDamageModifier:
+      mAmount: 0
+      mType: 0
+    mDamageFalloffDistanceModifier:
+      mAmount: 0
+      mType: 0
+    mFireRateModifier:
+      mAmount: 0
+      mType: 0
+    mReloadTimeModifier:
+      mAmount: 0
+      mType: 0
+    mClipSizeModifier:
+      mAmount: 0
+      mType: 0
   mDescription: No grip.
   mDurability: -1
---- !u!114 &114080148873222318
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1614481287065458}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 86bff5b46561ab240983a85ab11a9bda, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mPickupScale: 2.5
-  mPickupCollider: {fileID: 65819624777832710}

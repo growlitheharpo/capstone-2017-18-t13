@@ -51,7 +51,6 @@ GameObject:
   m_Component:
   - component: {fileID: 4952332574684298}
   - component: {fileID: 114314945546383498}
-  - component: {fileID: 114404574348095944}
   - component: {fileID: 54425571995156708}
   - component: {fileID: 114140533268044824}
   - component: {fileID: 114422212350316348}
@@ -421,19 +420,6 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 0
---- !u!114 &114404574348095944
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1648322808193650}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 86bff5b46561ab240983a85ab11a9bda, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mPickupScale: 2.5
-  mPickupCollider: {fileID: 65158641878431802}
 --- !u!114 &114422212350316348
 MonoBehaviour:
   m_ObjectHideFlags: 1

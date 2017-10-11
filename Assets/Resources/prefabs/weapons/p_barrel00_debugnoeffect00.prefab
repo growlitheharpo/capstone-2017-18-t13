@@ -52,7 +52,6 @@ GameObject:
   m_Component:
   - component: {fileID: 4321527704204570}
   - component: {fileID: 114623667425927558}
-  - component: {fileID: 114316685626621832}
   - component: {fileID: 54862289627748440}
   m_Layer: 10
   m_Name: p_barrel00_debugnoeffect00
@@ -297,19 +296,6 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 0.10865641, y: 0.10421839, z: 0.104218364}
   m_Center: {x: 0.31942266, y: 0.117345124, z: 0.00097361207}
---- !u!114 &114316685626621832
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1297151579918920}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 86bff5b46561ab240983a85ab11a9bda, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mPickupScale: 2.5
-  mPickupCollider: {fileID: 65771015034761112}
 --- !u!114 &114623667425927558
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -321,11 +307,42 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7024d1c3bbf87e0498ff935403a3540e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mData: []
+  mData:
+    mMinDispersionModifier:
+      mAmount: 0
+      mType: 0
+    mMaxDispersionModifier:
+      mAmount: 0
+      mType: 0
+    mDispersionRampModifier:
+      mAmount: 0
+      mType: 0
+    mRecoilAmountModifier:
+      mAmount: 0
+      mType: 0
+    mRecoilTimeModifier:
+      mAmount: 0
+      mType: 0
+    mDamageModifier:
+      mAmount: 0
+      mType: 0
+    mDamageFalloffDistanceModifier:
+      mAmount: 0
+      mType: 0
+    mFireRateModifier:
+      mAmount: 0
+      mType: 0
+    mReloadTimeModifier:
+      mAmount: 0
+      mType: 0
+    mClipSizeModifier:
+      mAmount: 0
+      mType: 0
   mDescription: A standard single-shot barrel.
   mDurability: -1
   mTip: {fileID: 4501483128918090}
   mProjectileCount: 1
+  mShotsPerClick: -1
   mOverrideRecoilCurve: 0
   mRecoilCurve:
     serializedVersion: 2
