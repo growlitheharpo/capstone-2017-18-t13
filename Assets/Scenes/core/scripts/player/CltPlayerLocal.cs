@@ -18,10 +18,10 @@ public class CltPlayerLocal : MonoBehaviour
 	private void Start()
 	{
 		ServiceLocator.Get<IInput>()
-			.RegisterInput(Input.GetButton, inputMap.fireWeaponButton, playerRoot.CmdWeaponFireHold, InputLevel.Gameplay)
-			.RegisterInput(Input.GetButtonUp, inputMap.fireWeaponButton, playerRoot.CmdWeaponFireUp, InputLevel.Gameplay)
-			.RegisterInput(Input.GetButtonDown, inputMap.reloadButton, playerRoot.CmdWeaponReload, InputLevel.Gameplay)
-			.RegisterInput(Input.GetButtonDown, inputMap.interactButton, playerRoot.CmdActivateInteract, InputLevel.Gameplay)
+			.RegisterInput(Input.GetButton, inputMap.fireWeaponButton, INPUT_WeaponFireHold, InputLevel.Gameplay)
+			.RegisterInput(Input.GetButtonUp, inputMap.fireWeaponButton, INPUT_WeaponFireUp, InputLevel.Gameplay)
+			.RegisterInput(Input.GetButtonDown, inputMap.reloadButton, INPUT_WeaponReload, InputLevel.Gameplay)
+			.RegisterInput(Input.GetButtonDown, inputMap.interactButton, INPUT_ActivateInteract, InputLevel.Gameplay)
 
 			.RegisterInput(Input.GetButtonDown, inputMap.pauseButton, INPUT_TogglePause, InputLevel.PauseMenu);
 
@@ -34,10 +34,10 @@ public class CltPlayerLocal : MonoBehaviour
 	private void OnDestroy()
 	{
 		ServiceLocator.Get<IInput>()
-			.UnregisterInput(playerRoot.CmdWeaponFireHold)
-			.UnregisterInput(playerRoot.CmdWeaponFireUp)
-			.UnregisterInput(playerRoot.CmdWeaponReload)
-			.UnregisterInput(playerRoot.CmdActivateInteract)
+			.UnregisterInput(INPUT_WeaponFireHold)
+			.UnregisterInput(INPUT_WeaponFireUp)
+			.UnregisterInput(INPUT_WeaponReload)
+			.UnregisterInput(INPUT_ActivateInteract)
 
 			.UnregisterInput(INPUT_TogglePause);
 
@@ -63,6 +63,26 @@ public class CltPlayerLocal : MonoBehaviour
 
 	private void CleanupUI()
 	{
+	}
+
+	private void INPUT_WeaponFireHold()
+	{
+		playerRoot.CmdWeaponFireHold();
+	}
+
+	private void INPUT_WeaponFireUp()
+	{
+		playerRoot.CmdWeaponFireUp();
+	}
+
+	private void INPUT_WeaponReload()
+	{
+		playerRoot.CmdWeaponReload();
+	}
+
+	private void INPUT_ActivateInteract()
+	{
+		playerRoot.CmdActivateInteract();
 	}
 
 	private void INPUT_TogglePause()
