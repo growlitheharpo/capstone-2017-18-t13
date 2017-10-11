@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using FiringSquad.Gameplay;
 
 /// <summary>
 /// Gets instances of the main game services at runtime.
@@ -21,7 +22,8 @@ public class ServiceLocator : MonoSingleton<ServiceLocator>
 			{ typeof(ISaveLoadManager), TryFind<ISaveLoadManager>(SaveLoadManager.instance) },
 			{ typeof(IAudioManager), TryFind<IAudioManager>(AudioManager.instance) },
 			{ typeof(IGamestateManager), TryFind<IGamestateManager>(GamestateManager.instance) },
-			{ typeof(IGameplayUIManager), TryFind<IGameplayUIManager>(GameplayUIManager.instance) }
+			{ typeof(IGameplayUIManager), TryFind<IGameplayUIManager>(GameplayUIManager.instance) },
+			{ typeof(IWeaponPartManager), TryFind<IWeaponPartManager>(WeaponPartManager.instance) },
 		};
 	}
 

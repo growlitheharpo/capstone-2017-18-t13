@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using FiringSquad.Gameplay;
 using KeatsLib.Persistence;
 using UnityEngine;
 using Input = KeatsLib.Unity.Input;
@@ -27,8 +28,34 @@ public class NullServices
 			return new NullGamestateManager() as T;
 		if (typeof(T) == typeof(IGameplayUIManager))
 			return new NullGameplayUIManager() as T;
+		if (typeof(T) == typeof(IWeaponPartManager))
+			return new NullWeaponPartManager() as T;
 
 		return null;
+	}
+
+	public class NullWeaponPartManager : IWeaponPartManager
+	{
+		public GameObject GetPartPrefab(string id)
+		{
+			Logger.Info("NULL SERVICE: NullWeaponPartManager.GetPartPrefab()", Logger.System.Services);
+			return null;
+		}
+
+		public GameObject this[string index]
+		{
+			get
+			{
+				Logger.Info("NULL SERVICE: NullWeaponPartManager[partId]", Logger.System.Services);
+				return null;
+			}
+		}
+
+		public Dictionary<string, GameObject> GetAllPrefabs(bool includeDebug)
+		{
+			Logger.Info("NULL SERVICE: NullWeaponPartManager.GetAllPrefabs()", Logger.System.Services);
+			return new Dictionary<string, GameObject>();
+		}
 	}
 
 	private class NullGamestateManager : IGamestateManager
