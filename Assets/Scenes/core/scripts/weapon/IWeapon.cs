@@ -20,13 +20,13 @@ namespace FiringSquad.Gameplay
 		/// Attach a new part to this weapon.
 		/// </summary>
 		/// <param name="part">The part to be attached.</param>
-		void AttachNewPart(WeaponPartScript part);
+		//void AttachNewPart(WeaponPartScript part);
 		
 		/// <summary>
 		/// Instantiate and fire a projectile immediately with no rule checking.
 		/// </summary>
 		/// <param name="shotDirections"></param>
-		void FireShotImmediate(List<Ray> shotDirections);
+		//void FireShotImmediate(List<Ray> shotDirections);
 
 		/// <summary>
 		/// Reset the amount of ammo in the clip and play some sort of animation.
@@ -41,6 +41,9 @@ namespace FiringSquad.Gameplay
 		/// <summary>
 		/// Gets the current recoil to apply to the bearer's view.
 		/// </summary>
-		float GetCurrentRecoil();
+		//float GetCurrentRecoil();
+
+		void FireWeaponHold();
+		void FireWeaponUp();
 	}
 }

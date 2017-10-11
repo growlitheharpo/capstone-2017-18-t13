@@ -8,25 +8,20 @@ public class CltPlayer : NetworkBehaviour, IWeaponBearer, IDamageReceiver
 {
 	public bool isCurrentPlayer { get { return isLocalPlayer; } }
 
+	public IWeapon weapon { get; private set; }
 	public Transform eye { get { throw new NotImplementedException(); } }
-	public IWeapon weapon { get { throw new NotImplementedException(); } }
-	public WeaponDefaultsData defaultParts { get { throw new NotImplementedException(); } }
+	public WeaponPartCollection defaultParts { get { throw new NotImplementedException(); } }
 
 	private IPlayerHitIndicator mHitIndicator;
-
-	public void ApplyDamage(float amount, Vector3 point, Vector3 normal, IDamageSource cause)
-	{
-		if (!isServer)
-			throw new ArgumentException("Cannot apply damage from a local client!");
-
-		throw new NotImplementedException();
-		RpcReflectDamageLocally(point, normal, cause.source.gameObject.transform.position, amount);
-	}
 
 	public override void OnStartServer()
 	{
 		// register for server events
 		mHitIndicator = new NullHitIndicator();
+
+		// create our weapon with client authority & bind
+		BaseWeaponScript wep = new BaseWeaponScript(); // actually create it here
+		BindWeaponToPlayer(wep);
 	}
 
 	public override void OnStartClient()
@@ -48,10 +43,43 @@ public class CltPlayer : NetworkBehaviour, IWeaponBearer, IDamageReceiver
 		}
 	}
 
+	public void BindWeaponToPlayer(BaseWeaponScript wep)
+	{
+		// find attach spot in view and set parent
+		weapon.transform.SetParent(transform);
+		wep.bearer = this;
+		weapon = weapon;
+	}
+
+	[Server]
+	public void ApplyDamage(float amount, Vector3 point, Vector3 normal, IDamageSource cause)
+	{
+		throw new NotImplementedException();
+		RpcReflectDamageLocally(point, normal, cause.source.gameObject.transform.position, amount);
+	}
+
 	// TODO: Is this the best way to handle this?
 	[ClientRpc]
 	private void RpcReflectDamageLocally(Vector3 point, Vector3 normal, Vector3 origin, float amount)
 	{
 		mHitIndicator.NotifyHit(this, origin, amount);
+	}
+
+	[Command]
+	public void WeaponFireHold()
+	{
+		weapon.FireWeaponHold();
+	}
+
+	[Command]
+	public void WeaponFireUp()
+	{
+		weapon.FireWeaponUp();
+	}
+
+	[Command]
+	public void WeaponReload()
+	{
+		weapon.Reload();
 	}
 }
