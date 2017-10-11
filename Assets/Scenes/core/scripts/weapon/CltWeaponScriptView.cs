@@ -6,13 +6,13 @@ using UnityEngine.Networking;
 public class CltWeaponScriptView : NetworkBehaviour
 {
 	[ClientRpc]
-	public void Reload()
+	public void RpcReload()
 	{
 		// play animation
 	}
 
 	[ClientRpc]
-	public void ShowShotAnimation()
+	public void RpcShowShotAnimation()
 	{
 		
 	}

@@ -10,14 +10,15 @@ namespace FiringSquad.Gameplay
 	/// object through the game world.
 	/// </summary>
 	/// <inheritdoc />
-	public class PlayerMovementScript : MonoBehaviour
+	public class CltPlayerMovementScript : MonoBehaviour
 	{
 		[SerializeField] private CharacterMovementData mMovementData;
 
 		private CapsuleCollider mCollider;
 		private CharacterController mController;
+		private new Transform transform { get { return mController.transform; } }
 
-		private IWeaponBearer mPlayer;
+		private CltPlayer mPlayer;
 
 		private PlayerInputMap mInputBindings;
 		private Vector2 mInput;
@@ -27,24 +28,25 @@ namespace FiringSquad.Gameplay
 		private float mRotationY;
 		private bool mJump, mIsJumping, mIsRunning, mPreviouslyGrounded, mCrouching;
 
+
 		private float mStandingHeight;
 		private float mStandingRadius;
 
 		private void Awake()
 		{
 			mMoveDirection = Vector3.zero;
-			mCollider = GetComponent<CapsuleCollider>();
-			mController = GetComponent<CharacterController>();
-			mPlayer = null;//GetComponent<PlayerScript>();
-
 			mMouseSensitivity = 1.0f;
-			mStandingHeight = mCollider.height;
-			mStandingRadius = mCollider.radius;
 		}
 
 		private void Start()
 		{
-			PlayerInputMap input = null;//GetComponent<PlayerScript>().inputMap;
+			mPlayer = GetComponentInParent<CltPlayer>();
+			mCollider = mPlayer.GetComponent<CapsuleCollider>();
+			mController = mPlayer.GetComponent<CharacterController>();
+			mStandingHeight = mCollider.height;
+			mStandingRadius = mCollider.radius;
+
+			PlayerInputMap input = GetComponent<CltPlayerLocal>().inputMap;
 
 			ServiceLocator.Get<IInput>()
 				.RegisterAxis(Input.GetAxis, input.moveSidewaysAxis, INPUT_LeftRightMovement, KeatsLib.Unity.Input.InputLevel.Gameplay)
@@ -80,13 +82,11 @@ namespace FiringSquad.Gameplay
 
 		private void INPUT_ForwardBackMovement(float val)
 		{
-			//mCumulativeMovement += transform.forward * mMovementData.forwardSpeed * val;
 			mInput.y = val;
 		}
 
 		private void INPUT_LeftRightMovement(float val)
 		{
-			//mCumulativeMovement += transform.right * val * mMovementData.strafeSpeed;
 			mInput.x = val;
 		}
 

@@ -6,14 +6,17 @@ using UnityEngine.Networking;
 
 public class CltPlayer : NetworkBehaviour, IWeaponBearer, IDamageReceiver
 {
+	[SerializeField] private PlayerAssetReferences mAssets;
 	[SerializeField] private PlayerDefaultsData mInformation;
+
+	[SerializeField] private Transform mCameraOffset;
 
 	public bool isCurrentPlayer { get { return isLocalPlayer; } }
 
 	public IWeapon weapon { get; private set; }
 	public WeaponPartCollection defaultParts { get { return mInformation.defaultWeaponParts; } }
+	public Transform eye { get { return mCameraOffset; } }
 
-	public Transform eye { get { throw new NotImplementedException(); } }
 	private IPlayerHitIndicator mHitIndicator;
 
 	public override void OnStartServer()
@@ -21,36 +24,57 @@ public class CltPlayer : NetworkBehaviour, IWeaponBearer, IDamageReceiver
 		// register for server events
 		mHitIndicator = new NullHitIndicator();
 
+		Debug.Log("Server!");
+
 		// create our weapon with client authority & bind
-		BaseWeaponScript wep = new BaseWeaponScript(); // actually create it here
+		//BaseWeaponScript wep = new BaseWeaponScript(); // actually create it here
+		//BindWeaponToPlayer(wep);
+		BaseWeaponScript wep = Instantiate(mAssets.baseWeaponPrefab).GetComponent<BaseWeaponScript>();
 		BindWeaponToPlayer(wep);
 	}
 
 	public override void OnStartClient()
 	{
+		base.OnStartClient();
+
+		Debug.Log("Client!");
 		// register for local events that should effect all players (might not be any?)
 
 		if (isLocalPlayer)
 		{
 			// instantiate the local player stuff
 			// register for local-player only client events
+
+			CltPlayerLocal localScript = Instantiate(mAssets.localPlayerPrefab).GetComponent<CltPlayerLocal>();
+			localScript.playerRoot = this;
+
 			mHitIndicator = (IPlayerHitIndicator)FindObjectOfType<PlayerHitIndicator>() ?? new NullHitIndicator();
 		}
 		else
 		{
 			// register anything specifically for non-local clients
-			
+
+			Debug.Log("Not the local player!");
 			// TODO: Make spawning hit particles done through here
 			mHitIndicator = new NullHitIndicator();
 		}
 	}
 
+	public override void OnStartLocalPlayer()
+	{
+		CltPlayerLocal localScript = Instantiate(mAssets.localPlayerPrefab).GetComponent<CltPlayerLocal>();
+		localScript.transform.SetParent(transform);
+		localScript.playerRoot = this;
+
+		mHitIndicator = (IPlayerHitIndicator)FindObjectOfType<PlayerHitIndicator>() ?? new NullHitIndicator();
+	}
+
 	public void BindWeaponToPlayer(BaseWeaponScript wep)
 	{
 		// find attach spot in view and set parent
-		weapon.transform.SetParent(transform);
+		wep.transform.SetParent(transform);
 		wep.bearer = this;
-		weapon = weapon;
+		weapon = wep;
 	}
 
 	[Server]
@@ -68,26 +92,26 @@ public class CltPlayer : NetworkBehaviour, IWeaponBearer, IDamageReceiver
 	}
 
 	[Command]
-	public void WeaponFireHold()
+	public void CmdWeaponFireHold()
 	{
 		weapon.FireWeaponHold();
 	}
 
 	[Command]
-	public void WeaponFireUp()
+	public void CmdWeaponFireUp()
 	{
 		weapon.FireWeaponUp();
 	}
 
 	[Command]
-	public void WeaponReload()
+	public void CmdWeaponReload()
 	{
 		weapon.Reload();
 	}
 
 	[Command]
-	public void ActivateInteract()
+	public void CmdActivateInteract()
 	{
-		
+
 	}
 }

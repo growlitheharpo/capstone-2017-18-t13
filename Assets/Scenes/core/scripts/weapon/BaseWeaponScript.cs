@@ -8,6 +8,29 @@ using UnityEngine.Networking;
 
 public class BaseWeaponScript : NetworkBehaviour, IWeapon
 {
+	public static class DebugHelper
+	{
+		public static WeaponData GetWeaponData(BaseWeaponScript p)
+		{
+			return new WeaponData(p.mCurrentData);
+		}
+
+		public static WeaponPartCollection GetAttachments(BaseWeaponScript p)
+		{
+			return new WeaponPartCollection(p.mCurrentParts);
+		}
+
+		public static Transform GetWeaponAimRoot(BaseWeaponScript p, bool forceBarrel = false)
+		{
+			return !forceBarrel ? p.GetAimRoot() : p.mCurrentParts.barrel.barrelTip;
+		}
+
+		public static float GetCurrentDispersion(BaseWeaponScript p)
+		{
+			return p.GetCurrentDispersionFactor(false);
+		}
+	}
+
 	public enum Attachment
 	{
 		Scope,

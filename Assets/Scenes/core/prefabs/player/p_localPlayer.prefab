@@ -19,8 +19,8 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4077927356055250}
-  - component: {fileID: 114391068608855474}
   - component: {fileID: 114500832833645646}
+  - component: {fileID: 114415606764463106}
   m_Layer: 0
   m_Name: p_localPlayer
   m_TagString: Untagged
@@ -41,7 +41,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &114391068608855474
+--- !u!114 &114415606764463106
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -64,3 +64,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1e9b33bcba716aa44aea037b1e676085, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mInputMap:
+    mToggleMenuButton: Pause
+    mFireWeaponButton: Fire1
+    mFireGravGunButton: Fire2
+    mReloadButton: Reload
+    mInteractButton: Interact
+    mPauseButton: Pause
+    mMoveBackFrontAxis: Vertical
+    mMoveSidewaysAxis: Horizontal
+    mLookUpDownAxis: Mouse Y
+    mLookLeftRightAxis: Mouse X
+    mJumpButton: Jump
+    mCrouchButton: Crouch
+    mSprintButton: Sprint
+    mStickySprint: 0
+  mCameraPrefab: {fileID: 1257016690938654, guid: e8c2d06892e19ec42abc7ae1394b2741,
+    type: 2}

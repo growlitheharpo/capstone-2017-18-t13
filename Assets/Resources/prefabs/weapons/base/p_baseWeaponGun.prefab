@@ -181,10 +181,11 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4064075139203806}
+  - component: {fileID: 114943338203428434}
+  - component: {fileID: 114320469336684846}
   - component: {fileID: 95394249164853166}
-  - component: {fileID: 114397685040299484}
   m_Layer: 9
-  m_Name: p_placeholderGun
+  m_Name: p_baseWeaponGun
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -550,7 +551,7 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
---- !u!114 &114397685040299484
+--- !u!114 &114320469336684846
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -558,52 +559,58 @@ MonoBehaviour:
   m_GameObject: {fileID: 1953974638818940}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0a23f3c67b1d27946ab497194bdaa666, type: 3}
+  m_Script: {fileID: 11500000, guid: 012ed6da583da6149b8ecf1dd8032c61, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mBaseData:
-    mMinimumDispersion: 0.04
-    mMaximumDispersion: 0.1
-    mDispersionRamp: 0.2
-    mRecoilAmount: 0.75
-    mRecoilTime: 0.5
+  mDefaultData:
+    mMinimumDispersion: 0
+    mMaximumDispersion: 0
+    mDispersionRamp: 0
+    mRecoilAmount: 0
+    mRecoilTime: 0
     mRecoilCurve:
       serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 2
-        time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-      - serializedVersion: 2
-        time: 0.1
-        value: 1
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-      - serializedVersion: 2
-        time: 1
-        value: 0
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
+      m_Curve: []
       m_PreInfinity: 2
       m_PostInfinity: 2
-      m_RotationOrder: 0
-    mDamage: 50
-    mDamageFalloffDistance: 25
-    mFireRate: 2
-    mReloadTime: 1
-    mClipSize: 10
-  mBarrelAttach: {fileID: 4096145057804758}
-  mScopeAttach: {fileID: 4197488167877586}
-  mMechanismAttach: {fileID: 4891504686318262}
-  mGripAttach: {fileID: 4904606761592194}
-  mAudioProfile: {fileID: 11400000, guid: 4bd979dee78bfff48a35481c999b1209, type: 2}
-  mPartBreakParticlesPrefab: {fileID: 1416275159863322, guid: 20f66ab1753f9bd4d966b7294883a924,
-    type: 2}
-  mShotParticles: {fileID: 198036377436996958}
+      m_RotationOrder: 4
+    mDamage: 0
+    mDamageFalloffDistance: 0
+    mFireRate: 0
+    mReloadTime: 0
+    mClipSize: 0
+--- !u!114 &114943338203428434
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1953974638818940}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 372142912, guid: dc443db3e92b4983b9738c1131f555cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SceneId:
+    m_Value: 0
+  m_AssetId:
+    i0: 0
+    i1: 0
+    i2: 0
+    i3: 0
+    i4: 0
+    i5: 0
+    i6: 0
+    i7: 0
+    i8: 0
+    i9: 0
+    i10: 0
+    i11: 0
+    i12: 0
+    i13: 0
+    i14: 0
+    i15: 0
+  m_ServerOnly: 0
+  m_LocalPlayerAuthority: 0
 --- !u!198 &198036377436996958
 ParticleSystem:
   m_ObjectHideFlags: 1
