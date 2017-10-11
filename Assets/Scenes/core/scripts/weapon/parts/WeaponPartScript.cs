@@ -62,9 +62,9 @@ namespace FiringSquad.Gameplay
 			copy.name = name;
 
 			// Destroy the pickup script (like when calling "interact")
-			WeaponPickupScript pickup = copy.GetComponent<WeaponPickupScript>();
-			Destroy(pickup);
-			Destroy(GetComponent<NetworkIdentity>());
+			Destroy(copy.GetComponent<WeaponPickupScript>());
+			Destroy(copy.GetComponent<NetworkTransform>());
+			Destroy(copy.GetComponent<NetworkIdentity>());
 
 			return copy.GetComponent<WeaponPartScript>();
 		}

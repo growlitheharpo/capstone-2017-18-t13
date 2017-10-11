@@ -1,11 +1,14 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using FiringSquad.Data;
 using FiringSquad.Gameplay;
+using KeatsLib.Unity;
 using UnityEngine;
 using UnityEngine.Networking;
+using Random = UnityEngine.Random;
 
 public class BaseWeaponScript : NetworkBehaviour, IWeapon
 {
@@ -45,11 +48,16 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 	public Transform aimRoot { get; set; }
 	public Vector3 positionOffset { get; set; }
 
+	[SerializeField] private Transform mBarrelAttach;
+	[SerializeField] private Transform mScopeAttach;
+	[SerializeField] private Transform mMechanismAttach;
+	[SerializeField] private Transform mGripAttach;
 	[SerializeField] private WeaponData mDefaultData;
 	public WeaponData baseData { get { return mDefaultData; } }
 
 	private WeaponPartCollection mCurrentParts;
 
+	private Dictionary<Attachment, Transform> mAttachPoints;
 	private WeaponData mCurrentData;
 	private float timePerShot { get { return 1.0f / mCurrentData.fireRate; } }
 
@@ -65,6 +73,15 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 	{
 		mCurrentData = new WeaponData(baseData);
 		mRecentShotTimes = new List<float>();
+		mCurrentParts = new WeaponPartCollection();
+
+		mAttachPoints = new Dictionary<Attachment, Transform>
+		{
+			{ Attachment.Scope, mScopeAttach },
+			{ Attachment.Barrel, mBarrelAttach },
+			{ Attachment.Mechanism, mMechanismAttach },
+			{ Attachment.Grip, mGripAttach },
+		};
 	}
 
 	// [Client] AND [Server]
@@ -135,7 +152,68 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 	{
 		GameObject prefab = ServiceLocator.Get<IWeaponPartManager>().GetPartPrefab(partId);
 		WeaponPartScript instance = prefab.GetComponent<WeaponPartScript>().SpawnForWeapon(this);
+
+		int originalClipsize = mCurrentData.clipSize;
+
+		MoveAttachmentToPoint(instance);
+		mCurrentParts[instance.attachPoint] = instance;
+
+		ActivatePartEffects();
+
+		if (instance.attachPoint == Attachment.Mechanism || mCurrentData.clipSize != originalClipsize)
+		{
+			if (mCurrentParts.mechanism == null)
+				return;
+
+			//CreateNewProjectilePool(mCurrentParts.mechanism);
+			mShotsInClip = mCurrentData.clipSize;
+		}
 	}
+
+	private void MoveAttachmentToPoint(WeaponPartScript instance)
+	{
+		Attachment place = instance.attachPoint;
+
+		WeaponPartScript current = mCurrentParts[place];
+		if (current != null)
+			Destroy(current.gameObject);
+
+		instance.transform.SetParent(mAttachPoints[place]);
+		instance.transform.ResetLocalValues();
+	}
+
+	private void ActivatePartEffects()
+	{
+		WeaponData start = new WeaponData(mCurrentData);
+
+		Action<WeaponPartScript> apply = part =>
+		{
+			foreach (WeaponPartData data in part.data)
+				start = new WeaponData(start, data);
+		};
+
+		var partOrder = new[] { Attachment.Mechanism, Attachment.Barrel, Attachment.Scope, Attachment.Grip };
+
+		foreach (Attachment part in partOrder)
+		{
+			if (mCurrentParts[part] != null)
+				apply(mCurrentParts[part]);
+		}
+
+		mCurrentData = start;
+	}
+
+	/*private void CreateNewProjectilePool(WeaponPartScriptMechanism mech)
+	{
+		StartCoroutine(CleanupDeadPool(mProjectilePool));
+		int count = Mathf.CeilToInt(mCurrentData.clipSize * 1.5f);
+
+		if (mCurrentParts.barrel != null)
+			count *= mCurrentParts.barrel.projectileCount;
+
+		GameObject newPrefab = mech.projectilePrefab;
+		mProjectilePool = new GameObjectPool(count, newPrefab, transform);
+	}*/
 
 	#endregion
 
@@ -291,6 +369,20 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 	#endregion
 
 	#region Data Management
+
+	/// <summary>
+	/// Removes all the old projectiles from previous firing mechanisms once they are no longer in use.
+	/// </summary>
+	/*private static IEnumerator CleanupDeadPool(GameObjectPool pool)
+	{
+		if (pool == null)
+			yield break;
+
+		while (pool.numInUse > 0)
+			yield return new WaitForEndOfFrame();
+
+		pool.Destroy();
+	}*/
 
 	[Server]
 	private void CleanupRecentShots()
