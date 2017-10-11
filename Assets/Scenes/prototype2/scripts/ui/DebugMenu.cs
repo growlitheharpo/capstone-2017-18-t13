@@ -73,8 +73,12 @@ namespace FiringSquad.Debug
 				if (part.description != "")
 					label += "\n\n" + part.description;
 
-				/*if (GUILayout.Button(label, GUILayout.MaxHeight(100.0f)))
-					Instantiate(part.gameObject).GetComponent<WeaponPickupScript>().ConfirmAttach(FindObjectOfType<PlayerScript>().weapon);*/
+				if (GUILayout.Button(label, GUILayout.MaxHeight(100.0f)))
+				{
+					FindObjectOfType<CltPlayer>()
+						.weapon
+						.AttachNewPart(part.name);
+				}
 			}
 			GUILayout.EndArea();
 		}

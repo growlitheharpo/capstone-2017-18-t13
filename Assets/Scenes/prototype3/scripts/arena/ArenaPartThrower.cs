@@ -92,7 +92,8 @@ namespace FiringSquad.Gameplay
 			Vector3 point = mMeshPoints.ChooseRandom();
 			Vector3 direction = (transform.position - point).normalized + Vector3.up * 2.0f;
 
-			GameObject instance = Instantiate(prefab, point, Quaternion.identity);
+			//GameObject instance = Instantiate(prefab, point, Quaternion.identity);
+			GameObject instance = prefab.GetComponent<WeaponPartScript>().SpawnInWorld();
 			instance.name = prefab.name;
 
 			instance.GetComponent<Rigidbody>().AddForce(direction.normalized * 20.0f, ForceMode.Impulse);

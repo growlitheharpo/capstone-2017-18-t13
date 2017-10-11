@@ -131,9 +131,10 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 
 	#region Part Attachment
 
-	public void AttachNewPart(WeaponPartScript part)
+	public void AttachNewPart(string partId)
 	{
-		
+		GameObject prefab = ServiceLocator.Get<IWeaponPartManager>().GetPartPrefab(partId);
+		WeaponPartScript instance = prefab.GetComponent<WeaponPartScript>().SpawnForWeapon(this);
 	}
 
 	#endregion

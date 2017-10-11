@@ -53,7 +53,9 @@ public class WeaponPickupScript : NetworkBehaviour, IInteractable
 		if (wepBearer == null)
 			return;
 
-		Destroy(this);
-		wepBearer.weapon.AttachNewPart(GetComponent<WeaponPartScript>());
+		Network.Destroy(gameObject);
+		Destroy(gameObject);
+
+		wepBearer.weapon.AttachNewPart(GetComponent<WeaponPartScript>().partId);
 	}
 }
