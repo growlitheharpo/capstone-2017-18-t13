@@ -63,6 +63,12 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 		mRecentShotTimes = new List<float>();
 	}
 
+	[ServerCallback]
+	private void Update()
+	{
+		SetDirtyBit(99999);
+	}
+
 	#region Serialization
 
 	// Todo: Write the parent and weapon variables here
@@ -81,7 +87,6 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 		writer.WriteBytesAndSize(memstream.ToArray(), memstream.ToArray().Length);
 
 		// serialize our weapon parts
-
 
 		return true;
 	}

@@ -1,6 +1,7 @@
 ﻿using System;
 using FiringSquad.Data;
 using FiringSquad.Gameplay;
+using KeatsLib.Unity;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -10,6 +11,8 @@ public class CltPlayer : NetworkBehaviour, IWeaponBearer, IDamageReceiver
 	[SerializeField] private PlayerDefaultsData mInformation;
 
 	[SerializeField] private Transform mCameraOffset;
+	[SerializeField] private Transform mGun1Offset;
+	[SerializeField] private Transform mGun2Offset;
 
 	public bool isCurrentPlayer { get { return isLocalPlayer; } }
 
@@ -31,6 +34,7 @@ public class CltPlayer : NetworkBehaviour, IWeaponBearer, IDamageReceiver
 		//BindWeaponToPlayer(wep);
 		BaseWeaponScript wep = Instantiate(mAssets.baseWeaponPrefab).GetComponent<BaseWeaponScript>();
 		BindWeaponToPlayer(wep);
+		NetworkServer.Spawn(wep.gameObject);
 	}
 
 	public override void OnStartClient()
@@ -39,29 +43,16 @@ public class CltPlayer : NetworkBehaviour, IWeaponBearer, IDamageReceiver
 
 		Debug.Log("Client!");
 		// register for local events that should effect all players (might not be any?)
-
-		if (isLocalPlayer)
-		{
-			// instantiate the local player stuff
-			// register for local-player only client events
-
-			CltPlayerLocal localScript = Instantiate(mAssets.localPlayerPrefab).GetComponent<CltPlayerLocal>();
-			localScript.playerRoot = this;
-
-			mHitIndicator = (IPlayerHitIndicator)FindObjectOfType<PlayerHitIndicator>() ?? new NullHitIndicator();
-		}
-		else
-		{
-			// register anything specifically for non-local clients
-
-			Debug.Log("Not the local player!");
-			// TODO: Make spawning hit particles done through here
-			mHitIndicator = new NullHitIndicator();
-		}
+		
+		// register anything specifically for non-local clients
+		// TODO: Make spawning hit particles done through here
+		mHitIndicator = new NullHitIndicator();
 	}
 
 	public override void OnStartLocalPlayer()
 	{
+		// register for local events that should effect us
+
 		CltPlayerLocal localScript = Instantiate(mAssets.localPlayerPrefab).GetComponent<CltPlayerLocal>();
 		localScript.transform.SetParent(transform);
 		localScript.playerRoot = this;
@@ -72,7 +63,8 @@ public class CltPlayer : NetworkBehaviour, IWeaponBearer, IDamageReceiver
 	public void BindWeaponToPlayer(BaseWeaponScript wep)
 	{
 		// find attach spot in view and set parent
-		wep.transform.SetParent(transform);
+		wep.transform.SetParent(mGun1Offset);
+		wep.transform.ResetLocalValues();
 		wep.bearer = this;
 		weapon = wep;
 	}

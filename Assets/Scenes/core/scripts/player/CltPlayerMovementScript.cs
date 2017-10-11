@@ -162,7 +162,10 @@ namespace FiringSquad.Gameplay
 			mRotationY += rotation.y;// + (mRecoilAmount * Time.deltaTime);
 			mRotationY = GenericExt.ClampAngle(mRotationY, -85.0f, 85.0f);
 
-			float realRotation = mRotationY + mPlayer.weapon.GetCurrentRecoil();
+			float realRotation = mRotationY;
+			if (mPlayer.weapon != null)
+				realRotation += mPlayer.weapon.GetCurrentRecoil();
+
 			mPlayer.eye.localRotation = Quaternion.AngleAxis(realRotation, Vector3.left);
 
 			mRotationAmount = Vector2.zero;
