@@ -33,17 +33,6 @@ namespace FiringSquad.Gameplay
 
 		public abstract BaseWeaponScript.Attachment attachPoint { get; }
 
-		private static bool doOnce = false;
-		void Awake()
-		{
-			if (doOnce)
-				return;
-
-			doOnce = true;
-			SpawnInWorld();
-			Destroy(gameObject);
-		}
-
 		public GameObject SpawnInWorld()
 		{
 			GameObject copy = Instantiate(gameObject);
