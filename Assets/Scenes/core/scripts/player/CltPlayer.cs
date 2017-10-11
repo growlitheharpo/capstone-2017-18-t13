@@ -6,12 +6,14 @@ using UnityEngine.Networking;
 
 public class CltPlayer : NetworkBehaviour, IWeaponBearer, IDamageReceiver
 {
+	[SerializeField] private PlayerDefaultsData mInformation;
+
 	public bool isCurrentPlayer { get { return isLocalPlayer; } }
 
 	public IWeapon weapon { get; private set; }
-	public Transform eye { get { throw new NotImplementedException(); } }
-	public WeaponPartCollection defaultParts { get { throw new NotImplementedException(); } }
+	public WeaponPartCollection defaultParts { get { return mInformation.defaultWeaponParts; } }
 
+	public Transform eye { get { throw new NotImplementedException(); } }
 	private IPlayerHitIndicator mHitIndicator;
 
 	public override void OnStartServer()
@@ -81,5 +83,11 @@ public class CltPlayer : NetworkBehaviour, IWeaponBearer, IDamageReceiver
 	public void WeaponReload()
 	{
 		weapon.Reload();
+	}
+
+	[Command]
+	public void ActivateInteract()
+	{
+		
 	}
 }

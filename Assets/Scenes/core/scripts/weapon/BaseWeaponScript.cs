@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 using FiringSquad.Data;
 using FiringSquad.Gameplay;
 using UnityEngine;
@@ -16,6 +18,7 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 
 	public IWeaponBearer bearer { get; set; }
 	private CltPlayer realBearer { get { return bearer as CltPlayer; } }
+	public Transform aimRoot { get; set; }
 
 	[SerializeField] private WeaponData mDefaultData;
 	public WeaponData baseData { get { return mDefaultData; } }
@@ -43,6 +46,17 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 	public override bool OnSerialize(NetworkWriter writer, bool initialState)
 	{
 		writer.Write(realBearer.netId);
+
+		if (isServer)
+			CleanupRecentShots();
+
+		// serialize our times
+		var binFormatter = new BinaryFormatter();
+		var mStream = new MemoryStream();
+		binFormatter.Serialize(mStream, mRecentShotTimes);
+
+		writer.WriteBytesAndSize(mStream.ToArray(), mStream.ToArray().Length);
+
 		return true;
 	}
 
@@ -55,6 +69,10 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 			if (bearerObj != null)
 				bearerObj.GetComponent<CltPlayer>().BindWeaponToPlayer(this);
 		}
+
+		var bytearray = reader.ReadBytesAndSize();
+		var binFormatter = new BinaryFormatter();
+		mRecentShotTimes = binFormatter.Deserialize(new MemoryStream(bytearray)) as List<float>;
 
 		base.OnDeserialize(reader, initialState);
 	}
@@ -82,21 +100,11 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 	[Server]
 	public void FireWeaponHold()
 	{
-		float lastShotTime = mRecentShotTimes.Count >= 1 ? mRecentShotTimes[mRecentShotTimes.Count - 1] : -1.0f;
-		if (mReloading || Time.time - lastShotTime < timePerShot)
+		CleanupRecentShots();
+		if (!CanFireShotNow())
 			return;
 
-		WeaponPartScriptBarrel barrel = mCurrentParts.barrel;
-		if (barrel == null || (barrel.shotsPerClick > 0 && mShotsSinceRelease >= barrel.shotsPerClick))
-			return;
-
-		if (mShotsInClip <= 0)
-		{
-			Reload();
-			return;
-		}
-
-		int count = barrel.projectileCount;
+		int count = mCurrentParts.barrel.projectileCount;
 		var shots = new List<Ray>(count);
 		for (int i = 0; i < count; i++)
 			shots.Add(CalculateShotDirection(i == 0));
@@ -105,9 +113,37 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 		mShotsSinceRelease++;
 		mShotsInClip--;
 
-		// Create the projectile
+		// Todo: create the projectile here
 
 		EventManager.Server.PlayerFiredWeapon(realBearer, shots);
+
+		OnPostFireShot();
+	}
+
+	[Server]
+	public void FireWeaponUp()
+	{
+		mShotsSinceRelease = 0;
+	}
+
+	[Server]
+	private bool CanFireShotNow()
+	{
+		float lastShotTime = mRecentShotTimes.Count >= 1 ? mRecentShotTimes[mRecentShotTimes.Count - 1] : -1.0f;
+		if (mReloading || Time.time - lastShotTime < timePerShot)
+			return false;
+
+		WeaponPartScriptBarrel barrel = mCurrentParts.barrel;
+		if (barrel == null || (barrel.shotsPerClick > 0 && mShotsSinceRelease >= barrel.shotsPerClick))
+			return false;
+
+		if (mShotsInClip <= 0)
+		{
+			Reload();
+			return false;
+		}
+
+		return true;
 	}
 
 	[Server]
@@ -121,18 +157,96 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 	}
 
 	[Server]
-	public void FireWeaponUp()
+	private float GetCurrentDispersionFactor(bool forceNotZero)
 	{
-		mShotsSinceRelease = 0;
+		float percentage = 0.0f;
+		float inverseFireRate = 1.0f / mCurrentData.fireRate;
+
+		foreach (float shot in mRecentShotTimes)
+		{
+			float timeSinceShot = Time.time - shot;
+			if (timeSinceShot > inverseFireRate * 2.0f)
+				continue;
+
+			float p = Mathf.Pow(Mathf.Clamp(inverseFireRate / timeSinceShot, 0.0f, 1.0f), 2);
+			percentage += p * mCurrentData.dispersionRamp;
+		}
+
+		if (!forceNotZero && percentage <= 0.005f)
+			return 0.0f;
+
+		return Mathf.Lerp(mCurrentData.minimumDispersion, mCurrentData.maximumDispersion, percentage);
+	}
+
+	[Server]
+	private Transform GetAimRoot()
+	{
+		if (!mCurrentParts.mechanism.overrideHitscanMethod && aimRoot != null)
+			return aimRoot;
+
+		return mCurrentParts.barrel.barrelTip;
+	}
+
+	[Server]
+	private void OnPostFireShot()
+	{
+		DegradeDurability();
+	}
+
+	[Server]
+	private void DegradeDurability()
+	{
+		foreach (WeaponPartScript part in mCurrentParts)
+		{
+			if (part.durability == WeaponPartScript.INFINITE_DURABILITY)
+				continue;
+
+			part.durability -= 1;
+			if (part.durability == 0)
+				BreakPart(part);
+		}
+	}
+
+	[Server]
+	private void BreakPart(WeaponPartScript part)
+	{
+		GameObject defaultPart = bearer.defaultParts.gameObjects[part.attachPoint];
+		GameObject instance = Instantiate(defaultPart); 
+
+		// TODO: override durability to infinite
+
+		instance.name = defaultPart.name;
+		// TODO: equip here
+
+		// TODO: Send "break" event here (which will then spawn particles)
+		// TODO: spawn "break" particle system here
 	}
 
 	#endregion
 
 	#region Data Management
 
+	[Server]
 	private void CleanupRecentShots()
 	{
-		// do some data manipulation
+		float inverseFireRate = (1.0f / mCurrentData.fireRate) * 10.0f;
+
+		for (int i = 0; i < mRecentShotTimes.Count; i++)
+		{
+			float timeSinceShot = Time.time - mRecentShotTimes[i];
+
+			if (timeSinceShot < inverseFireRate)
+				continue;
+
+			mRecentShotTimes.RemoveAt(i);
+			--i;
+		}
+	}
+
+	[Client]
+	public float GetCurrentRecoil()
+	{
+		
 	}
 
 	#endregion

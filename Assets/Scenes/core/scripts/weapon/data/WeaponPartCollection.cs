@@ -92,5 +92,13 @@ namespace FiringSquad.Data
 			mScope = s;
 			mGrip = g;
 		}
+
+		public IEnumerator<WeaponPartScript> GetEnumerator()
+		{
+			yield return scope;
+			yield return barrel;
+			yield return mechanism;
+			yield return grip;
+		}
 	}
 }

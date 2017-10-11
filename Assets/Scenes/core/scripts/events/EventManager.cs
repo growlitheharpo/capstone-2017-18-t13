@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using UnityEngine;
 
 #if !DEBUG && !DEVELOPMENT_BUILD
 using UnityEngine;
@@ -53,7 +54,12 @@ public partial class EventManager
 
 	public static class Server
 	{
-		
+		public static event Action<CltPlayer, List<Ray>> OnPlayerFiredWeapon = (p, s) => { LogEvent(); };
+
+		public static void PlayerFiredWeapon(CltPlayer bearer, List<Ray> shotsFired)
+		{
+			OnPlayerFiredWeapon(bearer, shotsFired);
+		}
 	}
 
 	#endregion

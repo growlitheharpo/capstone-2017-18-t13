@@ -41,7 +41,7 @@ namespace FiringSquad.Gameplay
 		/// <summary>
 		/// Gets the current recoil to apply to the bearer's view.
 		/// </summary>
-		//float GetCurrentRecoil();
+		float GetCurrentRecoil();
 
 		void FireWeaponHold();
 		void FireWeaponUp();
