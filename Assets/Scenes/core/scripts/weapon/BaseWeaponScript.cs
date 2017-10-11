@@ -43,25 +43,29 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 	#region Serialization
 
 	// Todo: Write the parent and weapon variables here
+	// Todo: Optimize these to only send changes
 	public override bool OnSerialize(NetworkWriter writer, bool initialState)
 	{
+		// write our bearer
 		writer.Write(realBearer.netId);
 
 		if (isServer)
 			CleanupRecentShots();
 
 		// serialize our times
-		var binFormatter = new BinaryFormatter();
-		var mStream = new MemoryStream();
-		binFormatter.Serialize(mStream, mRecentShotTimes);
+		MemoryStream memstream = new MemoryStream();
+		new BinaryFormatter().Serialize(memstream, mRecentShotTimes);
+		writer.WriteBytesAndSize(memstream.ToArray(), memstream.ToArray().Length);
 
-		writer.WriteBytesAndSize(mStream.ToArray(), mStream.ToArray().Length);
+		// serialize our weapon parts
+
 
 		return true;
 	}
 
 	public override void OnDeserialize(NetworkReader reader, bool initialState)
 	{
+		// read our bearer
 		NetworkInstanceId bearerId = reader.ReadNetworkId();
 		if (realBearer == null || realBearer.netId != bearerId)
 		{
@@ -70,11 +74,12 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 				bearerObj.GetComponent<CltPlayer>().BindWeaponToPlayer(this);
 		}
 
+		// read our times
 		var bytearray = reader.ReadBytesAndSize();
-		var binFormatter = new BinaryFormatter();
+		BinaryFormatter binFormatter = new BinaryFormatter();
 		mRecentShotTimes = binFormatter.Deserialize(new MemoryStream(bytearray)) as List<float>;
 
-		base.OnDeserialize(reader, initialState);
+		// read our weapon parts
 	}
 
 	#endregion
@@ -246,7 +251,16 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 	[Client]
 	public float GetCurrentRecoil()
 	{
-		
+		float value = 0.0f;
+		foreach (float v in mRecentShotTimes)
+		{
+			float timeSinceShot = Time.time - v;
+			float percent = Mathf.Clamp(timeSinceShot / mCurrentData.recoilTime, 0.0f, 1.0f);
+			float sample = mCurrentData.recoilCurve.Evaluate(percent);
+			value += sample;
+		}
+
+		return value * mCurrentData.recoilAmount;
 	}
 
 	#endregion
