@@ -68,6 +68,14 @@ namespace FiringSquad.Data
 		}
 
 		public GameObjects gameObjects { get { return new GameObjects(this);} }
+
+		public WeaponPartCollection()
+		{
+			mScope = null;
+			mBarrel = null;
+			mMechanism = null;
+			mGrip = null;
+		}
 		
 		public WeaponPartCollection(WeaponPartCollection copy)
 		{
@@ -99,6 +107,46 @@ namespace FiringSquad.Data
 			yield return barrel;
 			yield return mechanism;
 			yield return grip;
+		}
+
+		public WeaponPartScript this[BaseWeaponScript.Attachment index]
+		{
+			get
+			{
+				switch (index)
+				{
+					case BaseWeaponScript.Attachment.Scope:
+						return scope;
+					case BaseWeaponScript.Attachment.Barrel:
+						return barrel;
+					case BaseWeaponScript.Attachment.Mechanism:
+						return mechanism;
+					case BaseWeaponScript.Attachment.Grip:
+						return grip;
+					default:
+						throw new ArgumentOutOfRangeException("index", index, null);
+				}
+			}
+			set
+			{
+				switch (index)
+				{
+					case BaseWeaponScript.Attachment.Scope:
+						mScope = value as WeaponPartScriptScope;
+						break;
+					case BaseWeaponScript.Attachment.Barrel:
+						mBarrel = value as WeaponPartScriptBarrel;
+						break;
+					case BaseWeaponScript.Attachment.Mechanism:
+						mMechanism = value as WeaponPartScriptMechanism;
+						break;
+					case BaseWeaponScript.Attachment.Grip:
+						mGrip = value as WeaponPartScriptGrip;
+						break;
+					default:
+						throw new ArgumentOutOfRangeException("index", index, null);
+				}
+			}
 		}
 	}
 }
