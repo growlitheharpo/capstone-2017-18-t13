@@ -18,7 +18,8 @@ namespace FiringSquad.Debug
 		{
 			var parts = ServiceLocator.Get<IWeaponPartManager>()
 				.GetAllPrefabs(true).Values
-				.Select(x => x.GetComponent<WeaponPartScript>());
+				.Select(x => x.GetComponent<WeaponPartScript>())
+				.ToArray();
 
 			mMechanisms = parts.Where(x => x.attachPoint == BaseWeaponScript.Attachment.Mechanism).ToArray();
 			mBarrels = parts.Where(x => x.attachPoint == BaseWeaponScript.Attachment.Barrel).ToArray();
@@ -75,9 +76,10 @@ namespace FiringSquad.Debug
 
 				if (GUILayout.Button(label, GUILayout.MaxHeight(100.0f)))
 				{
-					FindObjectOfType<CltPlayer>()
-						.weapon
-						.AttachNewPart(part.name);
+					CltPlayer player = FindObjectsOfType<CltPlayer>()
+						.FirstOrDefault(x => x.isCurrentPlayer);
+					if (player != null)
+						player.CmdDebugEquipWeaponPart(part.name);
 				}
 			}
 			GUILayout.EndArea();

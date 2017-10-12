@@ -117,4 +117,10 @@ public class CltPlayer : NetworkBehaviour, IWeaponBearer, IDamageReceiver
 		if (obj != null)
 			obj.Interact(this);
 	}
+
+	[Command]
+	public void CmdDebugEquipWeaponPart(string part)
+	{
+		weapon.AttachNewPart(part);
+	}
 }
