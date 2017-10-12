@@ -56,7 +56,7 @@ public class WeaponPickupScript : NetworkBehaviour, IInteractable
 
 		try
 		{
-			Network.Destroy(gameObject);
+			NetworkServer.Destroy(gameObject);
 		}
 		catch (Exception e)
 		{

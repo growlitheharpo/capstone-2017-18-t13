@@ -20,7 +20,6 @@ namespace FiringSquad.Gameplay
 
 		private void Awake()
 		{
-			LoadWeaponPrefabs();
 
 #if UNITY_EDITOR
 			GenerateMeshPoints();
@@ -29,6 +28,7 @@ namespace FiringSquad.Gameplay
 
 		private void Start()
 		{
+			LoadWeaponPrefabs();
 			mSpawnedObjects = new List<GameObject>();
 
 			if (isServer)

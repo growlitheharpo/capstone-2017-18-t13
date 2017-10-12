@@ -69,7 +69,6 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 
 	private const float CAMERA_FOLLOW_FACTOR = 10.0f;
 
-	[ServerCallback]
 	private void Awake()
 	{
 		mCurrentData = new WeaponData(baseData);
@@ -155,14 +154,17 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 		// read our weapon parts
 		bytearray = reader.ReadBytesAndSize();
 		var partList = (string[])binFormatter.Deserialize(new MemoryStream(bytearray));
-		if (mCurrentParts.scope.partId != partList[0])
+		if (mCurrentParts == null)
+			mCurrentParts = new WeaponPartCollection();
+
+		if (mCurrentParts.scope == null || mCurrentParts.scope.partId != partList[0])
 			AttachNewPart(partList[0], true);
-		if (mCurrentParts.barrel.partId != partList[1])
-			AttachNewPart(partList[0], true);
-		if (mCurrentParts.mechanism.partId != partList[2])
-			AttachNewPart(partList[0], true);
-		if (mCurrentParts.grip.partId != partList[3])
-			AttachNewPart(partList[0], true);
+		if (mCurrentParts.barrel == null || mCurrentParts.barrel.partId != partList[1])
+			AttachNewPart(partList[1], true);
+		if (mCurrentParts.mechanism == null || mCurrentParts.mechanism.partId != partList[2])
+			AttachNewPart(partList[2], true);
+		if (mCurrentParts.grip == null || mCurrentParts.grip.partId != partList[3])
+			AttachNewPart(partList[3], true);
 	}
 
 	#endregion
@@ -176,6 +178,9 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 
 	public void AttachNewPart(string partId, bool forceInfiniteDurability)
 	{
+		if (string.IsNullOrEmpty(partId))
+			return;
+
 		GameObject prefab = ServiceLocator.Get<IWeaponPartManager>().GetPartPrefab(partId);
 		WeaponPartScript instance = prefab.GetComponent<WeaponPartScript>().SpawnForWeapon(this);
 
