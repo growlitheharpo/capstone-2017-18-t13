@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.Serialization;
 
 namespace FiringSquad.Data
@@ -69,6 +70,40 @@ namespace FiringSquad.Data
 		public override string ToString()
 		{
 			return string.Format("Spread: {0}, Damage: {1}, FireRate: {2} ClipSize: {3}, Recoil: {4}, Reload: {5}", mMinimumDispersion, mDamage, mFireRate, mClipSize, mRecoilAmount, mReloadTime);
+		}
+
+		public void Serialize(NetworkWriter stream)
+		{
+			stream.Write(mMinimumDispersion);
+			stream.Write(mMaximumDispersion);
+			stream.Write(mDispersionRamp);
+
+			stream.Write(mRecoilAmount);
+			stream.Write(mRecoilTime);
+
+			stream.Write(mDamage);
+			stream.Write(mDamageFalloffDistance);
+			stream.Write(mFireRate);
+			stream.Write(mReloadTime);
+			stream.Write(mClipSize);
+		}
+
+		public static WeaponData Deserialize(WeaponData baseData, NetworkReader stream)
+		{
+			WeaponData result = new WeaponData(baseData)
+			{
+				mMinimumDispersion = stream.ReadSingle(),
+				mMaximumDispersion = stream.ReadSingle(),
+				mDispersionRamp = stream.ReadSingle(),
+				mRecoilTime = stream.ReadSingle(),
+				mDamage = stream.ReadSingle(),
+				mDamageFalloffDistance = stream.ReadSingle(),
+				mFireRate = stream.ReadSingle(),
+				mReloadTime = stream.ReadSingle(),
+				mClipSize = stream.ReadInt32()
+			};
+
+			return result;
 		}
 	}
 }
