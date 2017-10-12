@@ -567,22 +567,40 @@ MonoBehaviour:
   mMechanismAttach: {fileID: 4891504686318262}
   mGripAttach: {fileID: 4904606761592194}
   mDefaultData:
-    mMinimumDispersion: 0
-    mMaximumDispersion: 0
-    mDispersionRamp: 0
-    mRecoilAmount: 0
-    mRecoilTime: 0
+    mMinimumDispersion: 0.05
+    mMaximumDispersion: 0.1
+    mDispersionRamp: 1
+    mRecoilAmount: 1
+    mRecoilTime: 1
     mRecoilCurve:
       serializedVersion: 2
-      m_Curve: []
+      m_Curve:
+      - serializedVersion: 2
+        time: 0
+        value: 0
+        inSlope: 2
+        outSlope: 2
+        tangentMode: 0
+      - serializedVersion: 2
+        time: 0.1
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+      - serializedVersion: 2
+        time: 1
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
       m_PreInfinity: 2
       m_PostInfinity: 2
-      m_RotationOrder: 4
-    mDamage: 0
-    mDamageFalloffDistance: 0
-    mFireRate: 0
-    mReloadTime: 0
-    mClipSize: 0
+      m_RotationOrder: 0
+    mDamage: 50
+    mDamageFalloffDistance: 200
+    mFireRate: 4
+    mReloadTime: 1
+    mClipSize: 10
 --- !u!114 &114943338203428434
 MonoBehaviour:
   m_ObjectHideFlags: 1

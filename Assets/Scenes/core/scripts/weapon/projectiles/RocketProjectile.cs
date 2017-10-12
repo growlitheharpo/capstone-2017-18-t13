@@ -101,6 +101,10 @@ namespace FiringSquad.Gameplay
 		
 		public ICharacter source { get { return sourceWeapon.bearer; } }
 		public IWeapon sourceWeapon { get; private set; }
+		public void Initialize(IWeapon weapon, Ray initialDirection, WeaponData data)
+		{
+			throw new System.NotImplementedException();
+		}
 
 		public void Instantiate(IWeapon weapon, Ray ray, WeaponData data)
 		{

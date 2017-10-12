@@ -268,6 +268,7 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 	[Server]
 	private void FinishReload()
 	{
+		mShotsInClip = mCurrentData.clipSize;
 		mReloading = false;
 	}
 
@@ -291,7 +292,12 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 		mShotsSinceRelease++;
 		mShotsInClip--;
 
-		// Todo: create the projectile here
+		foreach (Ray shot in shots)
+		{
+			GameObject projectile = Instantiate(mCurrentParts.mechanism.projectilePrefab);
+			NetworkServer.Spawn(projectile);
+			projectile.GetComponent<HitscanProjectile>().Initialize(this, shot, mCurrentData);
+		}
 
 		EventManager.Server.PlayerFiredWeapon(realBearer, shots);
 
