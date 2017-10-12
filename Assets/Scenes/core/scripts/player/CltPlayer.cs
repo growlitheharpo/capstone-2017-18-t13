@@ -34,6 +34,7 @@ public class CltPlayer : NetworkBehaviour, IWeaponBearer, IDamageReceiver
 		//BindWeaponToPlayer(wep);
 		BaseWeaponScript wep = Instantiate(mAssets.baseWeaponPrefab).GetComponent<BaseWeaponScript>();
 		BindWeaponToPlayer(wep);
+		AddDefaultPartsToWeapon(wep);
 		NetworkServer.Spawn(wep.gameObject);
 	}
 
@@ -43,7 +44,7 @@ public class CltPlayer : NetworkBehaviour, IWeaponBearer, IDamageReceiver
 
 		Debug.Log("Client!");
 		// register for local events that should effect all players (might not be any?)
-		
+
 		// register anything specifically for non-local clients
 		// TODO: Make spawning hit particles done through here
 		mHitIndicator = new NullHitIndicator();
@@ -69,6 +70,12 @@ public class CltPlayer : NetworkBehaviour, IWeaponBearer, IDamageReceiver
 		wep.transform.SetParent(transform);
 		wep.bearer = this;
 		weapon = wep;
+	}
+
+	private void AddDefaultPartsToWeapon(BaseWeaponScript wep)
+	{
+		foreach (WeaponPartScript part in defaultParts)
+			wep.AttachNewPart(part.partId, true);
 	}
 
 	[Server]
@@ -106,6 +113,8 @@ public class CltPlayer : NetworkBehaviour, IWeaponBearer, IDamageReceiver
 	[Command]
 	public void CmdActivateInteract()
 	{
-
+		WeaponPickupScript obj = FindObjectOfType<WeaponPickupScript>();
+		if (obj != null)
+			obj.Interact(this);
 	}
 }

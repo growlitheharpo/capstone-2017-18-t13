@@ -21,6 +21,8 @@ namespace FiringSquad.Data
 		public WeaponPartScriptMechanism mechanism { get { return mMechanism; } }
 		public WeaponPartScriptGrip grip { get { return mGrip; } }
 
+		public WeaponPartScript[] allParts { get { return new WeaponPartScript[] { scope, barrel, mechanism, grip }; } }
+
 		public struct GameObjects
 		{
 			private readonly WeaponPartCollection mCol;

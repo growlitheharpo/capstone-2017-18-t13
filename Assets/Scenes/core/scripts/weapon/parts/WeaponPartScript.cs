@@ -52,6 +52,7 @@ namespace FiringSquad.Gameplay
 
 			// Destroy the pickup script (like when calling "interact")
 			Destroy(copy.GetComponent<WeaponPickupScript>());
+			Destroy(copy.GetComponent<Rigidbody>());
 			Destroy(copy.GetComponent<NetworkTransform>());
 			Destroy(copy.GetComponent<NetworkIdentity>());
 

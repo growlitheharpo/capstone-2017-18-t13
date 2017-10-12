@@ -1,4 +1,5 @@
-﻿using FiringSquad.Gameplay;
+﻿using System;
+using FiringSquad.Gameplay;
 using KeatsLib.Unity;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -53,7 +54,15 @@ public class WeaponPickupScript : NetworkBehaviour, IInteractable
 		if (wepBearer == null)
 			return;
 
-		Network.Destroy(gameObject);
+		try
+		{
+			Network.Destroy(gameObject);
+		}
+		catch (Exception e)
+		{
+			Console.WriteLine(e);
+		}
+
 		Destroy(gameObject);
 
 		wepBearer.weapon.AttachNewPart(GetComponent<WeaponPartScript>().partId);

@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 using FiringSquad.Data;
 using FiringSquad.Gameplay;
@@ -112,15 +113,24 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 		// write our bearer
 		writer.Write(realBearer.netId);
 
+		var partIds = mCurrentParts.allParts.Select(x => x.partId).ToArray();
+
 		if (isServer)
 			CleanupRecentShots();
 
 		// serialize our times
-		MemoryStream memstream = new MemoryStream();
-		new BinaryFormatter().Serialize(memstream, mRecentShotTimes);
-		writer.WriteBytesAndSize(memstream.ToArray(), memstream.ToArray().Length);
+		BinaryFormatter bf = new BinaryFormatter();
 
-		// serialize our weapon parts
+		MemoryStream memstream = new MemoryStream();
+		bf.Serialize(memstream, mRecentShotTimes);
+		writer.WriteBytesAndSize(memstream.ToArray(), memstream.ToArray().Length);
+		memstream.Dispose();
+
+		// serialize our part ids
+		memstream = new MemoryStream();
+		bf.Serialize(memstream, partIds);
+		writer.WriteBytesAndSize(memstream.ToArray(), memstream.ToArray().Length);
+		memstream.Dispose();
 
 		return true;
 	}
@@ -136,12 +146,23 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 				bearerObj.GetComponent<CltPlayer>().BindWeaponToPlayer(this);
 		}
 
+		BinaryFormatter binFormatter = new BinaryFormatter();
+		
 		// read our times
 		var bytearray = reader.ReadBytesAndSize();
-		BinaryFormatter binFormatter = new BinaryFormatter();
-		mRecentShotTimes = binFormatter.Deserialize(new MemoryStream(bytearray)) as List<float>;
+		mRecentShotTimes = (List<float>)binFormatter.Deserialize(new MemoryStream(bytearray));
 
 		// read our weapon parts
+		bytearray = reader.ReadBytesAndSize();
+		var partList = (string[])binFormatter.Deserialize(new MemoryStream(bytearray));
+		if (mCurrentParts.scope.partId != partList[0])
+			AttachNewPart(partList[0], true);
+		if (mCurrentParts.barrel.partId != partList[1])
+			AttachNewPart(partList[0], true);
+		if (mCurrentParts.mechanism.partId != partList[2])
+			AttachNewPart(partList[0], true);
+		if (mCurrentParts.grip.partId != partList[3])
+			AttachNewPart(partList[0], true);
 	}
 
 	#endregion
@@ -150,6 +171,11 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 
 	public void AttachNewPart(string partId)
 	{
+		AttachNewPart(partId, false);
+	}
+
+	public void AttachNewPart(string partId, bool forceInfiniteDurability)
+	{
 		GameObject prefab = ServiceLocator.Get<IWeaponPartManager>().GetPartPrefab(partId);
 		WeaponPartScript instance = prefab.GetComponent<WeaponPartScript>().SpawnForWeapon(this);
 
@@ -157,6 +183,9 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 
 		MoveAttachmentToPoint(instance);
 		mCurrentParts[instance.attachPoint] = instance;
+
+		if (forceInfiniteDurability)
+			instance.durability = WeaponPartScript.INFINITE_DURABILITY;
 
 		ActivatePartEffects();
 
