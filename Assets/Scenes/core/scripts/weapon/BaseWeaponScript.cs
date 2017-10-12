@@ -218,7 +218,7 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 
 	private void ActivatePartEffects()
 	{
-		WeaponData start = new WeaponData(mCurrentData);
+		WeaponData start = new WeaponData(baseData);
 
 		Action<WeaponPartScript> apply = part =>
 		{
