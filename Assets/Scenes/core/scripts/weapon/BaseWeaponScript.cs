@@ -297,8 +297,9 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 		foreach (Ray shot in shots)
 		{
 			GameObject projectile = Instantiate(mCurrentParts.mechanism.projectilePrefab);
+			projectile.GetComponent<IProjectile>().PreSpawnInitialize(this, shot, mCurrentData);
 			NetworkServer.Spawn(projectile);
-			projectile.GetComponent<HitscanProjectile>().Initialize(this, shot, mCurrentData);
+			projectile.GetComponent<IProjectile>().PostSpawnInitialize(this, shot, mCurrentData);
 		}
 
 		EventManager.Server.PlayerFiredWeapon(realBearer, shots);

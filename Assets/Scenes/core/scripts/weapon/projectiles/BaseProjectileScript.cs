@@ -11,7 +11,13 @@ public abstract class BaseProjectileScript : NetworkBehaviour, IProjectile
 	public IWeapon sourceWeapon { get; protected set; }
 
 	[Server]
-	public virtual void Initialize(IWeapon weapon, Ray initialDirection, WeaponData data)
+	public virtual void PreSpawnInitialize(IWeapon weapon, Ray initialDirection, WeaponData data)
+	{
+		sourceWeapon = weapon;
+	}
+
+	[Server]
+	public virtual void PostSpawnInitialize(IWeapon weapon, Ray initialDirection, WeaponData data)
 	{
 		sourceWeapon = weapon;
 	}

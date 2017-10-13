@@ -18,9 +18,9 @@ namespace FiringSquad.Gameplay
 		}
 
 		[Server]
-		public override void Initialize(IWeapon weapon, Ray initialDirection, WeaponData data)
+		public override void PostSpawnInitialize(IWeapon weapon, Ray initialDirection, WeaponData data)
 		{
-			base.Initialize(weapon, initialDirection, data);
+			base.PostSpawnInitialize(weapon, initialDirection, data);
 
 			Vector3 endPoint;
 			RaycastHit hitInfo;

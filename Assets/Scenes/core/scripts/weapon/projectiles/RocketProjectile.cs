@@ -1,11 +1,116 @@
 ﻿using System.Collections;
 using FiringSquad.Data;
 using UnityEngine;
+using UnityEngine.Networking;
 
 namespace FiringSquad.Gameplay
 {
-	public class RocketProjectile : MonoBehaviour, IProjectile
+	public class RocketProjectile : BaseProjectileScript
 	{
+		[SerializeField] private ParticleSystem mHitParticles;
+		[SerializeField] private float mSpeed;
+		[SerializeField] private float mSplashDamageRadius;
+
+		private Transform mDirectHit;
+		private Rigidbody mRigidbody;
+		private Renderer mRenderer;
+		private WeaponData mData; // server-only
+
+		private GameObject mSpawnedParticles;
+
+		private void Awake()
+		{
+			mRigidbody = GetComponent<Rigidbody>();
+			mRenderer = GetComponent<Renderer>();
+		}
+
+		public override void PreSpawnInitialize(IWeapon weapon, Ray ray, WeaponData data)
+		{
+			base.PreSpawnInitialize(weapon, ray, data);
+			transform.position = ray.origin;
+
+			mRigidbody.AddForce(ray.direction * mSpeed, ForceMode.Impulse);
+			mData = data;
+		}
+
+		[ServerCallback]
+		private void OnCollisionEnter(Collision hit)
+		{
+			if (hit.transform == source.gameObject.transform)
+				return;
+
+			IDamageReceiver component = hit.GetDamageReceiver();
+			if (component != null)
+			{
+				component.ApplyDamage(mData.damage, hit.contacts[0].point, hit.contacts[0].normal, this);
+				mDirectHit = hit.transform;
+			}
+
+			ApplySplashDamage();
+			RpcActivateExplodeEffect();
+			StartCoroutine(DisplayExplodeParticles());
+		}
+
+		[Server]
+		private void ApplySplashDamage()
+		{
+			var colliders = Physics.OverlapSphere(transform.position, mSplashDamageRadius);
+			foreach (Collider col in colliders)
+			{
+				if (col.transform == mDirectHit)
+					continue;
+
+				IDamageReceiver c = col.GetComponentUpwards<IDamageReceiver>();
+				if (c == null)
+					continue;
+
+				Ray ray = new Ray(transform.position, col.transform.position - transform.position);
+				RaycastHit hitInfo;
+				Physics.Raycast(ray, out hitInfo);
+
+				if (hitInfo.collider != col)
+					continue;
+
+				c.ApplyDamage(mData.damage * 0.5f, hitInfo.point, hitInfo.normal, this);
+			}
+		}
+
+		[ClientRpc]
+		private void RpcActivateExplodeEffect()
+		{
+			StartCoroutine(DisplayExplodeParticles());
+		}
+
+		private IEnumerator DisplayExplodeParticles()
+		{
+			mRenderer.enabled = false;
+			mRigidbody.velocity = Vector3.zero;
+			mRigidbody.angularVelocity = Vector3.zero;
+
+			mHitParticles.transform.SetParent(null);
+			mHitParticles.transform.localScale = Vector3.one;
+			mHitParticles.Play();
+			yield return new WaitForParticles(mHitParticles);
+
+			if (!isServer)
+				yield break;
+
+			yield return new WaitForSeconds(0.1f);
+			OnEffectComplete();
+		}
+
+		[Server]
+		private void OnEffectComplete()
+		{
+			mHitParticles.transform.SetParent(transform);
+			mHitParticles.transform.localPosition = Vector3.zero;
+
+			NetworkServer.Destroy(gameObject);
+			Destroy(gameObject);
+		}
+
+
+		/*
 		[SerializeField] private ParticleSystem mHitParticles;
 		[SerializeField] private float mSpeed;
 
@@ -52,7 +157,7 @@ namespace FiringSquad.Gameplay
 				IDamageReceiver component = hit.GetDamageReceiver();
 				// TODO: This must be done server-side
 				/*if (component != null)
-					component.ApplyDamage(mData.damage / 2.0f, hit.point, hit.normal, this);*/
+					component.ApplyDamage(mData.damage / 2.0f, hit.point, hit.normal, this);
 			}
 		}
 
@@ -126,6 +231,6 @@ namespace FiringSquad.Gameplay
 			mData = data;
 		}
 
-		#endregion
+		#endregion*/
 	}
 }
