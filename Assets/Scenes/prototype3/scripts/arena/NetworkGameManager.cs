@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.Networking;
 
-public class NetworkGameManager : NetworkManager, INetworkManager
+public class NetworkGameManager : NetworkManager
 {
 	private int mPlayerCount;
 
@@ -20,8 +20,4 @@ public class NetworkGameManager : NetworkManager, INetworkManager
 		base.OnServerRemovePlayer(conn, player);
 		mPlayerCount -= 1;
 	}
-
-	public bool isGameClient { get { return Network.isServer; } }
-	public bool isGameServer { get { return Network.isClient; } }
-	public bool isGameHost { get { return isGameClient && isGameServer; } }
 }
