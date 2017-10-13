@@ -467,6 +467,7 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 	private IEnumerator WaitForReload(float time)
 	{
 		yield return null;
+		yield return null;
 		Animator anim = GetComponent<Animator>();
 		anim.speed = 1.0f / time;
 		yield return new WaitForAnimation(anim);
