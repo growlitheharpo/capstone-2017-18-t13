@@ -19,6 +19,18 @@ public class AudioManager : MonoSingleton<AudioManager>, IAudioManager
 		PrimaryEffect2 = 2,
 		PrimaryEffect3 = 3,
 		DeathSound = 10,
+		
+		Reload = 15, //done
+		Shoot = 20, //done
+		StartWalking = 25, // not yet!
+		LoopWalking = 30, // done
+		StartGravGun = 35, // not yet!
+		LoopGravGun = 40, // done
+		InteractReceive = 50, // not yet!
+
+		ImpactWall = 60, // done
+		ImpactOtherPlayer = 65, // done
+		ImpactCurrentPlayer = 70, // done
 	}
 
 	/// <summary>
