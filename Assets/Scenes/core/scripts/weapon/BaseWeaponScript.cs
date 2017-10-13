@@ -67,7 +67,9 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 	private int mShotsSinceRelease;
 	private List<float> mRecentShotTimes;
 
+
 	private const float CAMERA_FOLLOW_FACTOR = 10.0f;
+	private float currentTime { get { return (float)Network.time; } }
 
 	private void Awake()
 	{
@@ -114,8 +116,8 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 
 		var partIds = mCurrentParts.allParts.Select(x => x.partId).ToArray();
 
-		if (isServer)
-			CleanupRecentShots();
+		/*if (isServer)
+			CleanupRecentShots();*/
 
 		// serialize our times
 		BinaryFormatter bf = new BinaryFormatter();
@@ -146,7 +148,7 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 		}
 
 		BinaryFormatter binFormatter = new BinaryFormatter();
-		
+
 		// read our times
 		var bytearray = reader.ReadBytesAndSize();
 		mRecentShotTimes = (List<float>)binFormatter.Deserialize(new MemoryStream(bytearray));
@@ -288,7 +290,7 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 		for (int i = 0; i < count; i++)
 			shots.Add(CalculateShotDirection(i == 0));
 
-		mRecentShotTimes.Add(Time.time);
+		mRecentShotTimes.Add(currentTime);
 		mShotsSinceRelease++;
 		mShotsInClip--;
 
@@ -314,7 +316,7 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 	private bool CanFireShotNow()
 	{
 		float lastShotTime = mRecentShotTimes.Count >= 1 ? mRecentShotTimes[mRecentShotTimes.Count - 1] : -1.0f;
-		if (mReloading || Time.time - lastShotTime < timePerShot)
+		if (mReloading || currentTime - lastShotTime < timePerShot)
 			return false;
 
 		WeaponPartScriptBarrel barrel = mCurrentParts.barrel;
@@ -348,7 +350,7 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 
 		foreach (float shot in mRecentShotTimes)
 		{
-			float timeSinceShot = Time.time - shot;
+			float timeSinceShot = currentTime - shot;
 			if (timeSinceShot > inverseFireRate * 2.0f)
 				continue;
 
@@ -395,7 +397,7 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 	private void BreakPart(WeaponPartScript part)
 	{
 		GameObject defaultPart = bearer.defaultParts.gameObjects[part.attachPoint];
-		GameObject instance = Instantiate(defaultPart); 
+		GameObject instance = Instantiate(defaultPart);
 
 		// TODO: override durability to infinite
 
@@ -409,21 +411,7 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 	#endregion
 
 	#region Data Management
-
-	/// <summary>
-	/// Removes all the old projectiles from previous firing mechanisms once they are no longer in use.
-	/// </summary>
-	/*private static IEnumerator CleanupDeadPool(GameObjectPool pool)
-	{
-		if (pool == null)
-			yield break;
-
-		while (pool.numInUse > 0)
-			yield return new WaitForEndOfFrame();
-
-		pool.Destroy();
-	}*/
-
+	
 	[Server]
 	private void CleanupRecentShots()
 	{
@@ -431,7 +419,7 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 
 		for (int i = 0; i < mRecentShotTimes.Count; i++)
 		{
-			float timeSinceShot = Time.time - mRecentShotTimes[i];
+			float timeSinceShot = currentTime - mRecentShotTimes[i];
 
 			if (timeSinceShot < inverseFireRate)
 				continue;
@@ -447,7 +435,7 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 		float value = 0.0f;
 		foreach (float v in mRecentShotTimes)
 		{
-			float timeSinceShot = Time.time - v;
+			float timeSinceShot = currentTime - v;
 			float percent = Mathf.Clamp(timeSinceShot / mCurrentData.recoilTime, 0.0f, 1.0f);
 			float sample = mCurrentData.recoilCurve.Evaluate(percent);
 			value += sample;
