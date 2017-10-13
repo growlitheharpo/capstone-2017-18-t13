@@ -28,7 +28,7 @@ namespace FiringSquad.Gameplay
 		private float mRotationY;
 		private bool mJump, mIsJumping, mIsRunning, mPreviouslyGrounded, mCrouching;
 
-
+		private float mSmoothedRecoil;
 		private float mStandingHeight;
 		private float mStandingRadius;
 
@@ -36,6 +36,7 @@ namespace FiringSquad.Gameplay
 		{
 			mMoveDirection = Vector3.zero;
 			mMouseSensitivity = 1.0f;
+			mSmoothedRecoil = 0.0f;
 		}
 
 		private void Start()
@@ -164,7 +165,10 @@ namespace FiringSquad.Gameplay
 
 			float realRotation = mRotationY;
 			if (mPlayer.weapon != null)
-				realRotation += mPlayer.weapon.GetCurrentRecoil();
+			{
+				mSmoothedRecoil = Mathf.Lerp(mPlayer.weapon.GetCurrentRecoil(), mSmoothedRecoil, 0.4f);
+				realRotation += mSmoothedRecoil;
+			}
 
 			mPlayer.eye.localRotation = Quaternion.AngleAxis(realRotation, Vector3.left);
 
