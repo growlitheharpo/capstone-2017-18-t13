@@ -1,4 +1,5 @@
-﻿using FiringSquad.Data;
+﻿using System.Collections.Generic;
+using FiringSquad.Data;
 using FiringSquad.Gameplay;
 using KeatsLib.Unity;
 using UnityEngine;
@@ -27,13 +28,12 @@ public class CltPlayer : NetworkBehaviour, IWeaponBearer, IDamageReceiver
 	public override void OnStartServer()
 	{
 		// register for server events
-		mHitIndicator = new NullHitIndicator();
+		EventManager.Server.OnPlayerFiredWeapon += OnPlayerFiredWeapon;
 
+		mHitIndicator = new NullHitIndicator();
 		mHealth = mInformation.defaultHealth;
 
-		// create our weapon with client authority & bind
-		//BaseWeaponScript wep = new BaseWeaponScript(); // actually create it here
-		//BindWeaponToPlayer(wep);
+		// create our weapon & bind
 		BaseWeaponScript wep = Instantiate(mAssets.baseWeaponPrefab).GetComponent<BaseWeaponScript>();
 		BindWeaponToPlayer(wep);
 		AddDefaultPartsToWeapon(wep);
@@ -97,6 +97,22 @@ public class CltPlayer : NetworkBehaviour, IWeaponBearer, IDamageReceiver
 	private void RpcReflectDamageLocally(Vector3 point, Vector3 normal, Vector3 origin, float amount)
 	{
 		mHitIndicator.NotifyHit(this, origin, amount);
+	}
+
+	private void OnPlayerFiredWeapon(CltPlayer p, List<Ray> shots)
+	{
+		if (p != this)
+			RpcReflectPlayerShotWeapon(p.netId);
+	}
+
+	[ClientRpc]
+	private void RpcReflectPlayerShotWeapon(NetworkInstanceId playerId)
+	{
+		if (playerId == netId)
+			return;
+
+		CltPlayer p = ClientScene.FindLocalObject(playerId).GetComponent<CltPlayer>();
+		p.weapon.PlayFireEffect();
 	}
 
 	[Command]

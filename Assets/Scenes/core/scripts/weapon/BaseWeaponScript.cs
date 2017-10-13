@@ -67,7 +67,7 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 	private int mShotsInClip;
 	private int mShotsSinceRelease;
 	private List<float> mRecentShotTimes;
-
+	private ParticleSystem mShotParticles;
 
 	private const float CAMERA_FOLLOW_FACTOR = 10.0f;
 	private float currentTime { get { return (float)Network.time; } }
@@ -85,6 +85,8 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 			{ Attachment.Mechanism, mMechanismAttach },
 			{ Attachment.Grip, mGripAttach },
 		};
+
+		mShotParticles = transform.Find("shot_particles").GetComponent<ParticleSystem>();
 	}
 
 	// [Client] AND [Server]
@@ -489,13 +491,19 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 			mShotsInClip--;
 		}
 
-		transform.Find("shot_particles").GetComponent<ParticleSystem>().Play();
+		PlayFireEffect();
 	}
 
 	[Client]
 	public void CltMockFireWeaponUp()
 	{
 		mShotsSinceRelease = 0;
+	}
+
+	public void PlayFireEffect()
+	{
+		mShotParticles.transform.position = currentParts.barrel.barrelTip.position;
+		mShotParticles.Play();
 	}
 
 	#endregion

@@ -50,5 +50,7 @@ namespace FiringSquad.Gameplay
 
 		void FireWeaponHold();
 		void FireWeaponUp();
+
+		void PlayFireEffect();
 	}
 }
