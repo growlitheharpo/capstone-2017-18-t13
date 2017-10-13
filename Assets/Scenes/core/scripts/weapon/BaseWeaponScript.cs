@@ -57,6 +57,7 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 	public WeaponData baseData { get { return mDefaultData; } }
 
 	private WeaponPartCollection mCurrentParts;
+	public WeaponPartCollection currentParts { get { return mCurrentParts; } }
 
 	private Dictionary<Attachment, Transform> mAttachPoints;
 	private WeaponData mCurrentData;
@@ -107,12 +108,14 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 
 	#region Serialization
 
-	// Todo: Write the parent and weapon variables here
 	// Todo: Optimize these to only send changes
 	public override bool OnSerialize(NetworkWriter writer, bool initialState)
 	{
 		// write our bearer
 		writer.Write(realBearer.netId);
+
+		writer.Write(mShotsSinceRelease);
+		writer.Write(mShotsInClip);
 
 		var partIds = mCurrentParts.allParts.Select(x => x.partId).ToArray();
 
@@ -146,6 +149,9 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 			if (bearerObj != null)
 				bearerObj.GetComponent<CltPlayer>().BindWeaponToPlayer(this);
 		}
+
+		mShotsSinceRelease = reader.ReadInt32();
+		mShotsInClip = reader.ReadInt32();
 
 		BinaryFormatter binFormatter = new BinaryFormatter();
 
@@ -296,7 +302,7 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 
 		foreach (Ray shot in shots)
 		{
-			GameObject projectile = Instantiate(mCurrentParts.mechanism.projectilePrefab);
+			GameObject projectile = Instantiate(mCurrentParts.mechanism.projectilePrefab, mCurrentParts.barrel.barrelTip.position, Quaternion.identity);
 			projectile.GetComponent<IProjectile>().PreSpawnInitialize(this, shot, mCurrentData);
 			NetworkServer.Spawn(projectile);
 			projectile.GetComponent<IProjectile>().PostSpawnInitialize(this, shot, mCurrentData);
@@ -313,7 +319,6 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 		mShotsSinceRelease = 0;
 	}
 
-	[Server]
 	private bool CanFireShotNow()
 	{
 		float lastShotTime = mRecentShotTimes.Count >= 1 ? mRecentShotTimes[mRecentShotTimes.Count - 1] : -1.0f;
@@ -326,7 +331,9 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 
 		if (mShotsInClip <= 0)
 		{
-			Reload();
+			if (isServer)
+				Reload();
+
 			return false;
 		}
 
@@ -455,12 +462,40 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 	[Client]
 	private IEnumerator WaitForReload(float time)
 	{
+		mReloading = true;
+
 		yield return null;
 		yield return null;
 		Animator anim = GetComponent<Animator>();
 		anim.speed = 1.0f / time;
 		yield return new WaitForAnimation(anim);
 		anim.speed = 1.0f;
+
+		mReloading = false;
+		mShotsInClip = mCurrentData.clipSize;
+	}
+
+	[Client]
+	public void CltMockFireWeaponDown()
+	{
+		if (!CanFireShotNow())
+			return;
+
+		if (!isServer)
+		{
+			// these will be overridden later
+			mRecentShotTimes.Add(currentTime);
+			mShotsSinceRelease++;
+			mShotsInClip--;
+		}
+
+		transform.Find("shot_particles").GetComponent<ParticleSystem>().Play();
+	}
+
+	[Client]
+	public void CltMockFireWeaponUp()
+	{
+		mShotsSinceRelease = 0;
 	}
 
 	#endregion

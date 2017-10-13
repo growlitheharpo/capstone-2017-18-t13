@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using FiringSquad.Data;
+using KeatsLib.Unity;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -27,7 +28,9 @@ namespace FiringSquad.Gameplay
 		public override void PreSpawnInitialize(IWeapon weapon, Ray ray, WeaponData data)
 		{
 			base.PreSpawnInitialize(weapon, ray, data);
-			transform.position = ray.origin;
+
+			Transform barrelTip = weapon.currentParts.barrel.barrelTip;
+			transform.position = barrelTip.position + barrelTip.forward;
 
 			mRigidbody.AddForce(ray.direction * mSpeed, ForceMode.Impulse);
 			mData = data;
@@ -92,6 +95,9 @@ namespace FiringSquad.Gameplay
 			mHitParticles.Play();
 			yield return new WaitForParticles(mHitParticles);
 
+			mHitParticles.transform.SetParent(transform);
+			mHitParticles.transform.ResetLocalValues();
+
 			if (!isServer)
 				yield break;
 
@@ -102,9 +108,6 @@ namespace FiringSquad.Gameplay
 		[Server]
 		private void OnEffectComplete()
 		{
-			mHitParticles.transform.SetParent(transform);
-			mHitParticles.transform.localPosition = Vector3.zero;
-
 			NetworkServer.Destroy(gameObject);
 			Destroy(gameObject);
 		}

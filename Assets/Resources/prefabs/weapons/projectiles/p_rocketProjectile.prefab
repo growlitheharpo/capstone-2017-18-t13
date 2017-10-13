@@ -43,6 +43,7 @@ GameObject:
   - component: {fileID: 4610644686884410}
   - component: {fileID: 198625216423804770}
   - component: {fileID: 199522772476914602}
+  - component: {fileID: 114734932093702880}
   m_Layer: 12
   m_Name: hit_particles
   m_TagString: Untagged
@@ -177,6 +178,19 @@ MonoBehaviour:
   mHitParticles: {fileID: 198625216423804770}
   mSpeed: 750
   mSplashDamageRadius: 1.5
+--- !u!114 &114734932093702880
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1344607804661784}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c3ef6d6a9ce886d438ff3fa83f13f4f5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mMode: 0
+  mSeconds: 0
 --- !u!114 &114862862285180558
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -189,7 +203,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_TransformSyncMode: 3
-  m_SendInterval: 0.1
+  m_SendInterval: 0.033333335
   m_SyncRotationAxis: 7
   m_RotationSyncCompression: 0
   m_SyncSpin: 0
@@ -3563,7 +3577,7 @@ ParticleSystem:
   moveWithTransform: 0
   moveWithCustomTransform: {fileID: 0}
   scalingMode: 1
-  randomSeed: -423587609
+  randomSeed: -539287968
   InitialModule:
     serializedVersion: 3
     enabled: 1

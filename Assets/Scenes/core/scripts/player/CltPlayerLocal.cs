@@ -67,12 +67,14 @@ public class CltPlayerLocal : MonoBehaviour
 
 	private void INPUT_WeaponFireHold()
 	{
+		(playerRoot.weapon as BaseWeaponScript).CltMockFireWeaponDown();
 		playerRoot.CmdWeaponFireHold();
 	}
 
 	private void INPUT_WeaponFireUp()
 	{
 		playerRoot.CmdWeaponFireUp();
+		(playerRoot.weapon as BaseWeaponScript).CltMockFireWeaponUp();
 	}
 
 	private void INPUT_WeaponReload()

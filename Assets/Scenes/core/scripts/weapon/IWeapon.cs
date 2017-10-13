@@ -39,6 +39,11 @@ namespace FiringSquad.Gameplay
 		Transform transform { get; }
 
 		/// <summary>
+		/// Get the current set of parts on this weapon
+		/// </summary>
+		WeaponPartCollection currentParts { get; }
+
+		/// <summary>
 		/// Gets the current recoil to apply to the bearer's view.
 		/// </summary>
 		float GetCurrentRecoil();
