@@ -222,5 +222,15 @@ public class NullServices
 			Logger.Info("NULL SERVICE: NullGameplayUIManager.GetProperty<T>()", Logger.System.Services);
 			return null;
 		}
+
+		public void BindProperty(int hash, BoundProperty prop)
+		{
+			Logger.Info("NULL SERVICE: NullGameplayUIManager.BindProperty()", Logger.System.Services);
+		}
+
+		public void UnbindProperty(BoundProperty prop)
+		{
+			Logger.Info("NULL SERVICE: NullGameplayUIManager.UnbindProperty()", Logger.System.Services);
+		}
 	}
 }
