@@ -1,5 +1,4 @@
-﻿using System;
-using FiringSquad.Data;
+﻿using FiringSquad.Data;
 using FiringSquad.Gameplay;
 using KeatsLib.Unity;
 using UnityEngine;
@@ -22,12 +21,15 @@ public class CltPlayer : NetworkBehaviour, IWeaponBearer, IDamageReceiver
 
 	private IPlayerHitIndicator mHitIndicator;
 
+	[SyncVar(hook="OnHealthUpdate")] private float mHealth;
+	private BoundProperty<float> mLocalHealthVar;
+
 	public override void OnStartServer()
 	{
 		// register for server events
 		mHitIndicator = new NullHitIndicator();
 
-		Debug.Log("Server!");
+		mHealth = mInformation.defaultHealth;
 
 		// create our weapon with client authority & bind
 		//BaseWeaponScript wep = new BaseWeaponScript(); // actually create it here
@@ -48,6 +50,7 @@ public class CltPlayer : NetworkBehaviour, IWeaponBearer, IDamageReceiver
 		// register anything specifically for non-local clients
 		// TODO: Make spawning hit particles done through here
 		mHitIndicator = new NullHitIndicator();
+		mLocalHealthVar = new BoundProperty<float>(mInformation.defaultHealth);
 	}
 
 	public override void OnStartLocalPlayer()
@@ -59,6 +62,7 @@ public class CltPlayer : NetworkBehaviour, IWeaponBearer, IDamageReceiver
 		localScript.playerRoot = this;
 
 		mHitIndicator = (IPlayerHitIndicator)FindObjectOfType<PlayerHitIndicator>() ?? new NullHitIndicator();
+		mLocalHealthVar = new BoundProperty<float>(mInformation.defaultHealth, GameplayUIManager.PLAYER_HEALTH);
 	}
 
 	public void BindWeaponToPlayer(BaseWeaponScript wep)
@@ -82,11 +86,13 @@ public class CltPlayer : NetworkBehaviour, IWeaponBearer, IDamageReceiver
 	[Server]
 	public void ApplyDamage(float amount, Vector3 point, Vector3 normal, IDamageSource cause)
 	{
-		throw new NotImplementedException();
+		if (ReferenceEquals(cause.source, this))
+			amount *= 0.5f;
+
+		mHealth -= amount;
 		RpcReflectDamageLocally(point, normal, cause.source.gameObject.transform.position, amount);
 	}
 
-	// TODO: Is this the best way to handle this?
 	[ClientRpc]
 	private void RpcReflectDamageLocally(Vector3 point, Vector3 normal, Vector3 origin, float amount)
 	{
@@ -123,5 +129,13 @@ public class CltPlayer : NetworkBehaviour, IWeaponBearer, IDamageReceiver
 	public void CmdDebugEquipWeaponPart(string part)
 	{
 		weapon.AttachNewPart(part);
+	}
+
+	[Client]
+	private void OnHealthUpdate(float value)
+	{
+		mHealth = value;
+		if (mLocalHealthVar != null)
+			mLocalHealthVar.value = value;
 	}
 }
