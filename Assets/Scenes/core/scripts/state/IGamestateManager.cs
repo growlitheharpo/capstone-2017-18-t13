@@ -1,4 +1,6 @@
 ﻿
+using UnityEngine.SceneManagement;
+
 /// <summary>
 /// Base interface for the Gamestate Manager service.
 /// Handles the state of the game.
@@ -17,4 +19,11 @@ public interface IGamestateManager
 	/// killing the application.
 	/// </summary>
 	void RequestShutdown();
+
+	/// <summary>
+	/// Make a request to change the current scene.
+	/// </summary>
+	/// <param name="sceneName"></param>
+	/// <param name="mode"></param>
+	IGamestateManager RequestSceneChange(string sceneName, LoadSceneMode mode = LoadSceneMode.Single);
 }

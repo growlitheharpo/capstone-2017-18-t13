@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using FiringSquad.Gameplay;
 using KeatsLib.Persistence;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using Input = KeatsLib.Unity.Input;
 
 /// <summary>
@@ -64,6 +65,12 @@ public class NullServices
 		public void RequestShutdown()
 		{
 			Logger.Info("NULL SERVICE: NullGamestateManager.RequestShutdown()", Logger.System.Services);
+		}
+
+		public IGamestateManager RequestSceneChange(string sceneName, LoadSceneMode mode = LoadSceneMode.Single)
+		{
+			Logger.Info("NULL SERVICE: NullGamestateManager.RequestSceneChange()", Logger.System.Services);
+			return this;
 		}
 
 		public bool IsFeatureEnabled(GamestateManager.Feature feat)

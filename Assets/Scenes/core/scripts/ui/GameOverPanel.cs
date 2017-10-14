@@ -9,7 +9,6 @@ namespace FiringSquad.Gameplay
 		[SerializeField] private UIText mWhoWinsText;
 		[SerializeField] private ActionProvider mRestartButton;
 		[SerializeField] private ActionProvider mQuitButton;
-		[SerializeField] private string mOverrideRestartSceneName = "";
 
 		private void Start()
 		{
@@ -30,20 +29,14 @@ namespace FiringSquad.Gameplay
 
 		private void HandleRestart()
 		{
-			if (string.IsNullOrEmpty(mOverrideRestartSceneName))
-			{
-				//EventManager.Notify(() => EventManager.RequestSceneChange(GamestateManager.BASE_WORLD));
-				//EventManager.Notify(() => EventManager.RequestSceneChange(SceneManager.GetActiveScene().name, LoadSceneMode.Additive));
-			}
-			else
-			{
-				//EventManager.Notify(() => EventManager.RequestSceneChange(mOverrideRestartSceneName));
-			}
+			//EventManager.Notify(() => EventManager.RequestSceneChange(GamestateManager.BASE_WORLD));
+			//EventManager.Notify(() => EventManager.RequestSceneChange(SceneManager.GetActiveScene().name, LoadSceneMode.Additive));
 		}
 
 		private void HandleQuit()
 		{
-			//EventManager.Notify(() => EventManager.RequestSceneChange(GamestateManager.MENU_SCENE));
+			ServiceLocator.Get<IGamestateManager>()
+				.RequestSceneChange(GamestateManager.MENU_SCENE);
 		}
 
 		private void HandleGameover(string whoWins)

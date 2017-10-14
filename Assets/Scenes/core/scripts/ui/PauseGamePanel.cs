@@ -93,7 +93,10 @@ public class PauseGamePanel : MonoBehaviour
 	
 	private void HandleQuit()
 	{
-		EventManager.Notify(EventManager.Local.TogglePause);
-		//EventManager.Notify(() => EventManager.RequestSceneChange(GamestateManager.MENU_SCENE));
+		// Call event directly so that it is handled immediately.
+		EventManager.Local.TogglePause();
+
+		ServiceLocator.Get<IGamestateManager>()
+			.RequestSceneChange(GamestateManager.MENU_SCENE);
 	}
 }

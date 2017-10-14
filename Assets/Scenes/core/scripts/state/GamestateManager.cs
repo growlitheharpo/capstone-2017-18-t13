@@ -87,13 +87,6 @@ public partial class GamestateManager : MonoSingleton<GamestateManager>, IGamest
 			{ ART_PROTOTYPE_SCENE,	new MenuSceneState() },
 			{ BASE_WORLD, new NullState() },
 		};
-
-		//EventManager.OnRequestSceneChange += ReceiveSceneChangeRequest;
-	}
-
-	private void OnDestroy()
-	{
-		//EventManager.OnRequestSceneChange -= ReceiveSceneChangeRequest;
 	}
 
 	private void Start()
@@ -102,8 +95,8 @@ public partial class GamestateManager : MonoSingleton<GamestateManager>, IGamest
 		Logger.Info("Setting current state to InitializeGameState", Logger.System.State);
 		mCurrentState.OnEnter();
 
-		/*ServiceLocator.Get<IGameConsole>()
-			.RegisterCommand("close", s => EventManager.Notify(() => EventManager.RequestSceneChange(MENU_SCENE)));*/
+		ServiceLocator.Get<IGameConsole>()
+			.RegisterCommand("close", s => RequestSceneChange(MENU_SCENE));
 	}
 
 	private void Update()
@@ -139,9 +132,10 @@ public partial class GamestateManager : MonoSingleton<GamestateManager>, IGamest
 		return mBaseStates.TryGetValue(currentScene, out result) ? result : null;
 	}
 
-	private void ReceiveSceneChangeRequest(string sceneName, LoadSceneMode mode)
+	public IGamestateManager RequestSceneChange(string sceneName, LoadSceneMode mode = LoadSceneMode.Single)
 	{
 		StartCoroutine(AttemptSceneChange(sceneName, mode));
+		return this;
 	}
 
 	private IEnumerator AttemptSceneChange(string sceneName, LoadSceneMode mode)
@@ -151,7 +145,7 @@ public partial class GamestateManager : MonoSingleton<GamestateManager>, IGamest
 
 		mCurrentState.OnExit();
 		mCurrentState = new TransitionToSceneState(sceneName, mode);
-		Logger.Info("Setting current state to TransitionToSceneState because of an event.", Logger.System.State);
+		Logger.Info("Setting current state to TransitionToSceneState because of a request.", Logger.System.State);
 		mCurrentState.OnEnter();
 	}
 }
