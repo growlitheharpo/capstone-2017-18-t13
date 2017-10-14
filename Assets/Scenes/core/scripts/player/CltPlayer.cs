@@ -22,7 +22,7 @@ public class CltPlayer : NetworkBehaviour, IWeaponBearer, IDamageReceiver
 
 	private IPlayerHitIndicator mHitIndicator;
 
-	[SyncVar(hook="OnHealthUpdate")] private float mHealth;
+	[SyncVar(hook = "OnHealthUpdate")] private float mHealth;
 	private BoundProperty<float> mLocalHealthVar;
 
 	public override void OnStartServer()
@@ -37,7 +37,7 @@ public class CltPlayer : NetworkBehaviour, IWeaponBearer, IDamageReceiver
 		BaseWeaponScript wep = Instantiate(mAssets.baseWeaponPrefab).GetComponent<BaseWeaponScript>();
 		BindWeaponToPlayer(wep);
 		AddDefaultPartsToWeapon(wep);
-		NetworkServer.Spawn(wep.gameObject);
+		NetworkServer.SpawnWithClientAuthority(wep.gameObject, gameObject);
 	}
 
 	public override void OnStartClient()
@@ -113,24 +113,6 @@ public class CltPlayer : NetworkBehaviour, IWeaponBearer, IDamageReceiver
 
 		CltPlayer p = ClientScene.FindLocalObject(playerId).GetComponent<CltPlayer>();
 		p.weapon.PlayFireEffect();
-	}
-
-	[Command]
-	public void CmdWeaponFireHold()
-	{
-		weapon.FireWeaponHold();
-	}
-
-	[Command]
-	public void CmdWeaponFireUp()
-	{
-		weapon.FireWeaponUp();
-	}
-
-	[Command]
-	public void CmdWeaponReload()
-	{
-		weapon.Reload();
 	}
 
 	[Command]
