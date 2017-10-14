@@ -113,36 +113,26 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 	// Todo: Optimize these to only send changes
 	public override bool OnSerialize(NetworkWriter writer, bool initialState)
 	{
-		// write our bearer
-		writer.Write(realBearer.netId);
-
-		writer.Write(mShotsSinceRelease);
-		writer.Write(mShotsInClip);
-
-		var partIds = mCurrentParts.allParts.Select(x => x.partId).ToArray();
-
-		/*if (isServer)
-			CleanupRecentShots();*/
-
-		// serialize our times
 		BinaryFormatter bf = new BinaryFormatter();
+		using (MemoryStream memstream = new MemoryStream())
+		{
+			// write our bearer
+			writer.Write(realBearer.netId);
 
-		MemoryStream memstream = new MemoryStream();
-		bf.Serialize(memstream, mRecentShotTimes);
-		writer.WriteBytesAndSize(memstream.ToArray(), memstream.ToArray().Length);
-		memstream.Dispose();
-
-		// serialize our part ids
-		memstream = new MemoryStream();
-		bf.Serialize(memstream, partIds);
-		writer.WriteBytesAndSize(memstream.ToArray(), memstream.ToArray().Length);
-		memstream.Dispose();
+			// serialize our part ids
+			var partIds = mCurrentParts.allParts.Select(x => x.partId).ToArray();
+			bf.Serialize(memstream, partIds);
+			writer.WriteBytesAndSize(memstream.ToArray(), memstream.ToArray().Length);
+			memstream.Dispose();
+		}
 
 		return true;
 	}
 
 	public override void OnDeserialize(NetworkReader reader, bool initialState)
 	{
+		BinaryFormatter binFormatter = new BinaryFormatter();
+
 		// read our bearer
 		NetworkInstanceId bearerId = reader.ReadNetworkId();
 		if (realBearer == null || realBearer.netId != bearerId)
@@ -152,17 +142,8 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 				bearerObj.GetComponent<CltPlayer>().BindWeaponToPlayer(this);
 		}
 
-		mShotsSinceRelease = reader.ReadInt32();
-		mShotsInClip = reader.ReadInt32();
-
-		BinaryFormatter binFormatter = new BinaryFormatter();
-
-		// read our times
-		var bytearray = reader.ReadBytesAndSize();
-		mRecentShotTimes = (List<float>)binFormatter.Deserialize(new MemoryStream(bytearray));
-
 		// read our weapon parts
-		bytearray = reader.ReadBytesAndSize();
+		var bytearray = reader.ReadBytesAndSize();
 		var partList = (string[])binFormatter.Deserialize(new MemoryStream(bytearray));
 		if (mCurrentParts == null)
 			mCurrentParts = new WeaponPartCollection();
@@ -209,7 +190,6 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 			if (mCurrentParts.mechanism == null)
 				return;
 
-			//CreateNewProjectilePool(mCurrentParts.mechanism);
 			mShotsInClip = mCurrentData.clipSize;
 		}
 	}
@@ -246,48 +226,63 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 
 		mCurrentData = start;
 	}
-
-	/*private void CreateNewProjectilePool(WeaponPartScriptMechanism mech)
-	{
-		StartCoroutine(CleanupDeadPool(mProjectilePool));
-		int count = Mathf.CeilToInt(mCurrentData.clipSize * 1.5f);
-
-		if (mCurrentParts.barrel != null)
-			count *= mCurrentParts.barrel.projectileCount;
-
-		GameObject newPrefab = mech.projectilePrefab;
-		mProjectilePool = new GameObjectPool(count, newPrefab, transform);
-	}*/
-
+	
 	#endregion
 
 	#region Reloading
 
-	[Server]
 	public void Reload()
 	{
 		if (mReloading)
 			return;
 
 		mReloading = true;
-		RpcPlayReloadEffect(mCurrentData.reloadTime);
-
+		PlayReloadEffect(mCurrentData.reloadTime);
 		Invoke("FinishReload", mCurrentData.reloadTime);
 	}
 
-	[Server]
 	private void FinishReload()
 	{
 		mShotsInClip = mCurrentData.clipSize;
 		mReloading = false;
 	}
 
+	private void PlayReloadEffect(float time)
+	{
+		AnimationUtility.PlayAnimation(gameObject, "reload");
+		StartCoroutine(WaitForReload(time));
+	}
+
+	private IEnumerator WaitForReload(float time)
+	{
+		mReloading = true;
+
+		yield return null;
+		yield return null;
+		Animator anim = GetComponent<Animator>();
+		anim.speed = 1.0f / time;
+		yield return new WaitForAnimation(anim);
+		anim.speed = 1.0f;
+
+		mReloading = false;
+		mShotsInClip = mCurrentData.clipSize;
+	}
+
 	#endregion
 
 	#region Weapon Firing
 
-	[Server]
 	public void FireWeaponHold()
+	{
+		TryFireShot();
+	}
+
+	public void FireWeaponUp()
+	{
+		mShotsSinceRelease = 0;
+	}
+
+	private void TryFireShot()
 	{
 		CleanupRecentShots();
 		if (!CanFireShotNow())
@@ -304,21 +299,23 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 
 		foreach (Ray shot in shots)
 		{
-			GameObject projectile = Instantiate(mCurrentParts.mechanism.projectilePrefab, mCurrentParts.barrel.barrelTip.position, Quaternion.identity);
-			projectile.GetComponent<IProjectile>().PreSpawnInitialize(this, shot, mCurrentData);
-			NetworkServer.Spawn(projectile);
-			projectile.GetComponent<IProjectile>().PostSpawnInitialize(this, shot, mCurrentData);
+			CmdInstantiateShot(shot.origin, shot.direction);
 		}
 
-		EventManager.Server.PlayerFiredWeapon(realBearer, shots);
-
+		//EventManager.Local.PlayerFiredWeapon(realBearer, shots);
+		PlayFireEffect();
 		OnPostFireShot();
 	}
 
-	[Server]
-	public void FireWeaponUp()
+	[Command]
+	private void CmdInstantiateShot(Vector3 origin, Vector3 direction)
 	{
-		mShotsSinceRelease = 0;
+		Ray shot = new Ray(origin, direction);
+
+		GameObject projectile = Instantiate(mCurrentParts.mechanism.projectilePrefab, mCurrentParts.barrel.barrelTip.position, Quaternion.identity);
+		projectile.GetComponent<IProjectile>().PreSpawnInitialize(this, shot, mCurrentData);
+		NetworkServer.Spawn(projectile);
+		projectile.GetComponent<IProjectile>().PostSpawnInitialize(this, shot, mCurrentData);
 	}
 
 	private bool CanFireShotNow()
@@ -333,16 +330,13 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 
 		if (mShotsInClip <= 0)
 		{
-			if (isServer)
-				Reload();
-
+			Reload();
 			return false;
 		}
 
 		return true;
 	}
 
-	[Server]
 	private Ray CalculateShotDirection(bool firstShot)
 	{
 		float dispersionFactor = GetCurrentDispersionFactor(forceNotZero: !firstShot);
@@ -352,7 +346,6 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 		return new Ray(root.position, root.forward + randomness);
 	}
 
-	[Server]
 	private float GetCurrentDispersionFactor(bool forceNotZero)
 	{
 		float percentage = 0.0f;
@@ -374,7 +367,6 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 		return Mathf.Lerp(mCurrentData.minimumDispersion, mCurrentData.maximumDispersion, percentage);
 	}
 
-	[Server]
 	private Transform GetAimRoot()
 	{
 		if (!mCurrentParts.mechanism.overrideHitscanMethod && aimRoot != null)
@@ -383,13 +375,11 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 		return mCurrentParts.barrel.barrelTip;
 	}
 
-	[Server]
 	private void OnPostFireShot()
 	{
 		DegradeDurability();
 	}
 
-	[Server]
 	private void DegradeDurability()
 	{
 		foreach (WeaponPartScript part in mCurrentParts)
@@ -403,16 +393,9 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 		}
 	}
 
-	[Server]
 	private void BreakPart(WeaponPartScript part)
 	{
-		GameObject defaultPart = bearer.defaultParts.gameObjects[part.attachPoint];
-		GameObject instance = Instantiate(defaultPart);
-
-		// TODO: override durability to infinite
-
-		instance.name = defaultPart.name;
-		// TODO: equip here
+		AttachNewPart(bearer.defaultParts[part.attachPoint].partId);
 
 		// TODO: Send "break" event here (which will then spawn particles)
 		// TODO: spawn "break" particle system here
@@ -422,7 +405,6 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 
 	#region Data Management
 	
-	[Server]
 	private void CleanupRecentShots()
 	{
 		float inverseFireRate = (1.0f / mCurrentData.fireRate) * 10.0f;
@@ -453,53 +435,7 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 
 		return value * mCurrentData.recoilAmount;
 	}
-
-	[ClientRpc]
-	private void RpcPlayReloadEffect(float time)
-	{
-		AnimationUtility.PlayAnimation(gameObject, "reload");
-		StartCoroutine(WaitForReload(time));
-	}
-
-	[Client]
-	private IEnumerator WaitForReload(float time)
-	{
-		mReloading = true;
-
-		yield return null;
-		yield return null;
-		Animator anim = GetComponent<Animator>();
-		anim.speed = 1.0f / time;
-		yield return new WaitForAnimation(anim);
-		anim.speed = 1.0f;
-
-		mReloading = false;
-		mShotsInClip = mCurrentData.clipSize;
-	}
-
-	[Client]
-	public void CltMockFireWeaponDown()
-	{
-		if (!CanFireShotNow())
-			return;
-
-		if (!isServer)
-		{
-			// these will be overridden later
-			mRecentShotTimes.Add(currentTime);
-			mShotsSinceRelease++;
-			mShotsInClip--;
-		}
-
-		PlayFireEffect();
-	}
-
-	[Client]
-	public void CltMockFireWeaponUp()
-	{
-		mShotsSinceRelease = 0;
-	}
-
+	
 	public void PlayFireEffect()
 	{
 		mShotParticles.transform.position = currentParts.barrel.barrelTip.position;
