@@ -107,7 +107,7 @@ public class CltPlayerLocal : MonoBehaviour
 
 	private void INPUT_ActivateInteract()
 	{
-		playerRoot.CmdActivateInteract();
+		playerRoot.CmdActivateInteract(playerRoot.eye.position, playerRoot.eye.forward);
 	}
 
 	private void INPUT_TogglePause()

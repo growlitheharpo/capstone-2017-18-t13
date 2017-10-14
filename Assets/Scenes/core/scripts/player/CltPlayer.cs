@@ -116,11 +116,19 @@ public class CltPlayer : NetworkBehaviour, IWeaponBearer, IDamageReceiver
 	}
 
 	[Command]
-	public void CmdActivateInteract()
+	public void CmdActivateInteract(Vector3 eyePosition, Vector3 eyeForward)
 	{
-		WeaponPickupScript obj = FindObjectOfType<WeaponPickupScript>();
-		if (obj != null)
-			obj.Interact(this);
+		IInteractable interactable;
+		RaycastHit hit;
+
+		Ray ray = new Ray(eyePosition, eyeForward);
+		if (!Physics.Raycast(ray, out hit, mInformation.interactDistance))
+			return;
+
+		interactable = hit.GetInteractableComponent();
+
+		if (interactable != null)
+			interactable.Interact(this);
 	}
 
 	[Command]
