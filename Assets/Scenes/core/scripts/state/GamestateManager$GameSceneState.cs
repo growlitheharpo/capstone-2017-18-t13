@@ -8,7 +8,7 @@ public partial class GamestateManager
 	/// State used when the game is in the game scene state.
 	/// </summary>
 	/// <inheritdoc cref="IGameState" />
-	private partial class GameSceneState : BaseStateMachine, IGameState
+	private class GameSceneState : BaseStateMachine, IGameState
 	{
 		public bool safeToTransition { get { return true; } }
 		private bool mIsPaused;
@@ -21,6 +21,8 @@ public partial class GamestateManager
 			
 			ServiceLocator.Get<IInput>().SetInputLevelState(Input.InputLevel.Gameplay | Input.InputLevel.PauseMenu, true);
 			SetCursorState(true);
+
+			TransitionStates(new InGameState(this));
 			
 			mIsPaused = false;
 		}
@@ -68,11 +70,67 @@ public partial class GamestateManager
 			return this; //we never explicitly leave
 		}
 
+		private class InGameState : BaseState<GameSceneState>
+		{
+			public InGameState(GameSceneState machine) : base(machine) { }
+
+			private float mRoundEndTime;
+			private BoundProperty<float> mRemainingTime;
+
+			public override void OnEnter()
+			{
+				EventManager.Local.OnReceiveStartEvent += OnReceiveStartEvent;
+				EventManager.Local.OnReceiveFinishEvent += OnReceiveFinishEvent;
+			}
+
+			public override void OnExit()
+			{
+				EventManager.Local.OnReceiveStartEvent -= OnReceiveStartEvent;
+				EventManager.Local.OnReceiveFinishEvent -= OnReceiveFinishEvent;
+			}
+
+			private void OnReceiveStartEvent(float obj)
+			{
+				mRoundEndTime = obj;
+				float remainingTime = Mathf.Clamp(mRoundEndTime - (float)Network.time, 0.0f, float.MaxValue);
+				mRemainingTime = new BoundProperty<float>(remainingTime, GameplayUIManager.ARENA_ROUND_TIME);
+			}
+
+			private void OnReceiveFinishEvent()
+			{
+				int myScore = ServiceLocator.Get<IGameplayUIManager>().GetProperty<int>(GameplayUIManager.PLAYER_KILLS).value;
+				int myDeaths = ServiceLocator.Get<IGameplayUIManager>().GetProperty<int>(GameplayUIManager.PLAYER_DEATHS).value;
+
+				string resultText;
+				if (myScore > myDeaths)
+					resultText = "You win!";
+				else if (myScore < myDeaths)
+					resultText = "You lost.";
+				else
+					resultText = "It's a tie!";
+
+				EventManager.Notify(() => EventManager.LocalGUI.ShowGameoverPanel(resultText));
+				ServiceLocator.Get<IInput>().DisableInputLevel(Input.InputLevel.Gameplay);
+			}
+
+			public override void Update()
+			{
+				if (mRemainingTime == null)
+					return;
+
+				float remainingTime = mRoundEndTime - (float)Network.time;
+				mRemainingTime.value = remainingTime;
+			}
+
+			public override IState GetTransition()
+			{
+				return this;
+			}
+		}
+
 		private class PausedGameState : BaseState<GameSceneState>
 		{
-			public PausedGameState(GameSceneState m) : base(m)
-			{
-			}
+			public PausedGameState(GameSceneState m) : base(m) {}
 
 			private bool mOriginalGameplayState;
 

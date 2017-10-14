@@ -27,8 +27,17 @@ public class WeaponPickupScript : NetworkBehaviour, IInteractable
 			Destroy(mRigidbody);
 	}
 
+	[ClientRpc]
+	public void RpcInitializePickupView()
+	{
+		InitializePickupView();
+	}
+
 	public void InitializePickupView()
 	{
+		if (!mGunView.activeInHierarchy && mPickupView.activeInHierarchy)
+			return;
+
 		mGunView.SetActive(false);
 		mPickupView.SetActive(true);
 

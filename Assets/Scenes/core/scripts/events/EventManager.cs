@@ -30,6 +30,20 @@ public partial class EventManager
 		{
 			OnTogglePause();
 		}
+
+		public static event Action<float> OnReceiveStartEvent = t => { LogEvent(); };
+
+		public static void ReceiveStartEvent(float endTime)
+		{
+			OnReceiveStartEvent(endTime);
+		}
+
+		public static event Action OnReceiveFinishEvent = () => { LogEvent(); };
+
+		public static void ReceiveFinishEvent()
+		{
+			OnReceiveFinishEvent();
+		}
 	}
 
 	public static class LocalGUI
@@ -88,6 +102,20 @@ public partial class EventManager
 		public static void PlayerDied(CltPlayer deadPlayer, CltPlayer killer, Transform respawnPosition)
 		{
 			OnPlayerDied(deadPlayer, killer, respawnPosition);
+		}
+
+		public static event Action<double> OnStartGame = d => { LogEvent(); };
+
+		public static void StartGame(double endTime)
+		{
+			OnStartGame(endTime);
+		}
+
+		public static event Action OnFinishGame = () => { LogEvent(); };
+
+		public static void FinishGame()
+		{
+			OnFinishGame();
 		}
 	}
 

@@ -37,6 +37,9 @@ public class CltPlayer : NetworkBehaviour, IWeaponBearer, IDamageReceiver
 		EventManager.Server.OnPlayerFiredWeapon += OnPlayerFiredWeapon;
 		EventManager.Server.OnPlayerDied += OnPlayerDied;
 
+		EventManager.Server.OnStartGame += OnStartGame;
+		EventManager.Server.OnFinishGame += OnFinishGame;
+
 		mHitIndicator = new NullHitIndicator();
 		mHealth = mInformation.defaultHealth;
 
@@ -119,6 +122,19 @@ public class CltPlayer : NetworkBehaviour, IWeaponBearer, IDamageReceiver
 			mKills++;
 	}
 
+	[Server][EventHandler]
+	private void OnStartGame(double gameEndTime)
+	{
+		RpcHandleStartGame((float)gameEndTime);
+	}
+
+	[Server][EventHandler]
+	private void OnFinishGame()
+	{
+		RpcHandleFinishGame();
+	}
+
+
 	[Command]
 	public void CmdActivateInteract(Vector3 eyePosition, Vector3 eyeForward)
 	{
@@ -161,6 +177,12 @@ public class CltPlayer : NetworkBehaviour, IWeaponBearer, IDamageReceiver
 	}
 
 	[ClientRpc]
+	private void RpcHandleStartGame(float gameEndTime)
+	{
+		EventManager.Notify(() => EventManager.Local.ReceiveStartEvent(gameEndTime));
+	}
+
+	[ClientRpc]
 	private void RpcReflectDamageLocally(Vector3 point, Vector3 normal, Vector3 origin, float amount)
 	{
 		mHitIndicator.NotifyHit(this, origin, amount);
@@ -180,6 +202,12 @@ public class CltPlayer : NetworkBehaviour, IWeaponBearer, IDamageReceiver
 	private void RpcResetPlayerValues(Vector3 position, Quaternion rotation)
 	{
 		ResetPlayerValues(position, rotation);
+	}
+
+	[ClientRpc]
+	private void RpcHandleFinishGame()
+	{
+		EventManager.Notify(EventManager.Local.ReceiveFinishEvent);
 	}
 
 	[ClientRpc]

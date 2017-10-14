@@ -119,7 +119,7 @@ namespace FiringSquad.Gameplay
 						player.MoveToStartPosition(target.position, target.rotation);
 					}
 				}
-
+				
 				public override IState GetTransition()
 				{
 					return new GameRunningState(mMachine);
@@ -130,9 +130,20 @@ namespace FiringSquad.Gameplay
 			{
 				public GameRunningState(ServerStateMachine machine) : base(machine) { }
 
+				private double mEndTime;
+
 				public override void OnEnter()
 				{
+					mEndTime = mMachine.mScript.mRoundTime + Network.time;
+					EventManager.Notify(() => EventManager.Server.StartGame(mEndTime));
+
 					EventManager.Server.OnPlayerHealthHitsZero += OnPlayerHealthHitsZero;
+				}
+
+				public override void Update()
+				{
+					if (Network.time >= mEndTime)
+						EventManager.Server.FinishGame();
 				}
 
 				public override void OnExit()
@@ -151,7 +162,7 @@ namespace FiringSquad.Gameplay
 
 				public override IState GetTransition()
 				{
-					return this;
+					return (Network.time >= mEndTime) ? (IState)new WaitingForConnectionState(mMachine) : this;
 				}
 			}
 		}

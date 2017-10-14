@@ -99,6 +99,8 @@ namespace FiringSquad.Gameplay
 			instance.GetComponent<Rigidbody>().AddForce(direction.normalized * 20.0f, ForceMode.Impulse);
 			NetworkServer.Spawn(instance);
 
+			instance.GetComponent<WeaponPickupScript>().RpcInitializePickupView();
+
 			return instance;
 		}
 
