@@ -72,6 +72,11 @@ public class CltPlayer : NetworkBehaviour, IWeaponBearer, IDamageReceiver
 		mLocalHealthVar = new BoundProperty<float>(mInformation.defaultHealth, GameplayUIManager.PLAYER_HEALTH);
 		mLocalKillsVar = new BoundProperty<int>(0, GameplayUIManager.PLAYER_KILLS);
 		mLocalDeathsVar = new BoundProperty<int>(0, GameplayUIManager.PLAYER_DEATHS);
+
+		StartCoroutine(Coroutines.WaitOneFrame(() =>
+		{
+			(weapon as BaseWeaponScript).BindPropertiesToUI();
+		}));
 	}
 
 	public void BindWeaponToPlayer(BaseWeaponScript wep)

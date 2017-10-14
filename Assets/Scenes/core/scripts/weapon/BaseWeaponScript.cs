@@ -64,7 +64,7 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 	private float timePerShot { get { return 1.0f / mCurrentData.fireRate; } }
 
 	private bool mReloading;
-	private int mShotsInClip;
+	private BoundProperty<int> mShotsInClip, mTotalClipSize;
 	private int mShotsSinceRelease;
 	private List<float> mRecentShotTimes;
 	private ParticleSystem mShotParticles;
@@ -86,7 +86,15 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 			{ Attachment.Grip, mGripAttach },
 		};
 
+		mShotsInClip = new BoundProperty<int>();
+		mTotalClipSize = new BoundProperty<int>();
 		mShotParticles = transform.Find("shot_particles").GetComponent<ParticleSystem>();
+	}
+
+	public void BindPropertiesToUI()
+	{
+		mShotsInClip = new BoundProperty<int>(mShotsInClip == null ? 0 : mShotsInClip.value, GameplayUIManager.CLIP_CURRENT);
+		mTotalClipSize = new BoundProperty<int>(mTotalClipSize == null ? 0 : mTotalClipSize.value, GameplayUIManager.CLIP_TOTAL);
 	}
 
 	// [Client] AND [Server]
@@ -196,7 +204,8 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 			if (mCurrentParts.mechanism == null)
 				return;
 
-			mShotsInClip = mCurrentData.clipSize;
+			mShotsInClip.value = mCurrentData.clipSize;
+			mTotalClipSize.value = mCurrentData.clipSize;
 		}
 	}
 
@@ -249,7 +258,7 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 
 	private void FinishReload()
 	{
-		mShotsInClip = mCurrentData.clipSize;
+		mShotsInClip.value = mCurrentData.clipSize;
 		mReloading = false;
 	}
 
@@ -271,7 +280,7 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 		anim.speed = 1.0f;
 
 		mReloading = false;
-		mShotsInClip = mCurrentData.clipSize;
+		mShotsInClip.value = mCurrentData.clipSize;
 	}
 
 	#endregion
@@ -301,7 +310,7 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 
 		mRecentShotTimes.Add(currentTime);
 		mShotsSinceRelease++;
-		mShotsInClip--;
+		mShotsInClip.value--;
 
 		foreach (Ray shot in shots)
 			CmdInstantiateShot(shot.origin, shot.direction);
@@ -332,7 +341,7 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 		if (barrel == null || (barrel.shotsPerClick > 0 && mShotsSinceRelease >= barrel.shotsPerClick))
 			return false;
 
-		if (mShotsInClip <= 0)
+		if (mShotsInClip.value <= 0)
 		{
 			Reload();
 			return false;
