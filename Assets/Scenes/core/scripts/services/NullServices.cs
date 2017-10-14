@@ -87,6 +87,7 @@ public class NullServices
 		public void InitializeDatabase()
 		{
 			Logger.Info("NULL SERVICE: IAudioManager.InitializeDatabase()", Logger.System.Services);
+			EventManager.Notify(EventManager.InitialAudioLoadComplete);
 		}
 
 		public IAudioReference PlaySound(AudioManager.AudioEvent e, IAudioProfile profile, Transform location)
