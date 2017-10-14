@@ -25,8 +25,11 @@ public class CltPlayer : NetworkBehaviour, IWeaponBearer, IDamageReceiver
 	[SyncVar(hook = "OnHealthUpdate")] private float mHealth;
 	private BoundProperty<float> mLocalHealthVar;
 
-	[SyncVar] private int mKills;
-	[SyncVar] private int mDeaths;
+	[SyncVar(hook = "OnKillsUpdate")] private int mKills;
+	private BoundProperty<int> mLocalKillsVar;
+
+	[SyncVar(hook = "OnDeathsUpdate")] private int mDeaths;
+	private BoundProperty<int> mLocalDeathsVar;
 
 	public override void OnStartServer()
 	{
@@ -67,6 +70,8 @@ public class CltPlayer : NetworkBehaviour, IWeaponBearer, IDamageReceiver
 
 		mHitIndicator = (IPlayerHitIndicator)FindObjectOfType<PlayerHitIndicator>() ?? new NullHitIndicator();
 		mLocalHealthVar = new BoundProperty<float>(mInformation.defaultHealth, GameplayUIManager.PLAYER_HEALTH);
+		mLocalKillsVar = new BoundProperty<int>(0, GameplayUIManager.PLAYER_KILLS);
+		mLocalDeathsVar = new BoundProperty<int>(0, GameplayUIManager.PLAYER_DEATHS);
 	}
 
 	public void BindWeaponToPlayer(BaseWeaponScript wep)
@@ -200,5 +205,21 @@ public class CltPlayer : NetworkBehaviour, IWeaponBearer, IDamageReceiver
 		mHealth = value;
 		if (mLocalHealthVar != null)
 			mLocalHealthVar.value = value;
+	}
+
+	[Client]
+	private void OnKillsUpdate(int value)
+	{
+		mKills = value;
+		if (mLocalKillsVar != null)
+			mLocalKillsVar.value = value;
+	}
+
+	[Client]
+	private void OnDeathsUpdate(int value)
+	{
+		mDeaths = value;
+		if (mLocalDeathsVar != null)
+			mLocalDeathsVar.value = value;
 	}
 }
