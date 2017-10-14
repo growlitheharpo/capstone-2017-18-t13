@@ -67,19 +67,17 @@ public class CltPlayerLocal : MonoBehaviour
 
 	private void INPUT_WeaponFireHold()
 	{
-		(playerRoot.weapon as BaseWeaponScript).CltMockFireWeaponDown();
-		playerRoot.CmdWeaponFireHold();
+		playerRoot.weapon.FireWeaponHold();
 	}
 
 	private void INPUT_WeaponFireUp()
 	{
-		playerRoot.CmdWeaponFireUp();
-		(playerRoot.weapon as BaseWeaponScript).CltMockFireWeaponUp();
+		playerRoot.weapon.FireWeaponUp();
 	}
 
 	private void INPUT_WeaponReload()
 	{
-		playerRoot.CmdWeaponReload();
+		playerRoot.weapon.Reload();
 	}
 
 	private void INPUT_ActivateInteract()
@@ -96,5 +94,6 @@ public class CltPlayerLocal : MonoBehaviour
 	{
 		AudioListener.volume = data.masterVolume;
 		// TODO: Apply camera FOV
+		playerRoot.gameObject.GetComponentInChildren<Camera>().fieldOfView = data.fieldOfView;
 	}
 }
