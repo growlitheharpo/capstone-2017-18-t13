@@ -6,6 +6,9 @@ namespace FiringSquad.Gameplay
 	{
 		public override BaseWeaponScript.Attachment attachPoint { get { return BaseWeaponScript.Attachment.Mechanism; } }
 
+		[SerializeField] private AudioProfile mAudioOverride;
+		public AudioProfile audioOverride { get { return mAudioOverride; } }
+
 		[SerializeField] private GameObject mProjectilePrefab;
 		public GameObject projectilePrefab { get { return mProjectilePrefab; } }
 

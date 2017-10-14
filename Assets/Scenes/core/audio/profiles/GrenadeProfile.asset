@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9ef86b9d3e9a60b4bb9c755363f4bce5, type: 3}
+  m_Name: GrenadeProfile
+  m_EditorClassIdentifier: 
+  mParent: {fileID: 11400000, guid: 4bd979dee78bfff48a35481c999b1209, type: 2}
+  mId: GrenadeProfile
+  mProfile: 0
+  mClipsArray:
+  - mEvent: 20
+    mClips:
+    - {fileID: 11400000, guid: 3d89d8b43bee1f542bc7f75c41cd8319, type: 2}
+  - mEvent: 60
+    mClips:
+    - {fileID: 11400000, guid: e7ebd923a31c13b4d80d1f7085e0ce42, type: 2}
+  - mEvent: 65
+    mClips:
+    - {fileID: 11400000, guid: e7ebd923a31c13b4d80d1f7085e0ce42, type: 2}
+  - mEvent: 70
+    mClips:
+    - {fileID: 11400000, guid: e7ebd923a31c13b4d80d1f7085e0ce42, type: 2}
+  - mEvent: 15
+    mClips:
+    - {fileID: 11400000, guid: 0e83335fbcc2c8741bd0adb95c68568e, type: 2}

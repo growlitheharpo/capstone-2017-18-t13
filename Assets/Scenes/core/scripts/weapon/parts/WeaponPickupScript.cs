@@ -1,84 +1,79 @@
-﻿using System.Collections;
+﻿using System;
+using FiringSquad.Gameplay;
 using KeatsLib.Unity;
 using UnityEngine;
 using UnityEngine.Networking;
 
-namespace FiringSquad.Gameplay
+public class WeaponPickupScript : NetworkBehaviour, IInteractable
 {
-	public class WeaponPickupScript : NetworkBehaviour, IInteractable
+	[SerializeField] private GameObject mGunView;
+	[SerializeField] private GameObject mPickupView;
+
+	private Rigidbody mRigidbody;
+
+	private void Awake()
 	{
-		[SerializeField] private float mPickupScale = 2.0f;
-		[SerializeField] private Collider mPickupCollider;
+		mRigidbody = GetComponent<Rigidbody>();
+	}
 
-		public BaseWeaponScript.Attachment attachPoint { get { return mPart.attachPoint; } }
+	private void OnDestroy()
+	{
+		DestroyPickupView();
+
+		transform.ResetLocalValues();
+		mGunView.transform.ResetLocalValues();
 		
-		private Rigidbody mPickupRigidbody;
-		private WeaponPartScript mPart;
+		if (mRigidbody != null)
+			Destroy(mRigidbody);
+	}
 
-		private Transform mView, mRotator;
+	[ClientRpc]
+	public void RpcInitializePickupView()
+	{
+		InitializePickupView();
+	}
 
-		private void Awake()
+	public void InitializePickupView()
+	{
+		if (!mGunView.activeInHierarchy && mPickupView.activeInHierarchy)
+			return;
+
+		mGunView.SetActive(false);
+		mPickupView.SetActive(true);
+
+		GameObject psPrefab = Resources.Load<GameObject>("prefabs/weapons/effects/p_pickupEffectPack");
+		GameObject ps = Instantiate(psPrefab);
+
+		ps.transform.SetParent(mPickupView.transform);
+		ps.transform.ResetLocalValues();
+	}
+
+	public void DestroyPickupView()
+	{
+		mGunView.SetActive(true);
+
+		if (mPickupView != null)
+			Destroy(mPickupView);
+	}
+
+	[Server]
+	public void Interact(ICharacter source)
+	{
+		IWeaponBearer wepBearer = source as IWeaponBearer;
+		if (wepBearer == null)
+			return;
+
+		try
 		{
-			mPickupRigidbody = GetComponent<Rigidbody>();
-			mPart = GetComponent<WeaponPartScript>();
-			mView = transform.Find("View");
-
-			mRotator = new GameObject("Rotator", typeof(RotatorUtilityScript)).transform;
-			mRotator.SetParent(transform, false);
+			NetworkServer.Destroy(gameObject);
+		}
+		catch (Exception e)
+		{
+			Console.WriteLine(e);
 		}
 
-		private void Start()
-		{
-			StartCoroutine(Coroutines.InvokeAfterFrames(3, () =>
-			{
-				transform.localScale = Vector3.one * mPickupScale;
+		Destroy(gameObject);
 
-				GameObject psPrefab = Resources.Load<GameObject>("prefabs/weapons/effects/p_pickupEffectPack");
-				GameObject ps = Instantiate(psPrefab);
-
-				ps.transform.SetParent(mPickupCollider.transform, false);
-				ps.transform.position = mPickupCollider.bounds.center;
-
-				mRotator.position = mPickupCollider.bounds.center;
-				mView.SetParent(mRotator, true);
-			}));
-		}
-
-		private void OnDestroy()
-		{
-			StopAllCoroutines();
-			mView.SetParent(transform);
-			mView.localPosition = Vector3.zero;
-			mView.localRotation = Quaternion.identity;
-			mView.localScale = Vector3.one;
-
-			Destroy(mRotator.gameObject);
-		}
-		
-		public void Interact(ICharacter source)
-		{
-			PlayerScript bearer = source as PlayerScript;
-
-			if (bearer != null)
-				bearer.CmdPickupNewPart(netId, this.name);
-		}
-
-		public WeaponPickupScript OverrideDurability(int value)
-		{
-			mPart.durability = value;
-			return this;
-		}
-		
-		public void ConfirmAttach(IWeapon weapon)
-		{
-			Destroy(mPickupCollider.gameObject);
-			Destroy(mPickupRigidbody);
-
-			StartCoroutine(Coroutines.WaitOneFrame(() =>
-			{
-				weapon.AttachNewPart(mPart);
-				Destroy(this);
-			}));
-		}
+		wepBearer.weapon.AttachNewPart(GetComponent<WeaponPartScript>().partId);
 	}
 }

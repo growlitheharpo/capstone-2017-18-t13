@@ -124,6 +124,10 @@ namespace KeatsLib.Unity
 		public IInput RegisterInput<T>(Func<T, bool> method, T key, Action command, InputLevel level, bool allowOtherKeys = true)
 		{
 			Logger.Info("Registering " + command.Method.Name + " as a new input on key " + key + ".", Logger.System.Input);
+
+			if (command.Method.Name.Contains("Cmd") || command.Method.Name.Contains("Rpc"))
+				throw new ArgumentException("It is forbidden to bind network calls directly to the input system!", "command");
+
 			var newInput = new InputMap<T>(method, key, level);
 			ClearInputFromOtherCommands(newInput);
 

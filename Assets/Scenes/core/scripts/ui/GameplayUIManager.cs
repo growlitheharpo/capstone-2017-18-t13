@@ -19,31 +19,7 @@ public class GameplayUIManager : MonoSingleton<GameplayUIManager>, IGameplayUIMa
 		base.Awake();
 		mPropertyMap = new Dictionary<int, WeakReference>();
 	}
-
-	private void Start()
-	{
-		EventManager.OnBoundPropertyCreated += BoundPropertyCreated;
-		EventManager.OnBoundPropertyDestroyed += BoundPropertyDestroyed;
-	}
-
-	private void OnDestroy()
-	{
-		EventManager.OnBoundPropertyCreated -= BoundPropertyCreated;
-		EventManager.OnBoundPropertyDestroyed -= BoundPropertyDestroyed;
-	}
-
-	private void BoundPropertyCreated(BoundProperty boundProperty, int i)
-	{
-		mPropertyMap[i] = new WeakReference(boundProperty);
-	}
-
-	private void BoundPropertyDestroyed(BoundProperty obj)
-	{
-		var keys = mPropertyMap.Where(x => ReferenceEquals(x.Value.Target, obj)).Select(x => x.Key).ToArray();
-		foreach (int key in keys)
-			mPropertyMap.Remove(key);
-	}
-
+	
 	public BoundProperty<T> GetProperty<T>(int hash)
 	{
 		if (!mPropertyMap.ContainsKey(hash))
@@ -55,5 +31,21 @@ public class GameplayUIManager : MonoSingleton<GameplayUIManager>, IGameplayUIMa
 
 		mPropertyMap.Remove(hash);
 		return null;
+	}
+
+	public void BindProperty(int hash, BoundProperty prop)
+	{
+		mPropertyMap[hash] = new WeakReference(prop);
+	}
+
+	public void UnbindProperty(BoundProperty obj)
+	{
+		var keys = mPropertyMap
+			.Where(x => ReferenceEquals(x.Value.Target, obj))
+			.Select(x => x.Key)
+			.ToArray();
+
+		foreach (int key in keys)
+			mPropertyMap.Remove(key);
 	}
 }

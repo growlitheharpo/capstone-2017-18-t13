@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using FiringSquad.Gameplay;
 using KeatsLib.Persistence;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using Input = KeatsLib.Unity.Input;
 
 /// <summary>
@@ -27,8 +29,34 @@ public class NullServices
 			return new NullGamestateManager() as T;
 		if (typeof(T) == typeof(IGameplayUIManager))
 			return new NullGameplayUIManager() as T;
+		if (typeof(T) == typeof(IWeaponPartManager))
+			return new NullWeaponPartManager() as T;
 
 		return null;
+	}
+
+	public class NullWeaponPartManager : IWeaponPartManager
+	{
+		public GameObject GetPartPrefab(string id)
+		{
+			Logger.Info("NULL SERVICE: NullWeaponPartManager.GetPartPrefab()", Logger.System.Services);
+			return null;
+		}
+
+		public GameObject this[string index]
+		{
+			get
+			{
+				Logger.Info("NULL SERVICE: NullWeaponPartManager[partId]", Logger.System.Services);
+				return null;
+			}
+		}
+
+		public Dictionary<string, GameObject> GetAllPrefabs(bool includeDebug)
+		{
+			Logger.Info("NULL SERVICE: NullWeaponPartManager.GetAllPrefabs()", Logger.System.Services);
+			return new Dictionary<string, GameObject>();
+		}
 	}
 
 	private class NullGamestateManager : IGamestateManager
@@ -37,6 +65,12 @@ public class NullServices
 		public void RequestShutdown()
 		{
 			Logger.Info("NULL SERVICE: NullGamestateManager.RequestShutdown()", Logger.System.Services);
+		}
+
+		public IGamestateManager RequestSceneChange(string sceneName, LoadSceneMode mode = LoadSceneMode.Single)
+		{
+			Logger.Info("NULL SERVICE: NullGamestateManager.RequestSceneChange()", Logger.System.Services);
+			return this;
 		}
 
 		public bool IsFeatureEnabled(GamestateManager.Feature feat)
@@ -60,6 +94,7 @@ public class NullServices
 		public void InitializeDatabase()
 		{
 			Logger.Info("NULL SERVICE: IAudioManager.InitializeDatabase()", Logger.System.Services);
+			EventManager.Notify(EventManager.InitialAudioLoadComplete);
 		}
 
 		public IAudioReference PlaySound(AudioManager.AudioEvent e, IAudioProfile profile, Transform location)
@@ -194,6 +229,16 @@ public class NullServices
 		{
 			Logger.Info("NULL SERVICE: NullGameplayUIManager.GetProperty<T>()", Logger.System.Services);
 			return null;
+		}
+
+		public void BindProperty(int hash, BoundProperty prop)
+		{
+			Logger.Info("NULL SERVICE: NullGameplayUIManager.BindProperty()", Logger.System.Services);
+		}
+
+		public void UnbindProperty(BoundProperty prop)
+		{
+			Logger.Info("NULL SERVICE: NullGameplayUIManager.UnbindProperty()", Logger.System.Services);
 		}
 	}
 }

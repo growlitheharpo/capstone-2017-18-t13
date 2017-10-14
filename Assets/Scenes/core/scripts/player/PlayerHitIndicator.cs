@@ -8,12 +8,12 @@ namespace FiringSquad.Gameplay
 {
 	public interface IPlayerHitIndicator
 	{
-		void NotifyHit(ICharacter receiver, ICharacter source, float amount);
+		void NotifyHit(ICharacter receiver, Vector3 sourcePosition, float amount);
 	}
 
 	public class NullHitIndicator : IPlayerHitIndicator
 	{
-		public void NotifyHit(ICharacter receiver, ICharacter source, float amount)
+		public void NotifyHit(ICharacter receiver, Vector3 sourcePosition, float amount)
 		{
 			// Do nothing
 		}
@@ -58,23 +58,23 @@ namespace FiringSquad.Gameplay
 			t.offsetMin = Vector2.zero;
 		}
 
-		public void NotifyHit(ICharacter receiver, ICharacter source, float amount)
+		public void NotifyHit(ICharacter receiver, Vector3 sourcePosition, float amount)
 		{
 			if (mIndicatorPool.usePercentage >= 1.0f)
 				return;
 
-			SpawnHitIndicator(receiver, source, amount);
+			SpawnHitIndicator(receiver, sourcePosition, amount);
 			FlashScreenVignette();
 		}
 
-		private void SpawnHitIndicator(ICharacter receiver, ICharacter source, float amount)
+		private void SpawnHitIndicator(ICharacter receiver, Vector3 sourcePosition, float amount)
 		{
 			GameObject newObj = mIndicatorPool.ReleaseNewItem();
 			RectTransform t = newObj.GetComponent<RectTransform>().ResetEverything(100.0f);
 
 			Vector3 cam = receiver.gameObject.transform.forward;
 			Vector3 a = receiver.gameObject.transform.position;
-			Vector3 b = source.gameObject.transform.position;
+			Vector3 b = sourcePosition;
 			Vector3 dir = b - a;
 
 			cam = new Vector3(cam.x, 0.0f, cam.z);

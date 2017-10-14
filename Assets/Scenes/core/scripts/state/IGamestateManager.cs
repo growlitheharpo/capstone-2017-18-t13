@@ -1,4 +1,6 @@
 ﻿
+using UnityEngine.SceneManagement;
+
 /// <summary>
 /// Base interface for the Gamestate Manager service.
 /// Handles the state of the game.
@@ -19,7 +21,9 @@ public interface IGamestateManager
 	void RequestShutdown();
 
 	/// <summary>
-	/// Returns whether or not a feature is currently enabled. For prototyping only.
+	/// Make a request to change the current scene.
 	/// </summary>
-	bool IsFeatureEnabled(GamestateManager.Feature feat);
+	/// <param name="sceneName"></param>
+	/// <param name="mode"></param>
+	IGamestateManager RequestSceneChange(string sceneName, LoadSceneMode mode = LoadSceneMode.Single);
 }

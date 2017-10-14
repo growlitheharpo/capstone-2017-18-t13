@@ -7,9 +7,7 @@ namespace FiringSquad.Data
 	public class PlayerDefaultsData
 	{
 		[Header("Weapons")]
-		[SerializeField] private GameObject mGravityGunPrefab;
-		[SerializeField] private GameObject mBaseWeaponPrefab;
-		[SerializeField] private WeaponDefaultsData mDefaultWeaponParts;
+		[SerializeField] private WeaponPartCollection mDefaultWeaponParts;
 
 		[Header("Base Data")]
 		[SerializeField] private float mInteractDistance;
@@ -20,9 +18,7 @@ namespace FiringSquad.Data
 		[SerializeField] private bool mShouldInstantiateGravityGun = true;
 		[SerializeField] private bool mInstantiateParts = true;
 
-		public GameObject gravityGunPrefab { get { return mGravityGunPrefab; } }
-		public GameObject baseWeaponPrefab { get { return mBaseWeaponPrefab; } }
-		public WeaponDefaultsData defaultWeaponParts { get { return mDefaultWeaponParts; } }
+		public WeaponPartCollection defaultWeaponParts { get { return mDefaultWeaponParts; } }
 		public float interactDistance { get { return mInteractDistance; } }
 		public float defaultHealth { get { return mDefaultHealth; } }
 
