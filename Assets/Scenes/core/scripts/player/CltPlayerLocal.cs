@@ -14,15 +14,21 @@ public class CltPlayerLocal : MonoBehaviour
 
 	public CltPlayer playerRoot { get; set; }
 
+	private Camera mCameraRef;
+	private Vector3 mCameraOriginalPos;
+	private Quaternion mCameraOriginalRot;
+
 	// Use this for initialization
 	private void Start()
 	{
 		ServiceLocator.Get<IInput>()
+			// networked
 			.RegisterInput(Input.GetButton, inputMap.fireWeaponButton, INPUT_WeaponFireHold, InputLevel.Gameplay)
 			.RegisterInput(Input.GetButtonUp, inputMap.fireWeaponButton, INPUT_WeaponFireUp, InputLevel.Gameplay)
 			.RegisterInput(Input.GetButtonDown, inputMap.reloadButton, INPUT_WeaponReload, InputLevel.Gameplay)
 			.RegisterInput(Input.GetButtonDown, inputMap.interactButton, INPUT_ActivateInteract, InputLevel.Gameplay)
 
+			// local
 			.RegisterInput(Input.GetButtonDown, inputMap.pauseButton, INPUT_TogglePause, InputLevel.PauseMenu);
 
 		SetupCamera();
@@ -33,24 +39,37 @@ public class CltPlayerLocal : MonoBehaviour
 
 	private void OnDestroy()
 	{
+		EventManager.Local.OnApplyOptionsData -= ApplyOptionsData;
+		CleanupUI();
+		CleanupCamera();
+
 		ServiceLocator.Get<IInput>()
+			// networked
 			.UnregisterInput(INPUT_WeaponFireHold)
 			.UnregisterInput(INPUT_WeaponFireUp)
 			.UnregisterInput(INPUT_WeaponReload)
 			.UnregisterInput(INPUT_ActivateInteract)
 
+			// local
 			.UnregisterInput(INPUT_TogglePause);
-
-		EventManager.Local.OnApplyOptionsData -= ApplyOptionsData;
-		CleanupUI();
-		CleanupCamera();
 	}
 
 	private void SetupCamera()
 	{
-		Camera c = (Camera.main ?? FindObjectOfType<Camera>()) ?? Instantiate(mCameraPrefab).GetComponent<Camera>();
-		c.transform.SetParent(playerRoot.eye, false);
-		c.transform.ResetLocalValues();
+		mCameraRef = Camera.main ?? FindObjectOfType<Camera>();
+		if (mCameraRef == null)
+		{
+			mCameraRef = Instantiate(mCameraPrefab).GetComponent<Camera>();
+			mCameraOriginalPos = Vector3.one * -1.0f;
+		}
+		else
+		{
+			mCameraOriginalPos = mCameraRef.transform.position;
+			mCameraOriginalRot = mCameraRef.transform.rotation;
+		}
+
+		mCameraRef.transform.SetParent(playerRoot.eye, false);
+		mCameraRef.transform.ResetLocalValues();
 	}
 
 	private void SetupUI()
@@ -59,6 +78,12 @@ public class CltPlayerLocal : MonoBehaviour
 
 	private void CleanupCamera()
 	{
+		if (mCameraOriginalPos == Vector3.one * -1.0f)
+			return;
+
+		mCameraRef.transform.SetParent(null);
+		mCameraRef.transform.position = mCameraOriginalPos;
+		mCameraRef.transform.rotation = mCameraOriginalRot;
 	}
 
 	private void CleanupUI()
@@ -94,6 +119,6 @@ public class CltPlayerLocal : MonoBehaviour
 	{
 		AudioListener.volume = data.masterVolume;
 		// TODO: Apply camera FOV
-		playerRoot.gameObject.GetComponentInChildren<Camera>().fieldOfView = data.fieldOfView;
+		mCameraRef.fieldOfView = data.fieldOfView;
 	}
 }
