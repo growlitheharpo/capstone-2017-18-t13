@@ -83,36 +83,11 @@ public class CltPlayer : NetworkBehaviour, IWeaponBearer, IDamageReceiver
 			wep.AttachNewPart(part.partId, true);
 	}
 
-	[Server]
-	public void ApplyDamage(float amount, Vector3 point, Vector3 normal, IDamageSource cause)
-	{
-		if (ReferenceEquals(cause.source, this))
-			amount *= 0.5f;
-
-		mHealth -= amount;
-		RpcReflectDamageLocally(point, normal, cause.source.gameObject.transform.position, amount);
-	}
-
-	[ClientRpc]
-	private void RpcReflectDamageLocally(Vector3 point, Vector3 normal, Vector3 origin, float amount)
-	{
-		mHitIndicator.NotifyHit(this, origin, amount);
-	}
-
+	[Server][EventHandler]
 	private void OnPlayerFiredWeapon(CltPlayer p, List<Ray> shots)
 	{
 		if (p != this)
 			RpcReflectPlayerShotWeapon(p.netId);
-	}
-
-	[ClientRpc]
-	private void RpcReflectPlayerShotWeapon(NetworkInstanceId playerId)
-	{
-		if (playerId == netId)
-			return;
-
-		CltPlayer p = ClientScene.FindLocalObject(playerId).GetComponent<CltPlayer>();
-		p.weapon.PlayFireEffect();
 	}
 
 	[Command]
@@ -135,6 +110,45 @@ public class CltPlayer : NetworkBehaviour, IWeaponBearer, IDamageReceiver
 	public void CmdDebugEquipWeaponPart(string part)
 	{
 		weapon.AttachNewPart(part);
+	}
+
+	[Server]
+	public void ApplyDamage(float amount, Vector3 point, Vector3 normal, IDamageSource cause)
+	{
+		if (ReferenceEquals(cause.source, this))
+			amount *= 0.5f;
+
+		mHealth -= amount;
+		RpcReflectDamageLocally(point, normal, cause.source.gameObject.transform.position, amount);
+	}
+
+	[Server]
+	private void MoveToStartPosition(Vector3 position, Quaternion rotation)
+	{
+		RpcMoveToStartPosition(position, rotation);
+	}
+
+	[ClientRpc]
+	private void RpcReflectDamageLocally(Vector3 point, Vector3 normal, Vector3 origin, float amount)
+	{
+		mHitIndicator.NotifyHit(this, origin, amount);
+	}
+
+	[ClientRpc]
+	private void RpcReflectPlayerShotWeapon(NetworkInstanceId playerId)
+	{
+		if (playerId == netId)
+			return;
+
+		CltPlayer p = ClientScene.FindLocalObject(playerId).GetComponent<CltPlayer>();
+		p.weapon.PlayFireEffect();
+	}
+
+	[ClientRpc]
+	private void RpcMoveToStartPosition(Vector3 position, Quaternion rotation)
+	{
+		transform.position = position;
+		transform.rotation = rotation;
 	}
 
 	[Client]
