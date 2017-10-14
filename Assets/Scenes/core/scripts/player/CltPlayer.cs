@@ -123,7 +123,7 @@ public class CltPlayer : NetworkBehaviour, IWeaponBearer, IDamageReceiver
 	}
 
 	[Server]
-	private void MoveToStartPosition(Vector3 position, Quaternion rotation)
+	public void MoveToStartPosition(Vector3 position, Quaternion rotation)
 	{
 		RpcMoveToStartPosition(position, rotation);
 	}

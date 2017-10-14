@@ -1,5 +1,4 @@
 ﻿using FiringSquad.Gameplay;
-using UnityEngine;
 using UnityEngine.Networking;
 
 public class NetworkGameManager : NetworkManager
@@ -11,13 +10,13 @@ public class NetworkGameManager : NetworkManager
 		base.OnServerAddPlayer(conn, playerControllerId);
 		mPlayerCount += 1;
 
-		if (mPlayerCount == 2)
-			FindObjectOfType<NetworkServerGameManager>().NotifyStartGame();
+		EventManager.Notify(() => EventManager.Server.PlayerJoined(mPlayerCount));
 	}
 
 	public override void OnServerRemovePlayer(NetworkConnection conn, PlayerController player)
 	{
 		base.OnServerRemovePlayer(conn, player);
 		mPlayerCount -= 1;
+		EventManager.Notify(() => EventManager.Server.PlayerLeft(mPlayerCount));
 	}
 }

@@ -60,6 +60,20 @@ public partial class EventManager
 		{
 			OnPlayerFiredWeapon(bearer, shotsFired);
 		}
+
+		public static event Action<int> OnPlayerJoined = (i) => { LogEvent(); };
+
+		public static void PlayerJoined(int newCount)
+		{
+			OnPlayerJoined(newCount);
+		}
+
+		public static event Action<int> OnPlayerLeft = (i) => { LogEvent(); };
+
+		public static void PlayerLeft(int newCount)
+		{
+			OnPlayerJoined(newCount);
+		}
 	}
 
 	#endregion
