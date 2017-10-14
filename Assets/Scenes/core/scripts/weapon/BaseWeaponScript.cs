@@ -167,6 +167,12 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 		AttachNewPart(partId, false);
 	}
 
+	public void ResetToDefaultParts()
+	{
+		foreach (WeaponPartScript p in bearer.defaultParts)
+			AttachNewPart(p.partId, true);
+	}
+
 	public void AttachNewPart(string partId, bool forceInfiniteDurability)
 	{
 		if (string.IsNullOrEmpty(partId))
@@ -298,9 +304,7 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 		mShotsInClip--;
 
 		foreach (Ray shot in shots)
-		{
 			CmdInstantiateShot(shot.origin, shot.direction);
-		}
 
 		//EventManager.Local.PlayerFiredWeapon(realBearer, shots);
 		PlayFireEffect();

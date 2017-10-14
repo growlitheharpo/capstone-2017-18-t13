@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using FiringSquad.Gameplay;
 using UnityEngine;
 
 #if !DEBUG && !DEVELOPMENT_BUILD
@@ -72,7 +73,21 @@ public partial class EventManager
 
 		public static void PlayerLeft(int newCount)
 		{
-			OnPlayerJoined(newCount);
+			OnPlayerLeft(newCount);
+		}
+
+		public static event Action<CltPlayer, IDamageSource> OnPlayerHealthHitsZero = (p, r) => { LogEvent(); };
+
+		public static void PlayerHealthHitZero(CltPlayer player, IDamageSource reason)
+		{
+			OnPlayerHealthHitsZero(player, reason);
+		}
+
+		public static event Action<CltPlayer, CltPlayer, Transform> OnPlayerDied = (d, k, p) => { LogEvent(); };
+
+		public static void PlayerDied(CltPlayer deadPlayer, CltPlayer killer, Transform respawnPosition)
+		{
+			OnPlayerDied(deadPlayer, killer, respawnPosition);
 		}
 	}
 
