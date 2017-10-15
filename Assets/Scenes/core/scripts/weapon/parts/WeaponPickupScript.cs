@@ -16,6 +16,11 @@ public class WeaponPickupScript : NetworkBehaviour, IInteractable
 		mRigidbody = GetComponent<Rigidbody>();
 	}
 
+	private void Start()
+	{
+		InitializePickupView();
+	}
+
 	private void OnDestroy()
 	{
 		DestroyPickupView();
