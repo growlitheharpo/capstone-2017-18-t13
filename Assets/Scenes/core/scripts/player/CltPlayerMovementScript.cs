@@ -1,6 +1,7 @@
 ﻿using FiringSquad.Data;
 using KeatsLib;
 using UnityEngine;
+using UnityEngine.Networking;
 using Input = UnityEngine.Input;
 
 namespace FiringSquad.Gameplay
@@ -143,6 +144,8 @@ namespace FiringSquad.Gameplay
 			if (!mController.isGrounded && !mIsJumping && mPreviouslyGrounded)
 				mMoveDirection.y = 0.0f;
 			mPreviouslyGrounded = mController.isGrounded;
+
+			UpdateAnimatorState();
 		}
 
 		private void FixedUpdate()
@@ -191,6 +194,11 @@ namespace FiringSquad.Gameplay
 			mController.radius = newRadius;
 		}
 
+		private void UpdateAnimatorState()
+		{
+			AnimationUtility.SetVariable(mPlayer.localAnimator, "Crouch", mCrouching);
+		}
+
 		/// <summary>
 		/// Apply movement based on the input we received this frame.
 		/// </summary>
@@ -217,7 +225,12 @@ namespace FiringSquad.Gameplay
 				if (mJump)
 				{
 					mMoveDirection.y = mMovementData.jumpForce;
-					// play jump sound
+					
+					// play jump sound ?
+
+					mPlayer.localAnimator.SetTrigger("Jump");
+					mPlayer.networkAnimator.SetTrigger("Jump");
+
 					mJump = false;
 					mIsJumping = true;
 				}

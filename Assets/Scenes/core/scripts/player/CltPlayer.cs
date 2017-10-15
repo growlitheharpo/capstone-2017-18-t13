@@ -15,8 +15,13 @@ public class CltPlayer : NetworkBehaviour, IWeaponBearer, IDamageReceiver
 	[SerializeField] private Transform mCameraOffset;
 	[SerializeField] private Transform mGun1Offset;
 	[SerializeField] private Transform mGun2Offset;
+	[SerializeField] private Animator mAnimator;
+	[SerializeField] private NetworkAnimator mNetworkAnimator;
 
-	[SerializeField] private Animator mAnimatior;
+	public Animator localAnimator { get { return mAnimator; } }
+	public NetworkAnimator networkAnimator { get { return mNetworkAnimator; } }
+
+	private CharacterController mCharacterController;
 
 	public bool isCurrentPlayer { get { return isLocalPlayer; } }
 	private CltPlayerLocal localPlayerScript { get { return isCurrentPlayer ? GetComponentInChildren<CltPlayerLocal>() : null; } }
@@ -35,7 +40,9 @@ public class CltPlayer : NetworkBehaviour, IWeaponBearer, IDamageReceiver
 
 	[SyncVar(hook = "OnDeathsUpdate")] private int mDeaths;
 	private BoundProperty<int> mLocalDeathsVar;
-	
+
+	#region Unity Callbacks
+
 	public override void OnStartServer()
 	{
 		base.OnStartServer();
@@ -61,6 +68,8 @@ public class CltPlayer : NetworkBehaviour, IWeaponBearer, IDamageReceiver
 	{
 		ServiceLocator.Get<IWeaponPartManager>().GetAllPrefabs(false); // force the lazy initialization of the part list
 		base.OnStartClient();
+
+		mCharacterController = GetComponent<CharacterController>();
 
 		// register for local events that should effect all players (might not be any?)
 
@@ -106,6 +115,14 @@ public class CltPlayer : NetworkBehaviour, IWeaponBearer, IDamageReceiver
 			mLocalDeathsVar.Cleanup();
 	}
 
+	[ClientCallback]
+	private void Update()
+	{
+		UpdateAnimations();
+	}
+
+	#endregion
+
 	[Command]
 	public void CmdActivateInteract(Vector3 eyePosition, Vector3 eyeForward)
 	{
@@ -121,6 +138,24 @@ public class CltPlayer : NetworkBehaviour, IWeaponBearer, IDamageReceiver
 		if (interactable != null)
 			interactable.Interact(this);
 	}
+
+	#region Animations
+
+	[Client]
+	private void UpdateAnimations()
+	{
+		Vector3 relativeVel = mCharacterController.velocity / 6; // 6 is the MOVEMENTDATA SPEED
+		relativeVel = transform.InverseTransformDirection(relativeVel);
+		Vector2 vel = new Vector2(relativeVel.x, relativeVel.z);
+
+		float velX = Mathf.Lerp(AnimationUtility.GetFloat(mAnimator, "VelocityX"), vel.x, Time.deltaTime * 3.0f);
+		float velY = Mathf.Lerp(AnimationUtility.GetFloat(mAnimator, "VelocityY"), vel.y, Time.deltaTime * 3.0f);
+
+		AnimationUtility.SetVariable(mAnimator, "VelocityX", velX);
+		AnimationUtility.SetVariable(mAnimator, "VelocityY", velY);
+	}
+
+	#endregion
 
 	#region Weapons
 
