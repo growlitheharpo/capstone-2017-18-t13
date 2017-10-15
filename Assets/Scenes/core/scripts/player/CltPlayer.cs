@@ -60,7 +60,9 @@ public class CltPlayer : NetworkBehaviour, IWeaponBearer, IDamageReceiver
 
 		// register anything specifically for non-local clients
 		// TODO: Make spawning hit particles done through here
-		mHitIndicator = gameObject.AddComponent<RemotePlayerHitIndicator>();
+		GameObject go = new GameObject("HitIndicator");//, typeof(RemotePlayerHitIndicator));
+		go.transform.SetParent(transform);
+		mHitIndicator = go.AddComponent<RemotePlayerHitIndicator>();
 		mLocalHealthVar = new BoundProperty<float>(mInformation.defaultHealth);
 	}
 

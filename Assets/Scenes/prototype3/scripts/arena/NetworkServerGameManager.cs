@@ -178,7 +178,7 @@ namespace FiringSquad.Gameplay
 
 				public override IState GetTransition()
 				{
-					throw new NotImplementedException();
+					return this;
 				}
 			}
 		}
