@@ -12,7 +12,7 @@ public partial class GamestateManager
 	private class GameSceneState : BaseStateMachine, IGameState
 	{
 		public bool safeToTransition { get { return true; } }
-		private bool mIsPaused, mPlayerCreated;
+		private bool mIsPaused;
 		
 		/// <inheritdoc />
 		public void OnEnter()
@@ -26,8 +26,6 @@ public partial class GamestateManager
 
 		private void HandlePlayerCreated(CltPlayer obj)
 		{
-			mPlayerCreated = true;
-
 			ServiceLocator.Get<IInput>().SetInputLevelState(Input.InputLevel.Gameplay | Input.InputLevel.PauseMenu, true);
 			SetCursorState(true);
 
