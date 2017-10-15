@@ -46,7 +46,7 @@ public class CltPlayer : NetworkBehaviour, IWeaponBearer, IDamageReceiver
 
 		// create our weapon & bind
 		BaseWeaponScript wep = Instantiate(mAssets.baseWeaponPrefab).GetComponent<BaseWeaponScript>();
-		BindWeaponToPlayer(wep);
+		BindWeaponToPlayer(wep, true);
 		AddDefaultPartsToWeapon(wep);
 		NetworkServer.SpawnWithClientAuthority(wep.gameObject, gameObject);
 	}
@@ -78,14 +78,26 @@ public class CltPlayer : NetworkBehaviour, IWeaponBearer, IDamageReceiver
 		mLocalHealthVar = new BoundProperty<float>(mInformation.defaultHealth, GameplayUIManager.PLAYER_HEALTH);
 		mLocalKillsVar = new BoundProperty<int>(0, GameplayUIManager.PLAYER_KILLS);
 		mLocalDeathsVar = new BoundProperty<int>(0, GameplayUIManager.PLAYER_DEATHS);
-
-		StartCoroutine(Coroutines.WaitOneFrame(() =>
-		{
-			(weapon as BaseWeaponScript).BindPropertiesToUI();
-		}));
 	}
 
-	public void BindWeaponToPlayer(BaseWeaponScript wep)
+	private void OnDestroy()
+	{
+		EventManager.Server.OnPlayerFiredWeapon -= OnPlayerFiredWeapon;
+		EventManager.Server.OnPlayerDied -= OnPlayerDied;
+		EventManager.Server.OnStartGame -= OnStartGame;
+		EventManager.Server.OnFinishGame -= OnFinishGame;
+
+		if (mLocalHealthVar != null)
+			mLocalHealthVar.Cleanup();
+
+		if (mLocalKillsVar != null)
+			mLocalKillsVar.Cleanup();
+
+		if (mLocalDeathsVar != null)
+			mLocalDeathsVar.Cleanup();
+	}
+
+	public void BindWeaponToPlayer(BaseWeaponScript wep, bool bindUI = false)
 	{
 		// find attach spot in view and set parent
 		wep.transform.SetParent(mGun1Offset);
@@ -94,6 +106,10 @@ public class CltPlayer : NetworkBehaviour, IWeaponBearer, IDamageReceiver
 		wep.positionOffset = eye.InverseTransformPoint(mGun1Offset.position);
 		wep.transform.SetParent(transform);
 		wep.bearer = this;
+
+		if (bindUI || isCurrentPlayer)
+			wep.BindPropertiesToUI();
+
 		weapon = wep;
 	}
 

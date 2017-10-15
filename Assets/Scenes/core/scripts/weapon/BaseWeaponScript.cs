@@ -91,6 +91,12 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 		mShotParticles = transform.Find("shot_particles").GetComponent<ParticleSystem>();
 	}
 
+	private void OnDestroy()
+	{
+		mShotsInClip.Cleanup();
+		mTotalClipSize.Cleanup();
+	}
+
 	public void BindPropertiesToUI()
 	{
 		mShotsInClip = new BoundProperty<int>(mShotsInClip == null ? 0 : mShotsInClip.value, GameplayUIManager.CLIP_CURRENT);
