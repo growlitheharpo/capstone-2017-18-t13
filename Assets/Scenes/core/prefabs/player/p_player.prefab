@@ -71,6 +71,7 @@ GameObject:
   - component: {fileID: 114159140150864456}
   - component: {fileID: 114048560508088466}
   - component: {fileID: 114240298838670862}
+  - component: {fileID: 114113183744137726}
   - component: {fileID: 143384186503923910}
   - component: {fileID: 136145069032951676}
   - component: {fileID: 54370038794602910}
@@ -986,6 +987,25 @@ MonoBehaviour:
   m_SnapThreshold: 5
   m_InterpolateRotation: 1
   m_InterpolateMovement: 1
+--- !u!114 &114113183744137726
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1314326850756854}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1590678366, guid: 870353891bb340e2b2a9c8707e7419ba, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Animator: {fileID: 95149858184009574}
+  m_ParameterSendBits: 4
+  param0: 
+  param1: 
+  param2: 
+  param3: 
+  param4: 
+  param5: 
 --- !u!114 &114159140150864456
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1074,8 +1094,8 @@ MonoBehaviour:
   mCameraOffset: {fileID: 4999094504190870}
   mGun1Offset: {fileID: 4098957100354382}
   mGun2Offset: {fileID: 4883558922381024}
-  mAnimator: {fileID: 0}
-  mNetworkAnimator: {fileID: 0}
+  mAnimator: {fileID: 95149858184009574}
+  mNetworkAnimator: {fileID: 114113183744137726}
 --- !u!136 &136145069032951676
 CapsuleCollider:
   m_ObjectHideFlags: 1
