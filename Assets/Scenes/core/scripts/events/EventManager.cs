@@ -44,6 +44,13 @@ public partial class EventManager
 		{
 			OnReceiveFinishEvent();
 		}
+
+		public static event Action<CltPlayer> OnLocalPlayerSpawned = (p) => { LogEvent(); };
+
+		public static void LocalPlayerSpawned(CltPlayer p)
+		{
+			OnLocalPlayerSpawned(p);
+		}
 	}
 
 	public static class LocalGUI

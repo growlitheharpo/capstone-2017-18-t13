@@ -12,7 +12,7 @@ public partial class GamestateManager
 	private class GameSceneState : BaseStateMachine, IGameState
 	{
 		public bool safeToTransition { get { return true; } }
-		private bool mIsPaused;
+		private bool mIsPaused, mPlayerCreated;
 		
 		/// <inheritdoc />
 		public void OnEnter()
@@ -20,12 +20,19 @@ public partial class GamestateManager
 			EventManager.OnInputLevelChanged += HandleInputChange;
 			EventManager.Local.OnTogglePause += HandlePauseToggle;
 			
+			EventManager.Local.OnLocalPlayerSpawned += HandlePlayerCreated;
+			mIsPaused = false;
+		}
+
+		private void HandlePlayerCreated(CltPlayer obj)
+		{
+			mPlayerCreated = true;
+
 			ServiceLocator.Get<IInput>().SetInputLevelState(Input.InputLevel.Gameplay | Input.InputLevel.PauseMenu, true);
 			SetCursorState(true);
 
+			EventManager.Local.OnLocalPlayerSpawned -= HandlePlayerCreated;
 			TransitionStates(new InGameState(this));
-			
-			mIsPaused = false;
 		}
 
 		private void HandlePauseToggle()
@@ -63,6 +70,7 @@ public partial class GamestateManager
 
 			EventManager.OnInputLevelChanged -= HandleInputChange;
 			EventManager.Local.OnTogglePause -= HandlePauseToggle;
+			EventManager.Local.OnLocalPlayerSpawned -= HandlePlayerCreated;
 			SetCursorState(false);
 		}
 

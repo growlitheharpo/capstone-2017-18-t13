@@ -34,6 +34,8 @@ public class CltPlayer : NetworkBehaviour, IWeaponBearer, IDamageReceiver
 
 	public override void OnStartServer()
 	{
+		base.OnStartServer();
+
 		// register for server events
 		EventManager.Server.OnPlayerFiredWeapon += OnPlayerFiredWeapon;
 		EventManager.Server.OnPlayerDied += OnPlayerDied;
@@ -58,18 +60,15 @@ public class CltPlayer : NetworkBehaviour, IWeaponBearer, IDamageReceiver
 
 		// register for local events that should effect all players (might not be any?)
 
-		// register anything specifically for non-local clients
-		// TODO: Make spawning hit particles done through here
-		GameObject go = new GameObject("HitIndicator");//, typeof(RemotePlayerHitIndicator));
+		GameObject go = new GameObject("HitIndicator");
 		go.transform.SetParent(transform);
 		mHitIndicator = go.AddComponent<RemotePlayerHitIndicator>();
+
 		mLocalHealthVar = new BoundProperty<float>(mInformation.defaultHealth);
 	}
 
 	public override void OnStartLocalPlayer()
 	{
-		// register for local events that should effect us
-
 		CltPlayerLocal localScript = Instantiate(mAssets.localPlayerPrefab).GetComponent<CltPlayerLocal>();
 		localScript.transform.SetParent(transform);
 		localScript.playerRoot = this;
@@ -78,6 +77,8 @@ public class CltPlayer : NetworkBehaviour, IWeaponBearer, IDamageReceiver
 		mLocalHealthVar = new BoundProperty<float>(mInformation.defaultHealth, GameplayUIManager.PLAYER_HEALTH);
 		mLocalKillsVar = new BoundProperty<int>(0, GameplayUIManager.PLAYER_KILLS);
 		mLocalDeathsVar = new BoundProperty<int>(0, GameplayUIManager.PLAYER_DEATHS);
+
+		EventManager.Notify(() => EventManager.Local.LocalPlayerSpawned(this));
 	}
 
 	private void OnDestroy()
