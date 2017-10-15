@@ -76,14 +76,19 @@ public class CltPlayerLocal : MonoBehaviour
 	{
 	}
 
-	private void CleanupCamera()
+	public void CleanupCamera()
 	{
+		if (mCameraRef == null)
+			return;
+
 		if (mCameraOriginalPos == Vector3.one * -1.0f)
 			return;
 
 		mCameraRef.transform.SetParent(null);
 		mCameraRef.transform.position = mCameraOriginalPos;
 		mCameraRef.transform.rotation = mCameraOriginalRot;
+
+		mCameraRef = null;
 	}
 
 	private void CleanupUI()

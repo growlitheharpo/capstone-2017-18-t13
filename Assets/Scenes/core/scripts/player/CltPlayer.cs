@@ -16,6 +16,7 @@ public class CltPlayer : NetworkBehaviour, IWeaponBearer, IDamageReceiver
 	[SerializeField] private Transform mGun2Offset;
 
 	public bool isCurrentPlayer { get { return isLocalPlayer; } }
+	private CltPlayerLocal localPlayerScript { get { return isCurrentPlayer ? GetComponentInChildren<CltPlayerLocal>() : null; } }
 
 	public IWeapon weapon { get; private set; }
 	public WeaponPartCollection defaultParts { get { return mInformation.defaultWeaponParts; } }
@@ -87,6 +88,10 @@ public class CltPlayer : NetworkBehaviour, IWeaponBearer, IDamageReceiver
 		EventManager.Server.OnPlayerDied -= OnPlayerDied;
 		EventManager.Server.OnStartGame -= OnStartGame;
 		EventManager.Server.OnFinishGame -= OnFinishGame;
+
+		CltPlayerLocal localPlayer = localPlayerScript;
+		if (localPlayer != null)
+			localPlayer.CleanupCamera();
 
 		if (mLocalHealthVar != null)
 			mLocalHealthVar.Cleanup();
