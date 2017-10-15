@@ -21,17 +21,18 @@ public class CltPlayer : NetworkBehaviour, IWeaponBearer, IDamageReceiver
 	public Animator localAnimator { get { return mAnimator; } }
 	public NetworkAnimator networkAnimator { get { return mNetworkAnimator; } }
 
-	private CharacterController mCharacterController;
-
 	public bool isCurrentPlayer { get { return isLocalPlayer; } }
-	private CltPlayerLocal localPlayerScript { get { return isCurrentPlayer ? GetComponentInChildren<CltPlayerLocal>() : null; } }
-
+	
 	public IWeapon weapon { get; private set; }
 	public WeaponPartCollection defaultParts { get { return mInformation.defaultWeaponParts; } }
 	public Transform eye { get { return mCameraOffset; } }
 
-	private IPlayerHitIndicator mHitIndicator;
 	private PlayerMagnetArm mMagnetArm;
+	public PlayerMagnetArm magnetArm { get { return mMagnetArm; } }
+
+	private IPlayerHitIndicator mHitIndicator;
+	private CharacterController mCharacterController;
+	private CltPlayerLocal mLocalPlayerScript;
 
 	[SyncVar(hook = "OnHealthUpdate")] private float mHealth;
 	private BoundProperty<float> mLocalHealthVar;
@@ -87,9 +88,9 @@ public class CltPlayer : NetworkBehaviour, IWeaponBearer, IDamageReceiver
 
 	public override void OnStartLocalPlayer()
 	{
-		CltPlayerLocal localScript = Instantiate(mAssets.localPlayerPrefab).GetComponent<CltPlayerLocal>();
-		localScript.transform.SetParent(transform);
-		localScript.playerRoot = this;
+		mLocalPlayerScript = Instantiate(mAssets.localPlayerPrefab).GetComponent<CltPlayerLocal>();
+		mLocalPlayerScript.transform.SetParent(transform);
+		mLocalPlayerScript.playerRoot = this;
 
 		mHitIndicator = (IPlayerHitIndicator)FindObjectOfType<LocalPlayerHitIndicator>() ?? new NullHitIndicator();
 		mLocalHealthVar = new BoundProperty<float>(mInformation.defaultHealth, GameplayUIManager.PLAYER_HEALTH);
@@ -106,7 +107,7 @@ public class CltPlayer : NetworkBehaviour, IWeaponBearer, IDamageReceiver
 		EventManager.Server.OnStartGame -= OnStartGame;
 		EventManager.Server.OnFinishGame -= OnFinishGame;
 
-		CltPlayerLocal localPlayer = localPlayerScript;
+		CltPlayerLocal localPlayer = mLocalPlayerScript;
 		if (localPlayer != null)
 			localPlayer.CleanupCamera();
 
@@ -186,6 +187,8 @@ public class CltPlayer : NetworkBehaviour, IWeaponBearer, IDamageReceiver
 		arm.transform.ResetLocalValues();
 		arm.transform.SetParent(transform);
 		arm.bearer = this;
+
+		mMagnetArm = arm;
 	}
 
 	private void AddDefaultPartsToWeapon(BaseWeaponScript wep)

@@ -4,10 +4,13 @@ using KeatsLib.Unity;
 using UnityEngine;
 using UnityEngine.Networking;
 
-public class WeaponPickupScript : NetworkBehaviour, IInteractable
+public class WeaponPickupScript : NetworkBehaviour, IInteractable, INetworkGrabbable
 {
 	[SerializeField] private GameObject mGunView;
 	[SerializeField] private GameObject mPickupView;
+
+	public CltPlayer currentHolder { get; private set; }
+	public bool currentlyHeld { get { return currentHolder != null; } }
 
 	private Rigidbody mRigidbody;
 
@@ -32,6 +35,14 @@ public class WeaponPickupScript : NetworkBehaviour, IInteractable
 			Destroy(mRigidbody);
 	}
 
+	private void DestroyPickupView()
+	{
+		mGunView.SetActive(true);
+
+		if (mPickupView != null)
+			Destroy(mPickupView);
+	}
+
 	[ClientRpc]
 	public void RpcInitializePickupView()
 	{
@@ -53,14 +64,6 @@ public class WeaponPickupScript : NetworkBehaviour, IInteractable
 		ps.transform.ResetLocalValues();
 	}
 
-	private void DestroyPickupView()
-	{
-		mGunView.SetActive(true);
-
-		if (mPickupView != null)
-			Destroy(mPickupView);
-	}
-
 	[Server]
 	public void Interact(ICharacter source)
 	{
@@ -80,5 +83,34 @@ public class WeaponPickupScript : NetworkBehaviour, IInteractable
 		Destroy(gameObject);
 
 		wepBearer.weapon.AttachNewPart(GetComponent<WeaponPartScript>().partId);
+	}
+
+	public void PullTowards(CltPlayer player)
+	{
+		if (currentlyHeld)
+			return;
+
+		Vector3 direction = player.magnetArm.transform.position - transform.position;
+		direction = direction.normalized * player.magnetArm.pullForce;
+
+		mRigidbody.AddForce(direction, ForceMode.Force);
+	}
+
+	public void GrabNow(CltPlayer player)
+	{
+		currentHolder = player;
+	}
+
+	public void Throw()
+	{
+		Vector3 direction = currentHolder.magnetArm.transform.forward;
+
+		transform.SetParent(null);
+		currentHolder = null;
+	}
+
+	public void Release()
+	{
+		currentHolder = null;
 	}
 }
