@@ -31,6 +31,7 @@ public class CltPlayer : NetworkBehaviour, IWeaponBearer, IDamageReceiver
 	public Transform eye { get { return mCameraOffset; } }
 
 	private IPlayerHitIndicator mHitIndicator;
+	private PlayerMagnetArm mMagnetArm;
 
 	[SyncVar(hook = "OnHealthUpdate")] private float mHealth;
 	private BoundProperty<float> mLocalHealthVar;
@@ -62,20 +63,24 @@ public class CltPlayer : NetworkBehaviour, IWeaponBearer, IDamageReceiver
 		BindWeaponToPlayer(wep, true);
 		AddDefaultPartsToWeapon(wep);
 		NetworkServer.SpawnWithClientAuthority(wep.gameObject, gameObject);
+
+		// create our magnet arm & bind
+		PlayerMagnetArm arm = Instantiate(mAssets.gravityGunPrefab).GetComponent<PlayerMagnetArm>();
+		BindMagnetArmToPlayer(arm);
+		NetworkServer.SpawnWithClientAuthority(arm.gameObject, gameObject);
 	}
 
 	public override void OnStartClient()
 	{
-		ServiceLocator.Get<IWeaponPartManager>().GetAllPrefabs(false); // force the lazy initialization of the part list
-		base.OnStartClient();
+		// force the lazy initialization of the part list
+		ServiceLocator.Get<IWeaponPartManager>().GetAllPrefabs(false);
 
+		base.OnStartClient();
 		mCharacterController = GetComponent<CharacterController>();
 
-		// register for local events that should effect all players (might not be any?)
-
-		GameObject go = new GameObject("HitIndicator");
-		go.transform.SetParent(transform);
-		mHitIndicator = go.AddComponent<RemotePlayerHitIndicator>();
+		GameObject hitObject = new GameObject("HitIndicator");
+		hitObject.transform.SetParent(transform);
+		mHitIndicator = hitObject.AddComponent<RemotePlayerHitIndicator>();
 
 		mLocalHealthVar = new BoundProperty<float>(mInformation.defaultHealth);
 	}
@@ -173,6 +178,14 @@ public class CltPlayer : NetworkBehaviour, IWeaponBearer, IDamageReceiver
 			wep.BindPropertiesToUI();
 
 		weapon = wep;
+	}
+
+	public void BindMagnetArmToPlayer(PlayerMagnetArm arm)
+	{
+		arm.transform.SetParent(mGun2Offset);
+		arm.transform.ResetLocalValues();
+		arm.transform.SetParent(transform);
+		arm.bearer = this;
 	}
 
 	private void AddDefaultPartsToWeapon(BaseWeaponScript wep)
