@@ -88,4 +88,49 @@ public static class AnimationUtility
 		if (obj != null)
 			obj.SetBool(name, val);
 	}
+
+	public static float GetFloat(GameObject obj, string name)
+	{
+		return GetFloat(obj.GetComponent<Animator>(), name);
+	}
+
+	public static float GetFloat(Transform obj, string name)
+	{
+		return GetFloat(obj.GetComponent<Animator>(), name);
+	}
+
+	public static float GetFloat(Animator obj, string name)
+	{
+		return obj.GetFloat(name);
+	}
+
+	public static bool GetBool(GameObject obj, string name)
+	{
+		return GetBool(obj.GetComponent<Animator>(), name);
+	}
+
+	public static bool GetBool(Transform obj, string name)
+	{
+		return GetBool(obj.GetComponent<Animator>(), name);
+	}
+
+	public static bool GetBool(Animator obj, string name)
+	{
+		return obj.GetBool(name);
+	}
+
+	public static int GetInt(GameObject obj, string name)
+	{
+		return GetInt(obj.GetComponent<Animator>(), name);
+	}
+
+	public static int GetInt(Transform obj, string name)
+	{
+		return GetInt(obj.GetComponent<Animator>(), name);
+	}
+
+	public static int GetInt(Animator obj, string name)
+	{
+		return obj.GetInteger(name);
+	}
 }
