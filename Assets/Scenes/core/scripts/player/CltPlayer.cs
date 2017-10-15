@@ -117,6 +117,7 @@ public class CltPlayer : NetworkBehaviour, IWeaponBearer, IDamageReceiver
 				mDeaths++;
 
 			mHealth = mInformation.defaultHealth;
+			weapon.ResetToDefaultParts();
 			RpcHandleDeath(transform.position, spawnPos.position, spawnPos.rotation);
 		}
 		else if (killer == this)
@@ -164,8 +165,12 @@ public class CltPlayer : NetworkBehaviour, IWeaponBearer, IDamageReceiver
 		if (ReferenceEquals(cause.source, this))
 			amount *= 0.5f;
 
-		mHealth = Mathf.Clamp(mHealth - amount, 0.0f, float.MaxValue);
 		RpcReflectDamageLocally(point, normal, cause.source.gameObject.transform.position, amount);
+
+		if (mHealth <= 0.0f)
+			return;
+
+		mHealth = Mathf.Clamp(mHealth - amount, 0.0f, float.MaxValue);
 
 		if (mHealth <= 0.0f)
 			EventManager.Notify(() => EventManager.Server.PlayerHealthHitZero(this, cause));
