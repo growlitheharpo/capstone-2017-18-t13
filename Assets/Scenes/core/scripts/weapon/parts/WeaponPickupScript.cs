@@ -48,7 +48,7 @@ public class WeaponPickupScript : NetworkBehaviour, IInteractable
 		ps.transform.ResetLocalValues();
 	}
 
-	public void DestroyPickupView()
+	private void DestroyPickupView()
 	{
 		mGunView.SetActive(true);
 

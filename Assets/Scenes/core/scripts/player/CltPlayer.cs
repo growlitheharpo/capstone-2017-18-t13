@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using FiringSquad.Data;
 using FiringSquad.Gameplay;
+using FiringSquad.Gameplay.UI;
 using KeatsLib.Unity;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -59,7 +60,7 @@ public class CltPlayer : NetworkBehaviour, IWeaponBearer, IDamageReceiver
 
 		// register anything specifically for non-local clients
 		// TODO: Make spawning hit particles done through here
-		mHitIndicator = new NullHitIndicator();
+		mHitIndicator = gameObject.AddComponent<RemotePlayerHitIndicator>();
 		mLocalHealthVar = new BoundProperty<float>(mInformation.defaultHealth);
 	}
 
@@ -71,7 +72,7 @@ public class CltPlayer : NetworkBehaviour, IWeaponBearer, IDamageReceiver
 		localScript.transform.SetParent(transform);
 		localScript.playerRoot = this;
 
-		mHitIndicator = (IPlayerHitIndicator)FindObjectOfType<PlayerHitIndicator>() ?? new NullHitIndicator();
+		mHitIndicator = (IPlayerHitIndicator)FindObjectOfType<LocalPlayerHitIndicator>() ?? new NullHitIndicator();
 		mLocalHealthVar = new BoundProperty<float>(mInformation.defaultHealth, GameplayUIManager.PLAYER_HEALTH);
 		mLocalKillsVar = new BoundProperty<int>(0, GameplayUIManager.PLAYER_KILLS);
 		mLocalDeathsVar = new BoundProperty<int>(0, GameplayUIManager.PLAYER_DEATHS);
@@ -185,7 +186,7 @@ public class CltPlayer : NetworkBehaviour, IWeaponBearer, IDamageReceiver
 	[ClientRpc]
 	private void RpcReflectDamageLocally(Vector3 point, Vector3 normal, Vector3 origin, float amount)
 	{
-		mHitIndicator.NotifyHit(this, origin, amount);
+		mHitIndicator.NotifyHit(this, origin, point, normal, amount);
 	}
 
 	[ClientRpc]
