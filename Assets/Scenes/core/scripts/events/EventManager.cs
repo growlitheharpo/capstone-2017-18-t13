@@ -31,9 +31,9 @@ public partial class EventManager
 			OnTogglePause();
 		}
 
-		public static event Action<float> OnReceiveStartEvent = t => { LogEvent(); };
+		public static event Action<long> OnReceiveStartEvent = t => { LogEvent(); };
 
-		public static void ReceiveStartEvent(float endTime)
+		public static void ReceiveStartEvent(long endTime)
 		{
 			OnReceiveStartEvent(endTime);
 		}
@@ -104,9 +104,9 @@ public partial class EventManager
 			OnPlayerDied(deadPlayer, killer, respawnPosition);
 		}
 
-		public static event Action<double> OnStartGame = d => { LogEvent(); };
+		public static event Action<long> OnStartGame = d => { LogEvent(); };
 
-		public static void StartGame(double endTime)
+		public static void StartGame(long endTime)
 		{
 			OnStartGame(endTime);
 		}

@@ -1,4 +1,5 @@
-﻿using KeatsLib.State;
+﻿using System;
+using KeatsLib.State;
 using UnityEngine;
 using Input = KeatsLib.Unity.Input;
 
@@ -74,7 +75,7 @@ public partial class GamestateManager
 		{
 			public InGameState(GameSceneState machine) : base(machine) { }
 
-			private float mRoundEndTime;
+			private long mRoundEndTime;
 			private BoundProperty<float> mRemainingTime;
 
 			public override void OnEnter()
@@ -89,11 +90,10 @@ public partial class GamestateManager
 				EventManager.Local.OnReceiveFinishEvent -= OnReceiveFinishEvent;
 			}
 
-			private void OnReceiveStartEvent(float obj)
+			private void OnReceiveStartEvent(long time)
 			{
-				mRoundEndTime = obj;
-				float remainingTime = Mathf.Clamp(mRoundEndTime - (float)Network.time, 0.0f, float.MaxValue);
-				mRemainingTime = new BoundProperty<float>(remainingTime, GameplayUIManager.ARENA_ROUND_TIME);
+				mRoundEndTime = time;
+				mRemainingTime = new BoundProperty<float>(CalculateRemainingTime(), GameplayUIManager.ARENA_ROUND_TIME);
 			}
 
 			private void OnReceiveFinishEvent()
@@ -118,8 +118,15 @@ public partial class GamestateManager
 				if (mRemainingTime == null)
 					return;
 
-				float remainingTime = mRoundEndTime - (float)Network.time;
-				mRemainingTime.value = remainingTime;
+				mRemainingTime.value = Mathf.Clamp(CalculateRemainingTime(), 0.0f, float.MaxValue);
+			}
+
+			private float CalculateRemainingTime()
+			{
+				long currentTime = DateTime.Now.Ticks;
+				long remainingTicks = mRoundEndTime - currentTime;
+
+				return (float)remainingTicks / TimeSpan.TicksPerSecond;
 			}
 
 			public override IState GetTransition()

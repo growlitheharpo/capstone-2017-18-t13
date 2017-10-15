@@ -70,7 +70,7 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 	private ParticleSystem mShotParticles;
 
 	private const float CAMERA_FOLLOW_FACTOR = 10.0f;
-	private float currentTime { get { return (float)Network.time; } }
+	private float currentTime { get { return Time.time; } }
 
 	private void Awake()
 	{

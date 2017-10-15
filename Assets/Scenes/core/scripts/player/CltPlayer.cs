@@ -124,9 +124,9 @@ public class CltPlayer : NetworkBehaviour, IWeaponBearer, IDamageReceiver
 	}
 
 	[Server][EventHandler]
-	private void OnStartGame(double gameEndTime)
+	private void OnStartGame(long gameEndTime)
 	{
-		RpcHandleStartGame((float)gameEndTime);
+		RpcHandleStartGame(gameEndTime);
 	}
 
 	[Server][EventHandler]
@@ -178,7 +178,7 @@ public class CltPlayer : NetworkBehaviour, IWeaponBearer, IDamageReceiver
 	}
 
 	[ClientRpc]
-	private void RpcHandleStartGame(float gameEndTime)
+	private void RpcHandleStartGame(long gameEndTime)
 	{
 		EventManager.Notify(() => EventManager.Local.ReceiveStartEvent(gameEndTime));
 	}

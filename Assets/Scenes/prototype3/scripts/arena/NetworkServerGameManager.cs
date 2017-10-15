@@ -130,11 +130,12 @@ namespace FiringSquad.Gameplay
 			{
 				public GameRunningState(ServerStateMachine machine) : base(machine) { }
 
-				private double mEndTime;
+				private long mEndTime;
+				private bool mFinished;
 
 				public override void OnEnter()
 				{
-					mEndTime = mMachine.mScript.mRoundTime + Network.time;
+					mEndTime = DateTime.Now.Ticks + (mMachine.mScript.mRoundTime * TimeSpan.TicksPerSecond);
 					EventManager.Notify(() => EventManager.Server.StartGame(mEndTime));
 
 					EventManager.Server.OnPlayerHealthHitsZero += OnPlayerHealthHitsZero;
@@ -142,8 +143,8 @@ namespace FiringSquad.Gameplay
 
 				public override void Update()
 				{
-					if (Network.time >= mEndTime)
-						EventManager.Server.FinishGame();
+					if (!mFinished && DateTime.Now.Ticks >= mEndTime)
+						mFinished = true;
 				}
 
 				public override void OnExit()
@@ -162,7 +163,22 @@ namespace FiringSquad.Gameplay
 
 				public override IState GetTransition()
 				{
-					return (Network.time >= mEndTime) ? (IState)new WaitingForConnectionState(mMachine) : this;
+					return mFinished ? (IState)new GameFinishedState(mMachine) : this;
+				}
+			}
+
+			private class GameFinishedState : BaseState<ServerStateMachine>
+			{
+				public GameFinishedState(ServerStateMachine machine) : base(machine) { }
+
+				public override void OnEnter()
+				{
+					EventManager.Server.FinishGame();
+				}
+
+				public override IState GetTransition()
+				{
+					throw new NotImplementedException();
 				}
 			}
 		}
