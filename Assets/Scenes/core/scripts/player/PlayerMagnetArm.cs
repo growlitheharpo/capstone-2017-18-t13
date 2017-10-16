@@ -17,6 +17,9 @@ public class PlayerMagnetArm : NetworkBehaviour
 	[SerializeField] private WeaponPickupScript mHeldObject;
 	public WeaponPickupScript heldWeaponPart { get { return mHeldObject; } }
 
+	[SerializeField] private AudioProfile mAudioProfile;
+	private IAudioReference mGrabSound;
+
 	public CltPlayer bearer { get; set; }
 
 	private WeaponPickupScript mGrabCandidate;
@@ -93,9 +96,11 @@ public class PlayerMagnetArm : NetworkBehaviour
 				if (mGrabCandidate == null)
 					TryFindGrabCandidate();
 				ReelGrabCandidate();
+				UpdateSound(true);
 				break;
 			case State.Reeling:
 				ReelGrabCandidate();
+				UpdateSound(true);
 				break;
 			case State.Locked:
 				mHeldTimer += Time.deltaTime;
@@ -109,13 +114,29 @@ public class PlayerMagnetArm : NetworkBehaviour
 		switch (mState)
 		{
 			case State.Idle:
+				UpdateSound(false);
 				break;
 			case State.Reeling:
 				mState = mHeldObject != null ? State.Locked : State.Idle;
+				UpdateSound(false);
 				break;
 			case State.Locked:
 				ThrowOrDropItem();
 				break;
+		}
+	}
+
+	private void UpdateSound(bool shouldPlay)
+	{
+		if (shouldPlay && mGrabSound == null)
+		{
+			ServiceLocator.Get<IAudioManager>()
+				.PlaySound(AudioManager.AudioEvent.LoopGravGun, mAudioProfile, transform);
+		}
+		else if (!shouldPlay && mGrabSound != null)
+		{
+			mGrabSound.Kill();
+			mGrabSound = null;
 		}
 	}
 
