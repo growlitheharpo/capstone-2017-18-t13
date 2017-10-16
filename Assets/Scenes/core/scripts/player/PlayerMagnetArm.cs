@@ -64,6 +64,11 @@ public class PlayerMagnetArm : NetworkBehaviour
 		}
 	}
 
+	private void Update()
+	{
+		SetDirtyBit(99999);
+	}
+
 	#endregion
 	
 	[Client]
