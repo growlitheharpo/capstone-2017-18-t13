@@ -101,7 +101,7 @@ public class WeaponPickupScript : NetworkBehaviour, IInteractable, INetworkGrabb
 
 		// TODO: Lerp this
 
-		mPickupView.transform.localScale = Vector3.one * 0.5f;
+		mPickupView.transform.localScale = Vector3.one * 0.45f;
 		//mPickupView.SetActive(false);
 		//mGunView.SetActive(true);
 

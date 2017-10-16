@@ -55,6 +55,9 @@ public class PlayerMagnetArm : NetworkBehaviour
 		if (bearer == null)
 			return;
 
+		if (bearer.isCurrentPlayer) // WE have authority if our bearer is the local player. No deserializing.
+			return;
+
 		// read if we have a held object
 		if (reader.ReadBoolean())
 		{
@@ -66,7 +69,7 @@ public class PlayerMagnetArm : NetworkBehaviour
 			if (mHeldObject.currentHolder != bearer)
 				mHeldObject.GrabNow(bearer);
 		}
-		else if (!bearer.isCurrentPlayer)
+		else
 		{
 			if (mHeldObject != null)
 				mHeldObject.Release();
@@ -142,7 +145,7 @@ public class PlayerMagnetArm : NetworkBehaviour
 
 		Vector3 direction = mGrabCandidate.transform.position - bearer.eye.position;
 
-		if (direction.magnitude < 1.5f)
+		if (direction.magnitude < 2.5f)
 		{
 			GrabItem();
 			return;
