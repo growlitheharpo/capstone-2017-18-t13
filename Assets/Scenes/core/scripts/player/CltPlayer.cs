@@ -98,6 +98,10 @@ public class CltPlayer : NetworkBehaviour, IWeaponBearer, IDamageReceiver
 		mLocalKillsVar = new BoundProperty<int>(0, GameplayUIManager.PLAYER_KILLS);
 		mLocalDeathsVar = new BoundProperty<int>(0, GameplayUIManager.PLAYER_DEATHS);
 
+		var renderers = mAnimator.transform.GetComponentsInChildren<Renderer>();
+		foreach (Renderer r in renderers)
+			Destroy(r);
+
 		EventManager.Notify(() => EventManager.Local.LocalPlayerSpawned(this));
 	}
 
