@@ -4,10 +4,6 @@ using System.Reflection;
 using FiringSquad.Gameplay;
 using UnityEngine;
 
-#if !DEBUG && !DEVELOPMENT_BUILD
-using UnityEngine;
-#endif
-
 /// <summary>
 /// A list of game events for this project.
 /// </summary>
@@ -31,9 +27,9 @@ public partial class EventManager
 			OnTogglePause();
 		}
 
-		public static event Action<float> OnReceiveStartEvent = t => { LogEvent(); };
+		public static event Action<long> OnReceiveStartEvent = t => { LogEvent(); };
 
-		public static void ReceiveStartEvent(float endTime)
+		public static void ReceiveStartEvent(long endTime)
 		{
 			OnReceiveStartEvent(endTime);
 		}
@@ -43,6 +39,13 @@ public partial class EventManager
 		public static void ReceiveFinishEvent()
 		{
 			OnReceiveFinishEvent();
+		}
+
+		public static event Action<CltPlayer> OnLocalPlayerSpawned = (p) => { LogEvent(); };
+
+		public static void LocalPlayerSpawned(CltPlayer p)
+		{
+			OnLocalPlayerSpawned(p);
 		}
 	}
 
@@ -104,9 +107,9 @@ public partial class EventManager
 			OnPlayerDied(deadPlayer, killer, respawnPosition);
 		}
 
-		public static event Action<double> OnStartGame = d => { LogEvent(); };
+		public static event Action<long> OnStartGame = d => { LogEvent(); };
 
-		public static void StartGame(double endTime)
+		public static void StartGame(long endTime)
 		{
 			OnStartGame(endTime);
 		}

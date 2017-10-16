@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using FiringSquad.Data;
 using FiringSquad.Gameplay;
+using FiringSquad.Gameplay.UI;
 using KeatsLib.Unity;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -10,17 +11,29 @@ public class CltPlayer : NetworkBehaviour, IWeaponBearer, IDamageReceiver
 	[SerializeField] private PlayerAssetReferences mAssets;
 	[SerializeField] private PlayerDefaultsData mInformation;
 
+	[Header("References")]
 	[SerializeField] private Transform mCameraOffset;
 	[SerializeField] private Transform mGun1Offset;
 	[SerializeField] private Transform mGun2Offset;
+	[SerializeField] private Animator mAnimator;
+	[SerializeField] private NetworkAnimator mNetworkAnimator;
+
+	public Animator localAnimator { get { return mAnimator; } }
+	public NetworkAnimator networkAnimator { get { return mNetworkAnimator; } }
 
 	public bool isCurrentPlayer { get { return isLocalPlayer; } }
-
+	
 	public IWeapon weapon { get; private set; }
 	public WeaponPartCollection defaultParts { get { return mInformation.defaultWeaponParts; } }
+	public AudioProfile audioProfile { get { return mInformation.audioProfile; } }
 	public Transform eye { get { return mCameraOffset; } }
 
+	private PlayerMagnetArm mMagnetArm;
+	public PlayerMagnetArm magnetArm { get { return mMagnetArm; } }
+
 	private IPlayerHitIndicator mHitIndicator;
+	private CharacterController mCharacterController;
+	private CltPlayerLocal mLocalPlayerScript;
 
 	[SyncVar(hook = "OnHealthUpdate")] private float mHealth;
 	private BoundProperty<float> mLocalHealthVar;
@@ -31,8 +44,12 @@ public class CltPlayer : NetworkBehaviour, IWeaponBearer, IDamageReceiver
 	[SyncVar(hook = "OnDeathsUpdate")] private int mDeaths;
 	private BoundProperty<int> mLocalDeathsVar;
 
+	#region Unity Callbacks
+
 	public override void OnStartServer()
 	{
+		base.OnStartServer();
+
 		// register for server events
 		EventManager.Server.OnPlayerFiredWeapon += OnPlayerFiredWeapon;
 		EventManager.Server.OnPlayerDied += OnPlayerDied;
@@ -45,44 +62,118 @@ public class CltPlayer : NetworkBehaviour, IWeaponBearer, IDamageReceiver
 
 		// create our weapon & bind
 		BaseWeaponScript wep = Instantiate(mAssets.baseWeaponPrefab).GetComponent<BaseWeaponScript>();
-		BindWeaponToPlayer(wep);
+		BindWeaponToPlayer(wep, true);
 		AddDefaultPartsToWeapon(wep);
 		NetworkServer.SpawnWithClientAuthority(wep.gameObject, gameObject);
+
+		// create our magnet arm & bind
+		PlayerMagnetArm arm = Instantiate(mAssets.gravityGunPrefab).GetComponent<PlayerMagnetArm>();
+		BindMagnetArmToPlayer(arm);
+		NetworkServer.SpawnWithClientAuthority(arm.gameObject, gameObject);
 	}
 
 	public override void OnStartClient()
 	{
-		ServiceLocator.Get<IWeaponPartManager>().GetAllPrefabs(false); // force the lazy initialization of the part list
+		// force the lazy initialization of the part list
+		ServiceLocator.Get<IWeaponPartManager>().GetAllPrefabs(false);
+
 		base.OnStartClient();
+		mCharacterController = GetComponent<CharacterController>();
 
-		// register for local events that should effect all players (might not be any?)
+		GameObject hitObject = new GameObject("HitIndicator");
+		hitObject.transform.SetParent(transform);
+		mHitIndicator = hitObject.AddComponent<RemotePlayerHitIndicator>();
 
-		// register anything specifically for non-local clients
-		// TODO: Make spawning hit particles done through here
-		mHitIndicator = new NullHitIndicator();
 		mLocalHealthVar = new BoundProperty<float>(mInformation.defaultHealth);
 	}
 
 	public override void OnStartLocalPlayer()
 	{
-		// register for local events that should effect us
+		mLocalPlayerScript = Instantiate(mAssets.localPlayerPrefab).GetComponent<CltPlayerLocal>();
+		mLocalPlayerScript.transform.SetParent(transform);
+		mLocalPlayerScript.playerRoot = this;
 
-		CltPlayerLocal localScript = Instantiate(mAssets.localPlayerPrefab).GetComponent<CltPlayerLocal>();
-		localScript.transform.SetParent(transform);
-		localScript.playerRoot = this;
-
-		mHitIndicator = (IPlayerHitIndicator)FindObjectOfType<PlayerHitIndicator>() ?? new NullHitIndicator();
+		mHitIndicator = (IPlayerHitIndicator)FindObjectOfType<LocalPlayerHitIndicator>() ?? new NullHitIndicator();
 		mLocalHealthVar = new BoundProperty<float>(mInformation.defaultHealth, GameplayUIManager.PLAYER_HEALTH);
 		mLocalKillsVar = new BoundProperty<int>(0, GameplayUIManager.PLAYER_KILLS);
 		mLocalDeathsVar = new BoundProperty<int>(0, GameplayUIManager.PLAYER_DEATHS);
 
-		StartCoroutine(Coroutines.WaitOneFrame(() =>
-		{
-			(weapon as BaseWeaponScript).BindPropertiesToUI();
-		}));
+		EventManager.Notify(() => EventManager.Local.LocalPlayerSpawned(this));
 	}
 
-	public void BindWeaponToPlayer(BaseWeaponScript wep)
+	private void OnDestroy()
+	{
+		EventManager.Server.OnPlayerFiredWeapon -= OnPlayerFiredWeapon;
+		EventManager.Server.OnPlayerDied -= OnPlayerDied;
+		EventManager.Server.OnStartGame -= OnStartGame;
+		EventManager.Server.OnFinishGame -= OnFinishGame;
+
+		CltPlayerLocal localPlayer = mLocalPlayerScript;
+		if (localPlayer != null)
+			localPlayer.CleanupCamera();
+
+		if (mLocalHealthVar != null)
+			mLocalHealthVar.Cleanup();
+
+		if (mLocalKillsVar != null)
+			mLocalKillsVar.Cleanup();
+
+		if (mLocalDeathsVar != null)
+			mLocalDeathsVar.Cleanup();
+	}
+
+	[ClientCallback]
+	private void Update()
+	{
+		UpdateAnimations();
+	}
+
+	#endregion
+
+	[Command]
+	public void CmdActivateInteract(Vector3 eyePosition, Vector3 eyeForward)
+	{
+		IInteractable interactable = null;
+
+		if (magnetArm != null)
+			interactable = magnetArm.heldWeaponPart;
+
+		if (interactable == null)
+		{
+			RaycastHit hit;
+
+			Ray ray = new Ray(eyePosition, eyeForward);
+			if (!Physics.Raycast(ray, out hit, mInformation.interactDistance))
+				return;
+
+			interactable = hit.GetInteractableComponent();
+		}
+
+		if (interactable != null)
+			interactable.Interact(this);
+	}
+
+	#region Animations
+
+	[Client]
+	private void UpdateAnimations()
+	{
+		Vector3 relativeVel = mCharacterController.velocity / 6; // 6 is the MOVEMENTDATA SPEED
+		relativeVel = transform.InverseTransformDirection(relativeVel);
+		Vector2 vel = new Vector2(relativeVel.x, relativeVel.z);
+
+		float velX = Mathf.Lerp(AnimationUtility.GetFloat(mAnimator, "VelocityX"), vel.x, Time.deltaTime * 3.0f);
+		float velY = Mathf.Lerp(AnimationUtility.GetFloat(mAnimator, "VelocityY"), vel.y, Time.deltaTime * 3.0f);
+
+		AnimationUtility.SetVariable(mAnimator, "VelocityX", velX);
+		AnimationUtility.SetVariable(mAnimator, "VelocityY", velY);
+	}
+
+	#endregion
+
+	#region Weapons
+
+	public void BindWeaponToPlayer(BaseWeaponScript wep, bool bindUI = false)
 	{
 		// find attach spot in view and set parent
 		wep.transform.SetParent(mGun1Offset);
@@ -91,7 +182,21 @@ public class CltPlayer : NetworkBehaviour, IWeaponBearer, IDamageReceiver
 		wep.positionOffset = eye.InverseTransformPoint(mGun1Offset.position);
 		wep.transform.SetParent(transform);
 		wep.bearer = this;
+
+		if (bindUI || isCurrentPlayer)
+			wep.BindPropertiesToUI();
+
 		weapon = wep;
+	}
+
+	public void BindMagnetArmToPlayer(PlayerMagnetArm arm)
+	{
+		arm.transform.SetParent(mGun2Offset);
+		arm.transform.ResetLocalValues();
+		arm.transform.SetParent(transform);
+		arm.bearer = this;
+
+		mMagnetArm = arm;
 	}
 
 	private void AddDefaultPartsToWeapon(BaseWeaponScript wep)
@@ -100,92 +205,17 @@ public class CltPlayer : NetworkBehaviour, IWeaponBearer, IDamageReceiver
 			wep.AttachNewPart(part.partId, true);
 	}
 
-	[Server][EventHandler]
-	private void OnPlayerFiredWeapon(CltPlayer p, List<Ray> shots)
-	{
-		if (p != this)
-			RpcReflectPlayerShotWeapon(p.netId);
-	}
-
-	[Server][EventHandler]
-	private void OnPlayerDied(CltPlayer deadPlayer, CltPlayer killer, Transform spawnPos)
-	{
-		if (deadPlayer == this)
-		{
-			if (killer != null)
-				mDeaths++;
-
-			mHealth = mInformation.defaultHealth;
-			RpcHandleDeath(transform.position, spawnPos.position, spawnPos.rotation);
-		}
-		else if (killer == this)
-			mKills++;
-	}
-
-	[Server][EventHandler]
-	private void OnStartGame(double gameEndTime)
-	{
-		RpcHandleStartGame((float)gameEndTime);
-	}
-
-	[Server][EventHandler]
-	private void OnFinishGame()
-	{
-		RpcHandleFinishGame();
-	}
-
-
-	[Command]
-	public void CmdActivateInteract(Vector3 eyePosition, Vector3 eyeForward)
-	{
-		IInteractable interactable;
-		RaycastHit hit;
-
-		Ray ray = new Ray(eyePosition, eyeForward);
-		if (!Physics.Raycast(ray, out hit, mInformation.interactDistance))
-			return;
-
-		interactable = hit.GetInteractableComponent();
-
-		if (interactable != null)
-			interactable.Interact(this);
-	}
-
 	[Command]
 	public void CmdDebugEquipWeaponPart(string part)
 	{
 		weapon.AttachNewPart(part);
 	}
 
-	[Server]
-	public void ApplyDamage(float amount, Vector3 point, Vector3 normal, IDamageSource cause)
+	[Server][EventHandler]
+	private void OnPlayerFiredWeapon(CltPlayer p, List<Ray> shots)
 	{
-		if (ReferenceEquals(cause.source, this))
-			amount *= 0.5f;
-
-		mHealth = Mathf.Clamp(mHealth - amount, 0.0f, float.MaxValue);
-		RpcReflectDamageLocally(point, normal, cause.source.gameObject.transform.position, amount);
-
-		if (mHealth <= 0.0f)
-			EventManager.Notify(() => EventManager.Server.PlayerHealthHitZero(this, cause));
-	}
-
-	[Server]
-	public void MoveToStartPosition(Vector3 position, Quaternion rotation)
-	{
-		RpcResetPlayerValues(position, rotation);
-	}
-
-	[ClientRpc]
-	private void RpcHandleStartGame(float gameEndTime)
-	{
-		EventManager.Notify(() => EventManager.Local.ReceiveStartEvent(gameEndTime));
-	}
-
-	[ClientRpc]
-	private void RpcReflectDamageLocally(Vector3 point, Vector3 normal, Vector3 origin, float amount)
-	{
-		mHitIndicator.NotifyHit(this, origin, amount);
+		if (p != this)
+			RpcReflectPlayerShotWeapon(p.netId);
 	}
 
 	[ClientRpc]
@@ -198,16 +228,81 @@ public class CltPlayer : NetworkBehaviour, IWeaponBearer, IDamageReceiver
 		p.weapon.PlayFireEffect();
 	}
 
-	[ClientRpc]
-	private void RpcResetPlayerValues(Vector3 position, Quaternion rotation)
+	#endregion
+
+	#region GameState
+
+	[Server]
+	public void MoveToStartPosition(Vector3 position, Quaternion rotation)
 	{
-		ResetPlayerValues(position, rotation);
+		RpcResetPlayerValues(position, rotation);
+	}
+
+	[Server] [EventHandler]
+	private void OnStartGame(long gameEndTime)
+	{
+		RpcHandleStartGame(gameEndTime);
+	}
+
+	[Server] [EventHandler]
+	private void OnFinishGame()
+	{
+		RpcHandleFinishGame();
+	}
+
+	[ClientRpc]
+	private void RpcHandleStartGame(long gameEndTime)
+	{
+		EventManager.Notify(() => EventManager.Local.ReceiveStartEvent(gameEndTime));
 	}
 
 	[ClientRpc]
 	private void RpcHandleFinishGame()
 	{
 		EventManager.Notify(EventManager.Local.ReceiveFinishEvent);
+	}
+
+	#endregion
+
+	#region Player Health/Death
+
+	[Server]
+	public void ApplyDamage(float amount, Vector3 point, Vector3 normal, IDamageSource cause)
+	{
+		if (ReferenceEquals(cause.source, this))
+			amount *= 0.5f;
+
+		RpcReflectDamageLocally(point, normal, cause.source.gameObject.transform.position, amount);
+
+		if (mHealth <= 0.0f)
+			return;
+
+		mHealth = Mathf.Clamp(mHealth - amount, 0.0f, float.MaxValue);
+
+		if (mHealth <= 0.0f)
+			EventManager.Notify(() => EventManager.Server.PlayerHealthHitZero(this, cause));
+	}
+
+	[Server] [EventHandler]
+	private void OnPlayerDied(CltPlayer deadPlayer, CltPlayer killer, Transform spawnPos)
+	{
+		if (deadPlayer == this)
+		{
+			if (killer != null)
+				mDeaths++;
+
+			mHealth = mInformation.defaultHealth;
+			weapon.ResetToDefaultParts();
+			RpcHandleDeath(transform.position, spawnPos.position, spawnPos.rotation);
+		}
+		else if (killer == this)
+			mKills++;
+	}
+
+	[ClientRpc]
+	private void RpcReflectDamageLocally(Vector3 point, Vector3 normal, Vector3 origin, float amount)
+	{
+		mHitIndicator.NotifyHit(this, origin, point, normal, amount);
 	}
 
 	[ClientRpc]
@@ -221,6 +316,12 @@ public class CltPlayer : NetworkBehaviour, IWeaponBearer, IDamageReceiver
 			ResetPlayerValues(spawnPos, spawnRot);
 	}
 
+	[ClientRpc]
+	private void RpcResetPlayerValues(Vector3 position, Quaternion rotation)
+	{
+		ResetPlayerValues(position, rotation);
+	}
+
 	[Client]
 	private void ResetPlayerValues(Vector3 position, Quaternion rotation)
 	{
@@ -231,6 +332,10 @@ public class CltPlayer : NetworkBehaviour, IWeaponBearer, IDamageReceiver
 		if (weapon != null)
 			weapon.ResetToDefaultParts();
 	}
+
+	#endregion
+
+	#region SyncVars
 
 	[Client]
 	private void OnHealthUpdate(float value)
@@ -255,4 +360,6 @@ public class CltPlayer : NetworkBehaviour, IWeaponBearer, IDamageReceiver
 		if (mLocalDeathsVar != null)
 			mLocalDeathsVar.value = value;
 	}
+
+	#endregion
 }

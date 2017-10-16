@@ -1,6 +1,8 @@
 ﻿using FiringSquad.Data;
 using KeatsLib;
+using UnityEditor;
 using UnityEngine;
+using UnityEngine.Networking;
 using Input = UnityEngine.Input;
 
 namespace FiringSquad.Gameplay
@@ -19,6 +21,7 @@ namespace FiringSquad.Gameplay
 		private new Transform transform { get { return mController.transform; } }
 
 		private CltPlayer mPlayer;
+		private IAudioReference mWalkingSound;
 
 		private PlayerInputMap mInputBindings;
 		private Vector2 mInput;
@@ -84,11 +87,33 @@ namespace FiringSquad.Gameplay
 		private void INPUT_ForwardBackMovement(float val)
 		{
 			mInput.y = val;
+
+			if (mInput.magnitude >= 0.1f && mWalkingSound == null)
+			{
+				mWalkingSound = ServiceLocator.Get<IAudioManager>()
+					.PlaySound(AudioManager.AudioEvent.LoopWalking, mPlayer.audioProfile, mPlayer.transform);
+			}
+			else if (mInput.magnitude < 0.1f && mWalkingSound != null)
+			{
+				mWalkingSound.Kill();
+				mWalkingSound = null;
+			}
 		}
 
 		private void INPUT_LeftRightMovement(float val)
 		{
 			mInput.x = val;
+
+			if (mInput.magnitude >= 0.1f && mWalkingSound == null)
+			{
+				mWalkingSound = ServiceLocator.Get<IAudioManager>()
+					.PlaySound(AudioManager.AudioEvent.LoopWalking, mPlayer.audioProfile, mPlayer.transform);
+			}
+			else if (mInput.magnitude < 0.1f && mWalkingSound != null)
+			{
+				mWalkingSound.Kill();
+				mWalkingSound = null;
+			}
 		}
 
 		private void INPUT_LookHorizontal(float val)
@@ -143,6 +168,8 @@ namespace FiringSquad.Gameplay
 			if (!mController.isGrounded && !mIsJumping && mPreviouslyGrounded)
 				mMoveDirection.y = 0.0f;
 			mPreviouslyGrounded = mController.isGrounded;
+
+			UpdateAnimatorState();
 		}
 
 		private void FixedUpdate()
@@ -191,6 +218,11 @@ namespace FiringSquad.Gameplay
 			mController.radius = newRadius;
 		}
 
+		private void UpdateAnimatorState()
+		{
+			AnimationUtility.SetVariable(mPlayer.localAnimator, "Crouch", mCrouching);
+		}
+
 		/// <summary>
 		/// Apply movement based on the input we received this frame.
 		/// </summary>
@@ -217,7 +249,12 @@ namespace FiringSquad.Gameplay
 				if (mJump)
 				{
 					mMoveDirection.y = mMovementData.jumpForce;
-					// play jump sound
+					
+					// play jump sound ?
+
+					mPlayer.localAnimator.SetTrigger("Jump");
+					mPlayer.networkAnimator.SetTrigger("Jump");
+
 					mJump = false;
 					mIsJumping = true;
 				}

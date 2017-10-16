@@ -41,7 +41,7 @@ GameObject:
   - component: {fileID: 4195391653417196}
   m_Layer: 10
   m_Name: GunView
-  m_TagString: Untagged
+  m_TagString: interactable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -57,7 +57,7 @@ GameObject:
   - component: {fileID: 114038379896566526}
   m_Layer: 10
   m_Name: PickupView
-  m_TagString: Untagged
+  m_TagString: interactable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -89,9 +89,9 @@ GameObject:
   - component: {fileID: 33286078478025546}
   - component: {fileID: 23551360629024042}
   - component: {fileID: 95505494026878724}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: mesh_rocketMechanism
-  m_TagString: Untagged
+  m_TagString: interactable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -107,9 +107,9 @@ GameObject:
   - component: {fileID: 33677034396412318}
   - component: {fileID: 23014167435414232}
   - component: {fileID: 95255421387454024}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: mesh_rocketMechanism
-  m_TagString: Untagged
+  m_TagString: interactable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -163,8 +163,8 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1892180529110704}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.062, y: -0.161, z: -0.013}
-  m_LocalScale: {x: 2, y: 2, z: 2}
+  m_LocalPosition: {x: 0.062, y: -0.19, z: -0.013}
+  m_LocalScale: {x: 2.5, y: 2.5, z: 2.5}
   m_Children: []
   m_Father: {fileID: 4141891380440446}
   m_RootOrder: 1
@@ -177,7 +177,7 @@ Transform:
   m_GameObject: {fileID: 1504913695818014}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1.25, y: 1.25, z: 1.25}
   m_Children: []
   m_Father: {fileID: 4141891380440446}
   m_RootOrder: 0
@@ -413,7 +413,7 @@ MonoBehaviour:
       mType: 0
   mDescription: I'm a rocket man.
   mDurability: 10
-  mAudioOverride: {fileID: 0}
+  mAudioOverride: {fileID: 11400000, guid: c8de2752739058b488168e4afbe1309d, type: 2}
   mProjectilePrefab: {fileID: 1122678007204700, guid: 84b80f5ee9fffc84998972c5e7fc9d50,
     type: 2}
   mFireFromBarrelTip: 1

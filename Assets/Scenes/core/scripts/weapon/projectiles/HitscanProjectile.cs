@@ -58,11 +58,6 @@ namespace FiringSquad.Gameplay
 			RpcCreateShot(source.netId, endPoint);
 		}
 
-		private AudioManager.AudioEvent GetHitAudioEvent(IDamageReceiver hitObject)
-		{
-			// todo: replace with the new events
-			return AudioManager.AudioEvent.PrimaryEffect1;
-		}
 
 		[ClientRpc]
 		private void RpcCreateShot(NetworkInstanceId s, Vector3 endPoint)

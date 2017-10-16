@@ -41,7 +41,7 @@ GameObject:
   - component: {fileID: 4924764877504538}
   m_Layer: 10
   m_Name: GunView
-  m_TagString: Untagged
+  m_TagString: interactable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -57,9 +57,9 @@ GameObject:
   - component: {fileID: 33083409277844742}
   - component: {fileID: 23651903283398960}
   - component: {fileID: 95494833394832806}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: mesh_stockMechanism
-  m_TagString: Untagged
+  m_TagString: interactable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -75,9 +75,9 @@ GameObject:
   - component: {fileID: 33329911826551298}
   - component: {fileID: 23426367506683990}
   - component: {fileID: 95130905760714816}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: mesh_stockMechanism
-  m_TagString: Untagged
+  m_TagString: interactable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -109,7 +109,7 @@ GameObject:
   - component: {fileID: 114462681959862826}
   m_Layer: 10
   m_Name: PickupView
-  m_TagString: Untagged
+  m_TagString: interactable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -380,7 +380,7 @@ MonoBehaviour:
       mType: 0
   mDescription: 'Fires bullets: 50 damage.'
   mDurability: -1
-  mAudioOverride: {fileID: 0}
+  mAudioOverride: {fileID: 11400000, guid: db7679da44bd9614988d4edc1ad41781, type: 2}
   mProjectilePrefab: {fileID: 1546697341052326, guid: 37046d5bb3731fa488c846503629ad6f,
     type: 2}
   mFireFromBarrelTip: 0

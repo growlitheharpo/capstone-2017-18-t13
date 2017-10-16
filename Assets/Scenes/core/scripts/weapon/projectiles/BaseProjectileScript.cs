@@ -40,4 +40,13 @@ public abstract class BaseProjectileScript : NetworkBehaviour, IProjectile
 		ServiceLocator.Get<IAudioManager>()
 			.PlaySound(e, mAudioProfile, transform, position);
 	}
+
+	protected AudioManager.AudioEvent GetHitAudioEvent(IDamageReceiver hitObject)
+	{
+		CltPlayer player = hitObject as CltPlayer;
+		if (hitObject == null || player == null)
+			return AudioManager.AudioEvent.ImpactWall;
+
+		return player.isCurrentPlayer ? AudioManager.AudioEvent.ImpactCurrentPlayer : AudioManager.AudioEvent.ImpactOtherPlayer;
+	}
 }
