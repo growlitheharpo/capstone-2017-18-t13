@@ -132,14 +132,21 @@ public class CltPlayer : NetworkBehaviour, IWeaponBearer, IDamageReceiver
 	[Command]
 	public void CmdActivateInteract(Vector3 eyePosition, Vector3 eyeForward)
 	{
-		IInteractable interactable;
-		RaycastHit hit;
+		IInteractable interactable = null;
 
-		Ray ray = new Ray(eyePosition, eyeForward);
-		if (!Physics.Raycast(ray, out hit, mInformation.interactDistance))
-			return;
+		if (magnetArm != null)
+			interactable = magnetArm.heldWeaponPart;
 
-		interactable = hit.GetInteractableComponent();
+		if (interactable == null)
+		{
+			RaycastHit hit;
+
+			Ray ray = new Ray(eyePosition, eyeForward);
+			if (!Physics.Raycast(ray, out hit, mInformation.interactDistance))
+				return;
+
+			interactable = hit.GetInteractableComponent();
+		}
 
 		if (interactable != null)
 			interactable.Interact(this);

@@ -1,5 +1,4 @@
-﻿using System;
-using FiringSquad.Gameplay;
+﻿using FiringSquad.Gameplay;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -15,7 +14,9 @@ public class PlayerMagnetArm : NetworkBehaviour
 	[SerializeField] private float mPullForce;
 	public float pullForce { get { return mPullForce; } }
 
-	private WeaponPickupScript mHeldObject;
+	[SerializeField] private WeaponPickupScript mHeldObject;
+	public WeaponPickupScript heldWeaponPart { get { return mHeldObject; } }
+
 	public CltPlayer bearer { get; set; }
 
 	private WeaponPickupScript mGrabCandidate;
@@ -200,18 +201,23 @@ public class PlayerMagnetArm : NetworkBehaviour
 	private void CmdGrabItem(NetworkInstanceId id)
 	{
 		GameObject go = NetworkServer.FindLocalObject(id);
-		go.GetComponent<INetworkGrabbable>().GrabNow(bearer);
+		WeaponPickupScript script = go.GetComponent<WeaponPickupScript>();
+
+		script.GrabNow(bearer);
+		mHeldObject = script;
 	}
 
 	[Command]
 	private void CmdReleaseItem(NetworkInstanceId itemId, bool drop)
 	{
-		INetworkGrabbable go = NetworkServer.FindLocalObject(itemId).GetComponent<INetworkGrabbable>();
+		WeaponPickupScript go = NetworkServer.FindLocalObject(itemId).GetComponent<WeaponPickupScript>();
 
 		if (drop)
 			go.Release();
 		else
 			go.Throw();
+
+		mHeldObject = null;
 	}
 
 	[ClientRpc]
