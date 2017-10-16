@@ -77,11 +77,10 @@ public class WeaponPickupScript : NetworkBehaviour, IInteractable, INetworkGrabb
 		}
 		catch (Exception e)
 		{
-			Console.WriteLine(e);
+			Debug.LogException(e);
 		}
 
 		Destroy(gameObject);
-
 		wepBearer.weapon.AttachNewPart(GetComponent<WeaponPartScript>().partId);
 	}
 
@@ -99,18 +98,48 @@ public class WeaponPickupScript : NetworkBehaviour, IInteractable, INetworkGrabb
 	public void GrabNow(CltPlayer player)
 	{
 		currentHolder = player;
+
+		// TODO: Lerp this
+
+		mPickupView.transform.localScale = Vector3.one * 0.5f;
+		//mPickupView.SetActive(false);
+		//mGunView.SetActive(true);
+
+		mRigidbody.isKinematic = true;
+
+		transform.SetParent(currentHolder.magnetArm.transform);
+		transform.ResetLocalValues();
 	}
 
 	public void Throw()
 	{
-		Vector3 direction = currentHolder.magnetArm.transform.forward;
+		if (currentHolder == null)
+			return;
+
+		Vector3 direction = currentHolder.eye.forward;
 
 		transform.SetParent(null);
+		mRigidbody.isKinematic = false;
+
+		mPickupView.transform.localScale = Vector3.one;
+		//mPickupView.SetActive(true);
+		//mGunView.SetActive(false);
+
+		mRigidbody.AddForce(direction * 30.0f, ForceMode.Impulse);
+
 		currentHolder = null;
 	}
 
 	public void Release()
 	{
+		transform.SetParent(null);
+
+		mRigidbody.isKinematic = false;
+
+		mPickupView.transform.localScale = Vector3.one;
+		//mPickupView.SetActive(true);
+		//mGunView.SetActive(false);
+
 		currentHolder = null;
 	}
 }

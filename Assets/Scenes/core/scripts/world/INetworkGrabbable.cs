@@ -1,4 +1,5 @@
-﻿using UnityEngine.Networking;
+﻿using UnityEngine;
+using UnityEngine.Networking;
 
 namespace FiringSquad.Gameplay
 {
@@ -7,6 +8,9 @@ namespace FiringSquad.Gameplay
 		NetworkInstanceId netId { get; }
 		CltPlayer currentHolder { get; }
 		bool currentlyHeld { get; }
+
+		Transform transform { get; }
+		GameObject gameObject { get; }
 
 		void PullTowards(CltPlayer player);
 		void GrabNow(CltPlayer player);

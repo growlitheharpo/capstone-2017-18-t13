@@ -15,10 +15,10 @@ public class PlayerMagnetArm : NetworkBehaviour
 	[SerializeField] private float mPullForce;
 	public float pullForce { get { return mPullForce; } }
 
-	private INetworkGrabbable mHeldObject;
+	private WeaponPickupScript mHeldObject;
 	public CltPlayer bearer { get; set; }
 
-	private INetworkGrabbable mGrabCandidate;
+	private WeaponPickupScript mGrabCandidate;
 	private float mHeldTimer;
 	private State mState;
 
@@ -58,9 +58,15 @@ public class PlayerMagnetArm : NetworkBehaviour
 			if (heldObject == null)
 				return;
 
-			INetworkGrabbable grabbable = heldObject.GetComponent<INetworkGrabbable>();
-			if (grabbable.currentHolder != bearer)
-				grabbable.GrabNow(bearer);
+			mHeldObject = heldObject.GetComponent<WeaponPickupScript>();
+			if (mHeldObject.currentHolder != bearer)
+				mHeldObject.GrabNow(bearer);
+		}
+		else
+		{
+			if (mHeldObject != null)
+				mHeldObject.Release();
+			mHeldObject = null;
 		}
 	}
 
@@ -70,17 +76,19 @@ public class PlayerMagnetArm : NetworkBehaviour
 	}
 
 	#endregion
-	
+
 	[Client]
 	public void FireHeld()
 	{
 		switch (mState)
 		{
 			case State.Idle:
-				TryReelObject();
+				if (mGrabCandidate == null)
+					TryFindGrabCandidate();
+				ReelGrabCandidate();
 				break;
 			case State.Reeling:
-				TryReelObject();
+				ReelGrabCandidate();
 				break;
 			case State.Locked:
 				mHeldTimer += Time.deltaTime;
@@ -104,9 +112,8 @@ public class PlayerMagnetArm : NetworkBehaviour
 		}
 	}
 
-	private void TryReelObject()
+	private void TryFindGrabCandidate()
 	{
-		INetworkGrabbable grabbable;
 		RaycastHit hitInfo;
 
 		Ray r = new Ray(bearer.eye.position, bearer.eye.forward);
@@ -117,25 +124,96 @@ public class PlayerMagnetArm : NetworkBehaviour
 		if (!Physics.Raycast(r, out hitInfo))
 			return;
 
-		grabbable = hitInfo.collider.GetComponentUpwards<INetworkGrabbable>();
+		WeaponPickupScript grabbable = hitInfo.collider.GetComponentUpwards<WeaponPickupScript>();
 		if (grabbable != null && !grabbable.currentlyHeld)
-			ReelObject(grabbable);
+			mGrabCandidate = grabbable;
 	}
 
-	private void ReelObject(INetworkGrabbable go)
+	private void ReelGrabCandidate()
 	{
-		go.PullTowards(bearer);
-		CmdReelObject(go.netId);
+		if (mGrabCandidate == null)
+			return;
+
+		mState = State.Reeling;
+
+		Vector3 direction = mGrabCandidate.transform.position - bearer.eye.position;
+
+		if (direction.magnitude < 1.5f)
+		{
+			GrabItem();
+			return;
+		}
+
+		Vector3 looking = bearer.eye.forward;
+		float dot = Vector3.Dot(direction.normalized, looking.normalized);
+		if (dot < 0.9f)
+		{
+			mGrabCandidate = null;
+			return;
+		}
+
+		mGrabCandidate.PullTowards(bearer);
+		CmdReelObject(mGrabCandidate.netId);
 	}
 
-	[Command]
-	private void CmdReelObject(NetworkInstanceId obj)
+	private void GrabItem()
 	{
-		GameObject go = NetworkServer.FindLocalObject(obj);
-		go.GetComponent<INetworkGrabbable>().PullTowards(bearer);
+		if (mGrabCandidate.currentlyHeld)
+			return;
+
+		mGrabCandidate.GrabNow(bearer);
+
+		mHeldObject = mGrabCandidate;
+		mGrabCandidate = null;
+
+		CmdGrabItem(mHeldObject.netId);
 	}
 
 	private void ThrowOrDropItem()
+	{
+		if (mHeldObject != null && mHeldObject.currentHolder == bearer)
+		{
+			if (mHeldTimer >= 1.0f)
+				mHeldObject.Throw();
+			else
+				mHeldObject.Release();
+
+			CmdReleaseItem(mHeldObject.netId, mHeldTimer < 1.0f);
+		}
+
+		mHeldObject = null;
+		mGrabCandidate = null;
+		mHeldTimer = 0.0f;
+		mState = State.Idle;
+	}
+
+	[Command]
+	private void CmdReelObject(NetworkInstanceId id)
+	{
+		GameObject go = NetworkServer.FindLocalObject(id);
+		go.GetComponent<INetworkGrabbable>().PullTowards(bearer);
+	}
+
+	[Command]
+	private void CmdGrabItem(NetworkInstanceId id)
+	{
+		GameObject go = NetworkServer.FindLocalObject(id);
+		go.GetComponent<INetworkGrabbable>().GrabNow(bearer);
+	}
+
+	[Command]
+	private void CmdReleaseItem(NetworkInstanceId itemId, bool drop)
+	{
+		INetworkGrabbable go = NetworkServer.FindLocalObject(itemId).GetComponent<INetworkGrabbable>();
+
+		if (drop)
+			go.Release();
+		else
+			go.Throw();
+	}
+
+	[ClientRpc]
+	private void RpcReleaseItem(NetworkInstanceId itemId, bool drop)
 	{
 		
 	}
