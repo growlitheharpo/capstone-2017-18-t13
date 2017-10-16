@@ -4,10 +4,6 @@ using System.Reflection;
 using FiringSquad.Gameplay;
 using UnityEngine;
 
-#if !DEBUG && !DEVELOPMENT_BUILD
-using UnityEngine;
-#endif
-
 /// <summary>
 /// A list of game events for this project.
 /// </summary>
