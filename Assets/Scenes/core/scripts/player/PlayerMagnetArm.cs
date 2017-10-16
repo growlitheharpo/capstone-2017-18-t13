@@ -14,7 +14,7 @@ public class PlayerMagnetArm : NetworkBehaviour
 	[SerializeField] private float mPullForce;
 	public float pullForce { get { return mPullForce; } }
 
-	[SerializeField] private WeaponPickupScript mHeldObject;
+	private WeaponPickupScript mHeldObject;
 	public WeaponPickupScript heldWeaponPart { get { return mHeldObject; } }
 
 	[SerializeField] private AudioProfile mAudioProfile;
