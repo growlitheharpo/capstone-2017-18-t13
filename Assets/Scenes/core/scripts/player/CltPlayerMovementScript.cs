@@ -1,5 +1,6 @@
 ﻿using FiringSquad.Data;
 using KeatsLib;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Networking;
 using Input = UnityEngine.Input;
@@ -20,6 +21,7 @@ namespace FiringSquad.Gameplay
 		private new Transform transform { get { return mController.transform; } }
 
 		private CltPlayer mPlayer;
+		private IAudioReference mWalkingSound;
 
 		private PlayerInputMap mInputBindings;
 		private Vector2 mInput;
@@ -85,11 +87,33 @@ namespace FiringSquad.Gameplay
 		private void INPUT_ForwardBackMovement(float val)
 		{
 			mInput.y = val;
+
+			if (mInput.magnitude >= 0.1f && mWalkingSound == null)
+			{
+				mWalkingSound = ServiceLocator.Get<IAudioManager>()
+					.PlaySound(AudioManager.AudioEvent.LoopWalking, mPlayer.audioProfile, mPlayer.transform);
+			}
+			else if (mInput.magnitude < 0.1f && mWalkingSound != null)
+			{
+				mWalkingSound.Kill();
+				mWalkingSound = null;
+			}
 		}
 
 		private void INPUT_LeftRightMovement(float val)
 		{
 			mInput.x = val;
+
+			if (mInput.magnitude >= 0.1f && mWalkingSound == null)
+			{
+				mWalkingSound = ServiceLocator.Get<IAudioManager>()
+					.PlaySound(AudioManager.AudioEvent.LoopWalking, mPlayer.audioProfile, mPlayer.transform);
+			}
+			else if (mInput.magnitude < 0.1f && mWalkingSound != null)
+			{
+				mWalkingSound.Kill();
+				mWalkingSound = null;
+			}
 		}
 
 		private void INPUT_LookHorizontal(float val)

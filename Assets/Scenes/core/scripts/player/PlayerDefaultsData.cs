@@ -18,6 +18,9 @@ namespace FiringSquad.Data
 		[SerializeField] private bool mShouldInstantiateGravityGun = true;
 		[SerializeField] private bool mInstantiateParts = true;
 
+		[SerializeField] private AudioProfile mAudioProfile;
+		public AudioProfile audioProfile { get { return mAudioProfile; } }
+
 		public WeaponPartCollection defaultWeaponParts { get { return mDefaultWeaponParts; } }
 		public float interactDistance { get { return mInteractDistance; } }
 		public float defaultHealth { get { return mDefaultHealth; } }
