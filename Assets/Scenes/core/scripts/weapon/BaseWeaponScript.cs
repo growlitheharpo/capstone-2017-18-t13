@@ -49,6 +49,17 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 	public Transform aimRoot { get; set; }
 	public Vector3 positionOffset { get; set; }
 
+	[SerializeField] private AudioProfile mAudioProfile;
+	private AudioProfile audioProfile
+	{
+		get
+		{
+			if (mCurrentParts.mechanism != null && mCurrentParts.mechanism.audioOverride != null)
+				return mCurrentParts.mechanism.audioOverride;
+			return mAudioProfile;
+		}
+	}
+
 	[SerializeField] private Transform mBarrelAttach;
 	[SerializeField] private Transform mScopeAttach;
 	[SerializeField] private Transform mMechanismAttach;
@@ -270,6 +281,9 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 
 	private void PlayReloadEffect(float time)
 	{
+		ServiceLocator.Get<IAudioManager>()
+			.PlaySound(AudioManager.AudioEvent.Reload, audioProfile, transform);
+
 		AnimationUtility.PlayAnimation(gameObject, "reload");
 		StartCoroutine(WaitForReload(time));
 	}
@@ -322,6 +336,7 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 			CmdInstantiateShot(shot.origin, shot.direction);
 
 		//EventManager.Local.PlayerFiredWeapon(realBearer, shots);
+		CmdOnShotFireComplete();
 		PlayFireEffect();
 		OnPostFireShot();
 	}
@@ -335,6 +350,12 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 		projectile.GetComponent<IProjectile>().PreSpawnInitialize(this, shot, mCurrentData);
 		NetworkServer.Spawn(projectile);
 		projectile.GetComponent<IProjectile>().PostSpawnInitialize(this, shot, mCurrentData);
+	}
+
+	[Command]
+	private void CmdOnShotFireComplete()
+	{
+		EventManager.Server.PlayerFiredWeapon(realBearer, null);
 	}
 
 	private bool CanFireShotNow()
@@ -459,6 +480,9 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 	{
 		mShotParticles.transform.position = currentParts.barrel.barrelTip.position;
 		mShotParticles.Play();
+
+		ServiceLocator.Get<IAudioManager>()
+			.PlaySound(AudioManager.AudioEvent.Shoot, audioProfile, transform);
 	}
 
 	#endregion
