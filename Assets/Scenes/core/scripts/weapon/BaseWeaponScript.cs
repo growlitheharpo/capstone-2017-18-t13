@@ -224,6 +224,9 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 			mShotsInClip.value = mCurrentData.clipSize;
 			mTotalClipSize.value = mCurrentData.clipSize;
 		}
+
+		ServiceLocator.Get<IAudioManager>()
+			.PlaySound(AudioManager.AudioEvent.InteractReceive, realBearer.audioProfile, transform);
 	}
 
 	private void MoveAttachmentToPoint(WeaponPartScript instance)
