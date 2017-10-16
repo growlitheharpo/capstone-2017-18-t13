@@ -1,6 +1,5 @@
 ﻿using FiringSquad.Data;
 using KeatsLib;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.Networking;
 using Input = UnityEngine.Input;
