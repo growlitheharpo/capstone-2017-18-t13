@@ -104,3 +104,6 @@ public partial class EventManager : MonoSingleton<EventManager>
 		}
 	}
 }
+
+[AttributeUsage(validOn: AttributeTargets.Method)]
+public class EventHandlerAttribute : Attribute { }

@@ -16,27 +16,28 @@ namespace FiringSquad.Debug
 
 		public void RefreshWeaponList()
 		{
-			var allObjects = Resources.LoadAll<GameObject>("prefabs/weapons");
-			var parts = allObjects
-				.Where(x => x.GetComponent<WeaponPartScript>() != null)
-				.Select(x => x.GetComponent<WeaponPartScript>()).ToArray();
+			var parts = ServiceLocator.Get<IWeaponPartManager>()
+				.GetAllPrefabs(true).Values
+				.Select(x => x.GetComponent<WeaponPartScript>())
+				.ToArray();
 
 			mMechanisms = parts.Where(x => x.attachPoint == BaseWeaponScript.Attachment.Mechanism).ToArray();
 			mBarrels = parts.Where(x => x.attachPoint == BaseWeaponScript.Attachment.Barrel).ToArray();
 			mScopes = parts.Where(x => x.attachPoint == BaseWeaponScript.Attachment.Scope).ToArray();
 			mGrips = parts.Where(x => x.attachPoint == BaseWeaponScript.Attachment.Grip).ToArray();
-
 		}
 
 		private void Start()
 		{
 			RefreshWeaponList();
-			EventManager.OnUIToggle += ToggleUI;
+			ServiceLocator.Get<IInput>()
+				.RegisterInput(Input.GetKeyDown, KeyCode.Tab, ToggleUI, KeatsLib.Unity.Input.InputLevel.None);
 		}
 
 		private void OnDestroy()
 		{
-			EventManager.OnUIToggle -= ToggleUI;
+			ServiceLocator.Get<IInput>()
+				.UnregisterInput(ToggleUI);
 		}
 
 		private void ToggleUI()
@@ -74,7 +75,12 @@ namespace FiringSquad.Debug
 					label += "\n\n" + part.description;
 
 				if (GUILayout.Button(label, GUILayout.MaxHeight(100.0f)))
-					Instantiate(part.gameObject).GetComponent<WeaponPickupScript>().ConfirmAttach(FindObjectOfType<PlayerScript>().weapon);
+				{
+					CltPlayer player = FindObjectsOfType<CltPlayer>()
+						.FirstOrDefault(x => x.isCurrentPlayer);
+					if (player != null)
+						player.CmdDebugEquipWeaponPart(part.name);
+				}
 			}
 			GUILayout.EndArea();
 		}

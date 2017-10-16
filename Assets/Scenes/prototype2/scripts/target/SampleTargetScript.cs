@@ -15,18 +15,12 @@ namespace FiringSquad.Gameplay
 
 		private BoundProperty<float> mHealth;
 		public BoundProperty<float> health { get { return mHealth; } }
-
-		private void Awake()
-		{
-			mHealth = new BoundProperty<float>(mStartHealth, (gameObject.name + "-health").GetHashCode());
-		}
-
+		
 		private void Start()
 		{
+			mHealth = new BoundProperty<float>(mStartHealth, (gameObject.name + "-health").GetHashCode());
 			ServiceLocator.Get<IGameConsole>()
 				.RegisterCommand("target", CONSOLE_Reset);
-
-			EventManager.OnResetLevel += HandleResetEvent;
 		}
 
 		private void OnDestroy()
@@ -34,7 +28,6 @@ namespace FiringSquad.Gameplay
 			ServiceLocator.Get<IGameConsole>()
 				.UnregisterCommand("target");
 
-			EventManager.OnResetLevel -= HandleResetEvent;
 			mHealth.Cleanup();
 		}
 
@@ -92,21 +85,10 @@ namespace FiringSquad.Gameplay
 
 			yield return null;
 		}
-
-		private void HandleResetEvent()
-		{
-			mHealth.value = mStartHealth;
-			mMesh.SetActive(true);
-		}
-
+		
 		private void Die()
 		{
 			mMesh.SetActive(false);
-
-			ICharacter characterComponent = GetComponent<AggressiveTargetScript>();
-			if (characterComponent != null)
-				EventManager.Notify(() => EventManager.PlayerKilledEnemy(characterComponent));
-
 			mDeathParticles.Play();
 		}
 	}

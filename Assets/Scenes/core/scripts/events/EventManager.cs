@@ -1,30 +1,136 @@
-﻿using FiringSquad.Gameplay;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using UnityEngine.SceneManagement;
-
-#if !DEBUG && !DEVELOPMENT_BUILD
+using FiringSquad.Gameplay;
 using UnityEngine;
-#endif
 
 /// <summary>
 /// A list of game events for this project.
 /// </summary>
 public partial class EventManager
 {
-	public static event Action OnTogglePauseState = () => { LogEvent(); };
+	#region Local-side Events
 
-	public static void TogglePauseState()
+	public static class Local
 	{
-		OnTogglePauseState();
+		public static event Action<IOptionsData> OnApplyOptionsData = e => { LogEvent(); };
+
+		public static void ApplyOptionsData(IOptionsData data)
+		{
+			OnApplyOptionsData(data);
+		}
+
+		public static event Action OnTogglePause = () => { LogEvent(); };
+
+		public static void TogglePause()
+		{
+			OnTogglePause();
+		}
+
+		public static event Action<long> OnReceiveStartEvent = t => { LogEvent(); };
+
+		public static void ReceiveStartEvent(long endTime)
+		{
+			OnReceiveStartEvent(endTime);
+		}
+
+		public static event Action OnReceiveFinishEvent = () => { LogEvent(); };
+
+		public static void ReceiveFinishEvent()
+		{
+			OnReceiveFinishEvent();
+		}
+
+		public static event Action<CltPlayer> OnLocalPlayerSpawned = (p) => { LogEvent(); };
+
+		public static void LocalPlayerSpawned(CltPlayer p)
+		{
+			OnLocalPlayerSpawned(p);
+		}
 	}
 
-	public static event Action<IOptionsData> OnApplyOptionsData = e => { LogEvent(); };
-
-	public static void ApplyOptionsData(IOptionsData data)
+	public static class LocalGUI
 	{
-		OnApplyOptionsData(data);
+		public static event Action<bool> OnTogglePauseMenu = b => { LogEvent(); };
+
+		public static void TogglePauseMenu(bool visible)
+		{
+			OnTogglePauseMenu(visible);
+		}
+
+		public static event Action<string> OnShowGameoverPanel = s => { LogEvent(); };
+
+		public static void ShowGameoverPanel(string whoWins)
+		{
+			OnShowGameoverPanel(whoWins);
+		}
+	}
+
+	#endregion
+
+	#region Server-side Events
+
+	public static class Server
+	{
+		public static event Action<CltPlayer, List<Ray>> OnPlayerFiredWeapon = (p, s) => { LogEvent(); };
+
+		public static void PlayerFiredWeapon(CltPlayer bearer, List<Ray> shotsFired)
+		{
+			OnPlayerFiredWeapon(bearer, shotsFired);
+		}
+
+		public static event Action<int> OnPlayerJoined = (i) => { LogEvent(); };
+
+		public static void PlayerJoined(int newCount)
+		{
+			OnPlayerJoined(newCount);
+		}
+
+		public static event Action<int> OnPlayerLeft = (i) => { LogEvent(); };
+
+		public static void PlayerLeft(int newCount)
+		{
+			OnPlayerLeft(newCount);
+		}
+
+		public static event Action<CltPlayer, IDamageSource> OnPlayerHealthHitsZero = (p, r) => { LogEvent(); };
+
+		public static void PlayerHealthHitZero(CltPlayer player, IDamageSource reason)
+		{
+			OnPlayerHealthHitsZero(player, reason);
+		}
+
+		public static event Action<CltPlayer, CltPlayer, Transform> OnPlayerDied = (d, k, p) => { LogEvent(); };
+
+		public static void PlayerDied(CltPlayer deadPlayer, CltPlayer killer, Transform respawnPosition)
+		{
+			OnPlayerDied(deadPlayer, killer, respawnPosition);
+		}
+
+		public static event Action<long> OnStartGame = d => { LogEvent(); };
+
+		public static void StartGame(long endTime)
+		{
+			OnStartGame(endTime);
+		}
+
+		public static event Action OnFinishGame = () => { LogEvent(); };
+
+		public static void FinishGame()
+		{
+			OnFinishGame();
+		}
+	}
+
+	#endregion
+
+	#region Agnostic Events
+
+	public static event Action OnInitialAudioLoadComplete = () => { LogEvent(); };
+
+	public static void InitialAudioLoadComplete()
+	{
+		OnInitialAudioLoadComplete();
 	}
 
 	public static event Action OnInitialPersistenceLoadComplete = () => { LogEvent(); };
@@ -34,92 +140,8 @@ public partial class EventManager
 		OnInitialPersistenceLoadComplete();
 	}
 
-	public static event Action OnInitialAudioLoadComplete = () => { LogEvent(); };
-
-	public static void InitialAudioLoadComplete()
-	{
-		OnInitialAudioLoadComplete();
-	}
-
-	public static event Action<string, LoadSceneMode> OnRequestSceneChange = (e, m) => { LogEvent(); };
-
-	public static void RequestSceneChange(string sceneName, LoadSceneMode mode = LoadSceneMode.Single)
-	{
-		OnRequestSceneChange(sceneName, mode);
-	}
-
-	// PROTOTYPE 2
-	public static event Action OnUIToggle = () => { LogEvent(); };
-
-	public static void UIToggle()
-	{
-		OnUIToggle();
-	}
-
-	public static event Action<FiringSquad.Gameplay.WeaponPartScript> OnConfirmPartAttach = e => { LogEvent(); };
-
-	public static void ConfirmPartAttach(FiringSquad.Gameplay.WeaponPartScript newPart)
-	{
-		OnConfirmPartAttach(newPart);
-	}
-
-	public static event Action<BoundProperty, int> OnBoundPropertyCreated = (p, c) => { LogEvent(); };
-
-	public static void BoundPropertyCreated(BoundProperty property, int propertyCode)
-	{
-		OnBoundPropertyCreated(property, propertyCode);
-	}
-
-	public static event Action<BoundProperty> OnBoundPropertyDestroyed = (p) => { LogEvent(); };
-
-	public static void BoundPropertyDestroyed(BoundProperty boundProperty)
-	{
-		OnBoundPropertyDestroyed(boundProperty);
-	}
-
-	public static event Action<ICharacter> OnPlayerDied = p => { LogEvent(); };
-
-	public static void PlayerDied(ICharacter player)
-	{
-		OnPlayerDied(player);
-	}
-
-	public static event Action OnResetLevel = () => { LogEvent(); };
-
-	public static void ResetLevel()
-	{
-		OnResetLevel();
-	}
-
-	public static event Action<ICharacter> OnPlayerKilledEnemy = e => { LogEvent(); };
-
-	public static void PlayerKilledEnemy(ICharacter enemy)
-	{
-		OnPlayerKilledEnemy(enemy);
-	}
-
-	public static event Action<string> OnShowGameoverPanel = e => { LogEvent(); };
-
-	public static void ShowGameoverPanel(string resultText)
-	{
-		OnShowGameoverPanel(resultText);
-	}
-
-	public static event Action<bool> OnShowPausePanel = b => { LogEvent(); };
-
-	public static void ShowPausePanel(bool show)
-	{
-		OnShowPausePanel(show);
-	}
-
-	public static event Action<long> OnAllPlayersReady = (t) => { LogEvent(); };
-
-	public static void AllPlayersReady(long endTime)
-	{
-		OnAllPlayersReady(endTime);
-	}
-
-	//!PROTOTYPE 2
+	#endregion
+	
 
 	public void Start()
 	{

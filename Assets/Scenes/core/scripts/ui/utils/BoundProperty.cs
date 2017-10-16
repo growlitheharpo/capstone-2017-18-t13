@@ -37,7 +37,8 @@ public class BoundProperty
 		foreach (Delegate d in delegates)
 			ValueChanged -= (Action)d;
 
-		EventManager.BoundPropertyDestroyed(this);
+		ServiceLocator.Get<IGameplayUIManager>()
+			.UnbindProperty(this);
 	}
 }
 
@@ -77,6 +78,7 @@ public class BoundProperty<T> : BoundProperty
 	public BoundProperty(T value, int property)
 	{
 		this.value = value;
-		EventManager.Notify(() => EventManager.BoundPropertyCreated(this, property));
+		ServiceLocator.Get<IGameplayUIManager>()
+			.BindProperty(property, this);
 	}
 }

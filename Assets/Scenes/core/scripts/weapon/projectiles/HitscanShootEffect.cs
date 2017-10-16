@@ -7,12 +7,22 @@ namespace FiringSquad.Gameplay
 	{
 		private LineRenderer mRenderer;
 
+		private Coroutine mEffectRoutine;
+
 		private void Awake()
 		{
 			mRenderer = GetComponent<LineRenderer>();
 		}
 
-		public IEnumerator Flash(Vector3 end, float time = 0.15f, Space endSpace = Space.World)
+		public Coroutine PlayEffect(Vector3 end, float time = 0.15f, Space endSpace = Space.World)
+		{
+			if (mEffectRoutine == null)
+				mEffectRoutine = StartCoroutine(Flash(end, time, endSpace));
+
+			return mEffectRoutine;
+		}
+
+		private IEnumerator Flash(Vector3 end, float time = 0.15f, Space endSpace = Space.World)
 		{
 			Vector3 realEnd = endSpace == Space.World ? end : transform.TransformPoint(end);
 			Vector3 start = transform.position;

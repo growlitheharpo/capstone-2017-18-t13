@@ -1,88 +1,145 @@
-﻿using System.Collections;
+﻿using System;
+using FiringSquad.Gameplay;
 using KeatsLib.Unity;
 using UnityEngine;
 using UnityEngine.Networking;
 
-namespace FiringSquad.Gameplay
+public class WeaponPickupScript : NetworkBehaviour, IInteractable, INetworkGrabbable
 {
-	public class WeaponPickupScript : NetworkBehaviour, IInteractable
+	[SerializeField] private GameObject mGunView;
+	[SerializeField] private GameObject mPickupView;
+
+	public CltPlayer currentHolder { get; private set; }
+	public bool currentlyHeld { get { return currentHolder != null; } }
+
+	private Rigidbody mRigidbody;
+
+	private void Awake()
 	{
-		[SerializeField] private AudioProfile mPickupAudioProfile;
-		[SerializeField] private float mPickupScale = 2.0f;
-		[SerializeField] private Collider mPickupCollider;
+		mRigidbody = GetComponent<Rigidbody>();
+	}
 
-		public BaseWeaponScript.Attachment attachPoint { get { return mPart.attachPoint; } }
+	private void Start()
+	{
+		InitializePickupView();
+	}
+
+	private void OnDestroy()
+	{
+		DestroyPickupView();
+
+		transform.ResetLocalValues();
+		mGunView.transform.ResetLocalValues();
 		
-		private Rigidbody mPickupRigidbody;
-		private WeaponPartScript mPart;
+		if (mRigidbody != null)
+			Destroy(mRigidbody);
+	}
 
-		private Transform mView, mRotator;
+	private void DestroyPickupView()
+	{
+		mGunView.SetActive(true);
 
-		private void Awake()
+		if (mPickupView != null)
+			Destroy(mPickupView);
+	}
+
+	[ClientRpc]
+	public void RpcInitializePickupView()
+	{
+		InitializePickupView();
+	}
+
+	public void InitializePickupView()
+	{
+		if (!mGunView.activeInHierarchy && mPickupView.activeInHierarchy)
+			return;
+
+		mGunView.SetActive(false);
+		mPickupView.SetActive(true);
+
+		GameObject psPrefab = Resources.Load<GameObject>("prefabs/weapons/effects/p_pickupEffectPack");
+		GameObject ps = Instantiate(psPrefab);
+
+		ps.transform.SetParent(mPickupView.transform);
+		ps.transform.ResetLocalValues();
+	}
+
+	[Server]
+	public void Interact(ICharacter source)
+	{
+		IWeaponBearer wepBearer = source as IWeaponBearer;
+		if (wepBearer == null)
+			return;
+
+		try
 		{
-			mPickupRigidbody = GetComponent<Rigidbody>();
-			mPart = GetComponent<WeaponPartScript>();
-			mView = transform.Find("View");
-
-			mRotator = new GameObject("Rotator", typeof(RotatorUtilityScript)).transform;
-			mRotator.SetParent(transform, false);
+			NetworkServer.Destroy(gameObject);
+		}
+		catch (Exception e)
+		{
+			Debug.LogException(e);
 		}
 
-		private void Start()
-		{
-			StartCoroutine(Coroutines.InvokeAfterFrames(3, () =>
-			{
-				transform.localScale = Vector3.one * mPickupScale;
+		Destroy(gameObject);
+		wepBearer.weapon.AttachNewPart(GetComponent<WeaponPartScript>().partId);
+	}
 
-				GameObject psPrefab = Resources.Load<GameObject>("prefabs/weapons/effects/p_pickupEffectPack");
-				GameObject ps = Instantiate(psPrefab);
+	public void PullTowards(CltPlayer player)
+	{
+		if (currentlyHeld)
+			return;
 
-				ps.transform.SetParent(mPickupCollider.transform, false);
-				ps.transform.position = mPickupCollider.bounds.center;
+		Vector3 direction = player.magnetArm.transform.position - transform.position;
+		direction = direction.normalized * player.magnetArm.pullForce;
 
-				mRotator.position = mPickupCollider.bounds.center;
-				mView.SetParent(mRotator, true);
-			}));
-		}
+		mRigidbody.AddForce(direction, ForceMode.Force);
+	}
 
-		private void OnDestroy()
-		{
-			StopAllCoroutines();
-			mView.SetParent(transform);
-			mView.localPosition = Vector3.zero;
-			mView.localRotation = Quaternion.identity;
-			mView.localScale = Vector3.one;
+	public void GrabNow(CltPlayer player)
+	{
+		currentHolder = player;
 
-			Destroy(mRotator.gameObject);
-		}
-		
-		public void Interact(ICharacter source)
-		{
-			ServiceLocator.Get<IAudioManager>()
-				.PlaySound(AudioManager.AudioEvent.InteractReceive, mPickupAudioProfile, transform);
+		// TODO: Lerp this
 
-			PlayerScript bearer = source as PlayerScript;
+		mPickupView.transform.localScale = Vector3.one * 0.45f;
+		//mPickupView.SetActive(false);
+		//mGunView.SetActive(true);
 
-			if (bearer != null)
-				bearer.CmdPickupNewPart(netId, this.name);
-		}
+		mRigidbody.isKinematic = true;
 
-		public WeaponPickupScript OverrideDurability(int value)
-		{
-			mPart.durability = value;
-			return this;
-		}
-		
-		public void ConfirmAttach(IWeapon weapon)
-		{
-			Destroy(mPickupCollider.gameObject);
-			Destroy(mPickupRigidbody);
+		transform.SetParent(currentHolder.magnetArm.transform);
+		transform.ResetLocalValues();
+	}
 
-			StartCoroutine(Coroutines.WaitOneFrame(() =>
-			{
-				weapon.AttachNewPart(mPart);
-				Destroy(this);
-			}));
-		}
+	public void Throw()
+	{
+		if (currentHolder == null)
+			return;
+
+		Vector3 direction = currentHolder.eye.forward;
+
+		transform.SetParent(null);
+		mRigidbody.isKinematic = false;
+
+		mPickupView.transform.localScale = Vector3.one;
+		//mPickupView.SetActive(true);
+		//mGunView.SetActive(false);
+
+		mRigidbody.AddForce(direction * 30.0f, ForceMode.Impulse);
+
+		currentHolder = null;
+	}
+
+	public void Release()
+	{
+		transform.SetParent(null);
+
+		mRigidbody.isKinematic = false;
+
+		mPickupView.transform.localScale = Vector3.one;
+		//mPickupView.SetActive(true);
+		//mGunView.SetActive(false);
+
+		currentHolder = null;
 	}
 }

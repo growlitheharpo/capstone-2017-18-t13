@@ -1,105 +1,87 @@
 ﻿using System.Collections;
 using FiringSquad.Data;
 using UnityEngine;
+using UnityEngine.Networking;
 
 namespace FiringSquad.Gameplay
 {
-	public class HitscanProjectile : MonoBehaviour, IProjectile
+	public class HitscanProjectile : BaseProjectileScript
 	{
-		public void PreSetup() {}
-		public void PostSetup() {}
-		public void PreDisable() {}
-		public void PostDisable() {}
-
 		[SerializeField] private AnimationCurve mFalloffCurve;
-		[SerializeField] private AudioProfile mProfile;
 
 		private HitscanShootEffect mEffect;
-		private IAudioReference mAudio;
+		private IAudioReference mSoundRef;
 
 		private void Awake()
 		{
 			mEffect = GetComponent<HitscanShootEffect>();
 		}
 
-		public ICharacter source { get { return sourceWeapon.bearer; } }
-		public IWeapon sourceWeapon { get; private set; }
-
-		public void Instantiate(IWeapon weapon, Ray ray, WeaponData data)
+		[Server]
+		public override void PostSpawnInitialize(IWeapon weapon, Ray initialDirection, WeaponData data)
 		{
-			HandleShot(weapon, ray, data);
-		}
+			base.PostSpawnInitialize(weapon, initialDirection, data);
 
-		public void Instantiate(IWeapon weapon, Ray ray, WeaponData data, GameObjectPool pool)
-		{
-			HandleShot(weapon, ray, data, pool);
-		}
-
-		private void HandleShot(IWeapon weapon, Ray ray, WeaponData data, GameObjectPool pool = null)
-		{
-			SetupShot(weapon);
-
-			UnityEngine.Debug.DrawLine(ray.origin, ray.origin + ray.direction * 2000.0f, Color.red, 1.0f / data.fireRate + 0.2f);
-
-			// See if we hit anything
-			RaycastHit hit;
-			if (!Physics.Raycast(ray, out hit))
+			Vector3 endPoint;
+			RaycastHit hitInfo;
+			if (Physics.Raycast(initialDirection, out hitInfo))
 			{
-				KillSelf(pool);
-				return;
-			}
+				endPoint = hitInfo.point;
 
-			AudioManager.AudioEvent eventToPlay;
+				IDamageReceiver hitObject = hitInfo.GetDamageReceiver();
+				if (hitObject != null)
+				{
+					float damage = GetDamage(data, Vector3.Distance(weapon.transform.position, endPoint));
+					hitObject.ApplyDamage(damage, endPoint, hitInfo.normal, this);
+				}
 
-			// Try to apply damage to it if we did
-			IDamageReceiver component = hit.GetDamageReceiver();
-			if (component != null)
-			{
-				float damage = GetDamage(data, Vector3.Distance(transform.position, hit.point));
-				component.ApplyDamage(damage, hit.point, hit.normal, this);
-
-				if (component is PlayerScript && ((PlayerScript)component).isCurrentPlayer)
-					eventToPlay = AudioManager.AudioEvent.ImpactCurrentPlayer;
-				else
-					eventToPlay = AudioManager.AudioEvent.ImpactOtherPlayer;
+				PlaySound(GetHitAudioEvent(hitObject), endPoint);
 			}
 			else
-				eventToPlay = AudioManager.AudioEvent.ImpactWall;
+				endPoint = initialDirection.origin + initialDirection.direction * 5000.0f;
 
-			mAudio = ServiceLocator.Get<IAudioManager>().PlaySound(eventToPlay, mProfile, transform, transform.InverseTransformPoint(hit.point));
-			StartCoroutine(PlayEffectAndKillSelf(pool, hit.point));
+			SetupShot(endPoint);
+			PositionAndVisualize(endPoint);
+			StartCoroutine(WaitAndKillSelf());
 		}
 
+		[Server]
 		private float GetDamage(WeaponData data, float distance)
 		{
 			float distancePercent = Mathf.Clamp(distance / data.damageFalloffDistance, 0.0f, 1.0f);
 			return mFalloffCurve.Evaluate(distancePercent) * data.damage;
 		}
 
-		private void SetupShot(IWeapon weapon)
+		[Server]
+		private void SetupShot(Vector3 endPoint)
 		{
-			sourceWeapon = weapon;
-
-			transform.position = weapon.transform.position;
-			transform.forward = weapon.transform.forward;
+			RpcCreateShot(source.netId, endPoint);
 		}
 
-		private IEnumerator PlayEffectAndKillSelf(GameObjectPool pool, Vector3 hitPoint)
+
+		[ClientRpc]
+		private void RpcCreateShot(NetworkInstanceId s, Vector3 endPoint)
 		{
-			yield return mEffect.Flash(hitPoint);
-			yield return new WaitForAudio(mAudio);
-			KillSelf(pool);
+			GameObject theSource = ClientScene.FindLocalObject(s);
+			if (theSource == null)
+				return;
+
+			sourceWeapon = theSource.GetComponent<CltPlayer>().weapon;
+			PositionAndVisualize(endPoint);
 		}
 
-		private void KillSelf(GameObjectPool pool)
+		private void PositionAndVisualize(Vector3 endPoint)
 		{
-			if (ServiceLocator.Get<IAudioManager>().CheckReferenceAlive(ref mAudio) != null)
-				mAudio.Kill();
+			transform.position = sourceWeapon.transform.position;
+			transform.forward = sourceWeapon.transform.forward;
 
-			if (pool != null)
-				pool.ReturnItem(gameObject);
-			else
-				Destroy(gameObject);
+			mEffect.PlayEffect(endPoint);
+		}
+
+		private IEnumerator WaitAndKillSelf()
+		{
+			yield return new WaitForSeconds(0.25f);
+			NetworkServer.Destroy(gameObject);
 		}
 	}
 }

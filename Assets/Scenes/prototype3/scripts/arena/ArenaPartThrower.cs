@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using KeatsLib.Collections;
+using KeatsLib.Unity;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -18,17 +19,19 @@ namespace FiringSquad.Gameplay
 
 		private List<GameObject> mSpawnedObjects;
 
+		[ServerCallback]
 		private void Awake()
 		{
-			LoadWeaponPrefabs();
 
 #if UNITY_EDITOR
 			GenerateMeshPoints();
 #endif
 		}
 
+		[ServerCallback]
 		private void Start()
 		{
+			LoadWeaponPrefabs();
 			mSpawnedObjects = new List<GameObject>();
 
 			if (isServer)
@@ -38,13 +41,11 @@ namespace FiringSquad.Gameplay
 			}
 		}
 
+		[Server]
 		private void LoadWeaponPrefabs()
 		{
-			var allObjects = Resources.LoadAll<GameObject>("prefabs/weapons");
-			mWeaponPrefabs = allObjects
-				.Where(x => !x.name.Contains("debug"))
-				.Where(x => x.GetComponent<WeaponPartScript>() != null)
-				.ToArray();
+			mWeaponPrefabs = ServiceLocator.Get<IWeaponPartManager>()
+				.GetAllPrefabs(includeDebug: false).Values.ToArray();
 
 			foreach (GameObject prefab in mWeaponPrefabs)
 			{
@@ -52,7 +53,8 @@ namespace FiringSquad.Gameplay
 				ClientScene.RegisterPrefab(prefab);
 			}
 		}
-		
+
+		[Server]
 		private void GenerateMeshPoints()
 		{
 			MeshFilter mesh = GetComponent<MeshFilter>();
@@ -74,6 +76,7 @@ namespace FiringSquad.Gameplay
 		}
 #endif
 
+		[Server]
 		private IEnumerator ThrowPartTimer()
 		{
 			while (true)
@@ -85,25 +88,33 @@ namespace FiringSquad.Gameplay
 					continue;
 
 				GameObject prefab = mWeaponPrefabs.ChooseRandom();
-				GameObject instance = InstantiatePart(prefab);
+				GameObject instance = CustomInstantiatePart(prefab);
 				mSpawnedObjects.Add(instance);
 			}
 		}
 
-		private GameObject InstantiatePart(GameObject prefab)
+		[Server]
+		private GameObject CustomInstantiatePart(GameObject prefab)
 		{
 			Vector3 point = mMeshPoints.ChooseRandom();
 			Vector3 direction = (transform.position - point).normalized + Vector3.up * 2.0f;
 
-			GameObject instance = Instantiate(prefab, point, Quaternion.identity);
+			GameObject instance = prefab.GetComponent<WeaponPartScript>().SpawnInWorld();
+			instance.transform.position = point;
 			instance.name = prefab.name;
 
 			instance.GetComponent<Rigidbody>().AddForce(direction.normalized * 20.0f, ForceMode.Impulse);
 			NetworkServer.Spawn(instance);
 
+			StartCoroutine(Coroutines.InvokeAfterFrames(2, () =>
+			{
+				instance.GetComponent<WeaponPickupScript>().RpcInitializePickupView();
+			}));
+
 			return instance;
 		}
 
+		[Server]
 		private void CleanupInstanceList()
 		{
 			mSpawnedObjects = mSpawnedObjects.Where(x => x != null && x.GetComponent<WeaponPickupScript>() != null).ToList();

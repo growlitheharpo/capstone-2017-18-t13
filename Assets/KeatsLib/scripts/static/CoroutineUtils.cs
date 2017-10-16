@@ -234,6 +234,7 @@ namespace KeatsLib.Unity
 		public static IEnumerator WaitAndDestroyParticleSystem(ParticleSystem ps, bool destroyGameObject = true)
 		{
 			yield return null;
+			yield return null;
 			yield return new WaitForParticles(ps);
 			yield return null;
 

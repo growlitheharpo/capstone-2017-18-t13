@@ -51,22 +51,15 @@ public partial class GamestateManager : MonoSingleton<GamestateManager>, IGamest
 
 	public const string MAIN_SCENE = "main";
 	public const string MENU_SCENE = "menu";
-	public const string GAME_SCENE = "scene1";
 	public const string BASE_WORLD = "base_world";
-	public const string PROTOTYPE1_SCENE = "prototype1";
-	public const string PROTOTYPE1_SETUP_SCENE = "prototype1_intro";
-	public const string PROTOTYPE2_SCENE = "prototype2";
 	public const string PROTOTYPE3_SCENE = "prototype3";
 	public const string ART_PROTOTYPE_SCENE = "artproto";
-	public const string DESIGN_TEST_SCENE = "p1&p2_testLevel";
 
 	public enum Feature
 	{
 		WeaponDrops,
 		WeaponDurability,
 	}
-
-	private bool mOverrideEnableDrops, mOverrideEnableDurability;
 
 	private Dictionary<string, IGameState> mBaseStates;
 	private IGameState mCurrentState;
@@ -89,24 +82,11 @@ public partial class GamestateManager : MonoSingleton<GamestateManager>, IGamest
 		{
 			{ MAIN_SCENE, new TransitionToSceneState(MENU_SCENE) },
 			{ MENU_SCENE, new MenuSceneState() },
-			{ GAME_SCENE, new GameSceneState() },
-			{ PROTOTYPE1_SETUP_SCENE, new MenuSceneState() },
-			{ PROTOTYPE1_SCENE,			new GameSceneState() },
-			{ PROTOTYPE2_SCENE,			new GameSceneState() },
 			{ PROTOTYPE3_SCENE,			new GameSceneState() },
-			{ DESIGN_TEST_SCENE,		new GameSceneState() },
-			{ "sandbox",				new GameSceneState() },
 			{ "sandbox_networked",		new GameSceneState() },
 			{ ART_PROTOTYPE_SCENE,	new MenuSceneState() },
 			{ BASE_WORLD, new NullState() },
 		};
-
-		EventManager.OnRequestSceneChange += ReceiveSceneChangeRequest;
-	}
-
-	private void OnDestroy()
-	{
-		EventManager.OnRequestSceneChange -= ReceiveSceneChangeRequest;
 	}
 
 	private void Start()
@@ -116,8 +96,7 @@ public partial class GamestateManager : MonoSingleton<GamestateManager>, IGamest
 		mCurrentState.OnEnter();
 
 		ServiceLocator.Get<IGameConsole>()
-			.RegisterCommand("close", s => EventManager.Notify(() => EventManager.RequestSceneChange(MENU_SCENE)))
-			.RegisterCommand("feature", HandleFeatureForceCommand);
+			.RegisterCommand("close", s => RequestSceneChange(MENU_SCENE));
 	}
 
 	private void Update()
@@ -153,9 +132,10 @@ public partial class GamestateManager : MonoSingleton<GamestateManager>, IGamest
 		return mBaseStates.TryGetValue(currentScene, out result) ? result : null;
 	}
 
-	private void ReceiveSceneChangeRequest(string sceneName, LoadSceneMode mode)
+	public IGamestateManager RequestSceneChange(string sceneName, LoadSceneMode mode = LoadSceneMode.Single)
 	{
 		StartCoroutine(AttemptSceneChange(sceneName, mode));
+		return this;
 	}
 
 	private IEnumerator AttemptSceneChange(string sceneName, LoadSceneMode mode)
@@ -165,42 +145,7 @@ public partial class GamestateManager : MonoSingleton<GamestateManager>, IGamest
 
 		mCurrentState.OnExit();
 		mCurrentState = new TransitionToSceneState(sceneName, mode);
-		Logger.Info("Setting current state to TransitionToSceneState because of an event.", Logger.System.State);
+		Logger.Info("Setting current state to TransitionToSceneState because of a request.", Logger.System.State);
 		mCurrentState.OnEnter();
-	}
-
-	private void HandleFeatureForceCommand(string[] obj)
-	{
-		if (obj.Length != 2)
-			throw new ArgumentException("Invalid arguments for command \"feature\".");
-
-		string feat = obj[0].ToLower();
-		int val = int.Parse(obj[1]);
-
-		switch (feat) {
-			case "drops":
-				mOverrideEnableDrops = val == 1;
-				break;
-			case "durability":
-				mOverrideEnableDurability = val == 1;
-				break;
-			default:
-				throw new ArgumentException(obj[0] + " is not a valid feature.");
-		}
-	}
-
-	public bool IsFeatureEnabled(Feature feat)
-	{
-		bool isStateGamestate = mCurrentState.GetType() == typeof(GameSceneState);
-
-		switch (feat)
-		{
-			case Feature.WeaponDrops:
-				return mOverrideEnableDrops || (isStateGamestate && ((GameSceneState)mCurrentState).IsFeatureEnabled(feat));
-			case Feature.WeaponDurability:
-				return mOverrideEnableDurability || (isStateGamestate && ((GameSceneState)mCurrentState).IsFeatureEnabled(feat));
-			default:
-				throw new ArgumentOutOfRangeException("feat", feat, null);
-		}
 	}
 }

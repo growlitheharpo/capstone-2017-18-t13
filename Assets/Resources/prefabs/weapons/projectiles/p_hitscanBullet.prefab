@@ -19,6 +19,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4028429752590910}
+  - component: {fileID: 114756075130657168}
   - component: {fileID: 114311638709930862}
   - component: {fileID: 114765406182020964}
   - component: {fileID: 120123338783791200}
@@ -53,6 +54,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4043a8477c9d32848ab38fe661d3f42c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mAudioProfile: {fileID: 11400000, guid: db7679da44bd9614988d4edc1ad41781, type: 2}
   mFalloffCurve:
     serializedVersion: 2
     m_Curve:
@@ -77,7 +79,38 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 0
-  mProfile: {fileID: 11400000, guid: db7679da44bd9614988d4edc1ad41781, type: 2}
+--- !u!114 &114756075130657168
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1546697341052326}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 372142912, guid: dc443db3e92b4983b9738c1131f555cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SceneId:
+    m_Value: 0
+  m_AssetId:
+    i0: 55
+    i1: 4
+    i2: 109
+    i3: 91
+    i4: 179
+    i5: 115
+    i6: 31
+    i7: 164
+    i8: 136
+    i9: 200
+    i10: 70
+    i11: 80
+    i12: 54
+    i13: 41
+    i14: 173
+    i15: 111
+  m_ServerOnly: 0
+  m_LocalPlayerAuthority: 0
 --- !u!114 &114765406182020964
 MonoBehaviour:
   m_ObjectHideFlags: 1

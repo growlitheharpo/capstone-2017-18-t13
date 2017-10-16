@@ -1,6 +1,4 @@
-﻿using FiringSquad.Gameplay;
-using KeatsLib.Persistence;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class PauseGamePanel : MonoBehaviour
 {
@@ -20,12 +18,12 @@ public class PauseGamePanel : MonoBehaviour
 	private void Awake()
 	{
 		EventManager.OnInitialPersistenceLoadComplete += HandleInitialLoad;
-		EventManager.OnApplyOptionsData += ReflectSettings;
+		EventManager.Local.OnApplyOptionsData += ReflectSettings;
 
 		mQuitButton.OnClick += HandleQuit;
 		mFieldOfViewProvider.OnValueChange += HandleValueChange;
 
-		EventManager.OnShowPausePanel += HandleToggle;
+		EventManager.LocalGUI.OnTogglePauseMenu += HandleToggle;
 		gameObject.SetActive(false);
 	}
 
@@ -40,8 +38,8 @@ public class PauseGamePanel : MonoBehaviour
 		mFieldOfViewProvider.OnValueChange -= HandleValueChange;
 
 		EventManager.OnInitialPersistenceLoadComplete -= HandleInitialLoad;
-		EventManager.OnApplyOptionsData -= ReflectSettings;
-		EventManager.OnShowPausePanel -= HandleToggle;
+		EventManager.Local.OnApplyOptionsData -= ReflectSettings;
+		EventManager.LocalGUI.OnTogglePauseMenu -= HandleToggle;
 	}
 	
 	private void HandleToggle(bool show)
@@ -90,12 +88,15 @@ public class PauseGamePanel : MonoBehaviour
 		mData.masterVolume = mVolumeProvider.GetValue() / 100.0f;
 		mData.mouseSensitivity = mMouseSensitivityProvider.GetValue();
 
-		EventManager.Notify(() => EventManager.ApplyOptionsData(mData));
+		EventManager.Notify(() => EventManager.Local.ApplyOptionsData(mData));
 	}
 	
 	private void HandleQuit()
 	{
-		EventManager.Notify(() => EventManager.TogglePauseState());
-		EventManager.Notify(() => EventManager.RequestSceneChange(GamestateManager.MENU_SCENE));
+		// Call event directly so that it is handled immediately.
+		EventManager.Local.TogglePause();
+
+		ServiceLocator.Get<IGamestateManager>()
+			.RequestSceneChange(GamestateManager.MENU_SCENE);
 	}
 }

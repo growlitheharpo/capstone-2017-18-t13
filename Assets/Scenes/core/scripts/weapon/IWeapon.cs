@@ -15,38 +15,23 @@ namespace FiringSquad.Gameplay
 		/// The base data for this weapon.
 		/// </summary>
 		WeaponData baseData { get; }
-		/// <summary>
-		/// The currently attached part modifiers.
-		/// </summary>
-		IEnumerable<WeaponPartScript> parts { get; }
 
 		/// <summary>
 		/// Attach a new part to this weapon.
 		/// </summary>
-		/// <param name="part">The part to be attached.</param>
-		void AttachNewPart(WeaponPartScript part);
-
+		/// <param name="partId">The part to be attached.</param>
+		void AttachNewPart(string partId);
+		
 		/// <summary>
-		/// Notify the weapon that the trigger has been pressed.
-		/// Instantiate and fire a projectile from this weapon. Notifies network.
+		/// Reset all the parts on this weapon to the default parts of the bearer.
 		/// </summary>
-		void FireWeaponDown();
+		void ResetToDefaultParts();
 
 		/// <summary>
-		/// Notify the weapon every frame the trigger is held.
-		/// </summary>
-		void FireWeaponHold();
-
-		/// <summary>
-		/// Notify the weapon when the trigger is released.
-		/// </summary>
-		void FireWeaponUp();
-
-		/// <summary>
-		/// Instantiate and fire projectiles immediately.
+		/// Instantiate and fire a projectile immediately with no rule checking.
 		/// </summary>
 		/// <param name="shotDirections"></param>
-		void FireShotImmediate(List<Ray> shotDirections);
+		//void FireShotImmediate(List<Ray> shotDirections);
 
 		/// <summary>
 		/// Reset the amount of ammo in the clip and play some sort of animation.
@@ -59,8 +44,18 @@ namespace FiringSquad.Gameplay
 		Transform transform { get; }
 
 		/// <summary>
-		/// Gets the current recoil amount.
+		/// Get the current set of parts on this weapon
+		/// </summary>
+		WeaponPartCollection currentParts { get; }
+
+		/// <summary>
+		/// Gets the current recoil to apply to the bearer's view.
 		/// </summary>
 		float GetCurrentRecoil();
+
+		void FireWeaponHold();
+		void FireWeaponUp();
+
+		void PlayFireEffect();
 	}
 }
