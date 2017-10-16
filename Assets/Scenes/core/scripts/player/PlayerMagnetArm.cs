@@ -130,7 +130,7 @@ public class PlayerMagnetArm : NetworkBehaviour
 	{
 		if (shouldPlay && mGrabSound == null)
 		{
-			ServiceLocator.Get<IAudioManager>()
+			mGrabSound = ServiceLocator.Get<IAudioManager>()
 				.PlaySound(AudioManager.AudioEvent.LoopGravGun, mAudioProfile, transform);
 		}
 		else if (!shouldPlay && mGrabSound != null)
