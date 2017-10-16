@@ -51,6 +51,9 @@ public class PlayerMagnetArm : NetworkBehaviour
 				bearerObj.GetComponent<CltPlayer>().BindMagnetArmToPlayer(this);
 		}
 
+		if (bearer == null)
+			return;
+
 		// read if we have a held object
 		if (reader.ReadBoolean())
 		{
@@ -62,7 +65,7 @@ public class PlayerMagnetArm : NetworkBehaviour
 			if (mHeldObject.currentHolder != bearer)
 				mHeldObject.GrabNow(bearer);
 		}
-		else
+		else if (!bearer.isCurrentPlayer)
 		{
 			if (mHeldObject != null)
 				mHeldObject.Release();
@@ -162,7 +165,6 @@ public class PlayerMagnetArm : NetworkBehaviour
 			return;
 
 		mGrabCandidate.GrabNow(bearer);
-
 		mHeldObject = mGrabCandidate;
 		mGrabCandidate = null;
 
