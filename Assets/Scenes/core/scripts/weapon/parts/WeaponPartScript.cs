@@ -8,8 +8,6 @@ namespace FiringSquad.Gameplay
 	{
 		public const int INFINITE_DURABILITY = -1;
 
-		public string partId { get { return gameObject.name; } }
-
 		[SerializeField] private WeaponPartData mData;
 		public WeaponPartData[] data { get { return new [] { mData }; } }
 
@@ -30,6 +28,16 @@ namespace FiringSquad.Gameplay
 			set
 			{
 				mDurability = value;
+			}
+		}
+
+		public string partId
+		{
+			get
+			{
+				if (gameObject.name.Contains("(Clone)"))
+					return gameObject.name.Replace("(Clone)", "");
+				return gameObject.name;
 			}
 		}
 
