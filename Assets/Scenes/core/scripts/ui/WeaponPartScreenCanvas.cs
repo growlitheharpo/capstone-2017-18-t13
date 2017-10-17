@@ -66,8 +66,9 @@ public class WeaponPartScreenCanvas : MonoBehaviour
 	[SerializeField] private GameObject mClipSizeBar;
 
 	private Dictionary<GameObject, UIPiece> mUIDictionary;
+	private WeaponPartCollection mCurrentGunParts;
+	private WeaponData mBaseData;
 	private WeaponPartScript mCurrentPart;
-	private WeaponData mCurrentData;
 
 	private void Awake()
 	{
@@ -96,7 +97,7 @@ public class WeaponPartScreenCanvas : MonoBehaviour
 	private void OnLocalPlayerReleasedPart(WeaponPartScript obj)
 	{
 		mTotalArea.SetActive(false);
-		SetStats(mCurrentData, true);
+		SetStats(BaseWeaponScript.ActivatePartEffects(mCurrentGunParts, mBaseData), true);
 		mCurrentPart = null;
 	}
 
@@ -116,15 +117,26 @@ public class WeaponPartScreenCanvas : MonoBehaviour
 
 	private void OnLocalPlayerAttachedPart(BaseWeaponScript weapon, WeaponPartScript part)
 	{
-		mCurrentData = weapon.currentData;
-		SetStats(mCurrentData, true);
+		mCurrentGunParts = weapon.currentParts;
+		mBaseData = weapon.baseData;
+
+		SetStats(BaseWeaponScript.ActivatePartEffects(mCurrentGunParts, mBaseData), true);
+
+		if (mCurrentPart != null)
+			PickUpPart(mCurrentPart);
 	}
 
 	private void PickUpPart(WeaponPartScript part)
 	{
-		WeaponData fakeData = new WeaponData(mCurrentData, part.data[0]);
+		WeaponPartCollection fakeCollection = new WeaponPartCollection(mCurrentGunParts);
+		fakeCollection[part.attachPoint] = part;
+
+		WeaponData fakeData = BaseWeaponScript.ActivatePartEffects(fakeCollection, mBaseData);
+
 		mPartName.text = part.prettyName;
 		mPartType.text = part.attachPoint + " Mod";
+
+		SetStats(BaseWeaponScript.ActivatePartEffects(mCurrentGunParts, mBaseData), true);
 		SetStats(fakeData, false);
 	}
 
