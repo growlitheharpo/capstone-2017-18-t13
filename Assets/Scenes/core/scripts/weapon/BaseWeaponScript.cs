@@ -72,6 +72,7 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 
 	private Dictionary<Attachment, Transform> mAttachPoints;
 	private WeaponData mCurrentData;
+	public WeaponData currentData { get { return mCurrentData; } }
 	private float timePerShot { get { return 1.0f / mCurrentData.fireRate; } }
 
 	private bool mReloading;
@@ -214,7 +215,7 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 		if (forceInfiniteDurability)
 			instance.durability = WeaponPartScript.INFINITE_DURABILITY;
 
-		ActivatePartEffects();
+		mCurrentData = ActivatePartEffects(mCurrentParts, baseData);
 
 		if (instance.attachPoint == Attachment.Mechanism || mCurrentData.clipSize != originalClipsize)
 		{
@@ -225,6 +226,7 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 			mTotalClipSize.value = mCurrentData.clipSize;
 		}
 
+		EventManager.Notify(() => EventManager.Local.LocalPlayerAttachedPart(this, instance));
 		if (realBearer !=  null && realBearer.audioProfile != null)
 		{
 			ServiceLocator.Get<IAudioManager>()
@@ -244,9 +246,9 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 		instance.transform.ResetLocalValues();
 	}
 
-	private void ActivatePartEffects()
+	public static WeaponData ActivatePartEffects(WeaponPartCollection parts, WeaponData startingData)
 	{
-		WeaponData start = new WeaponData(baseData);
+		WeaponData start = new WeaponData(startingData);
 
 		Action<WeaponPartScript> apply = part =>
 		{
@@ -258,11 +260,11 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 
 		foreach (Attachment part in partOrder)
 		{
-			if (mCurrentParts[part] != null)
-				apply(mCurrentParts[part]);
+			if (parts[part] != null)
+				apply(parts[part]);
 		}
 
-		mCurrentData = start;
+		return start;
 	}
 	
 	#endregion

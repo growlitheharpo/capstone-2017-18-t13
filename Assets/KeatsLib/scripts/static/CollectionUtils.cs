@@ -194,5 +194,13 @@ namespace KeatsLib.Collections
 		{
 			return list.Aggregate((l, r) => l.Value.CompareTo(r.Value) >= 0 ? l : r).Key;
 		}
+
+		public static float Rescale(this float val, float oldMin, float oldMax, float newMin = 0.0f, float newMax = 1.0f)
+		{
+			float oldRange = oldMax - oldMin;
+			float newRange = newMax - newMin;
+
+			return (val - oldMin) / oldRange * newRange + newMin;
+		}
 	}
 }

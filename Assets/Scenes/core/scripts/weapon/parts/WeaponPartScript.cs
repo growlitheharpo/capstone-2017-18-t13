@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 using FiringSquad.Data;
 using UnityEngine.Networking;
 
@@ -9,14 +8,15 @@ namespace FiringSquad.Gameplay
 	{
 		public const int INFINITE_DURABILITY = -1;
 
-		public string partId { get { return gameObject.name; } }
-
 		[SerializeField] private WeaponPartData mData;
 		public WeaponPartData[] data { get { return new [] { mData }; } }
 
 		[SerializeField] private string mDescription;
 		public string description { get { return mDescription; } }
-		
+
+		[SerializeField] private string mPrettyName;
+		public string prettyName { get { return mPrettyName; } }
+
 		[SerializeField] private int mDurability = INFINITE_DURABILITY;
 
 		public int durability
@@ -28,6 +28,16 @@ namespace FiringSquad.Gameplay
 			set
 			{
 				mDurability = value;
+			}
+		}
+
+		public string partId
+		{
+			get
+			{
+				if (gameObject.name.Contains("(Clone)"))
+					return gameObject.name.Replace("(Clone)", "");
+				return gameObject.name;
 			}
 		}
 
