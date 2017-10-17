@@ -12,6 +12,7 @@ public class WeaponPickupScript : NetworkBehaviour, IInteractable, INetworkGrabb
 	public CltPlayer currentHolder { get; private set; }
 	public bool currentlyHeld { get { return currentHolder != null; } }
 
+	private WeaponPartWorldCanvas mCanvas;
 	private Rigidbody mRigidbody;
 
 	private void Awake()
@@ -62,6 +63,11 @@ public class WeaponPickupScript : NetworkBehaviour, IInteractable, INetworkGrabb
 
 		ps.transform.SetParent(mPickupView.transform);
 		ps.transform.ResetLocalValues();
+
+		GameObject cvPrefab = Resources.Load<GameObject>("prefabs/weapons/effects/p_partWorldCanvas");
+		GameObject cv = Instantiate(cvPrefab, transform);
+		mCanvas = cv.GetComponent<WeaponPartWorldCanvas>();
+		mCanvas.LinkToObject(GetComponent<WeaponPartScript>());
 	}
 
 	[Server]
