@@ -5,6 +5,7 @@ using FiringSquad.Gameplay;
 using KeatsLib.Collections;
 using UnityEngine;
 using UIImage = UnityEngine.UI.Image;
+using UIText = UnityEngine.UI.Text;
 
 public class WeaponPartScreenCanvas : MonoBehaviour
 {
@@ -34,23 +35,28 @@ public class WeaponPartScreenCanvas : MonoBehaviour
 				fillBar.fillAmount = p;
 				arrow.rectTransform.anchorMin = new Vector2(p, 0.0f);
 				arrow.rectTransform.anchorMax = new Vector2(p, 1.0f);
+				arrow.rectTransform.localRotation = Quaternion.identity;
 			}
-			else if (fillBar.fillAmount < p) // part increases stat
+			else if (fillBar.fillAmount <= p) // part increases stat
 			{
 				differenceBar.fillAmount = p;
 				arrow.rectTransform.anchorMin = new Vector2(p, 0.0f);
 				arrow.rectTransform.anchorMax = new Vector2(p, 1.0f);
+				arrow.rectTransform.localRotation = Quaternion.identity;
 			}
 			else
 			{
 				fillBar.fillAmount = p;
 				arrow.rectTransform.anchorMin = new Vector2(p, 0.0f);
 				arrow.rectTransform.anchorMax = new Vector2(p, 1.0f);
-				arrow.rectTransform.rotation = Quaternion.Euler(0.0f, 0.0f, 180.0f);
+				arrow.rectTransform.localRotation = Quaternion.Euler(0.0f, 0.0f, 180.0f);
 			}
 		}
 	}
 
+	[SerializeField] private GameObject mTotalArea;
+	[SerializeField] private UIText mPartName;
+	[SerializeField] private UIText mPartType;
 	[SerializeField] private GameObject mDamageBar;
 	[SerializeField] private GameObject mAccuracyBar;
 	[SerializeField] private GameObject mRangeBar;
@@ -60,12 +66,38 @@ public class WeaponPartScreenCanvas : MonoBehaviour
 	[SerializeField] private GameObject mClipSizeBar;
 
 	private Dictionary<GameObject, UIPiece> mUIDictionary;
+	private WeaponPartScript mCurrentPart;
 	private WeaponData mCurrentData;
 
 	private void Awake()
 	{
 		CreateUIDictionary();
 		EventManager.Local.OnLocalPlayerAttachedPart += OnLocalPlayerAttachedPart;
+		EventManager.Local.OnLocalPlayerHoldingPart += OnLocalPlayerHoldingPart;
+		EventManager.Local.OnLocalPlayerReleasedPart += OnLocalPlayerReleasedPart;
+
+		mTotalArea.SetActive(false);
+	}
+
+	private void OnDestroy()
+	{
+		EventManager.Local.OnLocalPlayerAttachedPart -= OnLocalPlayerAttachedPart;
+		EventManager.Local.OnLocalPlayerHoldingPart -= OnLocalPlayerHoldingPart;
+		EventManager.Local.OnLocalPlayerReleasedPart -= OnLocalPlayerReleasedPart;
+	}
+
+	private void OnLocalPlayerHoldingPart(WeaponPartScript part)
+	{
+		PickUpPart(part);
+		mCurrentPart = part;
+		mTotalArea.SetActive(true);
+	}
+
+	private void OnLocalPlayerReleasedPart(WeaponPartScript obj)
+	{
+		mTotalArea.SetActive(false);
+		SetStats(mCurrentData, true);
+		mCurrentPart = null;
 	}
 
 	private void CreateUIDictionary()
@@ -88,9 +120,11 @@ public class WeaponPartScreenCanvas : MonoBehaviour
 		SetStats(mCurrentData, true);
 	}
 
-	public void PickUpPart(WeaponPartScript part)
+	private void PickUpPart(WeaponPartScript part)
 	{
 		WeaponData fakeData = new WeaponData(mCurrentData, part.data[0]);
+		mPartName.text = part.prettyName;
+		mPartType.text = part.attachPoint + " Mod";
 		SetStats(fakeData, false);
 	}
 
@@ -113,15 +147,12 @@ public class WeaponPartScreenCanvas : MonoBehaviour
 		mUIDictionary[mClipSizeBar].SetAmount(clipSize, setBase);
 	}
 
-	// Use this for initialization
-	void Start()
+	private void Update()
 	{
+		if (!mTotalArea.activeInHierarchy)
+			return;
 
-	}
-
-	// Update is called once per frame
-	void Update()
-	{
-
+		if (mCurrentPart == null)
+			mTotalArea.SetActive(false);
 	}
 }

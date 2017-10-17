@@ -54,6 +54,20 @@ public partial class EventManager
 		{
 			OnLocalPlayerAttachedPart(weapon, part);
 		}
+
+		public static event Action<WeaponPartScript> OnLocalPlayerHoldingPart = (w) => { LogEvent(); };
+
+		public static void LocalPlayerHoldingPart(WeaponPartScript part)
+		{
+			OnLocalPlayerHoldingPart(part);
+		}
+
+		public static event Action<WeaponPartScript> OnLocalPlayerReleasedPart = (w) => { LogEvent(); };
+
+		public static void LocalPlayerReleasedPart(WeaponPartScript part)
+		{
+			OnLocalPlayerReleasedPart(part);
+		}
 	}
 
 	public static class LocalGUI

@@ -13,10 +13,12 @@ public class WeaponPickupScript : NetworkBehaviour, IInteractable, INetworkGrabb
 	public bool currentlyHeld { get { return currentHolder != null; } }
 
 	private WeaponPartWorldCanvas mCanvas;
+	private WeaponPartScript mPartScript;
 	private Rigidbody mRigidbody;
 
 	private void Awake()
 	{
+		mPartScript = GetComponent<WeaponPartScript>();
 		mRigidbody = GetComponent<Rigidbody>();
 	}
 
@@ -67,7 +69,7 @@ public class WeaponPickupScript : NetworkBehaviour, IInteractable, INetworkGrabb
 		GameObject cvPrefab = Resources.Load<GameObject>("prefabs/weapons/effects/p_partWorldCanvas");
 		GameObject cv = Instantiate(cvPrefab, transform);
 		mCanvas = cv.GetComponent<WeaponPartWorldCanvas>();
-		mCanvas.LinkToObject(GetComponent<WeaponPartScript>());
+		mCanvas.LinkToObject(mPartScript);
 	}
 
 	[Server]
@@ -108,13 +110,13 @@ public class WeaponPickupScript : NetworkBehaviour, IInteractable, INetworkGrabb
 		// TODO: Lerp this
 
 		mPickupView.transform.localScale = Vector3.one * 0.45f;
-		//mPickupView.SetActive(false);
-		//mGunView.SetActive(true);
-
 		mRigidbody.isKinematic = true;
 
 		transform.SetParent(currentHolder.magnetArm.transform);
 		transform.ResetLocalValues();
+
+		if (player.isCurrentPlayer)
+			EventManager.Notify(() => EventManager.Local.LocalPlayerHoldingPart(mPartScript));
 	}
 
 	public void Throw()
@@ -126,12 +128,12 @@ public class WeaponPickupScript : NetworkBehaviour, IInteractable, INetworkGrabb
 
 		transform.SetParent(null);
 		mRigidbody.isKinematic = false;
-
 		mPickupView.transform.localScale = Vector3.one;
-		//mPickupView.SetActive(true);
-		//mGunView.SetActive(false);
 
 		mRigidbody.AddForce(direction * 30.0f, ForceMode.Impulse);
+
+		if (currentHolder.isCurrentPlayer)
+			EventManager.Notify(() => EventManager.Local.LocalPlayerReleasedPart(mPartScript));
 
 		currentHolder = null;
 	}
@@ -141,10 +143,10 @@ public class WeaponPickupScript : NetworkBehaviour, IInteractable, INetworkGrabb
 		transform.SetParent(null);
 
 		mRigidbody.isKinematic = false;
-
 		mPickupView.transform.localScale = Vector3.one;
-		//mPickupView.SetActive(true);
-		//mGunView.SetActive(false);
+
+		if (currentHolder != null && currentHolder.isCurrentPlayer)
+			EventManager.Notify(() => EventManager.Local.LocalPlayerReleasedPart(mPartScript));
 
 		currentHolder = null;
 	}
