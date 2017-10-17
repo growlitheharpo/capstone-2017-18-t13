@@ -79,6 +79,8 @@ public class WeaponPickupScript : NetworkBehaviour, IInteractable, INetworkGrabb
 		if (wepBearer == null)
 			return;
 
+		wepBearer.weapon.AttachNewPart(GetComponent<WeaponPartScript>().partId);
+
 		try
 		{
 			NetworkServer.Destroy(gameObject);
@@ -87,9 +89,6 @@ public class WeaponPickupScript : NetworkBehaviour, IInteractable, INetworkGrabb
 		{
 			Debug.LogException(e);
 		}
-
-		Destroy(gameObject);
-		wepBearer.weapon.AttachNewPart(GetComponent<WeaponPartScript>().partId);
 	}
 
 	public void PullTowards(CltPlayer player)
