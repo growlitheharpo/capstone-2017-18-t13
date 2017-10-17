@@ -70,7 +70,7 @@ namespace FiringSquad.Debug
 			GUILayout.BeginArea(area);
 			foreach (WeaponPartScript part in parts)
 			{
-				string label = part.name;
+				string label = part.prettyName;
 				if (part.description != "")
 					label += "\n\n" + part.description;
 

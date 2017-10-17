@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 using FiringSquad.Data;
 using UnityEngine.Networking;
 
@@ -16,7 +15,10 @@ namespace FiringSquad.Gameplay
 
 		[SerializeField] private string mDescription;
 		public string description { get { return mDescription; } }
-		
+
+		[SerializeField] private string mPrettyName;
+		public string prettyName { get { return mPrettyName; } }
+
 		[SerializeField] private int mDurability = INFINITE_DURABILITY;
 
 		public int durability
