@@ -72,6 +72,7 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 
 	private Dictionary<Attachment, Transform> mAttachPoints;
 	private WeaponData mCurrentData;
+	public WeaponData currentData { get { return mCurrentData; } }
 	private float timePerShot { get { return 1.0f / mCurrentData.fireRate; } }
 
 	private bool mReloading;
@@ -225,6 +226,7 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 			mTotalClipSize.value = mCurrentData.clipSize;
 		}
 
+		EventManager.Notify(() => EventManager.Local.LocalPlayerAttachedPart(this, instance));
 		if (realBearer !=  null && realBearer.audioProfile != null)
 		{
 			ServiceLocator.Get<IAudioManager>()
