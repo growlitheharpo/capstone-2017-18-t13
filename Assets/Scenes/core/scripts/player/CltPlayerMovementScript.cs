@@ -161,7 +161,12 @@ namespace FiringSquad.Gameplay
 			if (!mPreviouslyGrounded && mController.isGrounded)
 			{
 				mMoveDirection.y = 0.0f;
+
 				// play landing sound
+				mPlayer.localAnimator.ResetTrigger("Jump");
+				mPlayer.localAnimator.SetTrigger("Land");
+				mPlayer.networkAnimator.SetTrigger("Land");
+
 				mIsJumping = false;
 			}
 			if (!mController.isGrounded && !mIsJumping && mPreviouslyGrounded)
@@ -248,9 +253,10 @@ namespace FiringSquad.Gameplay
 				if (mJump)
 				{
 					mMoveDirection.y = mMovementData.jumpForce;
-					
+
 					// play jump sound ?
 
+					mPlayer.localAnimator.ResetTrigger("Land");
 					mPlayer.localAnimator.SetTrigger("Jump");
 					mPlayer.networkAnimator.SetTrigger("Jump");
 

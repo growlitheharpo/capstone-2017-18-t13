@@ -343,7 +343,8 @@ public class BaseWeaponScript : NetworkBehaviour, IWeapon
 		foreach (Ray shot in shots)
 			CmdInstantiateShot(shot.origin, shot.direction);
 
-		//EventManager.Local.PlayerFiredWeapon(realBearer, shots);
+		realBearer.localAnimator.SetTrigger("Fire");
+		realBearer.networkAnimator.SetTrigger("Fire");
 		CmdOnShotFireComplete();
 		PlayFireEffect();
 		OnPostFireShot();
