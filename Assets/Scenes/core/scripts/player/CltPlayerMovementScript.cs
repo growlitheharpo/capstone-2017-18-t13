@@ -194,7 +194,7 @@ namespace FiringSquad.Gameplay
 			Vector2 rotation = mRotationAmount * mMovementData.lookSpeed * mMouseSensitivity;
 			transform.RotateAround(transform.position, transform.up, rotation.x);
 
-			mRotationY += rotation.y;// + (mRecoilAmount * Time.deltaTime);
+			mRotationY += rotation.y; // + (mRecoilAmount * Time.deltaTime);
 			mRotationY = GenericExt.ClampAngle(mRotationY, -85.0f, 85.0f);
 
 			float realRotation = mRotationY;
@@ -215,12 +215,14 @@ namespace FiringSquad.Gameplay
 		private void UpdateCrouch()
 		{
 			float currentHeight = mCollider.height;
-			float newHeight = Mathf.Lerp(currentHeight, mCrouching ? mStandingHeight * mMovementData.crouchHeight : mStandingHeight, Time.deltaTime * mMovementData.crouchSpeed);
+			float newHeight = Mathf.Lerp(currentHeight, mCrouching ? mStandingHeight * mMovementData.crouchHeight : mStandingHeight,
+				Time.deltaTime * mMovementData.crouchSpeed);
 			mCollider.height = newHeight;
 			mController.height = newHeight;
 
 			float currentRadius = mCollider.radius;
-			float newRadius = Mathf.Lerp(currentRadius, mCrouching ? mStandingRadius * mMovementData.crouchHeight : mStandingRadius, Time.deltaTime * mMovementData.crouchSpeed);
+			float newRadius = Mathf.Lerp(currentRadius, mCrouching ? mStandingRadius * mMovementData.crouchHeight : mStandingRadius,
+				Time.deltaTime * mMovementData.crouchSpeed);
 			mCollider.radius = newRadius;
 			mController.radius = newRadius;
 		}

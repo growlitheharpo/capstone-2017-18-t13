@@ -59,7 +59,6 @@ namespace FiringSquad.Gameplay.Weapons
 			RpcCreateShot(source.netId, endPoint);
 		}
 
-
 		[ClientRpc]
 		private void RpcCreateShot(NetworkInstanceId s, Vector3 endPoint)
 		{

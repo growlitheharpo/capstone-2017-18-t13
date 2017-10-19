@@ -58,8 +58,7 @@ namespace FiringSquad.Debug
 
 			/*if (mCurrentScript == null)
 				mCurrentScript = FindObjectOfType<PlayerWeaponScript>();*/
-#else
-			//mCurrentScript = FindObjectOfType<PlayerWeaponScript>();
+#else //mCurrentScript = FindObjectOfType<PlayerWeaponScript>();
 #endif
 		}
 

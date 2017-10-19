@@ -19,7 +19,7 @@
 
 		protected class NullState : BaseState<BaseStateMachine>
 		{
-			public NullState() : base(null) {}
+			public NullState() : base(null) { }
 
 			public override IState GetTransition()
 			{

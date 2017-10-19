@@ -20,7 +20,7 @@ namespace FiringSquad.Gameplay.Weapons
 		/// </summary>
 		/// <param name="partId">The part to be attached.</param>
 		void AttachNewPart(string partId);
-		
+
 		/// <summary>
 		/// Reset all the parts on this weapon to the default parts of the bearer.
 		/// </summary>
@@ -31,7 +31,6 @@ namespace FiringSquad.Gameplay.Weapons
 		/// </summary>
 		/// <param name="shotDirections"></param>
 		//void FireShotImmediate(List<Ray> shotDirections);
-
 		/// <summary>
 		/// Reset the amount of ammo in the clip and play some sort of animation.
 		/// </summary>

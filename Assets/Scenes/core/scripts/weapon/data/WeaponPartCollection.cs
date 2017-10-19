@@ -69,7 +69,7 @@ namespace FiringSquad.Data
 			}
 		}
 
-		public GameObjects gameObjects { get { return new GameObjects(this);} }
+		public GameObjects gameObjects { get { return new GameObjects(this); } }
 
 		public WeaponPartCollection()
 		{
@@ -78,7 +78,7 @@ namespace FiringSquad.Data
 			mMechanism = null;
 			mGrip = null;
 		}
-		
+
 		public WeaponPartCollection(WeaponPartCollection copy)
 		{
 			mScope = copy.mScope;

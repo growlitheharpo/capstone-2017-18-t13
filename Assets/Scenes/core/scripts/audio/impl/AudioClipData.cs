@@ -9,7 +9,7 @@ namespace FiringSquad.Data
 	public class AudioClipData : ScriptableObject, IAudioClip
 	{
 		[SerializeField] private bool mBypassEffects;
-		
+
 		[SerializeField] private float mFadeInTime;
 		[SerializeField] private float mFadeOutTime;
 		[SerializeField] private AudioMixerGroup mGroup;

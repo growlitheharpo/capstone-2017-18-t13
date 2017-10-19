@@ -29,7 +29,6 @@ namespace FiringSquad.Gameplay
 				.RegisterInput(Input.GetButtonUp, inputMap.fireWeaponButton, INPUT_WeaponFireUp, InputLevel.Gameplay)
 				.RegisterInput(Input.GetButtonDown, inputMap.reloadButton, INPUT_WeaponReload, InputLevel.Gameplay)
 				.RegisterInput(Input.GetButtonDown, inputMap.interactButton, INPUT_ActivateInteract, InputLevel.Gameplay)
-
 				.RegisterInput(Input.GetButton, inputMap.fireGravGunButton, INPUT_MagnetArmHeld, InputLevel.Gameplay)
 				.RegisterInput(Input.GetButtonUp, inputMap.fireGravGunButton, INPUT_MagnetArmUp, InputLevel.Gameplay)
 
@@ -54,7 +53,6 @@ namespace FiringSquad.Gameplay
 				.UnregisterInput(INPUT_WeaponFireUp)
 				.UnregisterInput(INPUT_WeaponReload)
 				.UnregisterInput(INPUT_ActivateInteract)
-
 				.UnregisterInput(INPUT_MagnetArmHeld)
 				.UnregisterInput(INPUT_MagnetArmUp)
 

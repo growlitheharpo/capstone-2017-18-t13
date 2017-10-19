@@ -10,4 +10,3 @@ namespace FiringSquad.Gameplay.UI
 		}
 	}
 }
-

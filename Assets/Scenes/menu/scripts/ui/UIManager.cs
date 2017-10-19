@@ -17,7 +17,7 @@ public class UIManager : MonoBehaviour
 		mProto3Button.OnClick += LaunchProto3;
 		mQuitButton.OnClick += ClickQuit;
 	}
-	
+
 	private void LaunchProto3()
 	{
 		mMainElementHolder.SetActive(false);

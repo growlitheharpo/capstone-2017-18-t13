@@ -165,7 +165,6 @@ public partial class EventManager
 	}
 
 	#endregion
-	
 
 	public void Start()
 	{

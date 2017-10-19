@@ -121,7 +121,7 @@ namespace FiringSquad.Networking
 						player.MoveToStartPosition(target.position, target.rotation);
 					}
 				}
-				
+
 				public override IState GetTransition()
 				{
 					return new GameRunningState(mMachine);

@@ -178,6 +178,5 @@ namespace FiringSquad.Debug
 			mCurrentCommand = GUI.TextField(entryRect, mCurrentCommand);
 			GUI.FocusControl("ConsoleEntry");
 		}
-
 	}
 }

@@ -13,12 +13,8 @@ namespace KeatsLib.Unity
 			mAnim = anim;
 			mDepth = depth;
 			mNameHash = mAnim.GetCurrentAnimatorStateInfo(depth).fullPathHash;
-
 		}
 
-		public override bool keepWaiting
-		{
-			get { return mAnim.GetCurrentAnimatorStateInfo(mDepth).fullPathHash == mNameHash; }
-		}
+		public override bool keepWaiting { get { return mAnim.GetCurrentAnimatorStateInfo(mDepth).fullPathHash == mNameHash; } }
 	}
 }

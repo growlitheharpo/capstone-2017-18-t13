@@ -6,15 +6,12 @@ namespace FiringSquad.Data
 	[Serializable]
 	public class PlayerDefaultsData
 	{
-		[Header("Weapons")]
-		[SerializeField] private WeaponPartCollection mDefaultWeaponParts;
+		[Header("Weapons")] [SerializeField] private WeaponPartCollection mDefaultWeaponParts;
 
-		[Header("Base Data")]
-		[SerializeField] private float mInteractDistance;
+		[Header("Base Data")] [SerializeField] private float mInteractDistance;
 		[SerializeField] private float mDefaultHealth;
 
-		[Header("Startup Options")]
-		[SerializeField] private bool mShouldInstantiateWeapon = true;
+		[Header("Startup Options")] [SerializeField] private bool mShouldInstantiateWeapon = true;
 		[SerializeField] private bool mShouldInstantiateGravityGun = true;
 		[SerializeField] private bool mInstantiateParts = true;
 

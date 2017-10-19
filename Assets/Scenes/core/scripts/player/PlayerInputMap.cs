@@ -6,16 +6,14 @@ namespace FiringSquad.Data
 	[Serializable]
 	public class PlayerInputMap
 	{
-		[Header("Weapons and Interactions")]
-		[SerializeField] private string mToggleMenuButton;
+		[Header("Weapons and Interactions")] [SerializeField] private string mToggleMenuButton;
 		[SerializeField] private string mFireWeaponButton;
 		[SerializeField] private string mFireGravGunButton;
 		[SerializeField] private string mReloadButton;
 		[SerializeField] private string mInteractButton;
 		[SerializeField] private string mPauseButton;
 
-		[Header("Movement")]
-		[SerializeField] private string mMoveBackFrontAxis;
+		[Header("Movement")] [SerializeField] private string mMoveBackFrontAxis;
 		[SerializeField] private string mMoveSidewaysAxis;
 		[SerializeField] private string mLookUpDownAxis;
 		[SerializeField] private string mLookLeftRightAxis;

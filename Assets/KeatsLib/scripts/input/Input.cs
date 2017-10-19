@@ -77,7 +77,7 @@ namespace FiringSquad.Core.Input
 				}
 			}
 		}
-		
+
 		/// <summary>
 		/// Useable input map to bind Unity input collection.
 		/// </summary>

@@ -114,7 +114,6 @@ namespace FiringSquad.Gameplay.Weapons
 			Destroy(gameObject);
 		}
 
-
 		/*
 		[SerializeField] private ParticleSystem mHitParticles;
 		[SerializeField] private float mSpeed;

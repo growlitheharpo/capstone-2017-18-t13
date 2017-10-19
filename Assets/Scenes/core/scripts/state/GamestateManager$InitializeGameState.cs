@@ -63,6 +63,5 @@ namespace FiringSquad.Core.State
 				EventManager.OnInitialAudioLoadComplete -= AudioLoadComplete;
 			}
 		}
-
 	}
 }

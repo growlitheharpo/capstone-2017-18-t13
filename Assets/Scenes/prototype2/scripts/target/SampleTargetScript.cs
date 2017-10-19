@@ -18,7 +18,7 @@ namespace FiringSquad.Prototyping
 
 		private BoundProperty<float> mHealth;
 		public BoundProperty<float> health { get { return mHealth; } }
-		
+
 		private void Start()
 		{
 			mHealth = new BoundProperty<float>(mStartHealth, (gameObject.name + "-health").GetHashCode());
@@ -38,7 +38,8 @@ namespace FiringSquad.Prototyping
 		{
 			var allObjects = FindObjectsOfType<SampleTargetScript>();
 
-			switch (args[0].ToLower()) {
+			switch (args[0].ToLower())
+			{
 				case "reset":
 					foreach (SampleTargetScript obj in allObjects)
 					{
@@ -88,7 +89,7 @@ namespace FiringSquad.Prototyping
 
 			yield return null;
 		}
-		
+
 		private void Die()
 		{
 			mMesh.SetActive(false);

@@ -19,7 +19,7 @@ namespace FiringSquad.Prototyping
 		{
 			Color startColor = mRenderer.material.color;
 			Color endColor = new Color(startColor.r, startColor.g, startColor.b, 0.0f);
-			
+
 			float currentTime = 0.0f;
 			while (currentTime < mFadeTime)
 			{

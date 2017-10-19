@@ -7,22 +7,17 @@ namespace FiringSquad.Data
 	[Serializable]
 	public class WeaponPartData
 	{
-		[Header("Dispersion")]
-		[FormerlySerializedAs("mSpreadModifier")] [SerializeField] private Modifier.Float mMinDispersionModifier;
+		[Header("Dispersion")] [FormerlySerializedAs("mSpreadModifier")] [SerializeField] private Modifier.Float mMinDispersionModifier;
 		[SerializeField] private Modifier.Float mMaxDispersionModifier;
 		[SerializeField] private Modifier.Float mDispersionRampModifier;
 
-		[Header("Recoil")]
-		[FormerlySerializedAs("mRecoilModifier")]
-		[SerializeField] private Modifier.Float mRecoilAmountModifier;
+		[Header("Recoil")] [FormerlySerializedAs("mRecoilModifier")] [SerializeField] private Modifier.Float mRecoilAmountModifier;
 		[SerializeField] private Modifier.Float mRecoilTimeModifier;
 
-		[Header("Damage")]
-		[SerializeField] private Modifier.Float mDamageModifier;
+		[Header("Damage")] [SerializeField] private Modifier.Float mDamageModifier;
 		[SerializeField] private Modifier.Float mDamageFalloffDistanceModifier;
 
-		[Header("Other")]
-		[SerializeField] private Modifier.Float mFireRateModifier;
+		[Header("Other")] [SerializeField] private Modifier.Float mFireRateModifier;
 		[SerializeField] private Modifier.Float mReloadTimeModifier;
 		[SerializeField] private Modifier.Int mClipSizeModifier;
 

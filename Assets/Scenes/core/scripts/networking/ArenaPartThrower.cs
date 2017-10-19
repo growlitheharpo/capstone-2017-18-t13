@@ -26,7 +26,6 @@ namespace FiringSquad.Gameplay
 		[ServerCallback]
 		private void Awake()
 		{
-
 #if UNITY_EDITOR
 			GenerateMeshPoints();
 #endif
@@ -110,10 +109,7 @@ namespace FiringSquad.Gameplay
 			instance.GetComponent<Rigidbody>().AddForce(direction.normalized * 20.0f, ForceMode.Impulse);
 			NetworkServer.Spawn(instance);
 
-			StartCoroutine(Coroutines.InvokeAfterFrames(2, () =>
-			{
-				instance.GetComponent<WeaponPickupScript>().RpcInitializePickupView();
-			}));
+			StartCoroutine(Coroutines.InvokeAfterFrames(2, () => { instance.GetComponent<WeaponPickupScript>().RpcInitializePickupView(); }));
 
 			return instance;
 		}

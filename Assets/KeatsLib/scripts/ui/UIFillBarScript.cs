@@ -4,7 +4,6 @@ using UIImage = UnityEngine.UI.Image;
 
 namespace KeatsLib.Unity
 {
-
 	/// <summary>
 	/// A utility UI class attached to a prefab. This is useful for a bar that needs to fill/drain, such as progress or
 	/// health.
