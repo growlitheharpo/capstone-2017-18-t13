@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using FiringSquad.Core;
+using FiringSquad.Core.State;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 
 /// <summary>
@@ -15,7 +17,7 @@ public class UIManager : MonoBehaviour
 		mProto3Button.OnClick += LaunchProto3;
 		mQuitButton.OnClick += ClickQuit;
 	}
-	
+
 	private void LaunchProto3()
 	{
 		mMainElementHolder.SetActive(false);

@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections;
+using FiringSquad.Core;
+using FiringSquad.Debug;
+using FiringSquad.Gameplay;
 using UnityEngine;
 using UIText = UnityEngine.UI.Text;
 
-namespace FiringSquad.Gameplay
+namespace FiringSquad.Prototyping
 {
 	public class SampleTargetScript : MonoBehaviour, IDamageReceiver
 	{
@@ -15,7 +18,7 @@ namespace FiringSquad.Gameplay
 
 		private BoundProperty<float> mHealth;
 		public BoundProperty<float> health { get { return mHealth; } }
-		
+
 		private void Start()
 		{
 			mHealth = new BoundProperty<float>(mStartHealth, (gameObject.name + "-health").GetHashCode());
@@ -35,7 +38,8 @@ namespace FiringSquad.Gameplay
 		{
 			var allObjects = FindObjectsOfType<SampleTargetScript>();
 
-			switch (args[0].ToLower()) {
+			switch (args[0].ToLower())
+			{
 				case "reset":
 					foreach (SampleTargetScript obj in allObjects)
 					{
@@ -85,7 +89,7 @@ namespace FiringSquad.Gameplay
 
 			yield return null;
 		}
-		
+
 		private void Die()
 		{
 			mMesh.SetActive(false);

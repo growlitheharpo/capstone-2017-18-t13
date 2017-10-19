@@ -1,15 +1,15 @@
-﻿using UnityEngine;
-using FiringSquad.Data;
+﻿using FiringSquad.Data;
+using UnityEngine;
 using UnityEngine.Networking;
 
-namespace FiringSquad.Gameplay
+namespace FiringSquad.Gameplay.Weapons
 {
 	public abstract class WeaponPartScript : MonoBehaviour
 	{
 		public const int INFINITE_DURABILITY = -1;
 
 		[SerializeField] private WeaponPartData mData;
-		public WeaponPartData[] data { get { return new [] { mData }; } }
+		public WeaponPartData[] data { get { return new[] { mData }; } }
 
 		[SerializeField] private string mDescription;
 		public string description { get { return mDescription; } }
@@ -19,17 +19,7 @@ namespace FiringSquad.Gameplay
 
 		[SerializeField] private int mDurability = INFINITE_DURABILITY;
 
-		public int durability
-		{
-			get
-			{
-				return mDurability;
-			}
-			set
-			{
-				mDurability = value;
-			}
-		}
+		public int durability { get { return mDurability; } set { mDurability = value; } }
 
 		public string partId
 		{

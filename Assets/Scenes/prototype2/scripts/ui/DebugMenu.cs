@@ -1,6 +1,11 @@
 ﻿using System.Linq;
-using UnityEngine;
+using FiringSquad.Core;
+using FiringSquad.Core.Input;
+using FiringSquad.Core.Weapons;
 using FiringSquad.Gameplay;
+using FiringSquad.Gameplay.Weapons;
+using UnityEngine;
+using Input = UnityEngine.Input;
 
 namespace FiringSquad.Debug
 {
@@ -31,7 +36,7 @@ namespace FiringSquad.Debug
 		{
 			RefreshWeaponList();
 			ServiceLocator.Get<IInput>()
-				.RegisterInput(Input.GetKeyDown, KeyCode.Tab, ToggleUI, KeatsLib.Unity.Input.InputLevel.None);
+				.RegisterInput(Input.GetKeyDown, KeyCode.Tab, ToggleUI, InputLevel.None);
 		}
 
 		private void OnDestroy()
@@ -44,7 +49,7 @@ namespace FiringSquad.Debug
 		{
 			mActive = !mActive;
 			ServiceLocator.Get<IInput>()
-				.SetInputLevelState(KeatsLib.Unity.Input.InputLevel.Gameplay, !mActive);
+				.SetInputLevelState(InputLevel.Gameplay, !mActive);
 		}
 
 		private void OnGUI()

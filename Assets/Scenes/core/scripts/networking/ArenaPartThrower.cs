@@ -1,10 +1,14 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using FiringSquad.Core;
+using FiringSquad.Core.Weapons;
+using FiringSquad.Gameplay.Weapons;
 using KeatsLib.Collections;
 using KeatsLib.Unity;
 using UnityEngine;
 using UnityEngine.Networking;
+using Logger = FiringSquad.Debug.Logger;
 
 namespace FiringSquad.Gameplay
 {
@@ -22,7 +26,6 @@ namespace FiringSquad.Gameplay
 		[ServerCallback]
 		private void Awake()
 		{
-
 #if UNITY_EDITOR
 			GenerateMeshPoints();
 #endif
@@ -45,7 +48,7 @@ namespace FiringSquad.Gameplay
 		private void LoadWeaponPrefabs()
 		{
 			mWeaponPrefabs = ServiceLocator.Get<IWeaponPartManager>()
-				.GetAllPrefabs(includeDebug: false).Values.ToArray();
+				.GetAllPrefabs(false).Values.ToArray();
 
 			foreach (GameObject prefab in mWeaponPrefabs)
 			{
@@ -106,10 +109,7 @@ namespace FiringSquad.Gameplay
 			instance.GetComponent<Rigidbody>().AddForce(direction.normalized * 20.0f, ForceMode.Impulse);
 			NetworkServer.Spawn(instance);
 
-			StartCoroutine(Coroutines.InvokeAfterFrames(2, () =>
-			{
-				instance.GetComponent<WeaponPickupScript>().RpcInitializePickupView();
-			}));
+			StartCoroutine(Coroutines.InvokeAfterFrames(2, () => { instance.GetComponent<WeaponPickupScript>().RpcInitializePickupView(); }));
 
 			return instance;
 		}

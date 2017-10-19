@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-namespace FiringSquad.Gameplay
+namespace FiringSquad.Prototyping
 {
 	public class HitDecalScript : MonoBehaviour
 	{
@@ -19,7 +19,7 @@ namespace FiringSquad.Gameplay
 		{
 			Color startColor = mRenderer.material.color;
 			Color endColor = new Color(startColor.r, startColor.g, startColor.b, 0.0f);
-			
+
 			float currentTime = 0.0f;
 			while (currentTime < mFadeTime)
 			{

@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using FiringSquad.Core.Audio;
+using UnityEngine;
 using UnityEngine.Audio;
 
 namespace FiringSquad.Data
@@ -8,7 +9,7 @@ namespace FiringSquad.Data
 	public class AudioClipData : ScriptableObject, IAudioClip
 	{
 		[SerializeField] private bool mBypassEffects;
-		
+
 		[SerializeField] private float mFadeInTime;
 		[SerializeField] private float mFadeOutTime;
 		[SerializeField] private AudioMixerGroup mGroup;

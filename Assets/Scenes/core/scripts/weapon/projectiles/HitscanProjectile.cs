@@ -1,9 +1,10 @@
 ﻿using System.Collections;
+using FiringSquad.Core.Audio;
 using FiringSquad.Data;
 using UnityEngine;
 using UnityEngine.Networking;
 
-namespace FiringSquad.Gameplay
+namespace FiringSquad.Gameplay.Weapons
 {
 	public class HitscanProjectile : BaseProjectileScript
 	{
@@ -57,7 +58,6 @@ namespace FiringSquad.Gameplay
 		{
 			RpcCreateShot(source.netId, endPoint);
 		}
-
 
 		[ClientRpc]
 		private void RpcCreateShot(NetworkInstanceId s, Vector3 endPoint)

@@ -1,4 +1,5 @@
-﻿using KeatsLib.Unity;
+﻿using FiringSquad.Data;
+using KeatsLib.Unity;
 using UnityEngine;
 
 namespace UnityEditor

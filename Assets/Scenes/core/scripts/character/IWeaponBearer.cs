@@ -1,4 +1,5 @@
 ﻿using FiringSquad.Data;
+using FiringSquad.Gameplay.Weapons;
 
 namespace FiringSquad.Gameplay
 {

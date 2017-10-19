@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using FiringSquad.Gameplay;
 using KeatsLib.Collections;
 using KeatsLib.State;
 using UnityEngine;
 using UnityEngine.Networking;
+using Logger = FiringSquad.Debug.Logger;
 
-namespace FiringSquad.Gameplay
+namespace FiringSquad.Networking
 {
 	public class NetworkServerGameManager : NetworkBehaviour
 	{
@@ -57,7 +59,7 @@ namespace FiringSquad.Gameplay
 
 			private readonly NetworkServerGameManager mScript;
 
-			private Transform[] mStartPositions;
+			private readonly Transform[] mStartPositions;
 			private CltPlayer[] mPlayerList;
 
 			private class WaitingForConnectionState : BaseState<ServerStateMachine>
@@ -119,7 +121,7 @@ namespace FiringSquad.Gameplay
 						player.MoveToStartPosition(target.position, target.rotation);
 					}
 				}
-				
+
 				public override IState GetTransition()
 				{
 					return new GameRunningState(mMachine);
@@ -135,7 +137,7 @@ namespace FiringSquad.Gameplay
 
 				public override void OnEnter()
 				{
-					mEndTime = DateTime.Now.Ticks + (mMachine.mScript.mRoundTime * TimeSpan.TicksPerSecond);
+					mEndTime = DateTime.Now.Ticks + mMachine.mScript.mRoundTime * TimeSpan.TicksPerSecond;
 					EventManager.Notify(() => EventManager.Server.StartGame(mEndTime));
 
 					EventManager.Server.OnPlayerHealthHitsZero += OnPlayerHealthHitsZero;

@@ -1,30 +1,32 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using FiringSquad.Core.Audio;
 using UnityEngine;
 
-public class WaitForAudio : CustomYieldInstruction
+namespace KeatsLib.Unity
 {
-	private IAudioReference mRef;
-	private AudioSource mSource;
-
-	public WaitForAudio(IAudioReference reference)
+	public class WaitForAudio : CustomYieldInstruction
 	{
-		mRef = reference;
-	}
+		private readonly IAudioReference mRef;
+		private readonly AudioSource mSource;
 
-	public WaitForAudio(AudioSource source)
-	{
-		mSource = source;
-	}
-
-	public override bool keepWaiting
-	{
-		get
+		public WaitForAudio(IAudioReference reference)
 		{
-			if (mSource != null)
-				return mSource.time + Time.deltaTime < mSource.clip.length;
+			mRef = reference;
+		}
 
-			return mRef.isPlaying;
+		public WaitForAudio(AudioSource source)
+		{
+			mSource = source;
+		}
+
+		public override bool keepWaiting
+		{
+			get
+			{
+				if (mSource != null)
+					return mSource.time + Time.deltaTime < mSource.clip.length;
+
+				return mRef.isPlaying;
+			}
 		}
 	}
 }

@@ -3,50 +3,53 @@ using KeatsLib.State;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public partial class GamestateManager
+namespace FiringSquad.Core.State
 {
-	/// <summary>
-	/// State used during the transition to another scene.
-	/// Scene loading is done async to avoid freezing the game.
-	/// </summary>
-	private class TransitionToSceneState : BaseGameState
+	public partial class GamestateManager
 	{
-		private readonly string mSceneName;
-		private AsyncOperation mLoadingOperation;
-		private LoadSceneMode mMode;
-
-		public override bool safeToTransition { get { return false; } }
-
-		public TransitionToSceneState(string sceneName, LoadSceneMode mode = LoadSceneMode.Single)
+		/// <summary>
+		/// State used during the transition to another scene.
+		/// Scene loading is done async to avoid freezing the game.
+		/// </summary>
+		private class TransitionToSceneState : BaseGameState
 		{
-			mSceneName = sceneName;
-			mMode = mode;
-		}
+			private readonly string mSceneName;
+			private AsyncOperation mLoadingOperation;
+			private readonly LoadSceneMode mMode;
 
-		/// <inheritdoc />
-		public override void OnEnter()
-		{
-			instance.StartCoroutine(LoadScene());
-		}
+			public override bool safeToTransition { get { return false; } }
 
-		private IEnumerator LoadScene()
-		{
-			mLoadingOperation = SceneManager.LoadSceneAsync(mSceneName, mMode);
+			public TransitionToSceneState(string sceneName, LoadSceneMode mode = LoadSceneMode.Single)
+			{
+				mSceneName = sceneName;
+				mMode = mode;
+			}
 
-			while (!mLoadingOperation.isDone)
-				yield return null;
-		}
+			/// <inheritdoc />
+			public override void OnEnter()
+			{
+				instance.StartCoroutine(LoadScene());
+			}
 
-		public override void OnExit()
-		{
-			var scene = SceneManager.GetSceneByName(mSceneName);
-			SceneManager.SetActiveScene(scene);
-		}
+			private IEnumerator LoadScene()
+			{
+				mLoadingOperation = SceneManager.LoadSceneAsync(mSceneName, mMode);
 
-		/// <inheritdoc />
-		public override IState GetTransition()
-		{
-			return mLoadingOperation != null && mLoadingOperation.isDone ? instance.ChooseStateByScene() : null;
+				while (!mLoadingOperation.isDone)
+					yield return null;
+			}
+
+			public override void OnExit()
+			{
+				Scene scene = SceneManager.GetSceneByName(mSceneName);
+				SceneManager.SetActiveScene(scene);
+			}
+
+			/// <inheritdoc />
+			public override IState GetTransition()
+			{
+				return mLoadingOperation != null && mLoadingOperation.isDone ? instance.ChooseStateByScene() : null;
+			}
 		}
 	}
 }
