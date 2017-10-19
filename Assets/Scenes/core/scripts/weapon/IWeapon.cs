@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using FiringSquad.Data;
+﻿using FiringSquad.Data;
 using UnityEngine;
 
 namespace FiringSquad.Gameplay.Weapons

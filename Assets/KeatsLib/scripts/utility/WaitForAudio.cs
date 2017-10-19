@@ -5,8 +5,8 @@ namespace KeatsLib.Unity
 {
 	public class WaitForAudio : CustomYieldInstruction
 	{
-		private IAudioReference mRef;
-		private AudioSource mSource;
+		private readonly IAudioReference mRef;
+		private readonly AudioSource mSource;
 
 		public WaitForAudio(IAudioReference reference)
 		{

@@ -7,7 +7,6 @@ using FiringSquad.Core.State;
 using FiringSquad.Core.UI;
 using FiringSquad.Core.Weapons;
 using FiringSquad.Debug;
-using FiringSquad.Gameplay;
 using KeatsLib.Persistence;
 using UnityEngine;
 using UnityEngine.SceneManagement;

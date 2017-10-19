@@ -13,7 +13,7 @@ namespace FiringSquad.Gameplay
 		{
 			Idle,
 			Reeling,
-			Locked,
+			Locked
 		}
 
 		[SerializeField] private float mPullForce;

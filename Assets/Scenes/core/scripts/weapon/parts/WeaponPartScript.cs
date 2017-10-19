@@ -1,5 +1,5 @@
-﻿using UnityEngine;
-using FiringSquad.Data;
+﻿using FiringSquad.Data;
+using UnityEngine;
 using UnityEngine.Networking;
 
 namespace FiringSquad.Gameplay.Weapons

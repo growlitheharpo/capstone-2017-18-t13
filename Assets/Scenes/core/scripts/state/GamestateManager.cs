@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
+using FiringSquad.Debug;
 using KeatsLib.State;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using FiringSquad.Debug;
 using Logger = FiringSquad.Debug.Logger;
 
 namespace FiringSquad.Core.State
@@ -62,7 +61,7 @@ namespace FiringSquad.Core.State
 		public enum Feature
 		{
 			WeaponDrops,
-			WeaponDurability,
+			WeaponDurability
 		}
 
 		private Dictionary<string, IGameState> mBaseStates;
@@ -89,7 +88,7 @@ namespace FiringSquad.Core.State
 				{ PROTOTYPE3_SCENE, new GameSceneState() },
 				{ "sandbox_networked", new GameSceneState() },
 				{ ART_PROTOTYPE_SCENE, new MenuSceneState() },
-				{ BASE_WORLD, new NullState() },
+				{ BASE_WORLD, new NullState() }
 			};
 		}
 

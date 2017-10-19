@@ -8,6 +8,7 @@ using KeatsLib.Collections;
 using KeatsLib.Unity;
 using UnityEngine;
 using UnityEngine.Networking;
+using Logger = FiringSquad.Debug.Logger;
 
 namespace FiringSquad.Gameplay
 {
@@ -48,11 +49,11 @@ namespace FiringSquad.Gameplay
 		private void LoadWeaponPrefabs()
 		{
 			mWeaponPrefabs = ServiceLocator.Get<IWeaponPartManager>()
-				.GetAllPrefabs(includeDebug: false).Values.ToArray();
+				.GetAllPrefabs(false).Values.ToArray();
 
 			foreach (GameObject prefab in mWeaponPrefabs)
 			{
-				Debug.Logger.Info("Registering part for spawn: " + prefab.name, Debug.Logger.System.Network);
+				Logger.Info("Registering part for spawn: " + prefab.name, Logger.System.Network);
 				ClientScene.RegisterPrefab(prefab);
 			}
 		}

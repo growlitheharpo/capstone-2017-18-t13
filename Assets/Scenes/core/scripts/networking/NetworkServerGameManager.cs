@@ -59,7 +59,7 @@ namespace FiringSquad.Networking
 
 			private readonly NetworkServerGameManager mScript;
 
-			private Transform[] mStartPositions;
+			private readonly Transform[] mStartPositions;
 			private CltPlayer[] mPlayerList;
 
 			private class WaitingForConnectionState : BaseState<ServerStateMachine>
@@ -137,7 +137,7 @@ namespace FiringSquad.Networking
 
 				public override void OnEnter()
 				{
-					mEndTime = DateTime.Now.Ticks + (mMachine.mScript.mRoundTime * TimeSpan.TicksPerSecond);
+					mEndTime = DateTime.Now.Ticks + mMachine.mScript.mRoundTime * TimeSpan.TicksPerSecond;
 					EventManager.Notify(() => EventManager.Server.StartGame(mEndTime));
 
 					EventManager.Server.OnPlayerHealthHitsZero += OnPlayerHealthHitsZero;

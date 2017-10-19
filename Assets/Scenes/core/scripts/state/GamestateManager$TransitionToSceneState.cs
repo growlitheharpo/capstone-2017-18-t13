@@ -15,7 +15,7 @@ namespace FiringSquad.Core.State
 		{
 			private readonly string mSceneName;
 			private AsyncOperation mLoadingOperation;
-			private LoadSceneMode mMode;
+			private readonly LoadSceneMode mMode;
 
 			public override bool safeToTransition { get { return false; } }
 
@@ -41,7 +41,7 @@ namespace FiringSquad.Core.State
 
 			public override void OnExit()
 			{
-				var scene = SceneManager.GetSceneByName(mSceneName);
+				Scene scene = SceneManager.GetSceneByName(mSceneName);
 				SceneManager.SetActiveScene(scene);
 			}
 

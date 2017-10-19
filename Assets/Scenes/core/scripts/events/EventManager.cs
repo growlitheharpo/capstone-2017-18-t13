@@ -44,7 +44,7 @@ public partial class EventManager
 			OnReceiveFinishEvent();
 		}
 
-		public static event Action<CltPlayer> OnLocalPlayerSpawned = (p) => { LogEvent(); };
+		public static event Action<CltPlayer> OnLocalPlayerSpawned = p => { LogEvent(); };
 
 		public static void LocalPlayerSpawned(CltPlayer p)
 		{
@@ -58,14 +58,14 @@ public partial class EventManager
 			OnLocalPlayerAttachedPart(weapon, part);
 		}
 
-		public static event Action<WeaponPartScript> OnLocalPlayerHoldingPart = (w) => { LogEvent(); };
+		public static event Action<WeaponPartScript> OnLocalPlayerHoldingPart = w => { LogEvent(); };
 
 		public static void LocalPlayerHoldingPart(WeaponPartScript part)
 		{
 			OnLocalPlayerHoldingPart(part);
 		}
 
-		public static event Action<WeaponPartScript> OnLocalPlayerReleasedPart = (w) => { LogEvent(); };
+		public static event Action<WeaponPartScript> OnLocalPlayerReleasedPart = w => { LogEvent(); };
 
 		public static void LocalPlayerReleasedPart(WeaponPartScript part)
 		{
@@ -103,14 +103,14 @@ public partial class EventManager
 			OnPlayerFiredWeapon(bearer, shotsFired);
 		}
 
-		public static event Action<int> OnPlayerJoined = (i) => { LogEvent(); };
+		public static event Action<int> OnPlayerJoined = i => { LogEvent(); };
 
 		public static void PlayerJoined(int newCount)
 		{
 			OnPlayerJoined(newCount);
 		}
 
-		public static event Action<int> OnPlayerLeft = (i) => { LogEvent(); };
+		public static event Action<int> OnPlayerLeft = i => { LogEvent(); };
 
 		public static void PlayerLeft(int newCount)
 		{

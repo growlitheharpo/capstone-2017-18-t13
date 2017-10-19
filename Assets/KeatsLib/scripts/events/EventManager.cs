@@ -113,5 +113,5 @@ public partial class EventManager : MonoSingleton<EventManager>
 /// documentation in code.
 /// It marks a function as an event handler.
 /// </summary>
-[AttributeUsage(validOn: AttributeTargets.Method)]
+[AttributeUsage(AttributeTargets.Method)]
 public class EventHandlerAttribute : Attribute { }

@@ -85,7 +85,7 @@ namespace FiringSquad.Data
 			AdditiveAbsolute,
 			SetAbsolute,
 			AdditivePercent,
-			SetPercentage,
+			SetPercentage
 		}
 	}
 }

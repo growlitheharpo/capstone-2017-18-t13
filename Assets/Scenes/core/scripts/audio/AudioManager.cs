@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using FiringSquad.Core.State;
 using FiringSquad.Data;
@@ -13,7 +14,7 @@ namespace FiringSquad.Core.Audio
 		public enum ProfileType
 		{
 			ChooseRandom,
-			PlayAll,
+			PlayAll
 		}
 
 		public enum AudioEvent
@@ -35,7 +36,7 @@ namespace FiringSquad.Core.Audio
 
 			ImpactWall = 60, // done
 			ImpactOtherPlayer = 65, // done
-			ImpactCurrentPlayer = 70, // done
+			ImpactCurrentPlayer = 70 // done
 		}
 
 		/// <summary>
@@ -62,7 +63,7 @@ namespace FiringSquad.Core.Audio
 			/// <inheritdoc />
 			public void FadeOut(float time)
 			{
-				throw new System.NotImplementedException("Fading audio in and out is not yet supported!");
+				throw new NotImplementedException("Fading audio in and out is not yet supported!");
 			}
 
 			/// <inheritdoc />

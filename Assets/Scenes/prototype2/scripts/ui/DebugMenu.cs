@@ -2,9 +2,9 @@
 using FiringSquad.Core;
 using FiringSquad.Core.Input;
 using FiringSquad.Core.Weapons;
-using UnityEngine;
 using FiringSquad.Gameplay;
 using FiringSquad.Gameplay.Weapons;
+using UnityEngine;
 using Input = UnityEngine.Input;
 
 namespace FiringSquad.Debug

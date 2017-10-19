@@ -9,8 +9,6 @@ using FiringSquad.Core.Audio;
 using FiringSquad.Core.UI;
 using FiringSquad.Core.Weapons;
 using FiringSquad.Data;
-using FiringSquad.Gameplay;
-using FiringSquad.Gameplay.Weapons;
 using KeatsLib.Unity;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -48,7 +46,7 @@ namespace FiringSquad.Gameplay.Weapons
 			Scope,
 			Barrel,
 			Mechanism,
-			Grip,
+			Grip
 		}
 
 		public IWeaponBearer bearer { get; set; }
@@ -103,7 +101,7 @@ namespace FiringSquad.Gameplay.Weapons
 				{ Attachment.Scope, mScopeAttach },
 				{ Attachment.Barrel, mBarrelAttach },
 				{ Attachment.Mechanism, mMechanismAttach },
-				{ Attachment.Grip, mGripAttach },
+				{ Attachment.Grip, mGripAttach }
 			};
 
 			mShotsInClip = new BoundProperty<int>();
@@ -383,7 +381,7 @@ namespace FiringSquad.Gameplay.Weapons
 				return false;
 
 			WeaponPartScriptBarrel barrel = mCurrentParts.barrel;
-			if (barrel == null || (barrel.shotsPerClick > 0 && mShotsSinceRelease >= barrel.shotsPerClick))
+			if (barrel == null || barrel.shotsPerClick > 0 && mShotsSinceRelease >= barrel.shotsPerClick)
 				return false;
 
 			if (mShotsInClip.value <= 0)
@@ -397,7 +395,7 @@ namespace FiringSquad.Gameplay.Weapons
 
 		private Ray CalculateShotDirection(bool firstShot)
 		{
-			float dispersionFactor = GetCurrentDispersionFactor(forceNotZero: !firstShot);
+			float dispersionFactor = GetCurrentDispersionFactor(!firstShot);
 			Vector3 randomness = Random.insideUnitSphere * dispersionFactor;
 
 			Transform root = GetAimRoot();
@@ -465,7 +463,7 @@ namespace FiringSquad.Gameplay.Weapons
 
 		private void CleanupRecentShots()
 		{
-			float inverseFireRate = (1.0f / mCurrentData.fireRate) * 10.0f;
+			float inverseFireRate = 1.0f / mCurrentData.fireRate * 10.0f;
 
 			for (int i = 0; i < mRecentShotTimes.Count; i++)
 			{
