@@ -6,6 +6,7 @@ using FiringSquad.Debug;
 using FiringSquad.Gameplay;
 using FiringSquad.Gameplay.Weapons;
 using UnityEngine;
+using Logger = FiringSquad.Debug.Logger;
 
 /// <summary>
 /// A list of game events for this project.
