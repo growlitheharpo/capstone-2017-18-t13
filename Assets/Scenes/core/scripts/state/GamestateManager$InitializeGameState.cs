@@ -1,63 +1,68 @@
 ﻿using System;
+using FiringSquad.Core.Audio;
+using FiringSquad.Core.SaveLoad;
 using KeatsLib.State;
 
-public partial class GamestateManager
+namespace FiringSquad.Core.State
 {
-	/// <summary>
-	/// State used to initialize the game at start-up.
-	/// </summary>
-	/// <inheritdoc />
-	private class InitializeGameState : BaseGameState
+	public partial class GamestateManager
 	{
-		private static bool kOccured;
-		private bool mSaveLoadComplete, mAudioLoadComplete;
-
+		/// <summary>
+		/// State used to initialize the game at start-up.
+		/// </summary>
 		/// <inheritdoc />
-		public override void OnEnter()
+		private class InitializeGameState : BaseGameState
 		{
-			if (kOccured)
-				throw new ArgumentException("Cannot Initialize the game more than once! Manager is now in an invalid state.");
+			private static bool kOccured;
+			private bool mSaveLoadComplete, mAudioLoadComplete;
 
-			mSaveLoadComplete = false;
-			mAudioLoadComplete = false;
-			EventManager.OnInitialPersistenceLoadComplete += InitialLoadComplete;
-			EventManager.OnInitialAudioLoadComplete += AudioLoadComplete;
+			/// <inheritdoc />
+			public override void OnEnter()
+			{
+				if (kOccured)
+					throw new ArgumentException("Cannot Initialize the game more than once! Manager is now in an invalid state.");
 
-			ServiceLocator.Get<ISaveLoadManager>()
-				.LoadData();
-			ServiceLocator.Get<IAudioManager>()
-				.InitializeDatabase();
+				mSaveLoadComplete = false;
+				mAudioLoadComplete = false;
+				EventManager.OnInitialPersistenceLoadComplete += InitialLoadComplete;
+				EventManager.OnInitialAudioLoadComplete += AudioLoadComplete;
+
+				ServiceLocator.Get<ISaveLoadManager>()
+					.LoadData();
+				ServiceLocator.Get<IAudioManager>()
+					.InitializeDatabase();
+			}
+
+			/// <inheritdoc />
+			public override bool safeToTransition { get { return false; } }
+
+			/// <inheritdoc />
+			public override IState GetTransition()
+			{
+				if (mSaveLoadComplete && mAudioLoadComplete)
+					return instance.ChooseStateByScene();
+				return null;
+			}
+
+			private void InitialLoadComplete()
+			{
+				mSaveLoadComplete = true;
+			}
+
+			private void AudioLoadComplete()
+			{
+				mAudioLoadComplete = true;
+			}
+
+			/// <inheritdoc />
+			public override void OnExit()
+			{
+				kOccured = true;
+				//Cleanup handlers so we can be garbage collected
+				EventManager.OnInitialPersistenceLoadComplete -= InitialLoadComplete;
+				EventManager.OnInitialAudioLoadComplete -= AudioLoadComplete;
+			}
 		}
 
-		/// <inheritdoc />
-		public override bool safeToTransition { get { return false; } }
-
-		/// <inheritdoc />
-		public override IState GetTransition()
-		{
-			if (mSaveLoadComplete && mAudioLoadComplete)
-				return instance.ChooseStateByScene();
-			return null;
-		}
-
-		private void InitialLoadComplete()
-		{
-			mSaveLoadComplete = true;
-		}
-
-		private void AudioLoadComplete()
-		{
-			mAudioLoadComplete = true;
-		}
-
-		/// <inheritdoc />
-		public override void OnExit()
-		{
-			kOccured = true;
-			//Cleanup handlers so we can be garbage collected
-			EventManager.OnInitialPersistenceLoadComplete -= InitialLoadComplete;
-			EventManager.OnInitialAudioLoadComplete -= AudioLoadComplete;
-		}
 	}
-
 }

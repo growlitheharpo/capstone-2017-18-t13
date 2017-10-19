@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-namespace FiringSquad.Gameplay
+namespace FiringSquad.Gameplay.Weapons
 {
 	public class HitscanShootEffect : MonoBehaviour
 	{

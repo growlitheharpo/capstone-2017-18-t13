@@ -1,6 +1,7 @@
-﻿using UnityEngine;
+﻿using FiringSquad.Data;
+using UnityEngine;
 
-namespace FiringSquad.Gameplay
+namespace FiringSquad.Gameplay.Weapons
 {
 	public class WeaponPartScriptMechanism : WeaponPartScript
 	{

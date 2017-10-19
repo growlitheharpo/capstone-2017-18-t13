@@ -1,101 +1,104 @@
 ﻿using System;
 using System.Collections.Generic;
+using FiringSquad.Core;
 using KeatsLib.Collections;
-using UnityEngine;
 
-/// <summary>
-/// Unity Debug.Log wrapper.
-/// Allows easy colorization and toggling.
-/// </summary>
-public static class Logger
+namespace FiringSquad.Debug
 {
-	private static readonly Dictionary<System, string> COLORS = new Dictionary<System, string>
-	{
-		{ System.State, "teal" },
-		{ System.Audio, "blue" },
-		{ System.Event, "purple" },
-		{ System.Services, "olive" },
-		{ System.Input, "orange" },
-		{ System.Network, "maroon" },
-		{ System.Generic, "grey" },
-	};
-
-	[Flags]
-	public enum System
-	{
-		State = 0x1,
-		Audio = 0x2,
-		Event = 0x4,
-		Services = 0x8,
-		Input = 0x10,
-		Network = 0x20,
-		Generic = 0x10000,
-	}
-
 	/// <summary>
-	/// Stand-in for Debug.Log().
-	/// Prints information to the Unity console.
+	/// Unity Debug.Log wrapper.
+	/// Allows easy colorization and toggling.
 	/// </summary>
-	/// <param name="message">The message to be printed.</param>
-	/// <param name="system">The system of origin for the log, if applicable. Will affect color and header.</param>
-	public static void Info(string message, System system = System.Generic)
+	public static class Logger
 	{
-		if (!CheckLevel(system))
-			return;
-
-		var colorPair = GetColorPair(system);
-		string label = system == System.Generic ? "Info" : system.ToString();
-		Debug.Log(colorPair.first + label + ": " + message + colorPair.second);
-	}
-	
-	/// <summary>
-	/// Stand-in for Debug.LogWarning().
-	/// Prints information to the Unity console.
-	/// </summary>
-	/// <param name="message">The message to be printed.</param>
-	/// <param name="system">The system of origin for the log, if applicable. Will affect color and header.</param>
-	public static void Warn(string message, System system = System.Generic)
-	{
-		if (!CheckLevel(system))
-			return;
-
-		var colorPair = GetColorPair(system);
-		string label = system == System.Generic ? "Info" : system.ToString();
-		Debug.LogWarning(colorPair.first + label + ": " + message + colorPair.second);
-	}
-	
-	/// <summary>
-	/// Stand-in for Debug.LogError().
-	/// Prints information to the Unity console.
-	/// </summary>
-	/// <param name="message">The message to be printed.</param>
-	/// <param name="system">The system of origin for the log, if applicable. Will affect color and header.</param>
-	public static void Error(string message, System system = System.Generic)
-	{
-		if (!CheckLevel(system))
-			return;
-
-		var colorPair = GetColorPair(system);
-		string label = system == System.Generic ? "Info" : system.ToString();
-		Debug.LogError(colorPair.first + label + ": " + message + colorPair.second);
-	}
-
-	private static bool CheckLevel(System system)
-	{
-		try
+		private static readonly Dictionary<System, string> COLORS = new Dictionary<System, string>
 		{
-			System level = ServiceLocator.Get<IGameConsole>().enabledLogLevels;
-			return (level & system) == system;
-		}
-		catch (Exception)
-		{
-			return true;
-		}
-	}
+			{ System.State, "teal" },
+			{ System.Audio, "blue" },
+			{ System.Event, "purple" },
+			{ System.Services, "olive" },
+			{ System.Input, "orange" },
+			{ System.Network, "maroon" },
+			{ System.Generic, "grey" },
+		};
 
-	private static SystemExtensions.Types.Pair<string, string> GetColorPair(System system)
-	{
-		string color = COLORS[system];
-		return new SystemExtensions.Types.Pair<string, string>("<color=" + color + ">", "</color>");
+		[Flags]
+		public enum System
+		{
+			State = 0x1,
+			Audio = 0x2,
+			Event = 0x4,
+			Services = 0x8,
+			Input = 0x10,
+			Network = 0x20,
+			Generic = 0x10000,
+		}
+
+		/// <summary>
+		/// Stand-in for Debug.Log().
+		/// Prints information to the Unity console.
+		/// </summary>
+		/// <param name="message">The message to be printed.</param>
+		/// <param name="system">The system of origin for the log, if applicable. Will affect color and header.</param>
+		public static void Info(string message, System system = System.Generic)
+		{
+			if (!CheckLevel(system))
+				return;
+
+			var colorPair = GetColorPair(system);
+			string label = system == System.Generic ? "Info" : system.ToString();
+			UnityEngine.Debug.Log(colorPair.first + label + ": " + message + colorPair.second);
+		}
+
+		/// <summary>
+		/// Stand-in for Debug.LogWarning().
+		/// Prints information to the Unity console.
+		/// </summary>
+		/// <param name="message">The message to be printed.</param>
+		/// <param name="system">The system of origin for the log, if applicable. Will affect color and header.</param>
+		public static void Warn(string message, System system = System.Generic)
+		{
+			if (!CheckLevel(system))
+				return;
+
+			var colorPair = GetColorPair(system);
+			string label = system == System.Generic ? "Info" : system.ToString();
+			UnityEngine.Debug.LogWarning(colorPair.first + label + ": " + message + colorPair.second);
+		}
+
+		/// <summary>
+		/// Stand-in for Debug.LogError().
+		/// Prints information to the Unity console.
+		/// </summary>
+		/// <param name="message">The message to be printed.</param>
+		/// <param name="system">The system of origin for the log, if applicable. Will affect color and header.</param>
+		public static void Error(string message, System system = System.Generic)
+		{
+			if (!CheckLevel(system))
+				return;
+
+			var colorPair = GetColorPair(system);
+			string label = system == System.Generic ? "Info" : system.ToString();
+			UnityEngine.Debug.LogError(colorPair.first + label + ": " + message + colorPair.second);
+		}
+
+		private static bool CheckLevel(System system)
+		{
+			try
+			{
+				System level = ServiceLocator.Get<IGameConsole>().enabledLogLevels;
+				return (level & system) == system;
+			}
+			catch (Exception)
+			{
+				return true;
+			}
+		}
+
+		private static SystemExtensions.Types.Pair<string, string> GetColorPair(System system)
+		{
+			string color = COLORS[system];
+			return new SystemExtensions.Types.Pair<string, string>("<color=" + color + ">", "</color>");
+		}
 	}
 }

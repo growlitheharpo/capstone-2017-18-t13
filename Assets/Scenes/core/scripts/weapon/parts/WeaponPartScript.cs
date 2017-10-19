@@ -2,7 +2,7 @@
 using FiringSquad.Data;
 using UnityEngine.Networking;
 
-namespace FiringSquad.Gameplay
+namespace FiringSquad.Gameplay.Weapons
 {
 	public abstract class WeaponPartScript : MonoBehaviour
 	{

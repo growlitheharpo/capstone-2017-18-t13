@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using FiringSquad.Core.Audio;
+using UnityEngine;
 using UnityEngine.Audio;
 
 namespace FiringSquad.Data

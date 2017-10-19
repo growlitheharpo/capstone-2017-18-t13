@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections;
+using FiringSquad.Core;
+using FiringSquad.Debug;
+using FiringSquad.Gameplay;
 using UnityEngine;
 using UIText = UnityEngine.UI.Text;
 
-namespace FiringSquad.Gameplay
+namespace FiringSquad.Prototyping
 {
 	public class SampleTargetScript : MonoBehaviour, IDamageReceiver
 	{

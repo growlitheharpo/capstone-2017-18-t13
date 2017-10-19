@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using FiringSquad.Core;
+using FiringSquad.Core.State;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 
 /// <summary>

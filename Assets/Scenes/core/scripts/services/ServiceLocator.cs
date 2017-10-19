@@ -1,47 +1,56 @@
 ﻿using System;
 using System.Collections.Generic;
-using FiringSquad.Gameplay;
+using FiringSquad.Core.Audio;
+using FiringSquad.Core.Input;
+using FiringSquad.Core.SaveLoad;
+using FiringSquad.Core.State;
+using FiringSquad.Core.UI;
+using FiringSquad.Core.Weapons;
+using FiringSquad.Debug;
 
-/// <summary>
-/// Gets instances of the main game services at runtime.
-/// Preferable to using the singleton instance directly because
-/// it will prevent crashes and null references at runtime
-/// when a service does not exist.
-/// </summary>
-public class ServiceLocator : MonoSingleton<ServiceLocator>
+namespace FiringSquad.Core
 {
-	private Dictionary<Type, object> mInterfaceMap;
-
-	protected override void Awake()
+	/// <summary>
+	/// Gets instances of the main game services at runtime.
+	/// Preferable to using the singleton instance directly because
+	/// it will prevent crashes and null references at runtime
+	/// when a service does not exist.
+	/// </summary>
+	public class ServiceLocator : MonoSingleton<ServiceLocator>
 	{
-		base.Awake();
-		mInterfaceMap = new Dictionary<Type, object>
+		private Dictionary<Type, object> mInterfaceMap;
+
+		protected override void Awake()
 		{
-			{ typeof(IInput), TryFind<IInput>(KeatsLib.Unity.Input.instance) },
-			{ typeof(IGameConsole), TryFind<IGameConsole>(GameConsole.instance) },
-			{ typeof(ISaveLoadManager), TryFind<ISaveLoadManager>(SaveLoadManager.instance) },
-			{ typeof(IAudioManager), TryFind<IAudioManager>(AudioManager.instance) },
-			{ typeof(IGamestateManager), TryFind<IGamestateManager>(GamestateManager.instance) },
-			{ typeof(IGameplayUIManager), TryFind<IGameplayUIManager>(GameplayUIManager.instance) },
-			{ typeof(IWeaponPartManager), TryFind<IWeaponPartManager>(WeaponPartManager.instance) },
-		};
-	}
+			base.Awake();
+			mInterfaceMap = new Dictionary<Type, object>
+			{
+				{ typeof(IInput), TryFind<IInput>(Input.Input.instance) },
+				{ typeof(IGameConsole), TryFind<IGameConsole>(GameConsole.instance) },
+				{ typeof(ISaveLoadManager), TryFind<ISaveLoadManager>(SaveLoadManager.instance) },
+				{ typeof(IAudioManager), TryFind<IAudioManager>(AudioManager.instance) },
+				{ typeof(IGamestateManager), TryFind<IGamestateManager>(GamestateManager.instance) },
+				{ typeof(IGameplayUIManager), TryFind<IGameplayUIManager>(GameplayUIManager.instance) },
+				{ typeof(IWeaponPartManager), TryFind<IWeaponPartManager>(WeaponPartManager.instance) },
+			};
+		}
 
-	public static T Get<T>() where T : class
-	{
+		public static T Get<T>() where T : class
+		{
 #if DEBUG || DEVELOPMENT_BUILD
-		object result;
-		if (instance.mInterfaceMap.TryGetValue(typeof(T), out result))
-			return result as T;
+			object result;
+			if (instance.mInterfaceMap.TryGetValue(typeof(T), out result))
+				return result as T;
 
-		throw new KeyNotFoundException("Type " + typeof(T).Name + " is not accessible through the service locator.");
+			throw new KeyNotFoundException("Type " + typeof(T).Name + " is not accessible through the service locator.");
 #else
 		return instance.mInterfaceMap[typeof(T)] as T;
 #endif
-	}
+		}
 
-	private static T TryFind<T>(object inst) where T : class
-	{
-		return inst as T ?? NullServices.Create<T>();
+		private static T TryFind<T>(object inst) where T : class
+		{
+			return inst as T ?? NullServices.Create<T>();
+		}
 	}
 }

@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using FiringSquad.Gameplay;
 using KeatsLib.Collections;
 using KeatsLib.State;
 using UnityEngine;
 using UnityEngine.Networking;
+using Logger = FiringSquad.Debug.Logger;
 
-namespace FiringSquad.Gameplay
+namespace FiringSquad.Networking
 {
 	public class NetworkServerGameManager : NetworkBehaviour
 	{

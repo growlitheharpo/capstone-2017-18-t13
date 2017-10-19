@@ -1,5 +1,5 @@
 ﻿using System;
-using FiringSquad.Gameplay;
+using FiringSquad.Gameplay.Weapons;
 using UnityEngine;
 
 namespace FiringSquad.Data

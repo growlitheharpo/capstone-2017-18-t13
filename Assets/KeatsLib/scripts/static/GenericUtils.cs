@@ -2,7 +2,7 @@
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace KeatsLib
+namespace KeatsLib.Collections
 {
 	public static class GenericExt
 	{

@@ -1,4 +1,4 @@
-﻿using FiringSquad.Gameplay;
+﻿using FiringSquad.Gameplay.Weapons;
 
 namespace UnityEditor
 {

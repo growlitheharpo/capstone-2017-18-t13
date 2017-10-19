@@ -1,21 +1,24 @@
 ﻿using UnityEngine;
 
-public class WaitForAnimation : CustomYieldInstruction
+namespace KeatsLib.Unity
 {
-	private readonly Animator mAnim;
-	private readonly int mNameHash;
-	private readonly int mDepth;
-
-	public WaitForAnimation(Animator anim, int depth = 0)
+	public class WaitForAnimation : CustomYieldInstruction
 	{
-		mAnim = anim;
-		mDepth = depth;
-		mNameHash = mAnim.GetCurrentAnimatorStateInfo(depth).fullPathHash;
+		private readonly Animator mAnim;
+		private readonly int mNameHash;
+		private readonly int mDepth;
 
-	}
+		public WaitForAnimation(Animator anim, int depth = 0)
+		{
+			mAnim = anim;
+			mDepth = depth;
+			mNameHash = mAnim.GetCurrentAnimatorStateInfo(depth).fullPathHash;
 
-	public override bool keepWaiting
-	{
-		get { return mAnim.GetCurrentAnimatorStateInfo(mDepth).fullPathHash == mNameHash; }
+		}
+
+		public override bool keepWaiting
+		{
+			get { return mAnim.GetCurrentAnimatorStateInfo(mDepth).fullPathHash == mNameHash; }
+		}
 	}
 }

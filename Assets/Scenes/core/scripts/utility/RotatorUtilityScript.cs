@@ -1,11 +1,14 @@
 ﻿using UnityEngine;
 
-public class RotatorUtilityScript : MonoBehaviour
+namespace KeatsLib.Unity
 {
-	[SerializeField] private float mRotationRate = 180.0f;
-
-	private void Update()
+	public class RotatorUtilityScript : MonoBehaviour
 	{
-		transform.Rotate(Vector3.up, mRotationRate * Time.deltaTime);
+		[SerializeField] private float mRotationRate = 180.0f;
+
+		private void Update()
+		{
+			transform.Rotate(Vector3.up, mRotationRate * Time.deltaTime);
+		}
 	}
 }

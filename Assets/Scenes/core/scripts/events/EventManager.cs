@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using FiringSquad.Core;
+using FiringSquad.Debug;
 using FiringSquad.Gameplay;
+using FiringSquad.Gameplay.Weapons;
 using UnityEngine;
 
 /// <summary>

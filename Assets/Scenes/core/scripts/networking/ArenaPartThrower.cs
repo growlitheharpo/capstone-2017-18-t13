@@ -1,6 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using FiringSquad.Core;
+using FiringSquad.Core.Weapons;
+using FiringSquad.Gameplay.Weapons;
 using KeatsLib.Collections;
 using KeatsLib.Unity;
 using UnityEngine;
@@ -49,7 +52,7 @@ namespace FiringSquad.Gameplay
 
 			foreach (GameObject prefab in mWeaponPrefabs)
 			{
-				Logger.Info("Registering part for spawn: " + prefab.name, Logger.System.Network);
+				Debug.Logger.Info("Registering part for spawn: " + prefab.name, Debug.Logger.System.Network);
 				ClientScene.RegisterPrefab(prefab);
 			}
 		}

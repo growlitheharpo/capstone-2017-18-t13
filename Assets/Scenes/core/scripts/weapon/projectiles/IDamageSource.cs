@@ -1,4 +1,7 @@
-﻿public interface IDamageSource
+﻿namespace FiringSquad.Gameplay
 {
-	ICharacter source { get; }
+	public interface IDamageSource
+	{
+		ICharacter source { get; }
+	}
 }

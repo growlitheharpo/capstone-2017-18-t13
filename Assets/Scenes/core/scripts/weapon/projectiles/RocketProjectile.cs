@@ -4,7 +4,7 @@ using KeatsLib.Unity;
 using UnityEngine;
 using UnityEngine.Networking;
 
-namespace FiringSquad.Gameplay
+namespace FiringSquad.Gameplay.Weapons
 {
 	public class RocketProjectile : BaseProjectileScript
 	{

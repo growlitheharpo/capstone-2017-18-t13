@@ -240,11 +240,5 @@ namespace KeatsLib.Unity
 
 			Object.Destroy(destroyGameObject ? (Object)ps.gameObject : ps);
 		}
-
-		public static IEnumerator WaitOneFrame(Action doAfterWait)
-		{
-			yield return null;
-			doAfterWait.Invoke();
-		}
 	}
 }

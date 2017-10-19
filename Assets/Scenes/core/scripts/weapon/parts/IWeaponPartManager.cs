@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace FiringSquad.Gameplay
+namespace FiringSquad.Core.Weapons
 {
 	public interface IWeaponPartManager
 	{

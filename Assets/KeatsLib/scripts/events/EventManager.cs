@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using FiringSquad.Core;
+using FiringSquad.Core.Input;
+using FiringSquad.Debug;
 using Debug = UnityEngine.Debug;
 
 /// <summary>
@@ -24,9 +27,9 @@ public partial class EventManager : MonoSingleton<EventManager>
 		OnXmlSuccesfullyRefreshed();
 	}
 
-	public static event Action<KeatsLib.Unity.Input.InputLevel, bool> OnInputLevelChanged = (a, b) => { LogEvent(); };
+	public static event Action<InputLevel, bool> OnInputLevelChanged = (a, b) => { LogEvent(); };
 
-	public static void InputLevelChanged(KeatsLib.Unity.Input.InputLevel level, bool state)
+	public static void InputLevelChanged(InputLevel level, bool state)
 	{
 		OnInputLevelChanged(level, state);
 	}
@@ -105,5 +108,10 @@ public partial class EventManager : MonoSingleton<EventManager>
 	}
 }
 
+/// <summary>
+/// This attribute is just used for non-comment
+/// documentation in code.
+/// It marks a function as an event handler.
+/// </summary>
 [AttributeUsage(validOn: AttributeTargets.Method)]
 public class EventHandlerAttribute : Attribute { }

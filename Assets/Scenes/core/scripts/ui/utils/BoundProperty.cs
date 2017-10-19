@@ -1,84 +1,90 @@
 ﻿using System;
+using FiringSquad.Core.UI;
 
-/// <summary>
-/// A class to bind data between classes, so that the listener (such as a UI element)
-/// can get notifications when the value changes.
-/// </summary>
-public class BoundProperty
+namespace FiringSquad.Core
 {
-	protected object mValue;
-	public event Action ValueChanged = () => { };
-	public event Action BeingDestroyed = () => { };
-
-	~BoundProperty()
-	{
-		Cleanup();
-	}
-
-	protected void OnValueChanged()
-	{
-		ValueChanged();
-	}
-
-	protected void OnDestroy()
-	{
-		BeingDestroyed();
-	}
-
 	/// <summary>
-	/// This is just to be nice. A listener will not keep a publisher alive.
+	/// A class to bind data between classes, so that the listener (such as a UI element)
+	/// can get notifications when the value changes.
 	/// </summary>
-	/// <see cref="https://stackoverflow.com/a/298276"/>
-	public void Cleanup()
+	public class BoundProperty
 	{
-		OnDestroy();
+		protected object mValue;
+		public event Action ValueChanged = () => { };
+		public event Action BeingDestroyed = () => { };
 
-		var delegates = ValueChanged.GetInvocationList();
-		foreach (Delegate d in delegates)
-			ValueChanged -= (Action)d;
-
-		ServiceLocator.Get<IGameplayUIManager>()
-			.UnbindProperty(this);
-	}
-}
-
-/// <inheritdoc />
-/// <typeparam name="T">The type of object to store.</typeparam>
-public class BoundProperty<T> : BoundProperty
-{
-	public T value
-	{
-		get { return (T)mValue; }
-		set
+		~BoundProperty()
 		{
-			bool changed = !Equals(this.mValue, value);
-			if (!changed)
-				return;
+			Cleanup();
+		}
 
-			mValue = value;
-			OnValueChanged();
+		protected void OnValueChanged()
+		{
+			ValueChanged();
+		}
+
+		protected void OnDestroy()
+		{
+			BeingDestroyed();
+		}
+
+		/// <summary>
+		/// This is just to be nice. A listener will not keep a publisher alive.
+		/// </summary>
+		/// <see>
+		/// <cref>https://stackoverflow.com/a/298276</cref>
+		/// </see>
+		public void Cleanup()
+		{
+			OnDestroy();
+
+			var delegates = ValueChanged.GetInvocationList();
+			foreach (Delegate d in delegates)
+				ValueChanged -= (Action)d;
+
+			ServiceLocator.Get<IGameplayUIManager>()
+				.UnbindProperty(this);
 		}
 	}
 
-	~BoundProperty()
+	/// <inheritdoc />
+	/// <typeparam name="T">The type of object to store.</typeparam>
+	public class BoundProperty<T> : BoundProperty
 	{
-		Cleanup();
-	}
+		public T value
+		{
+			get { return (T)mValue; }
+			set
+			{
+				bool changed = !Equals(mValue, value);
+				if (!changed)
+					return;
 
-	public BoundProperty()
-	{
-		value = default(T);
-	}
+				mValue = value;
+				OnValueChanged();
+			}
+		}
 
-	public BoundProperty(T value)
-	{
-		this.value = value;
-	}
+		~BoundProperty()
+		{
+			Cleanup();
+		}
 
-	public BoundProperty(T value, int property)
-	{
-		this.value = value;
-		ServiceLocator.Get<IGameplayUIManager>()
-			.BindProperty(property, this);
+		public BoundProperty()
+		{
+			value = default(T);
+		}
+
+		public BoundProperty(T value)
+		{
+			this.value = value;
+		}
+
+		public BoundProperty(T value, int property)
+		{
+			this.value = value;
+			ServiceLocator.Get<IGameplayUIManager>()
+				.BindProperty(property, this);
+		}
 	}
 }

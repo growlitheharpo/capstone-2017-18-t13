@@ -1,16 +1,16 @@
 ﻿using UnityEngine;
 
-public class WaitForParticles : CustomYieldInstruction
+namespace KeatsLib.Unity
 {
-	private readonly ParticleSystem mParticles;
-
-	public WaitForParticles(ParticleSystem ps)
+	public class WaitForParticles : CustomYieldInstruction
 	{
-		mParticles = ps;
-	}
+		private readonly ParticleSystem mParticles;
 
-	public override bool keepWaiting
-	{
-		get { return mParticles.isPlaying; }
+		public WaitForParticles(ParticleSystem ps)
+		{
+			mParticles = ps;
+		}
+
+		public override bool keepWaiting { get { return mParticles.isPlaying; } }
 	}
 }

@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
+using FiringSquad.Core;
+using FiringSquad.Core.Input;
 using FiringSquad.Data;
-using FiringSquad.Gameplay;
+using FiringSquad.Gameplay.Weapons;
 using UnityEngine;
+using Input = UnityEngine.Input;
 
 namespace FiringSquad.Debug
 {
@@ -21,7 +23,7 @@ namespace FiringSquad.Debug
 		private void Start()
 		{
 			ServiceLocator.Get<IInput>()
-				.RegisterInput(Input.GetKeyDown, KeyCode.F5, INPUT_ToggleState, KeatsLib.Unity.Input.InputLevel.None);
+				.RegisterInput(Input.GetKeyDown, KeyCode.F5, INPUT_ToggleState, InputLevel.None);
 
 			mLineRenderers = GetComponentsInChildren<LineRenderer>();
 
