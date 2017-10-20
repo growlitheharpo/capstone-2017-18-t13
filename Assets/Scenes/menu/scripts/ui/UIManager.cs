@@ -3,33 +3,47 @@ using FiringSquad.Core.State;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-/// <summary>
-/// Main menu UI manager.
-/// </summary>
-public class UIManager : MonoBehaviour
+namespace FiringSquad.Gameplay.UI
 {
-	[SerializeField] private GameObject mMainElementHolder;
-	[SerializeField] private ActionProvider mProto3Button;
-	[SerializeField] private ActionProvider mQuitButton;
-
-	private void Start()
+	/// <summary>
+	/// Main menu UI manager.
+	/// </summary>
+	public class UIManager : MonoBehaviour
 	{
-		mProto3Button.OnClick += LaunchProto3;
-		mQuitButton.OnClick += ClickQuit;
-	}
+		[SerializeField] private GameObject mMainElementHolder;
+		[SerializeField] private ActionProvider mTwoPlayerButton;
+		[SerializeField] private ActionProvider mFourPlayerButton;
+		[SerializeField] private ActionProvider mQuitButton;
 
-	private void LaunchProto3()
-	{
-		mMainElementHolder.SetActive(false);
+		private void Start()
+		{
+			mTwoPlayerButton.OnClick += LaunchTwoPlayer;
+			mFourPlayerButton.OnClick += LaunchFourPlayer;
+			mQuitButton.OnClick += ClickQuit;
+		}
 
-		ServiceLocator.Get<IGamestateManager>()
-			.RequestSceneChange(GamestateManager.BASE_WORLD)
-			.RequestSceneChange(GamestateManager.PROTOTYPE3_SCENE, LoadSceneMode.Additive);
-	}
+		private void LaunchTwoPlayer()
+		{
+			mMainElementHolder.SetActive(false);
 
-	private void ClickQuit()
-	{
-		ServiceLocator.Get<IGamestateManager>()
-			.RequestShutdown();
+			ServiceLocator.Get<IGamestateManager>()
+				.RequestSceneChange(GamestateManager.TWOPLAYER_WORLD)
+				.RequestSceneChange(GamestateManager.TWOPLAYER_GAMEPLAY, LoadSceneMode.Additive);
+		}
+
+		private void LaunchFourPlayer()
+		{
+			mMainElementHolder.SetActive(false);
+
+			ServiceLocator.Get<IGamestateManager>()
+				.RequestSceneChange(GamestateManager.FOURPLAYER_WORLD)
+				.RequestSceneChange(GamestateManager.FOURPLAYER_GAMEPLAY, LoadSceneMode.Additive);
+		}
+
+		private void ClickQuit()
+		{
+			ServiceLocator.Get<IGamestateManager>()
+				.RequestShutdown();
+		}
 	}
 }

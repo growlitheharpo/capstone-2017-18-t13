@@ -54,9 +54,11 @@ namespace FiringSquad.Core.State
 
 		public const string MAIN_SCENE = "main";
 		public const string MENU_SCENE = "menu";
-		public const string BASE_WORLD = "base_world";
-		public const string PROTOTYPE3_SCENE = "prototype3";
 		public const string ART_PROTOTYPE_SCENE = "artproto";
+		public const string FOURPLAYER_WORLD = "game4player_world";
+		public const string FOURPLAYER_GAMEPLAY = "game4player_gameplay";
+		public const string TWOPLAYER_WORLD = "game2player_world";
+		public const string TWOPLAYER_GAMEPLAY = "game2player_gameplay";
 
 		public enum Feature
 		{
@@ -85,10 +87,12 @@ namespace FiringSquad.Core.State
 			{
 				{ MAIN_SCENE, new TransitionToSceneState(MENU_SCENE) },
 				{ MENU_SCENE, new MenuSceneState() },
-				{ PROTOTYPE3_SCENE, new GameSceneState() },
-				{ "sandbox_networked", new GameSceneState() },
 				{ ART_PROTOTYPE_SCENE, new MenuSceneState() },
-				{ BASE_WORLD, new NullState() }
+				{ TWOPLAYER_GAMEPLAY, new GameSceneState() },
+				{ FOURPLAYER_GAMEPLAY, new GameSceneState() },
+				{ "sandbox_networked", new GameSceneState() },
+				{ FOURPLAYER_WORLD, new NullState() },
+				{ TWOPLAYER_WORLD, new NullState() }
 			};
 		}
 
