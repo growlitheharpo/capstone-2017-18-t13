@@ -39,6 +39,7 @@ GameObject:
   - component: {fileID: 4153540426220584}
   - component: {fileID: 114938750904579408}
   - component: {fileID: 65569102338335204}
+  - component: {fileID: 54845656473887784}
   - component: {fileID: 114976630646055724}
   m_Layer: 0
   m_Name: p_gripsCrate
@@ -113,6 +114,21 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1032605421519110}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!54 &54845656473887784
+Rigidbody:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1044795996218704}
+  serializedVersion: 2
+  m_Mass: 5000
+  m_Drag: 0.8
+  m_AngularDrag: 0.05
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!65 &65569102338335204
 BoxCollider:
   m_ObjectHideFlags: 1
@@ -182,14 +198,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mParts:
   - mPrefab: {fileID: 1297151579918920, guid: ae2a9ffdc62cede43828d78624b9146c, type: 2}
-    mWeight: 0.16883095
+    mWeight: 0.57940036
   - mPrefab: {fileID: 1173900482085758, guid: a8527659f4be87c45ad46d750263c94c, type: 2}
-    mWeight: 0.019712627
-  - mPrefab: {fileID: 1711722334057618, guid: ee84b24b05b85574cad2a56c257e292f, type: 2}
-    mWeight: 0.3637567
-  - mPrefab: {fileID: 1711722334057618, guid: e0af227ee65ce794b9a3a83a40cc7adc, type: 2}
-    mWeight: 0.11650089
-  - mPrefab: {fileID: 1648322808193650, guid: 17592fca01a55b74bafe2e36a610920a, type: 2}
-    mWeight: 0.33119887
+    mWeight: 0.4205997
   mBreakVFX: {fileID: 1416275159863322, guid: 20f66ab1753f9bd4d966b7294883a924, type: 2}
   mRespawnTime: 5
