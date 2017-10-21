@@ -21,6 +21,8 @@ namespace FiringSquad.Gameplay
 		private Vector3 mCameraOriginalPos;
 		private Quaternion mCameraOriginalRot;
 
+		public bool inAimDownSightsMode { get; private set; }
+
 		// Use this for initialization
 		private void Start()
 		{
@@ -119,6 +121,9 @@ namespace FiringSquad.Gameplay
 
 		private void INPUT_MagnetArmHeld()
 		{
+			if (inAimDownSightsMode)
+				return;
+
 			playerRoot.magnetArm.FireHeld();
 		}
 
@@ -134,23 +139,27 @@ namespace FiringSquad.Gameplay
 
 		private void INPUT_TogglePause()
 		{
+			if (inAimDownSightsMode)
+				return;
+
 			EventManager.Local.TogglePause();
 		}
 
 		private void INPUT_EnterAimDownSights()
 		{
+			inAimDownSightsMode = true;
 			EventManager.Notify(EventManager.Local.EnterAimDownSightsMode);
 		}
 
 		private void INPUT_ExitAimDownSights()
 		{
+			inAimDownSightsMode = false;
 			EventManager.Notify(EventManager.Local.ExitAimDownSightsMode);
 		}
 
 		private void ApplyOptionsData(IOptionsData data)
 		{
 			AudioListener.volume = data.masterVolume;
-			// TODO: Apply camera FOV
 			mCameraRef.fieldOfView = data.fieldOfView;
 		}
 	}
