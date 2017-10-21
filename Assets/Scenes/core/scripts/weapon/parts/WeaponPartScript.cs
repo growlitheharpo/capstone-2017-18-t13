@@ -7,6 +7,7 @@ namespace FiringSquad.Gameplay.Weapons
 	public abstract class WeaponPartScript : MonoBehaviour
 	{
 		public const int INFINITE_DURABILITY = -1;
+		public const int USE_DEFAULT_DURABILITY = -2;
 
 		[SerializeField] private WeaponPartData mData;
 		public WeaponPartData[] data { get { return new[] { mData }; } }

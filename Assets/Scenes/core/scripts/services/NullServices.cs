@@ -7,6 +7,7 @@ using FiringSquad.Core.State;
 using FiringSquad.Core.UI;
 using FiringSquad.Core.Weapons;
 using FiringSquad.Debug;
+using FiringSquad.Gameplay.Weapons;
 using KeatsLib.Persistence;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -45,6 +46,12 @@ namespace FiringSquad.Core
 
 		public class NullWeaponPartManager : IWeaponPartManager
 		{
+			public WeaponPartScript GetPrefabScript(string id)
+			{
+				Logger.Info("NULL SERVICE: NullWeaponPartManager.GetPrefabScript()", Logger.System.Services);
+				return null;
+			}
+
 			public GameObject GetPartPrefab(string id)
 			{
 				Logger.Info("NULL SERVICE: NullWeaponPartManager.GetPartPrefab()", Logger.System.Services);
@@ -64,6 +71,12 @@ namespace FiringSquad.Core
 			{
 				Logger.Info("NULL SERVICE: NullWeaponPartManager.GetAllPrefabs()", Logger.System.Services);
 				return new Dictionary<string, GameObject>();
+			}
+
+			public Dictionary<string, WeaponPartScript> GetAllPrefabScripts(bool includeDebug)
+			{
+				Logger.Info("NULL SERVICE: NullWeaponPartManager.GetAllPrefabScripts()", Logger.System.Services);
+				return new Dictionary<string, WeaponPartScript>();
 			}
 		}
 
