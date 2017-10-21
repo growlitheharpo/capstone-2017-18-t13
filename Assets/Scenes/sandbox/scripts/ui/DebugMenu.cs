@@ -21,10 +21,7 @@ namespace FiringSquad.Debug
 
 		public void RefreshWeaponList()
 		{
-			var parts = ServiceLocator.Get<IWeaponPartManager>()
-				.GetAllPrefabs(true).Values
-				.Select(x => x.GetComponent<WeaponPartScript>())
-				.ToArray();
+			var parts = ServiceLocator.Get<IWeaponPartManager>().GetAllPrefabScripts(true).Values;
 
 			mMechanisms = parts.Where(x => x.attachPoint == BaseWeaponScript.Attachment.Mechanism).ToArray();
 			mBarrels = parts.Where(x => x.attachPoint == BaseWeaponScript.Attachment.Barrel).ToArray();
