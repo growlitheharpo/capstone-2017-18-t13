@@ -4,6 +4,7 @@ using FiringSquad.Data;
 using KeatsLib.Unity;
 using UnityEngine;
 using Input = UnityEngine.Input;
+using Logger = FiringSquad.Debug.Logger;
 
 namespace FiringSquad.Gameplay
 {
@@ -33,6 +34,8 @@ namespace FiringSquad.Gameplay
 				.RegisterInput(Input.GetButtonUp, inputMap.fireGravGunButton, INPUT_MagnetArmUp, InputLevel.Gameplay)
 
 				// local
+				.RegisterInput(Input.GetButtonDown, inputMap.activateADSButton, INPUT_EnterAimDownSights, InputLevel.Gameplay)
+				.RegisterInput(Input.GetButtonUp, inputMap.activateADSButton, INPUT_ExitAimDownSights, InputLevel.Gameplay)
 				.RegisterInput(Input.GetButtonDown, inputMap.pauseButton, INPUT_TogglePause, InputLevel.PauseMenu);
 
 			SetupCamera();
@@ -57,6 +60,8 @@ namespace FiringSquad.Gameplay
 				.UnregisterInput(INPUT_MagnetArmUp)
 
 				// local
+				.UnregisterInput(INPUT_EnterAimDownSights)
+				.UnregisterInput(INPUT_ExitAimDownSights)
 				.UnregisterInput(INPUT_TogglePause);
 		}
 
@@ -130,6 +135,16 @@ namespace FiringSquad.Gameplay
 		private void INPUT_TogglePause()
 		{
 			EventManager.Local.TogglePause();
+		}
+
+		private void INPUT_EnterAimDownSights()
+		{
+			Logger.Info("Entering ADS mode", Logger.System.State);
+		}
+
+		private void INPUT_ExitAimDownSights()
+		{
+			Logger.Info("Exiting ADS mode", Logger.System.State);
 		}
 
 		private void ApplyOptionsData(IOptionsData data)
