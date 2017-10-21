@@ -14,6 +14,9 @@ namespace FiringSquad.Gameplay.Weapons
 		public CltPlayer currentHolder { get; private set; }
 		public bool currentlyHeld { get { return currentHolder != null; } }
 
+		private int mOverrideDurability = WeaponPartScript.USE_DEFAULT_DURABILITY;
+		public int overrideDurability { get { return mOverrideDurability; } set { mOverrideDurability = value; } }
+
 		private WeaponPartWorldCanvas mCanvas;
 		private WeaponPartScript mPartScript;
 		private Rigidbody mRigidbody;
@@ -81,7 +84,7 @@ namespace FiringSquad.Gameplay.Weapons
 			if (wepBearer == null)
 				return;
 
-			wepBearer.weapon.AttachNewPart(GetComponent<WeaponPartScript>().partId);
+			wepBearer.weapon.AttachNewPart(GetComponent<WeaponPartScript>().partId, overrideDurability);
 
 			try
 			{

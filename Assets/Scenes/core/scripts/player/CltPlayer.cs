@@ -210,7 +210,7 @@ namespace FiringSquad.Gameplay
 		private void AddDefaultPartsToWeapon(BaseWeaponScript wep)
 		{
 			foreach (WeaponPartScript part in defaultParts)
-				wep.AttachNewPart(part.partId, true);
+				wep.AttachNewPart(part.partId, WeaponPartScript.INFINITE_DURABILITY);
 		}
 
 		[Command]
