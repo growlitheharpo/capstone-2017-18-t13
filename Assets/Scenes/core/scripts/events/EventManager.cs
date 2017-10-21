@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using FiringSquad.Core;
+using FiringSquad.Debug;
 using FiringSquad.Gameplay;
+using FiringSquad.Gameplay.Weapons;
 using UnityEngine;
+using Logger = FiringSquad.Debug.Logger;
 
 /// <summary>
 /// A list of game events for this project.
@@ -41,11 +45,32 @@ public partial class EventManager
 			OnReceiveFinishEvent();
 		}
 
-		public static event Action<CltPlayer> OnLocalPlayerSpawned = (p) => { LogEvent(); };
+		public static event Action<CltPlayer> OnLocalPlayerSpawned = p => { LogEvent(); };
 
 		public static void LocalPlayerSpawned(CltPlayer p)
 		{
 			OnLocalPlayerSpawned(p);
+		}
+
+		public static event Action<BaseWeaponScript, WeaponPartScript> OnLocalPlayerAttachedPart = (w, p) => { LogEvent(); };
+
+		public static void LocalPlayerAttachedPart(BaseWeaponScript weapon, WeaponPartScript part)
+		{
+			OnLocalPlayerAttachedPart(weapon, part);
+		}
+
+		public static event Action<WeaponPartScript> OnLocalPlayerHoldingPart = w => { LogEvent(); };
+
+		public static void LocalPlayerHoldingPart(WeaponPartScript part)
+		{
+			OnLocalPlayerHoldingPart(part);
+		}
+
+		public static event Action<WeaponPartScript> OnLocalPlayerReleasedPart = w => { LogEvent(); };
+
+		public static void LocalPlayerReleasedPart(WeaponPartScript part)
+		{
+			OnLocalPlayerReleasedPart(part);
 		}
 	}
 
@@ -79,14 +104,14 @@ public partial class EventManager
 			OnPlayerFiredWeapon(bearer, shotsFired);
 		}
 
-		public static event Action<int> OnPlayerJoined = (i) => { LogEvent(); };
+		public static event Action<int> OnPlayerJoined = i => { LogEvent(); };
 
 		public static void PlayerJoined(int newCount)
 		{
 			OnPlayerJoined(newCount);
 		}
 
-		public static event Action<int> OnPlayerLeft = (i) => { LogEvent(); };
+		public static event Action<int> OnPlayerLeft = i => { LogEvent(); };
 
 		public static void PlayerLeft(int newCount)
 		{
@@ -141,7 +166,6 @@ public partial class EventManager
 	}
 
 	#endregion
-	
 
 	public void Start()
 	{

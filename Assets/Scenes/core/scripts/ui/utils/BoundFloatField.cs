@@ -1,68 +1,73 @@
 ﻿using System.Collections;
+using FiringSquad.Core;
+using FiringSquad.Core.UI;
 using UnityEngine;
 using UIText = UnityEngine.UI.Text;
 
-public class BoundFloatField : MonoBehaviour
+namespace FiringSquad.Gameplay.UI
 {
-	[SerializeField] private string mBoundProperty;
-	[SerializeField] private string mDisplayFormat;
-
-	private IGameplayUIManager mUIManagerRef;
-	private BoundProperty<float> mProperty;
-	private UIText mTextElement;
-	private int mPropertyHash;
-	private bool mSearching;
-
-	private void Awake()
+	public class BoundFloatField : MonoBehaviour
 	{
-		mTextElement = GetComponent<UIText>();
-		mPropertyHash = mBoundProperty.GetHashCode();
-		mProperty = null;
-	}
+		[SerializeField] private string mBoundProperty;
+		[SerializeField] private string mDisplayFormat;
 
-	private void Start()
-	{
-		mUIManagerRef = ServiceLocator.Get<IGameplayUIManager>();
-	}
+		private IGameplayUIManager mUIManagerRef;
+		private BoundProperty<float> mProperty;
+		private UIText mTextElement;
+		private int mPropertyHash;
+		private bool mSearching;
 
-	private IEnumerator CheckForProperty()
-	{
-		mSearching = true;
-
-		yield return new WaitForEndOfFrame();
-		yield return new WaitForEndOfFrame();
-		while (mProperty == null)
+		private void Awake()
 		{
-			mProperty = mUIManagerRef.GetProperty<float>(mPropertyHash);
-			yield return null;
+			mTextElement = GetComponent<UIText>();
+			mPropertyHash = mBoundProperty.GetHashCode();
+			mProperty = null;
 		}
 
-		AttachProperty();
-	}
+		private void Start()
+		{
+			mUIManagerRef = ServiceLocator.Get<IGameplayUIManager>();
+		}
 
-	private void Update()
-	{
-		if (mProperty == null && !mSearching)
-			StartCoroutine(CheckForProperty());
-	}
+		private IEnumerator CheckForProperty()
+		{
+			mSearching = true;
 
-	private void AttachProperty()
-	{
-		mProperty.ValueChanged += HandlePropertyChanged;
-		mProperty.BeingDestroyed += CleanupProperty;
-		HandlePropertyChanged();
-		mSearching = false;
-	}
+			yield return new WaitForEndOfFrame();
+			yield return new WaitForEndOfFrame();
+			while (mProperty == null)
+			{
+				mProperty = mUIManagerRef.GetProperty<float>(mPropertyHash);
+				yield return null;
+			}
 
-	private void CleanupProperty()
-	{
-		mProperty.ValueChanged -= HandlePropertyChanged;
-		mProperty.BeingDestroyed -= CleanupProperty;
-		mProperty = null;
-	}
+			AttachProperty();
+		}
 
-	private void HandlePropertyChanged()
-	{
-		mTextElement.text = mProperty.value.ToString(mDisplayFormat);
+		private void Update()
+		{
+			if (mProperty == null && !mSearching)
+				StartCoroutine(CheckForProperty());
+		}
+
+		private void AttachProperty()
+		{
+			mProperty.ValueChanged += HandlePropertyChanged;
+			mProperty.BeingDestroyed += CleanupProperty;
+			HandlePropertyChanged();
+			mSearching = false;
+		}
+
+		private void CleanupProperty()
+		{
+			mProperty.ValueChanged -= HandlePropertyChanged;
+			mProperty.BeingDestroyed -= CleanupProperty;
+			mProperty = null;
+		}
+
+		private void HandlePropertyChanged()
+		{
+			mTextElement.text = mProperty.value.ToString(mDisplayFormat);
+		}
 	}
 }

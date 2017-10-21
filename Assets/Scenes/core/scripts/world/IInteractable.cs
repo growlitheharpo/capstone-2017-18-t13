@@ -1,5 +1,4 @@
-﻿
-namespace FiringSquad.Gameplay
+﻿namespace FiringSquad.Gameplay
 {
 	public interface IInteractable
 	{

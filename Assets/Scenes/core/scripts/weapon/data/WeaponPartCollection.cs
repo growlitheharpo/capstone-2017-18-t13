@@ -1,6 +1,7 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
-using FiringSquad.Gameplay;
+using FiringSquad.Gameplay.Weapons;
 using UnityEngine;
 
 namespace FiringSquad.Data
@@ -9,7 +10,7 @@ namespace FiringSquad.Data
 	/// Serializable utility class that stores a collection of weapon parts.
 	/// </summary>
 	[Serializable]
-	public class WeaponPartCollection
+	public class WeaponPartCollection : IEnumerable<WeaponPartScript>
 	{
 		[SerializeField] private WeaponPartScriptScope mScope;
 		[SerializeField] private WeaponPartScriptBarrel mBarrel;
@@ -69,7 +70,7 @@ namespace FiringSquad.Data
 			}
 		}
 
-		public GameObjects gameObjects { get { return new GameObjects(this);} }
+		public GameObjects gameObjects { get { return new GameObjects(this); } }
 
 		public WeaponPartCollection()
 		{
@@ -78,7 +79,7 @@ namespace FiringSquad.Data
 			mMechanism = null;
 			mGrip = null;
 		}
-		
+
 		public WeaponPartCollection(WeaponPartCollection copy)
 		{
 			mScope = copy.mScope;
@@ -109,6 +110,11 @@ namespace FiringSquad.Data
 			yield return barrel;
 			yield return mechanism;
 			yield return grip;
+		}
+
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			return GetEnumerator();
 		}
 
 		public WeaponPartScript this[BaseWeaponScript.Attachment index]

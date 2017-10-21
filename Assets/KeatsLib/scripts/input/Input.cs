@@ -1,9 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using FiringSquad.Debug;
 
-namespace KeatsLib.Unity
+namespace FiringSquad.Core.Input
 {
+	[Flags]
+	public enum InputLevel
+	{
+		None = 0,
+		Gameplay = 1,
+		InGameMenu = 32,
+		PauseMenu = 64,
+		DevConsole = 128,
+		All = int.MaxValue
+	}
+
 	/// <inheritdoc cref="IInput"/>
 	/// <summary>
 	/// Global input manager using the command pattern.
@@ -65,7 +77,7 @@ namespace KeatsLib.Unity
 				}
 			}
 		}
-		
+
 		/// <summary>
 		/// Useable input map to bind Unity input collection.
 		/// </summary>
@@ -101,17 +113,6 @@ namespace KeatsLib.Unity
 					return 0.0f;
 				}
 			}
-		}
-
-		[Flags]
-		public enum InputLevel
-		{
-			None = 0,
-			Gameplay = 1,
-			InGameMenu = 32,
-			PauseMenu = 64,
-			DevConsole = 128,
-			All = int.MaxValue
 		}
 
 		private readonly Dictionary<Action, List<BaseInputMap>> mCommands = new Dictionary<Action, List<BaseInputMap>>();

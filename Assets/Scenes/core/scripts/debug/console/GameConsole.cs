@@ -1,148 +1,153 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using FiringSquad.Core;
+using KeatsLib.Unity;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-/// <inheritdoc cref="IGameConsole"/>
-public class GameConsole : MonoSingleton<GameConsole>, IGameConsole
+namespace FiringSquad.Debug
 {
-	private bool mCheatsEnabled;
-
-	private Dictionary<string, Action<string[]>> mCommandHandlers;
-	[SerializeField] private BaseGameConsoleView mConsoleView;
-
-	[SerializeField] [EnumFlags] private Logger.System mEnabledLogSystems;
-	public Logger.System enabledLogLevels { get { return mEnabledLogSystems; } }
-
-	protected override void Awake()
+	/// <inheritdoc cref="IGameConsole"/>
+	public class GameConsole : MonoSingleton<GameConsole>, IGameConsole
 	{
-		base.Awake();
-		Assert.raiseExceptions = true;
+		private bool mCheatsEnabled;
 
-		mCommandHandlers = new Dictionary<string,  Action<string[]>>();
-	}
+		private Dictionary<string, Action<string[]>> mCommandHandlers;
+		[SerializeField] private BaseGameConsoleView mConsoleView;
 
-	private void Start()
-	{
-		Application.logMessageReceived += UnityLogToConsole;
+		[SerializeField] [EnumFlags] private Logger.System mEnabledLogSystems;
+		public Logger.System enabledLogLevels { get { return mEnabledLogSystems; } }
 
-		mConsoleView.RegisterCommandHandler(EnterCommand);
-		RegisterCommand("cheats", ToggleCheatsCommand);
-		RegisterCommand("clear", ClearConsoleCmmand);
-		RegisterCommand("help", ListCommandsCommand);
-	}
-
-	/// <inheritdoc />
-	public void AssertCheatsEnabled()
-	{
-		Assert.IsTrue(mCheatsEnabled, "Cheats are not enabled at this time.");
-	}
-
-	/// <inheritdoc />
-	public IGameConsole RegisterCommand(string command, Action<string[]> handle)
-	{
-		mCommandHandlers[command] = handle;
-		return this;
-	}
-
-	public IGameConsole UnregisterCommand(string command)
-	{
-		mCommandHandlers.Remove(command);
-		return this;
-	}
-
-	public IGameConsole UnregisterCommand(Action<string[]> handle)
-	{
-		var keys = mCommandHandlers.Where(x => x.Value == handle).ToArray();
-		foreach (var k in keys)
-			mCommandHandlers.Remove(k.Key);
-
-		return this;
-	}
-
-	/// <summary>
-	/// Event called when Unity receives a Debug.Log call or variant.
-	/// </summary>
-	/// <param name="message"></param>
-	/// <param name="stackTrace"></param>
-	/// <param name="type"></param>
-	private void UnityLogToConsole(string message, string stackTrace, LogType type)
-	{
-		switch (type)
+		protected override void Awake()
 		{
-			// Treat Assert, and Exception as errors. The rest are handled as themselves.
-			case LogType.Assert:
-			case LogType.Exception:
-				mConsoleView.AddMessage(message, LogType.Error);
-				break;
-			default:
-				mConsoleView.AddMessage(message, type);
-				break;
-		}
-	}
+			base.Awake();
+			Assert.raiseExceptions = true;
 
-	/// <summary>
-	/// Callback for when a command is entered into the console.
-	/// </summary>
-	private void EnterCommand(string[] typedData)
-	{
-		string command = typedData[0].ToLower();
-		Action<string[]> handle;
-
-		if (!mCommandHandlers.TryGetValue(command, out handle))
-		{
-			Debug.LogError("Console command not found: " + command);
-			return;
+			mCommandHandlers = new Dictionary<string, Action<string[]>>();
 		}
 
-		try
+		private void Start()
 		{
-			handle(typedData.Skip(1).ToArray());
-			Debug.Log(string.Join(" ", typedData));
+			Application.logMessageReceived += UnityLogToConsole;
+
+			mConsoleView.RegisterCommandHandler(EnterCommand);
+			RegisterCommand("cheats", ToggleCheatsCommand);
+			RegisterCommand("clear", ClearConsoleCmmand);
+			RegisterCommand("help", ListCommandsCommand);
 		}
-		catch (Exception e)
+
+		/// <inheritdoc />
+		public void AssertCheatsEnabled()
 		{
-			Debug.LogException(e);
+			Assert.IsTrue(mCheatsEnabled, "Cheats are not enabled at this time.");
 		}
-	}
 
-	/// <summary>
-	/// Handler for the "cheats [0/1]" command.
-	/// </summary>
-	private void ToggleCheatsCommand(string[] data)
-	{
-		if (data.Length != 1 || data[0] != "0" && data[0] != "1")
-			throw new ArgumentException("Invalid parameters for command: cheats");
-
-		switch (data[0])
+		/// <inheritdoc />
+		public IGameConsole RegisterCommand(string command, Action<string[]> handle)
 		{
-			case "0":
-				mCheatsEnabled = false;
-				break;
-			case "1":
-				mCheatsEnabled = true;
-				break;
+			mCommandHandlers[command] = handle;
+			return this;
 		}
-	}
 
-	/// <summary>
-	/// Handler for the "help" command.
-	/// </summary>
-	private void ListCommandsCommand(string[] data)
-	{
-		string commands = string.Join("\n", mCommandHandlers.Keys.ToArray());
-		Debug.Log(commands);
-	}
+		public IGameConsole UnregisterCommand(string command)
+		{
+			mCommandHandlers.Remove(command);
+			return this;
+		}
 
-	/// <summary>
-	/// Handler for the "clear" command.
-	/// </summary>
-	private void ClearConsoleCmmand(string[] data)
-	{
-		if (data.Length > 0)
-			throw new ArgumentException("Invalid parameters for command: clear");
+		public IGameConsole UnregisterCommand(Action<string[]> handle)
+		{
+			var keys = mCommandHandlers.Where(x => x.Value == handle).ToArray();
+			foreach (var k in keys)
+				mCommandHandlers.Remove(k.Key);
 
-		mConsoleView.ClearLogs();
+			return this;
+		}
+
+		/// <summary>
+		/// Event called when Unity receives a Debug.Log call or variant.
+		/// </summary>
+		/// <param name="message"></param>
+		/// <param name="stackTrace"></param>
+		/// <param name="type"></param>
+		private void UnityLogToConsole(string message, string stackTrace, LogType type)
+		{
+			switch (type)
+			{
+				// Treat Assert, and Exception as errors. The rest are handled as themselves.
+				case LogType.Assert:
+				case LogType.Exception:
+					mConsoleView.AddMessage(message, LogType.Error);
+					break;
+				default:
+					mConsoleView.AddMessage(message, type);
+					break;
+			}
+		}
+
+		/// <summary>
+		/// Callback for when a command is entered into the console.
+		/// </summary>
+		private void EnterCommand(string[] typedData)
+		{
+			string command = typedData[0].ToLower();
+			Action<string[]> handle;
+
+			if (!mCommandHandlers.TryGetValue(command, out handle))
+			{
+				UnityEngine.Debug.LogError("Console command not found: " + command);
+				return;
+			}
+
+			try
+			{
+				handle(typedData.Skip(1).ToArray());
+				UnityEngine.Debug.Log(string.Join(" ", typedData));
+			}
+			catch (Exception e)
+			{
+				UnityEngine.Debug.LogException(e);
+			}
+		}
+
+		/// <summary>
+		/// Handler for the "cheats [0/1]" command.
+		/// </summary>
+		private void ToggleCheatsCommand(string[] data)
+		{
+			if (data.Length != 1 || data[0] != "0" && data[0] != "1")
+				throw new ArgumentException("Invalid parameters for command: cheats");
+
+			switch (data[0])
+			{
+				case "0":
+					mCheatsEnabled = false;
+					break;
+				case "1":
+					mCheatsEnabled = true;
+					break;
+			}
+		}
+
+		/// <summary>
+		/// Handler for the "help" command.
+		/// </summary>
+		private void ListCommandsCommand(string[] data)
+		{
+			string commands = string.Join("\n", mCommandHandlers.Keys.ToArray());
+			UnityEngine.Debug.Log(commands);
+		}
+
+		/// <summary>
+		/// Handler for the "clear" command.
+		/// </summary>
+		private void ClearConsoleCmmand(string[] data)
+		{
+			if (data.Length > 0)
+				throw new ArgumentException("Invalid parameters for command: clear");
+
+			mConsoleView.ClearLogs();
+		}
 	}
 }

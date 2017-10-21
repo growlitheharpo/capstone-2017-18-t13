@@ -1,102 +1,108 @@
-﻿using UnityEngine;
+﻿using FiringSquad.Core;
+using FiringSquad.Core.SaveLoad;
+using FiringSquad.Core.State;
+using UnityEngine;
 
-public class PauseGamePanel : MonoBehaviour
+namespace FiringSquad.Gameplay.UI
 {
-	private const string SETTINGS_ID = "options_menu_options_id";
-
-	private IOptionsData mData;
-	[SerializeField] private float mDefaultFieldOfView;
-	[SerializeField] private float mDefaultMouseSensitivity;
-
-	[SerializeField] private float mDefaultVolume;
-	[SerializeField] private BaseFloatProvider mFieldOfViewProvider;
-	[SerializeField] private BaseFloatProvider mMouseSensitivityProvider;
-	[SerializeField] private BaseFloatProvider mVolumeProvider;
-
-	[SerializeField] private ActionProvider mQuitButton;
-
-	private void Awake()
+	public class PauseGamePanel : MonoBehaviour
 	{
-		EventManager.OnInitialPersistenceLoadComplete += HandleInitialLoad;
-		EventManager.Local.OnApplyOptionsData += ReflectSettings;
+		private const string SETTINGS_ID = "options_menu_options_id";
 
-		mQuitButton.OnClick += HandleQuit;
-		mFieldOfViewProvider.OnValueChange += HandleValueChange;
+		private IOptionsData mData;
+		[SerializeField] private float mDefaultFieldOfView;
+		[SerializeField] private float mDefaultMouseSensitivity;
 
-		EventManager.LocalGUI.OnTogglePauseMenu += HandleToggle;
-		gameObject.SetActive(false);
-	}
+		[SerializeField] private float mDefaultVolume;
+		[SerializeField] private BaseFloatProvider mFieldOfViewProvider;
+		[SerializeField] private BaseFloatProvider mMouseSensitivityProvider;
+		[SerializeField] private BaseFloatProvider mVolumeProvider;
 
-	private void Start()
-	{
-		HandleInitialLoad();
-	}
+		[SerializeField] private ActionProvider mQuitButton;
 
-	private void OnDestroy()
-	{
-		mQuitButton.OnClick -= HandleQuit;
-		mFieldOfViewProvider.OnValueChange -= HandleValueChange;
-
-		EventManager.OnInitialPersistenceLoadComplete -= HandleInitialLoad;
-		EventManager.Local.OnApplyOptionsData -= ReflectSettings;
-		EventManager.LocalGUI.OnTogglePauseMenu -= HandleToggle;
-	}
-	
-	private void HandleToggle(bool show)
-	{
-		gameObject.SetActive(show);
-		
-		if (!show)
-			ApplySettings();
-	}
-
-	private void HandleInitialLoad()
-	{
-		if (mData != null)
-			return;
-
-		ISaveLoadManager service = ServiceLocator.Get<ISaveLoadManager>();
-		mData = service.persistentData.GetOptionsData(SETTINGS_ID);
-
-		if (mData == null)
+		private void Awake()
 		{
-			mData = SaveLoadManager.instance.persistentData.CreateOptionsData(SETTINGS_ID);
-			mData.masterVolume = mDefaultVolume;
-			mData.fieldOfView = mDefaultFieldOfView;
-			mData.mouseSensitivity = mDefaultMouseSensitivity;
+			EventManager.OnInitialPersistenceLoadComplete += HandleInitialLoad;
+			EventManager.Local.OnApplyOptionsData += ReflectSettings;
+
+			mQuitButton.OnClick += HandleQuit;
+			mFieldOfViewProvider.OnValueChange += HandleValueChange;
+
+			EventManager.LocalGUI.OnTogglePauseMenu += HandleToggle;
+			gameObject.SetActive(false);
 		}
 
-		ReflectSettings(mData);
-	}
-	
-	private void HandleValueChange(float v)
-	{
-		ApplySettings();
-	}
+		private void Start()
+		{
+			HandleInitialLoad();
+		}
 
-	public void ReflectSettings(IOptionsData data)
-	{
-		mData = data;
-		mVolumeProvider.SetValue(mData.masterVolume);
-		mFieldOfViewProvider.SetValue(mData.fieldOfView);
-		mMouseSensitivityProvider.SetValue(mData.mouseSensitivity);
-	}
+		private void OnDestroy()
+		{
+			mQuitButton.OnClick -= HandleQuit;
+			mFieldOfViewProvider.OnValueChange -= HandleValueChange;
 
-	public void ApplySettings()
-	{
-		mData.fieldOfView = mFieldOfViewProvider.GetValue();
-		mData.masterVolume = mVolumeProvider.GetValue() / 100.0f;
-		mData.mouseSensitivity = mMouseSensitivityProvider.GetValue();
+			EventManager.OnInitialPersistenceLoadComplete -= HandleInitialLoad;
+			EventManager.Local.OnApplyOptionsData -= ReflectSettings;
+			EventManager.LocalGUI.OnTogglePauseMenu -= HandleToggle;
+		}
 
-		EventManager.Notify(() => EventManager.Local.ApplyOptionsData(mData));
-	}
-	
-	private void HandleQuit()
-	{
-		// Call event directly so that it is handled immediately.
-		EventManager.Local.TogglePause();
+		private void HandleToggle(bool show)
+		{
+			gameObject.SetActive(show);
 
-		ServiceLocator.Get<IGamestateManager>()
-			.RequestSceneChange(GamestateManager.MENU_SCENE);
+			if (!show)
+				ApplySettings();
+		}
+
+		private void HandleInitialLoad()
+		{
+			if (mData != null)
+				return;
+
+			ISaveLoadManager service = ServiceLocator.Get<ISaveLoadManager>();
+			mData = service.persistentData.GetOptionsData(SETTINGS_ID);
+
+			if (mData == null)
+			{
+				mData = SaveLoadManager.instance.persistentData.CreateOptionsData(SETTINGS_ID);
+				mData.masterVolume = mDefaultVolume;
+				mData.fieldOfView = mDefaultFieldOfView;
+				mData.mouseSensitivity = mDefaultMouseSensitivity;
+			}
+
+			ReflectSettings(mData);
+		}
+
+		private void HandleValueChange(float v)
+		{
+			ApplySettings();
+		}
+
+		public void ReflectSettings(IOptionsData data)
+		{
+			mData = data;
+			mVolumeProvider.SetValue(mData.masterVolume);
+			mFieldOfViewProvider.SetValue(mData.fieldOfView);
+			mMouseSensitivityProvider.SetValue(mData.mouseSensitivity);
+		}
+
+		public void ApplySettings()
+		{
+			mData.fieldOfView = mFieldOfViewProvider.GetValue();
+			mData.masterVolume = mVolumeProvider.GetValue() / 100.0f;
+			mData.mouseSensitivity = mMouseSensitivityProvider.GetValue();
+
+			EventManager.Notify(() => EventManager.Local.ApplyOptionsData(mData));
+		}
+
+		private void HandleQuit()
+		{
+			// Call event directly so that it is handled immediately.
+			EventManager.Local.TogglePause();
+
+			ServiceLocator.Get<IGamestateManager>()
+				.RequestSceneChange(GamestateManager.MENU_SCENE);
+		}
 	}
 }

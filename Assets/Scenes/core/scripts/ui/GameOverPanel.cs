@@ -1,8 +1,9 @@
-﻿using UnityEngine;
-using UnityEngine.SceneManagement;
+﻿using FiringSquad.Core;
+using FiringSquad.Core.State;
+using UnityEngine;
 using UIText = UnityEngine.UI.Text;
 
-namespace FiringSquad.Gameplay
+namespace FiringSquad.Gameplay.UI
 {
 	public class GameOverPanel : MonoBehaviour
 	{

@@ -1,7 +1,10 @@
-﻿public interface IGameplayUIManager
+﻿namespace FiringSquad.Core.UI
 {
-	BoundProperty<T> GetProperty<T>(int hash);
+	public interface IGameplayUIManager
+	{
+		BoundProperty<T> GetProperty<T>(int hash);
 
-	void BindProperty(int hash, BoundProperty prop);
-	void UnbindProperty(BoundProperty prop);
+		void BindProperty(int hash, BoundProperty prop);
+		void UnbindProperty(BoundProperty prop);
+	}
 }

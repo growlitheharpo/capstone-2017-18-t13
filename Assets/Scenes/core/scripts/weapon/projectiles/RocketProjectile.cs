@@ -4,7 +4,7 @@ using KeatsLib.Unity;
 using UnityEngine;
 using UnityEngine.Networking;
 
-namespace FiringSquad.Gameplay
+namespace FiringSquad.Gameplay.Weapons
 {
 	public class RocketProjectile : BaseProjectileScript
 	{
@@ -113,7 +113,6 @@ namespace FiringSquad.Gameplay
 			NetworkServer.Destroy(gameObject);
 			Destroy(gameObject);
 		}
-
 
 		/*
 		[SerializeField] private ParticleSystem mHitParticles;

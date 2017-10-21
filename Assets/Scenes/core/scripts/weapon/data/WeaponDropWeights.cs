@@ -1,6 +1,7 @@
 ﻿using System;
-using FiringSquad.Gameplay;
+using FiringSquad.Gameplay.Weapons;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace FiringSquad.Data
 {
@@ -19,7 +20,7 @@ namespace FiringSquad.Data
 
 		public BaseWeaponScript.Attachment ChooseRandomWeightedAttachment()
 		{
-			float val = UnityEngine.Random.value;
+			float val = Random.value;
 			if (val < mMechanismWeight)
 				return BaseWeaponScript.Attachment.Mechanism;
 			if (val < mMechanismWeight + mBarrelWeight)

@@ -391,6 +391,7 @@ MonoBehaviour:
       mAmount: 0
       mType: 0
   mDescription: No grip.
+  mPrettyName: Pistol Grip
   mDurability: -1
 --- !u!114 &114349749619417278
 MonoBehaviour:
@@ -405,6 +406,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mGunView: {fileID: 1833339108217666}
   mPickupView: {fileID: 1482241014274162}
+  mParticleSystem: {fileID: 1810346366702796, guid: f7ee1a281a44c5a409088c0375a0a986,
+    type: 2}
 --- !u!114 &114620695907616644
 MonoBehaviour:
   m_ObjectHideFlags: 1

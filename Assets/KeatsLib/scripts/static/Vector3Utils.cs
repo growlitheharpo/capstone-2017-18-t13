@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using KeatsLib.Collections;
 using UnityEngine;
 
 namespace KeatsLib.Unity
@@ -229,7 +230,7 @@ namespace KeatsLib.Unity
 		{
 			return new Rect(r.x, r.y + r.height, width, r.height);
 		}
-		
+
 		public static Rect ShiftAlongX(this Rect r, float width, float height)
 		{
 			return new Rect(r.x + r.width, r.y, width, height);

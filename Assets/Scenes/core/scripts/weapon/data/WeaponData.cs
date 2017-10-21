@@ -8,8 +8,7 @@ namespace FiringSquad.Data
 	[Serializable]
 	public struct WeaponData
 	{
-		[FormerlySerializedAs("mSpread")]
-		[SerializeField] private float mMinimumDispersion;
+		[FormerlySerializedAs("mSpread")] [SerializeField] private float mMinimumDispersion;
 		[SerializeField] private float mMaximumDispersion;
 		[SerializeField] private float mDispersionRamp;
 
@@ -28,7 +27,7 @@ namespace FiringSquad.Data
 		public float dispersionRamp { get { return mDispersionRamp; } }
 
 		public float recoilAmount { get { return mRecoilAmount; } }
-		public float recoilTime { get { return mRecoilTime; }}
+		public float recoilTime { get { return mRecoilTime; } }
 		public AnimationCurve recoilCurve { get { return mRecoilCurve; } }
 
 		public float damage { get { return mDamage; } }
@@ -69,7 +68,8 @@ namespace FiringSquad.Data
 
 		public override string ToString()
 		{
-			return string.Format("Spread: {0}, Damage: {1}, FireRate: {2} ClipSize: {3}, Recoil: {4}, Reload: {5}", mMinimumDispersion, mDamage, mFireRate, mClipSize, mRecoilAmount, mReloadTime);
+			return string.Format("Spread: {0}, Damage: {1}, FireRate: {2} ClipSize: {3}, Recoil: {4}, Reload: {5}", mMinimumDispersion, mDamage,
+				mFireRate, mClipSize, mRecoilAmount, mReloadTime);
 		}
 
 		public void Serialize(NetworkWriter stream)

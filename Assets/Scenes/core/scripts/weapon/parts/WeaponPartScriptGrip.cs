@@ -1,4 +1,4 @@
-﻿namespace FiringSquad.Gameplay
+﻿namespace FiringSquad.Gameplay.Weapons
 {
 	public class WeaponPartScriptGrip : WeaponPartScript
 	{

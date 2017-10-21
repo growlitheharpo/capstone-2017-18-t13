@@ -1,7 +1,7 @@
 ﻿using FiringSquad.Data;
 using UnityEngine;
 
-namespace FiringSquad.Gameplay
+namespace FiringSquad.Gameplay.Weapons
 {
 	public interface IProjectile : IDamageSource
 	{

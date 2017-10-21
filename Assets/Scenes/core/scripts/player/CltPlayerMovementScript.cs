@@ -1,7 +1,10 @@
-﻿using FiringSquad.Data;
-using KeatsLib;
+﻿using FiringSquad.Core;
+using FiringSquad.Core.Audio;
+using FiringSquad.Core.Input;
+using FiringSquad.Data;
+using KeatsLib.Collections;
+using KeatsLib.Unity;
 using UnityEngine;
-using UnityEngine.Networking;
 using Input = UnityEngine.Input;
 
 namespace FiringSquad.Gameplay
@@ -52,16 +55,16 @@ namespace FiringSquad.Gameplay
 			PlayerInputMap input = GetComponent<CltPlayerLocal>().inputMap;
 
 			ServiceLocator.Get<IInput>()
-				.RegisterAxis(Input.GetAxis, input.moveSidewaysAxis, INPUT_LeftRightMovement, KeatsLib.Unity.Input.InputLevel.Gameplay)
-				.RegisterAxis(Input.GetAxis, input.moveBackFrontAxis, INPUT_ForwardBackMovement, KeatsLib.Unity.Input.InputLevel.Gameplay)
-				.RegisterAxis(Input.GetAxis, input.lookLeftRightAxis, INPUT_LookHorizontal, KeatsLib.Unity.Input.InputLevel.Gameplay)
-				.RegisterAxis(Input.GetAxis, input.lookUpDownAxis, INPUT_LookVertical, KeatsLib.Unity.Input.InputLevel.Gameplay)
-				.RegisterInput(Input.GetButtonDown, input.jumpButton, INPUT_Jump, KeatsLib.Unity.Input.InputLevel.Gameplay)
-				.RegisterInput(Input.GetButtonDown, input.crouchButton, INPUT_CrouchStart, KeatsLib.Unity.Input.InputLevel.Gameplay)
-				.RegisterInput(Input.GetButtonUp, input.crouchButton, INPUT_CrouchStop, KeatsLib.Unity.Input.InputLevel.Gameplay)
-				.RegisterInput(Input.GetButtonDown, input.sprintButton, INPUT_SprintStart, KeatsLib.Unity.Input.InputLevel.Gameplay)
-				.RegisterInput(Input.GetButtonUp, input.sprintButton, INPUT_SprintStop, KeatsLib.Unity.Input.InputLevel.Gameplay)
-				.EnableInputLevel(KeatsLib.Unity.Input.InputLevel.Gameplay);
+				.RegisterAxis(Input.GetAxis, input.moveSidewaysAxis, INPUT_LeftRightMovement, InputLevel.Gameplay)
+				.RegisterAxis(Input.GetAxis, input.moveBackFrontAxis, INPUT_ForwardBackMovement, InputLevel.Gameplay)
+				.RegisterAxis(Input.GetAxis, input.lookLeftRightAxis, INPUT_LookHorizontal, InputLevel.Gameplay)
+				.RegisterAxis(Input.GetAxis, input.lookUpDownAxis, INPUT_LookVertical, InputLevel.Gameplay)
+				.RegisterInput(Input.GetButtonDown, input.jumpButton, INPUT_Jump, InputLevel.Gameplay)
+				.RegisterInput(Input.GetButtonDown, input.crouchButton, INPUT_CrouchStart, InputLevel.Gameplay)
+				.RegisterInput(Input.GetButtonUp, input.crouchButton, INPUT_CrouchStop, InputLevel.Gameplay)
+				.RegisterInput(Input.GetButtonDown, input.sprintButton, INPUT_SprintStart, InputLevel.Gameplay)
+				.RegisterInput(Input.GetButtonUp, input.sprintButton, INPUT_SprintStop, InputLevel.Gameplay)
+				.EnableInputLevel(InputLevel.Gameplay);
 
 			EventManager.Local.OnApplyOptionsData += ApplyOptionsData;
 			mInputBindings = input;
@@ -144,7 +147,7 @@ namespace FiringSquad.Gameplay
 		{
 			mIsRunning = true;
 		}
-		
+
 		private void INPUT_SprintStop()
 		{
 			if (!mInputBindings.stickySprint)
@@ -161,7 +164,12 @@ namespace FiringSquad.Gameplay
 			if (!mPreviouslyGrounded && mController.isGrounded)
 			{
 				mMoveDirection.y = 0.0f;
+
 				// play landing sound
+				mPlayer.localAnimator.ResetTrigger("Jump");
+				mPlayer.localAnimator.SetTrigger("Land");
+				mPlayer.networkAnimator.SetTrigger("Land");
+
 				mIsJumping = false;
 			}
 			if (!mController.isGrounded && !mIsJumping && mPreviouslyGrounded)
@@ -186,7 +194,7 @@ namespace FiringSquad.Gameplay
 			Vector2 rotation = mRotationAmount * mMovementData.lookSpeed * mMouseSensitivity;
 			transform.RotateAround(transform.position, transform.up, rotation.x);
 
-			mRotationY += rotation.y;// + (mRecoilAmount * Time.deltaTime);
+			mRotationY += rotation.y; // + (mRecoilAmount * Time.deltaTime);
 			mRotationY = GenericExt.ClampAngle(mRotationY, -85.0f, 85.0f);
 
 			float realRotation = mRotationY;
@@ -207,12 +215,14 @@ namespace FiringSquad.Gameplay
 		private void UpdateCrouch()
 		{
 			float currentHeight = mCollider.height;
-			float newHeight = Mathf.Lerp(currentHeight, mCrouching ? mStandingHeight * mMovementData.crouchHeight : mStandingHeight, Time.deltaTime * mMovementData.crouchSpeed);
+			float newHeight = Mathf.Lerp(currentHeight, mCrouching ? mStandingHeight * mMovementData.crouchHeight : mStandingHeight,
+				Time.deltaTime * mMovementData.crouchSpeed);
 			mCollider.height = newHeight;
 			mController.height = newHeight;
 
 			float currentRadius = mCollider.radius;
-			float newRadius = Mathf.Lerp(currentRadius, mCrouching ? mStandingRadius * mMovementData.crouchHeight : mStandingRadius, Time.deltaTime * mMovementData.crouchSpeed);
+			float newRadius = Mathf.Lerp(currentRadius, mCrouching ? mStandingRadius * mMovementData.crouchHeight : mStandingRadius,
+				Time.deltaTime * mMovementData.crouchSpeed);
 			mCollider.radius = newRadius;
 			mController.radius = newRadius;
 		}
@@ -248,9 +258,10 @@ namespace FiringSquad.Gameplay
 				if (mJump)
 				{
 					mMoveDirection.y = mMovementData.jumpForce;
-					
+
 					// play jump sound ?
 
+					mPlayer.localAnimator.ResetTrigger("Land");
 					mPlayer.localAnimator.SetTrigger("Jump");
 					mPlayer.networkAnimator.SetTrigger("Jump");
 

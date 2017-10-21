@@ -1,48 +1,78 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using FiringSquad.Gameplay;
+using FiringSquad.Gameplay.Weapons;
 using UnityEngine;
 
-public class WeaponPartManager : MonoSingleton<WeaponPartManager>, IWeaponPartManager
+namespace FiringSquad.Core.Weapons
 {
-	private Dictionary<string, GameObject> mPrefabs;
-
-	private Dictionary<string, GameObject> prefabs
+	public class WeaponPartManager : MonoSingleton<WeaponPartManager>, IWeaponPartManager
 	{
-		get
+		private Dictionary<string, GameObject> mPrefabs;
+		private Dictionary<string, WeaponPartScript> mScripts;
+		private Dictionary<string, GameObject> prefabs
+		{
+			get
+			{
+				LazyInitialize();
+				return mPrefabs;
+			}
+		}
+
+		private Dictionary<string, WeaponPartScript> scripts
+		{
+			get
+			{
+				LazyInitialize();
+				return mScripts;
+			}
+		}
+
+		public WeaponPartScript GetPrefabScript(string id)
+		{
+			return scripts[id];
+		}
+
+		public GameObject GetPartPrefab(string id)
+		{
+			return prefabs[id];
+		}
+
+		public GameObject this[string index] { get { return prefabs[index]; } }
+
+		public Dictionary<string, GameObject> GetAllPrefabs(bool includeDebug)
 		{
 			LazyInitialize();
-			return mPrefabs;
+
+			if (includeDebug)
+				return prefabs;
+
+			return prefabs.Values
+				.Where(x => !x.name.ToLower().Contains("debug"))
+				.ToDictionary(x => x.name);
 		}
-	}
 
-	public GameObject GetPartPrefab(string id)
-	{
-		return prefabs[id];
-	}
+		public Dictionary<string, WeaponPartScript> GetAllPrefabScripts(bool includeDebug)
+		{
+			if (includeDebug)
+				return scripts;
 
-	public GameObject this[string index] { get { return prefabs[index]; } }
+			return scripts.Values
+				.Where(x => !x.name.ToLower().Contains("debug"))
+				.ToDictionary(x => x.name);
+		}
 
-	public Dictionary<string, GameObject> GetAllPrefabs(bool includeDebug)
-	{
-		LazyInitialize();
+		private void LazyInitialize()
+		{
+			if (mPrefabs != null)
+				return;
 
-		if (includeDebug)
-			return prefabs;
-
-		return prefabs.Values
-			.Where(x => !x.name.ToLower().Contains("debug"))
-			.ToDictionary(x => x.name);
-	}
-
-	private void LazyInitialize()
-	{
-		if (mPrefabs != null)
-			return;
-
-		var allObjects = Resources.LoadAll<GameObject>("prefabs/weapons");
-		mPrefabs = allObjects
-			.Where(x => x.GetComponent<WeaponPartScript>() != null)
-			.ToDictionary(x => x.name);
+			var allObjects = Resources.LoadAll<GameObject>("prefabs/weapons");
+			mPrefabs = allObjects
+				.Where(x => x.GetComponent<WeaponPartScript>() != null)
+				.ToDictionary(x => x.name);
+			mScripts = mPrefabs
+				.Select(x => x.Value.GetComponent<WeaponPartScript>())
+				.ToDictionary(x => x.name);
+		}
 	}
 }
