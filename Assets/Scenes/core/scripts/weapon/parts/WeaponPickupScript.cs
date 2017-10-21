@@ -10,9 +10,13 @@ namespace FiringSquad.Gameplay.Weapons
 	{
 		[SerializeField] private GameObject mGunView;
 		[SerializeField] private GameObject mPickupView;
+		[SerializeField] private GameObject mParticleSystem;
 
 		public CltPlayer currentHolder { get; private set; }
 		public bool currentlyHeld { get { return currentHolder != null; } }
+
+		private int mOverrideDurability = WeaponPartScript.USE_DEFAULT_DURABILITY;
+		public int overrideDurability { get { return mOverrideDurability; } set { mOverrideDurability = value; } }
 
 		private WeaponPartWorldCanvas mCanvas;
 		private WeaponPartScript mPartScript;
@@ -62,8 +66,7 @@ namespace FiringSquad.Gameplay.Weapons
 			mGunView.SetActive(false);
 			mPickupView.SetActive(true);
 
-			GameObject psPrefab = Resources.Load<GameObject>("prefabs/weapons/effects/p_pickupEffectPack");
-			GameObject ps = Instantiate(psPrefab);
+			GameObject ps = Instantiate(mParticleSystem);
 
 			ps.transform.SetParent(mPickupView.transform);
 			ps.transform.ResetLocalValues();
@@ -81,7 +84,7 @@ namespace FiringSquad.Gameplay.Weapons
 			if (wepBearer == null)
 				return;
 
-			wepBearer.weapon.AttachNewPart(GetComponent<WeaponPartScript>().partId);
+			wepBearer.weapon.AttachNewPart(GetComponent<WeaponPartScript>().partId, overrideDurability);
 
 			try
 			{

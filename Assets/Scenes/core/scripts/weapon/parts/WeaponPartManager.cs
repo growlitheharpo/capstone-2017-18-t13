@@ -8,7 +8,7 @@ namespace FiringSquad.Core.Weapons
 	public class WeaponPartManager : MonoSingleton<WeaponPartManager>, IWeaponPartManager
 	{
 		private Dictionary<string, GameObject> mPrefabs;
-
+		private Dictionary<string, WeaponPartScript> mScripts;
 		private Dictionary<string, GameObject> prefabs
 		{
 			get
@@ -16,6 +16,20 @@ namespace FiringSquad.Core.Weapons
 				LazyInitialize();
 				return mPrefabs;
 			}
+		}
+
+		private Dictionary<string, WeaponPartScript> scripts
+		{
+			get
+			{
+				LazyInitialize();
+				return mScripts;
+			}
+		}
+
+		public WeaponPartScript GetPrefabScript(string id)
+		{
+			return scripts[id];
 		}
 
 		public GameObject GetPartPrefab(string id)
@@ -37,6 +51,16 @@ namespace FiringSquad.Core.Weapons
 				.ToDictionary(x => x.name);
 		}
 
+		public Dictionary<string, WeaponPartScript> GetAllPrefabScripts(bool includeDebug)
+		{
+			if (includeDebug)
+				return scripts;
+
+			return scripts.Values
+				.Where(x => !x.name.ToLower().Contains("debug"))
+				.ToDictionary(x => x.name);
+		}
+
 		private void LazyInitialize()
 		{
 			if (mPrefabs != null)
@@ -45,6 +69,9 @@ namespace FiringSquad.Core.Weapons
 			var allObjects = Resources.LoadAll<GameObject>("prefabs/weapons");
 			mPrefabs = allObjects
 				.Where(x => x.GetComponent<WeaponPartScript>() != null)
+				.ToDictionary(x => x.name);
+			mScripts = mPrefabs
+				.Select(x => x.Value.GetComponent<WeaponPartScript>())
 				.ToDictionary(x => x.name);
 		}
 	}

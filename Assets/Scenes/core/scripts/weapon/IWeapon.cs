@@ -19,7 +19,8 @@ namespace FiringSquad.Gameplay.Weapons
 		/// Attach a new part to this weapon.
 		/// </summary>
 		/// <param name="partId">The part to be attached.</param>
-		void AttachNewPart(string partId);
+		/// <param name="durability">The durability to assign to the new part, or -2 to use the default.</param>
+		void AttachNewPart(string partId, int durability = WeaponPartScript.USE_DEFAULT_DURABILITY);
 
 		/// <summary>
 		/// Reset all the parts on this weapon to the default parts of the bearer.

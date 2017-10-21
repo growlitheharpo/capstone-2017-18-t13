@@ -155,7 +155,13 @@ namespace FiringSquad.Gameplay.Weapons
 				var partIds = mCurrentParts.allParts.Select(x => x.partId).ToArray();
 				bf.Serialize(memstream, partIds);
 				writer.WriteBytesAndSize(memstream.ToArray(), memstream.ToArray().Length);
-				memstream.Dispose();
+			}
+			using (MemoryStream memstream = new MemoryStream())
+			{
+				// serialize our durability
+				var durabilities = mCurrentParts.allParts.Select(x => x.durability).ToArray();
+				bf.Serialize(memstream, durabilities);
+				writer.WriteBytesAndSize(memstream.ToArray(), memstream.ToArray().Length);
 			}
 
 			return true;
@@ -174,52 +180,50 @@ namespace FiringSquad.Gameplay.Weapons
 					bearerObj.GetComponent<CltPlayer>().BindWeaponToPlayer(this);
 			}
 
-			// read our weapon parts
+			// read our weapon parts and durabilities
 			var bytearray = reader.ReadBytesAndSize();
 			var partList = (string[])binFormatter.Deserialize(new MemoryStream(bytearray));
+
+			bytearray = reader.ReadBytesAndSize();
+			var durabilityList = (int[])binFormatter.Deserialize(new MemoryStream(bytearray));
+
 			if (mCurrentParts == null)
 				mCurrentParts = new WeaponPartCollection();
 
 			if (mCurrentParts.scope == null || mCurrentParts.scope.partId != partList[0])
-				AttachNewPart(partList[0], true);
+				AttachNewPart(partList[0], durabilityList[0]);
 			if (mCurrentParts.barrel == null || mCurrentParts.barrel.partId != partList[1])
-				AttachNewPart(partList[1], true);
+				AttachNewPart(partList[1], durabilityList[1]);
 			if (mCurrentParts.mechanism == null || mCurrentParts.mechanism.partId != partList[2])
-				AttachNewPart(partList[2], true);
+				AttachNewPart(partList[2], durabilityList[2]);
 			if (mCurrentParts.grip == null || mCurrentParts.grip.partId != partList[3])
-				AttachNewPart(partList[3], true);
+				AttachNewPart(partList[3], durabilityList[3]);
 		}
 
 		#endregion
 
 		#region Part Attachment
-
-		public void AttachNewPart(string partId)
-		{
-			AttachNewPart(partId, false);
-		}
-
+		
 		public void ResetToDefaultParts()
 		{
 			foreach (WeaponPartScript p in bearer.defaultParts)
-				AttachNewPart(p.partId, true);
+				AttachNewPart(p.partId, p.durability);
 		}
 
-		public void AttachNewPart(string partId, bool forceInfiniteDurability)
+		public void AttachNewPart(string partId, int durability = WeaponPartScript.USE_DEFAULT_DURABILITY)
 		{
 			if (string.IsNullOrEmpty(partId))
 				return;
 
-			GameObject prefab = ServiceLocator.Get<IWeaponPartManager>().GetPartPrefab(partId);
-			WeaponPartScript instance = prefab.GetComponent<WeaponPartScript>().SpawnForWeapon(this);
+			WeaponPartScript prefab = ServiceLocator.Get<IWeaponPartManager>().GetPrefabScript(partId);
+			WeaponPartScript instance = prefab.SpawnForWeapon(this);
 
 			int originalClipsize = mCurrentData.clipSize;
 
 			MoveAttachmentToPoint(instance);
 			mCurrentParts[instance.attachPoint] = instance;
 
-			if (forceInfiniteDurability)
-				instance.durability = WeaponPartScript.INFINITE_DURABILITY;
+			instance.durability = durability == WeaponPartScript.USE_DEFAULT_DURABILITY ? prefab.durability : durability;
 
 			mCurrentData = ActivatePartEffects(mCurrentParts, baseData);
 
@@ -433,10 +437,11 @@ namespace FiringSquad.Gameplay.Weapons
 
 		private void OnPostFireShot()
 		{
-			DegradeDurability();
+			CmdDegradeDurability();
 		}
 
-		private void DegradeDurability()
+		[Command]
+		private void CmdDegradeDurability()
 		{
 			foreach (WeaponPartScript part in mCurrentParts)
 			{
@@ -449,9 +454,10 @@ namespace FiringSquad.Gameplay.Weapons
 			}
 		}
 
+		[Server]
 		private void BreakPart(WeaponPartScript part)
 		{
-			AttachNewPart(bearer.defaultParts[part.attachPoint].partId);
+			AttachNewPart(bearer.defaultParts[part.attachPoint].partId, WeaponPartScript.INFINITE_DURABILITY);
 
 			// TODO: Send "break" event here (which will then spawn particles)
 			// TODO: spawn "break" particle system here

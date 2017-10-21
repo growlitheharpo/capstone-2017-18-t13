@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using FiringSquad.Core;
 using FiringSquad.Core.UI;
 using FiringSquad.Core.Weapons;
@@ -210,7 +211,7 @@ namespace FiringSquad.Gameplay
 		private void AddDefaultPartsToWeapon(BaseWeaponScript wep)
 		{
 			foreach (WeaponPartScript part in defaultParts)
-				wep.AttachNewPart(part.partId, true);
+				wep.AttachNewPart(part.partId, WeaponPartScript.INFINITE_DURABILITY);
 		}
 
 		[Command]
@@ -225,6 +226,29 @@ namespace FiringSquad.Gameplay
 		{
 			if (p != this)
 				RpcReflectPlayerShotWeapon(p.netId);
+		}
+
+		[Server]
+		private void SpawnDeathWeaponParts()
+		{
+			IWeaponPartManager partService = ServiceLocator.Get<IWeaponPartManager>();
+			foreach (WeaponPartScript part in weapon.currentParts)
+			{
+				if (defaultParts.Any(defaultPart => part.partId == defaultPart.partId))
+					continue;
+
+				WeaponPartScript prefab = partService.GetPrefabScript(part.partId);
+				GameObject instance = prefab.SpawnInWorld();
+
+				instance.transform.position = weapon.transform.position + Random.insideUnitSphere;
+
+				instance.GetComponent<WeaponPickupScript>().overrideDurability = part.durability;
+				instance.GetComponent<Rigidbody>().AddExplosionForce(40.0f, transform.position, 2.0f);
+
+				NetworkServer.Spawn(instance);
+
+				StartCoroutine(Coroutines.InvokeAfterFrames(2, () => { instance.GetComponent<WeaponPickupScript>().RpcInitializePickupView(); }));
+			}
 		}
 
 		[ClientRpc]
@@ -302,6 +326,8 @@ namespace FiringSquad.Gameplay
 			{
 				if (killer != null)
 					mDeaths++;
+
+				SpawnDeathWeaponParts();
 
 				mHealth = mInformation.defaultHealth;
 				weapon.ResetToDefaultParts();
