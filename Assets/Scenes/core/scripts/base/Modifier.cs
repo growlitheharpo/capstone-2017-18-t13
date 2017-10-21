@@ -32,6 +32,12 @@ namespace FiringSquad.Data
 
 				return input;
 			}
+
+			public Float(float value, ModType type)
+			{
+				mType = type;
+				mAmount = value;
+			}
 		}
 
 		[Serializable]
@@ -55,6 +61,12 @@ namespace FiringSquad.Data
 				}
 
 				return input;
+			}
+
+			public Int(int value, ModType type)
+			{
+				mType = type;
+				mAmount = value;
 			}
 		}
 

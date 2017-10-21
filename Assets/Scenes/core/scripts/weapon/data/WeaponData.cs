@@ -105,5 +105,55 @@ namespace FiringSquad.Data
 
 			return result;
 		}
+
+		public void ForceModifyMinDispersion(Modifier.Float modification)
+		{
+			mMinimumDispersion = modification.Apply(mMinimumDispersion);
+		}
+
+		public void ForceModifyMaxDispersion(Modifier.Float modification)
+		{
+			mMaximumDispersion = modification.Apply(mMaximumDispersion);
+		}
+
+		public void ForceModifyDispersionRamp(Modifier.Float modification)
+		{
+			mDispersionRamp = modification.Apply(mDispersionRamp);
+		}
+
+		public void ForceModifyRecoilAmount(Modifier.Float modification)
+		{
+			mRecoilAmount = modification.Apply(mRecoilAmount);
+		}
+
+		public void ForceModifyRecoilTime(Modifier.Float modification)
+		{
+			mRecoilTime = modification.Apply(mRecoilTime);
+		}
+
+		public void ForceModifyDamage(Modifier.Float modification)
+		{
+			mDamage = modification.Apply(mDamage);
+		}
+
+		public void ForceModifyDamageFalloff(Modifier.Float modification)
+		{
+			mDamageFalloffDistance = modification.Apply(mDamageFalloffDistance);
+		}
+
+		public void ForceModifyFireRate(Modifier.Float modification)
+		{
+			mFireRate = modification.Apply(mFireRate);
+		}
+
+		public void ForceModifyReloadTime(Modifier.Float modification)
+		{
+			mReloadTime = modification.Apply(reloadTime);
+		}
+
+		public void ForceModifyClipSize(Modifier.Int modification)
+		{
+			mClipSize = modification.Apply(mClipSize);
+		}
 	}
 }
