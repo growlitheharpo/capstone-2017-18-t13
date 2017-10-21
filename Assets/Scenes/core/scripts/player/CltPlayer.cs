@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using FiringSquad.Core;
 using FiringSquad.Core.UI;
 using FiringSquad.Core.Weapons;
@@ -233,6 +234,9 @@ namespace FiringSquad.Gameplay
 			IWeaponPartManager partService = ServiceLocator.Get<IWeaponPartManager>();
 			foreach (WeaponPartScript part in weapon.currentParts)
 			{
+				if (defaultParts.Any(defaultPart => part.partId == defaultPart.partId))
+					continue;
+
 				WeaponPartScript prefab = partService.GetPrefabScript(part.partId);
 				GameObject instance = prefab.SpawnInWorld();
 
