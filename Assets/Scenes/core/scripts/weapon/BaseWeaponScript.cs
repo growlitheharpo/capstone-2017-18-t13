@@ -86,6 +86,7 @@ namespace FiringSquad.Gameplay.Weapons
 		private int mShotsSinceRelease;
 		private List<float> mRecentShotTimes;
 		private ParticleSystem mShotParticles;
+		private Animator mAnimator;
 
 		private const float CAMERA_FOLLOW_FACTOR = 10.0f;
 		private float currentTime { get { return Time.time; } }
@@ -107,6 +108,7 @@ namespace FiringSquad.Gameplay.Weapons
 			mShotsInClip = new BoundProperty<int>();
 			mTotalClipSize = new BoundProperty<int>();
 			mShotParticles = transform.Find("shot_particles").GetComponent<ParticleSystem>();
+			mAnimator = GetComponent<Animator>();
 		}
 
 		private void OnDestroy()
@@ -298,7 +300,7 @@ namespace FiringSquad.Gameplay.Weapons
 			ServiceLocator.Get<IAudioManager>()
 				.PlaySound(AudioManager.AudioEvent.Reload, audioProfile, transform);
 
-			AnimationUtility.PlayAnimation(gameObject, "reload");
+			AnimationUtility.PlayAnimation(mAnimator, "reload");
 			StartCoroutine(WaitForReload(time));
 		}
 
@@ -308,10 +310,9 @@ namespace FiringSquad.Gameplay.Weapons
 
 			yield return null;
 			yield return null;
-			Animator anim = GetComponent<Animator>();
-			anim.speed = 1.0f / time;
-			yield return new WaitForAnimation(anim);
-			anim.speed = 1.0f;
+			mAnimator.speed = 1.0f / time;
+			yield return new WaitForAnimation(mAnimator);
+			mAnimator.speed = 1.0f;
 
 			mReloading = false;
 			mShotsInClip.value = mCurrentData.clipSize;
@@ -455,6 +456,23 @@ namespace FiringSquad.Gameplay.Weapons
 
 			// TODO: Send "break" event here (which will then spawn particles)
 			// TODO: spawn "break" particle system here
+		}
+
+		#endregion
+
+		#region Aim Down Sights
+
+
+		[Client]
+		public void EnterAimDownSightsMode()
+		{
+			AnimationUtility.SetVariable(mAnimator, "AimDownSights", true);
+		}
+
+		[Client]
+		public void ExitAimDownSightsMode()
+		{
+			AnimationUtility.SetVariable(mAnimator, "AimDownSights", false);
 		}
 
 		#endregion

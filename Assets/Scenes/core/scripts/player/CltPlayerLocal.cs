@@ -139,12 +139,12 @@ namespace FiringSquad.Gameplay
 
 		private void INPUT_EnterAimDownSights()
 		{
-			Logger.Info("Entering ADS mode", Logger.System.State);
+			playerRoot.weapon.EnterAimDownSightsMode();
 		}
 
 		private void INPUT_ExitAimDownSights()
 		{
-			Logger.Info("Exiting ADS mode", Logger.System.State);
+			playerRoot.weapon.ExitAimDownSightsMode();
 		}
 
 		private void ApplyOptionsData(IOptionsData data)
