@@ -139,12 +139,12 @@ namespace FiringSquad.Gameplay
 
 		private void INPUT_EnterAimDownSights()
 		{
-			playerRoot.weapon.EnterAimDownSightsMode();
+			EventManager.Notify(EventManager.Local.EnterAimDownSightsMode);
 		}
 
 		private void INPUT_ExitAimDownSights()
 		{
-			playerRoot.weapon.ExitAimDownSightsMode();
+			EventManager.Notify(EventManager.Local.ExitAimDownSightsMode);
 		}
 
 		private void ApplyOptionsData(IOptionsData data)

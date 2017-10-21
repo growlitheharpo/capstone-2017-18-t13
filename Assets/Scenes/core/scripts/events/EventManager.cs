@@ -72,6 +72,20 @@ public partial class EventManager
 		{
 			OnLocalPlayerReleasedPart(part);
 		}
+
+		public static event Action OnEnterAimDownSightsMode = () => { LogEvent(); };
+
+		public static void EnterAimDownSightsMode()
+		{
+			OnEnterAimDownSightsMode();
+		}
+
+		public static event Action OnExitAimDownSightsMode = () => { LogEvent(); };
+
+		public static void ExitAimDownSightsMode()
+		{
+			OnExitAimDownSightsMode();
+		}
 	}
 
 	public static class LocalGUI

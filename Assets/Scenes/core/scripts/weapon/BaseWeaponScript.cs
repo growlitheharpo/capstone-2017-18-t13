@@ -111,10 +111,18 @@ namespace FiringSquad.Gameplay.Weapons
 			mAnimator = GetComponent<Animator>();
 		}
 
+		public override void OnStartClient()
+		{
+			EventManager.Local.OnEnterAimDownSightsMode += OnEnterAimDownSightsMode;
+			EventManager.Local.OnExitAimDownSightsMode += OnExitAimDownSightsMode;
+		}
+
 		private void OnDestroy()
 		{
 			mShotsInClip.Cleanup();
 			mTotalClipSize.Cleanup();
+			EventManager.Local.OnEnterAimDownSightsMode -= OnEnterAimDownSightsMode;
+			EventManager.Local.OnExitAimDownSightsMode -= OnExitAimDownSightsMode;
 		}
 
 		public void BindPropertiesToUI()
@@ -470,13 +478,13 @@ namespace FiringSquad.Gameplay.Weapons
 
 
 		[Client]
-		public void EnterAimDownSightsMode()
+		public void OnEnterAimDownSightsMode()
 		{
 			AnimationUtility.SetVariable(mAnimator, "AimDownSights", true);
 		}
 
 		[Client]
-		public void ExitAimDownSightsMode()
+		public void OnExitAimDownSightsMode()
 		{
 			AnimationUtility.SetVariable(mAnimator, "AimDownSights", false);
 		}

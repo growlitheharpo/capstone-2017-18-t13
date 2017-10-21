@@ -50,10 +50,6 @@ namespace FiringSquad.Gameplay.Weapons
 		void FireWeaponHold();
 		void FireWeaponUp();
 
-		void EnterAimDownSightsMode();
-
-		void ExitAimDownSightsMode();
-
 		void PlayFireEffect();
 	}
 }
