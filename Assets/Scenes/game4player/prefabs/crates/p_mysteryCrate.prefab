@@ -54,7 +54,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1044795996218704}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: 4}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4255248933974802}
@@ -181,15 +181,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mParts:
-  - mPrefab: {fileID: 1297151579918920, guid: ae2a9ffdc62cede43828d78624b9146c, type: 2}
-    mWeight: 0.16883095
-  - mPrefab: {fileID: 1173900482085758, guid: a8527659f4be87c45ad46d750263c94c, type: 2}
-    mWeight: 0.019712627
-  - mPrefab: {fileID: 1711722334057618, guid: ee84b24b05b85574cad2a56c257e292f, type: 2}
-    mWeight: 0.3637567
-  - mPrefab: {fileID: 1711722334057618, guid: e0af227ee65ce794b9a3a83a40cc7adc, type: 2}
-    mWeight: 0.11650089
-  - mPrefab: {fileID: 1648322808193650, guid: 17592fca01a55b74bafe2e36a610920a, type: 2}
-    mWeight: 0.33119887
+  - mPrefab: {fileID: 1009224365190128, guid: ac89948562eb23e47810effcccae5243, type: 2}
+    mWeight: 0.15949368
+  - mPrefab: {fileID: 1009224365190128, guid: 3276fdc30bad4b24692fb2085ead1607, type: 2}
+    mWeight: 0.49289155
+  - mPrefab: {fileID: 1009224365190128, guid: a9775d62066de3a4c9d3c148dfe016a4, type: 2}
+    mWeight: 0.3476148
   mBreakVFX: {fileID: 1416275159863322, guid: 1942861463afe354eb984decdff91d30, type: 2}
-  mRespawnTime: 5
+  mRespawnTime: 30
