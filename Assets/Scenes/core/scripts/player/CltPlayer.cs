@@ -227,6 +227,26 @@ namespace FiringSquad.Gameplay
 				RpcReflectPlayerShotWeapon(p.netId);
 		}
 
+		[Server]
+		private void SpawnDeathWeaponParts()
+		{
+			IWeaponPartManager partService = ServiceLocator.Get<IWeaponPartManager>();
+			foreach (WeaponPartScript part in weapon.currentParts)
+			{
+				WeaponPartScript prefab = partService.GetPrefabScript(part.partId);
+				GameObject instance = prefab.SpawnInWorld();
+
+				instance.transform.position = weapon.transform.position;
+
+				instance.GetComponent<WeaponPickupScript>().overrideDurability = part.durability;
+				instance.GetComponent<Rigidbody>().AddExplosionForce(40.0f, transform.position, 2.0f);
+
+				NetworkServer.Spawn(instance);
+
+				StartCoroutine(Coroutines.InvokeAfterFrames(2, () => { instance.GetComponent<WeaponPickupScript>().RpcInitializePickupView(); }));
+			}
+		}
+
 		[ClientRpc]
 		private void RpcReflectPlayerShotWeapon(NetworkInstanceId playerId)
 		{
@@ -302,6 +322,8 @@ namespace FiringSquad.Gameplay
 			{
 				if (killer != null)
 					mDeaths++;
+
+				SpawnDeathWeaponParts();
 
 				mHealth = mInformation.defaultHealth;
 				weapon.ResetToDefaultParts();
