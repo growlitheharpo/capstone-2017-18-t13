@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using FiringSquad.Gameplay.Weapons;
 using KeatsLib.Collections;
@@ -13,11 +14,14 @@ namespace FiringSquad.Gameplay
 		[Serializable]
 		public struct PartWeightSet
 		{
-			public GameObject mPrefab;
-			[Range(0.0f, 1.0f)] public float mWeight;
+			[SerializeField] private GameObject mPrefab;
+			[Range(0.0f, 1.0f)] [SerializeField] private float mWeight;
+
+			public GameObject prefab { get { return mPrefab; } }
+			public float weight { get { return mWeight; } }
 		}
 
-		[HideInInspector] [SerializeField] List<PartWeightSet> mParts;
+		[HideInInspector] [SerializeField] private List<PartWeightSet> mParts;
 		[SerializeField] private GameObject mBreakVFX;
 		public float mRespawnTime;
 
@@ -41,12 +45,9 @@ namespace FiringSquad.Gameplay
 		[Command]
 		private void CmdSpawnPart()
 		{
-			mCollider.enabled = false;
-			mView.SetActive(false);
-			//SpawnParticles();
 			mVisible = false;
 
-			GameObject prefab = mParts.ChooseRandom().mPrefab;
+			GameObject prefab = mParts.ChooseRandomWeighted(part => part.weight).prefab;
 			GameObject instance = prefab.GetComponent<WeaponPartScript>().SpawnInWorld();
 			instance.transform.position = transform.position + Vector3.up * 0.5f;
 			instance.name = prefab.name;
@@ -54,7 +55,25 @@ namespace FiringSquad.Gameplay
 			instance.GetComponent<Rigidbody>().AddForce(Vector3.up * 7.0f, ForceMode.Impulse);
 			NetworkServer.Spawn(instance);
 
+			StartCoroutine(WaitAndReappear());
 			StartCoroutine(Coroutines.InvokeAfterFrames(2, () => { instance.GetComponent<WeaponPickupScript>().RpcInitializePickupView(); }));
+		}
+
+		[Server]
+		private IEnumerator WaitAndReappear()
+		{
+			yield return new WaitForSeconds(mRespawnTime);
+
+			bool clear;
+			do
+			{
+				yield return null;
+				Bounds b = mCollider.bounds;
+				var cols = Physics.OverlapBox(b.center, b.extents, transform.rotation);
+				clear = cols.Length == 0;
+			} while (!clear);
+
+			mVisible = true;
 		}
 
 		private void OnChangeVisible(bool visible)
@@ -64,10 +83,10 @@ namespace FiringSquad.Gameplay
 			mView.SetActive(visible);
 
 			if (!visible)
-				SpawnParticles();
+				CreateBreakParticles();
 		}
 
-		private void SpawnParticles()
+		private void CreateBreakParticles()
 		{
 			ParticleSystem ps = Instantiate(mBreakVFX, transform.position + Vector3.up * 0.25f, Quaternion.identity).GetComponent<ParticleSystem>();
 			ps.Play();
