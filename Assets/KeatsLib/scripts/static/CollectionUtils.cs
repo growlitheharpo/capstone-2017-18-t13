@@ -132,6 +132,31 @@ namespace KeatsLib.Collections
 		}
 
 		/// <summary>
+		/// Extension to select and return a random weighted item from an IEnumerable.
+		/// </summary>
+		/// <param name="collection">The IEnumerable to iterate through and choose an item from.</param>
+		/// <param name="weight">
+		/// A function that takes each item from the list and returns its weight.
+		/// If called for every item in "collection", the sum of the results should equal 1.0f.
+		/// </param>
+		/// <returns></returns>
+		public static T ChooseRandomWeighted<T>(this IEnumerable<T> collection, Func<T, float> weight)
+		{
+			var iList = collection as IList<T> ?? collection.ToArray();
+			float ranVal = Random.value;
+
+			float accumulator = 0.0f;
+			foreach (T t in iList)
+			{
+				accumulator += weight(t);
+				if (accumulator >= ranVal)
+					return t;
+			}
+
+			throw new ArgumentException("Weights did not sum to 1.00f!");
+		}
+
+		/// <summary>
 		/// Extension to select and return a random item from any IEnumerable.
 		/// NOTE: If the collection does not implement IList, the collection will be iterated through up to twice!
 		/// </summary>
