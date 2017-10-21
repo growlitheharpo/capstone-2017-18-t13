@@ -72,7 +72,7 @@ namespace FiringSquad.Gameplay.Weapons
 
 		private void PositionAndVisualize(Vector3 endPoint)
 		{
-			transform.position = sourceWeapon.transform.position;
+			transform.position = sourceWeapon.currentParts.barrel.barrelTip.position;
 			transform.forward = sourceWeapon.transform.forward;
 
 			mEffect.PlayEffect(endPoint);
