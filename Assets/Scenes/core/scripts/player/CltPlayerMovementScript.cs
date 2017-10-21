@@ -1,7 +1,10 @@
-﻿using FiringSquad.Core;
+﻿using System.Collections;
+using FiringSquad.Core;
 using FiringSquad.Core.Audio;
 using FiringSquad.Core.Input;
+using FiringSquad.Core.SaveLoad;
 using FiringSquad.Data;
+using FiringSquad.Gameplay.UI;
 using KeatsLib.Collections;
 using KeatsLib.Unity;
 using UnityEngine;
@@ -37,6 +40,9 @@ namespace FiringSquad.Gameplay
 		private float mStandingHeight;
 		private float mStandingRadius;
 
+		private Coroutine mZoomInRoutine;
+		private Camera mRealCameraRef;
+
 		private void Awake()
 		{
 			mMoveDirection = Vector3.zero;
@@ -67,6 +73,8 @@ namespace FiringSquad.Gameplay
 				.EnableInputLevel(InputLevel.Gameplay);
 
 			EventManager.Local.OnApplyOptionsData += ApplyOptionsData;
+			EventManager.Local.OnEnterAimDownSightsMode += OnEnterAimDownSightsMode;
+			EventManager.Local.OnExitAimDownSightsMode += OnExitAimDownSightsMode;
 			mInputBindings = input;
 		}
 
@@ -82,6 +90,8 @@ namespace FiringSquad.Gameplay
 				.UnregisterAxis(INPUT_LookVertical);
 
 			EventManager.Local.OnApplyOptionsData -= ApplyOptionsData;
+			EventManager.Local.OnEnterAimDownSightsMode -= OnEnterAimDownSightsMode;
+			EventManager.Local.OnExitAimDownSightsMode -= OnExitAimDownSightsMode;
 		}
 
 		#region Input Delegates
@@ -279,10 +289,47 @@ namespace FiringSquad.Gameplay
 				mIsRunning = false;
 		}
 
-		// TODO: Make this private again
-		public void ApplyOptionsData(IOptionsData settings)
+		private void ApplyOptionsData(IOptionsData settings)
 		{
 			mMouseSensitivity = settings.mouseSensitivity;
+		}
+
+		private void OnEnterAimDownSightsMode()
+		{
+			mRealCameraRef = mRealCameraRef ?? mPlayer.eye.GetComponentInChildren<Camera>();
+
+			if (mZoomInRoutine != null)
+				StopCoroutine(mZoomInRoutine);
+
+			mZoomInRoutine = StartCoroutine(ZoomCameraFov(25.0f, 0.25f));
+		}
+
+		private void OnExitAimDownSightsMode()
+		{
+			IOptionsData settings = ServiceLocator.Get<ISaveLoadManager>()
+				.persistentData.GetOptionsData(PauseGamePanel.SETTINGS_ID);
+			float fov = settings == null ? 60 : settings.fieldOfView;
+
+			if (mZoomInRoutine != null)
+				StopCoroutine(mZoomInRoutine);
+
+			mZoomInRoutine = StartCoroutine(ZoomCameraFov(fov, 0.25f));
+		}
+
+		private IEnumerator ZoomCameraFov(float newFov, float time)
+		{
+			float currentTime = 0.0f;
+			float startFov = mRealCameraRef.fieldOfView;
+
+			while (currentTime < time)
+			{
+				mRealCameraRef.fieldOfView = Mathf.Lerp(startFov, newFov, currentTime / time);
+
+				currentTime += Time.deltaTime;
+				yield return null;
+			}
+
+			mRealCameraRef.fieldOfView = newFov;
 		}
 	}
 }
