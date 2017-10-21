@@ -56,9 +56,10 @@ namespace FiringSquad.Debug
 			if (target != null)
 				mCurrentScript = target.GetComponentUpwards<BaseWeaponScript>();
 
-			/*if (mCurrentScript == null)
-				mCurrentScript = FindObjectOfType<PlayerWeaponScript>();*/
-#else //mCurrentScript = FindObjectOfType<PlayerWeaponScript>();
+			if (mCurrentScript == null)
+				mCurrentScript = FindObjectOfType<BaseWeaponScript>();
+#else
+			mCurrentScript = FindObjectOfType<BaseWeaponScript>();
 #endif
 		}
 
@@ -68,9 +69,7 @@ namespace FiringSquad.Debug
 				l.SetPositions(new Vector3[] { });
 
 			if (mCurrentScript == null)
-			{
 				return;
-			}
 
 			WeaponData weaponStats = BaseWeaponScript.DebugHelper.GetWeaponData(mCurrentScript);
 			Transform target = BaseWeaponScript.DebugHelper.GetWeaponAimRoot(mCurrentScript, mOverrideEye);
