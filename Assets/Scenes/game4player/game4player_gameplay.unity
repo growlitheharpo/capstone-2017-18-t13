@@ -6555,9 +6555,9 @@ Transform:
   - {fileID: 110943043}
   - {fileID: 1584887012}
   - {fileID: 1895959631}
+  - {fileID: 335626236}
   - {fileID: 503895929}
   - {fileID: 1987785778}
-  - {fileID: 335626236}
   - {fileID: 1076250545}
   - {fileID: 1951582556}
   - {fileID: 954888677}
@@ -7170,7 +7170,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &2017141823
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7216,9 +7216,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f09959a7c4437954fa91b4976e31503b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mMinimumThrowTime: 3
-  mMaximumThrowTime: 7
-  mMaxExistingItems: 50
+  mMinimumThrowTime: 5
+  mMaximumThrowTime: 10
+  mMaxExistingItems: 25
 --- !u!33 &2017141825
 MeshFilter:
   m_ObjectHideFlags: 0
