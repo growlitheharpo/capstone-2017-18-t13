@@ -78,13 +78,13 @@ namespace FiringSquad.Gameplay.Weapons
 		public WeaponPartCollection currentParts { get { return mCurrentParts; } }
 
 		private Dictionary<Attachment, Transform> mAttachPoints;
-		private WeaponData mCurrentData, mADSActiveData;
+		private WeaponData mCurrentData, mAimDownSightsData;
 
 		public WeaponData currentData
 		{
 			get
 			{
-				return AnimationUtility.GetBool(mAnimator, "AimDownSights") ? mADSActiveData : mCurrentData;
+				return mAimDownSightsActive ? mAimDownSightsData : mCurrentData;
 			}
 		}
 
@@ -96,6 +96,7 @@ namespace FiringSquad.Gameplay.Weapons
 		private List<float> mRecentShotTimes;
 		private ParticleSystem mShotParticles;
 		private Animator mAnimator;
+		private bool mAimDownSightsActive;
 
 		private const float CAMERA_FOLLOW_FACTOR = 10.0f;
 		private float currentTime { get { return Time.time; } }
@@ -244,9 +245,9 @@ namespace FiringSquad.Gameplay.Weapons
 
 			instance.durability = durability == WeaponPartScript.USE_DEFAULT_DURABILITY ? prefab.durability : durability;
 
-			mCurrentData = mADSActiveData = ActivatePartEffects(mCurrentParts, baseData);
-			mADSActiveData.ForceModifyMinDispersion(new Modifier.Float(mAimDownSightsDispersionMod, Modifier.ModType.SetPercentage));
-			mADSActiveData.ForceModifyMaxDispersion(new Modifier.Float(mAimDownSightsDispersionMod, Modifier.ModType.SetPercentage));
+			mCurrentData = mAimDownSightsData = ActivatePartEffects(mCurrentParts, baseData);
+			mAimDownSightsData.ForceModifyMinDispersion(new Modifier.Float(mAimDownSightsDispersionMod, Modifier.ModType.SetPercentage));
+			mAimDownSightsData.ForceModifyMaxDispersion(new Modifier.Float(mAimDownSightsDispersionMod, Modifier.ModType.SetPercentage));
 
 			if (instance.attachPoint == Attachment.Mechanism || mCurrentData.clipSize != originalClipsize)
 			{
@@ -490,17 +491,24 @@ namespace FiringSquad.Gameplay.Weapons
 
 		#region Aim Down Sights
 
-
 		[Client]
 		public void OnEnterAimDownSightsMode()
 		{
-			AnimationUtility.SetVariable(mAnimator, "AimDownSights", true);
+			//AnimationUtility.SetVariable(mAnimator, "AimDownSights", true);
+			//StartCoroutine(Coroutines.LerpPosition(mView, new Vector3(-0.33f, 0.0f, 0.0f), 0.2f, Space.Self, Coroutines.MATHF_SMOOTHSTEP));
+			mAimDownSightsActive = true;
+			if (mCurrentParts.scope != null)
+				mCurrentParts.scope.ActivateAimDownSightsEffect();
 		}
 
 		[Client]
 		public void OnExitAimDownSightsMode()
 		{
-			AnimationUtility.SetVariable(mAnimator, "AimDownSights", false);
+			//AnimationUtility.SetVariable(mAnimator, "AimDownSights", false);
+			//StartCoroutine(Coroutines.LerpPosition(mView, new Vector3(0.0f, 0.0f, 0.0f), 0.2f, Space.Self, Coroutines.MATHF_SMOOTHSTEP));
+			mAimDownSightsActive = false;
+			if (mCurrentParts.scope != null)
+				mCurrentParts.scope.DeactivateAimDownSightsEffect();
 		}
 
 		#endregion
