@@ -178,6 +178,12 @@ namespace FiringSquad.Gameplay
 			AnimationUtility.SetVariable(mAnimator, "VelocityY", velY);
 		}
 
+		public void PlayFireAnimation()
+		{
+			localAnimator.SetTrigger("Fire");
+			networkAnimator.SetTrigger("Fire");
+		}
+
 		#endregion
 
 		#region Weapons

@@ -7,5 +7,7 @@ namespace FiringSquad.Gameplay
 	{
 		IWeapon weapon { get; }
 		WeaponPartCollection defaultParts { get; }
+
+		void PlayFireAnimation();
 	}
 }

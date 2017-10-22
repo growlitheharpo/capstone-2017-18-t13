@@ -379,8 +379,6 @@ namespace FiringSquad.Gameplay.Weapons
 			foreach (Ray shot in shots)
 				CmdInstantiateShot(shot.origin, shot.direction);
 
-			realBearer.localAnimator.SetTrigger("Fire");
-			realBearer.networkAnimator.SetTrigger("Fire");
 			CmdOnShotFireComplete();
 			PlayFireEffect();
 			OnPostFireShot();
@@ -562,6 +560,7 @@ namespace FiringSquad.Gameplay.Weapons
 
 		public void PlayFireEffect()
 		{
+			bearer.PlayFireAnimation();
 			mShotParticles.transform.position = currentParts.barrel.barrelTip.position;
 			mShotParticles.Play();
 
