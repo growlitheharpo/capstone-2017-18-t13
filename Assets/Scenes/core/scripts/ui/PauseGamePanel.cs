@@ -7,7 +7,7 @@ namespace FiringSquad.Gameplay.UI
 {
 	public class PauseGamePanel : MonoBehaviour
 	{
-		private const string SETTINGS_ID = "options_menu_options_id";
+		public const string SETTINGS_ID = "options_menu_options_id";
 
 		private IOptionsData mData;
 		[SerializeField] private float mDefaultFieldOfView;

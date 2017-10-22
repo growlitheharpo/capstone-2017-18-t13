@@ -1,7 +1,10 @@
-﻿using FiringSquad.Core;
+﻿using System.Collections;
+using FiringSquad.Core;
 using FiringSquad.Core.Audio;
 using FiringSquad.Core.Input;
+using FiringSquad.Core.SaveLoad;
 using FiringSquad.Data;
+using FiringSquad.Gameplay.UI;
 using KeatsLib.Collections;
 using KeatsLib.Unity;
 using UnityEngine;
@@ -23,6 +26,7 @@ namespace FiringSquad.Gameplay
 		private new Transform transform { get { return mController.transform; } }
 
 		private CltPlayer mPlayer;
+		private CltPlayerLocal mLocalPlayer;
 		private IAudioReference mWalkingSound;
 
 		private PlayerInputMap mInputBindings;
@@ -37,6 +41,9 @@ namespace FiringSquad.Gameplay
 		private float mStandingHeight;
 		private float mStandingRadius;
 
+		private Coroutine mZoomInRoutine;
+		private Camera mRealCameraRef;
+
 		private void Awake()
 		{
 			mMoveDirection = Vector3.zero;
@@ -47,6 +54,7 @@ namespace FiringSquad.Gameplay
 		private void Start()
 		{
 			mPlayer = GetComponentInParent<CltPlayer>();
+			mLocalPlayer = mPlayer.GetComponentInChildren<CltPlayerLocal>();
 			mCollider = mPlayer.GetComponent<CapsuleCollider>();
 			mController = mPlayer.GetComponent<CharacterController>();
 			mStandingHeight = mCollider.height;
@@ -67,6 +75,8 @@ namespace FiringSquad.Gameplay
 				.EnableInputLevel(InputLevel.Gameplay);
 
 			EventManager.Local.OnApplyOptionsData += ApplyOptionsData;
+			EventManager.Local.OnEnterAimDownSightsMode += OnEnterAimDownSightsMode;
+			EventManager.Local.OnExitAimDownSightsMode += OnExitAimDownSightsMode;
 			mInputBindings = input;
 		}
 
@@ -82,6 +92,8 @@ namespace FiringSquad.Gameplay
 				.UnregisterAxis(INPUT_LookVertical);
 
 			EventManager.Local.OnApplyOptionsData -= ApplyOptionsData;
+			EventManager.Local.OnEnterAimDownSightsMode -= OnEnterAimDownSightsMode;
+			EventManager.Local.OnExitAimDownSightsMode -= OnExitAimDownSightsMode;
 		}
 
 		#region Input Delegates
@@ -191,7 +203,11 @@ namespace FiringSquad.Gameplay
 		/// </summary>
 		private void HandleRotation()
 		{
-			Vector2 rotation = mRotationAmount * mMovementData.lookSpeed * mMouseSensitivity;
+			float speed = mMovementData.lookSpeed * mMouseSensitivity;
+			if (mLocalPlayer.inAimDownSightsMode)
+				speed *= mMovementData.aimDownSightsLookMultiplier;
+
+			Vector2 rotation = mRotationAmount * speed;
 			transform.RotateAround(transform.position, transform.up, rotation.x);
 
 			mRotationY += rotation.y; // + (mRecoilAmount * Time.deltaTime);
@@ -215,14 +231,12 @@ namespace FiringSquad.Gameplay
 		private void UpdateCrouch()
 		{
 			float currentHeight = mCollider.height;
-			float newHeight = Mathf.Lerp(currentHeight, mCrouching ? mStandingHeight * mMovementData.crouchHeight : mStandingHeight,
-				Time.deltaTime * mMovementData.crouchSpeed);
+			float newHeight = Mathf.Lerp(currentHeight, mCrouching ? mStandingHeight * mMovementData.crouchHeight : mStandingHeight, Time.deltaTime * mMovementData.crouchSpeed);
 			mCollider.height = newHeight;
 			mController.height = newHeight;
 
 			float currentRadius = mCollider.radius;
-			float newRadius = Mathf.Lerp(currentRadius, mCrouching ? mStandingRadius * mMovementData.crouchHeight : mStandingRadius,
-				Time.deltaTime * mMovementData.crouchSpeed);
+			float newRadius = Mathf.Lerp(currentRadius, mCrouching ? mStandingRadius * mMovementData.crouchHeight : mStandingRadius, Time.deltaTime * mMovementData.crouchSpeed);
 			mCollider.radius = newRadius;
 			mController.radius = newRadius;
 		}
@@ -240,13 +254,16 @@ namespace FiringSquad.Gameplay
 			Vector3 desiredMove = transform.forward * mInput.y + transform.right * mInput.x;
 
 			RaycastHit hitInfo;
-			Physics.SphereCast(transform.position, mController.radius, Vector3.down, out hitInfo,
-				mController.height / 2.0f, Physics.AllLayers, QueryTriggerInteraction.Ignore);
+			Physics.SphereCast(transform.position, mController.radius, Vector3.down, out hitInfo, mController.height / 2.0f, Physics.AllLayers, QueryTriggerInteraction.Ignore);
 			desiredMove = Vector3.ProjectOnPlane(desiredMove, hitInfo.normal).normalized;
 
 			float speed = mMovementData.speed;
 			if (mIsRunning)
 				speed *= mMovementData.sprintMultiplier;
+			if (mCrouching)
+				speed *= mMovementData.crouchMoveMultiplier;
+			if (mLocalPlayer.inAimDownSightsMode)
+				speed *= mMovementData.aimDownSightsMoveMultiplier;
 
 			mMoveDirection.x = desiredMove.x * speed;
 			mMoveDirection.z = desiredMove.z * speed;
@@ -279,10 +296,47 @@ namespace FiringSquad.Gameplay
 				mIsRunning = false;
 		}
 
-		// TODO: Make this private again
-		public void ApplyOptionsData(IOptionsData settings)
+		private void ApplyOptionsData(IOptionsData settings)
 		{
 			mMouseSensitivity = settings.mouseSensitivity;
+		}
+
+		private void OnEnterAimDownSightsMode()
+		{
+			mRealCameraRef = mRealCameraRef ?? mPlayer.eye.GetComponentInChildren<Camera>();
+
+			if (mZoomInRoutine != null)
+				StopCoroutine(mZoomInRoutine);
+
+			mZoomInRoutine = StartCoroutine(ZoomCameraFov(25.0f, 0.25f));
+		}
+
+		private void OnExitAimDownSightsMode()
+		{
+			IOptionsData settings = ServiceLocator.Get<ISaveLoadManager>()
+				.persistentData.GetOptionsData(PauseGamePanel.SETTINGS_ID);
+			float fov = settings == null ? 60 : settings.fieldOfView;
+
+			if (mZoomInRoutine != null)
+				StopCoroutine(mZoomInRoutine);
+
+			mZoomInRoutine = StartCoroutine(ZoomCameraFov(fov, 0.25f));
+		}
+
+		private IEnumerator ZoomCameraFov(float newFov, float time)
+		{
+			float currentTime = 0.0f;
+			float startFov = mRealCameraRef.fieldOfView;
+
+			while (currentTime < time)
+			{
+				mRealCameraRef.fieldOfView = Mathf.Lerp(startFov, newFov, currentTime / time);
+
+				currentTime += Time.deltaTime;
+				yield return null;
+			}
+
+			mRealCameraRef.fieldOfView = newFov;
 		}
 	}
 }

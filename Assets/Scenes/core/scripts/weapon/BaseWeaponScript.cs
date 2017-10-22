@@ -22,17 +22,17 @@ namespace FiringSquad.Gameplay.Weapons
 		{
 			public static WeaponData GetWeaponData(BaseWeaponScript p)
 			{
-				return new WeaponData(p.mCurrentData);
+				return new WeaponData(p.currentData);
 			}
 
 			public static WeaponPartCollection GetAttachments(BaseWeaponScript p)
 			{
-				return new WeaponPartCollection(p.mCurrentParts);
+				return new WeaponPartCollection(p.currentParts);
 			}
 
 			public static Transform GetWeaponAimRoot(BaseWeaponScript p, bool forceBarrel = false)
 			{
-				return !forceBarrel ? p.GetAimRoot() : p.mCurrentParts.barrel.barrelTip;
+				return !forceBarrel ? p.GetAimRoot() : p.currentParts.barrel.barrelTip;
 			}
 
 			public static float GetCurrentDispersion(BaseWeaponScript p)
@@ -70,6 +70,7 @@ namespace FiringSquad.Gameplay.Weapons
 		[SerializeField] private Transform mScopeAttach;
 		[SerializeField] private Transform mMechanismAttach;
 		[SerializeField] private Transform mGripAttach;
+		[SerializeField] private float mAimDownSightsDispersionMod;
 		[SerializeField] private WeaponData mDefaultData;
 		public WeaponData baseData { get { return mDefaultData; } }
 
@@ -77,15 +78,25 @@ namespace FiringSquad.Gameplay.Weapons
 		public WeaponPartCollection currentParts { get { return mCurrentParts; } }
 
 		private Dictionary<Attachment, Transform> mAttachPoints;
-		private WeaponData mCurrentData;
-		public WeaponData currentData { get { return mCurrentData; } }
-		private float timePerShot { get { return 1.0f / mCurrentData.fireRate; } }
+		private WeaponData mCurrentData, mAimDownSightsData;
+
+		public WeaponData currentData
+		{
+			get
+			{
+				return mAimDownSightsActive ? mAimDownSightsData : mCurrentData;
+			}
+		}
+
+		private float timePerShot { get { return 1.0f / currentData.fireRate; } }
 
 		private bool mReloading;
 		private BoundProperty<int> mShotsInClip, mTotalClipSize;
 		private int mShotsSinceRelease;
 		private List<float> mRecentShotTimes;
-		private ParticleSystem mShotParticles;
+		private ParticleSystem mShotParticles, mPartBreakPrefab;
+		private Animator mAnimator;
+		private bool mAimDownSightsActive;
 
 		private const float CAMERA_FOLLOW_FACTOR = 10.0f;
 		private float currentTime { get { return Time.time; } }
@@ -107,12 +118,23 @@ namespace FiringSquad.Gameplay.Weapons
 			mShotsInClip = new BoundProperty<int>();
 			mTotalClipSize = new BoundProperty<int>();
 			mShotParticles = transform.Find("shot_particles").GetComponent<ParticleSystem>();
+			mAnimator = GetComponent<Animator>();
+
+			mPartBreakPrefab = Resources.Load<GameObject>("prefabs/weapons/effects/p_vfxPartBreak").GetComponent<ParticleSystem>();
+		}
+
+		public override void OnStartClient()
+		{
+			EventManager.Local.OnEnterAimDownSightsMode += OnEnterAimDownSightsMode;
+			EventManager.Local.OnExitAimDownSightsMode += OnExitAimDownSightsMode;
 		}
 
 		private void OnDestroy()
 		{
 			mShotsInClip.Cleanup();
 			mTotalClipSize.Cleanup();
+			EventManager.Local.OnEnterAimDownSightsMode -= OnEnterAimDownSightsMode;
+			EventManager.Local.OnExitAimDownSightsMode -= OnExitAimDownSightsMode;
 		}
 
 		public void BindPropertiesToUI()
@@ -225,7 +247,9 @@ namespace FiringSquad.Gameplay.Weapons
 
 			instance.durability = durability == WeaponPartScript.USE_DEFAULT_DURABILITY ? prefab.durability : durability;
 
-			mCurrentData = ActivatePartEffects(mCurrentParts, baseData);
+			mCurrentData = mAimDownSightsData = ActivatePartEffects(mCurrentParts, baseData);
+			mAimDownSightsData.ForceModifyMinDispersion(new Modifier.Float(mAimDownSightsDispersionMod, Modifier.ModType.SetPercentage));
+			mAimDownSightsData.ForceModifyMaxDispersion(new Modifier.Float(mAimDownSightsDispersionMod, Modifier.ModType.SetPercentage));
 
 			if (instance.attachPoint == Attachment.Mechanism || mCurrentData.clipSize != originalClipsize)
 			{
@@ -256,9 +280,12 @@ namespace FiringSquad.Gameplay.Weapons
 			instance.transform.ResetLocalValues();
 		}
 
-		public static WeaponData ActivatePartEffects(WeaponPartCollection parts, WeaponData startingData)
+		public static WeaponData ActivatePartEffects(WeaponPartCollection parts, WeaponData startingData, IEnumerable<WeaponPartData> otherVars = null)
 		{
 			WeaponData start = new WeaponData(startingData);
+
+			if (otherVars != null)
+				start = otherVars.Aggregate(start, (current, v) => new WeaponData(current, v));
 
 			Action<WeaponPartScript> apply = part =>
 			{
@@ -287,13 +314,13 @@ namespace FiringSquad.Gameplay.Weapons
 				return;
 
 			mReloading = true;
-			PlayReloadEffect(mCurrentData.reloadTime);
-			Invoke("FinishReload", mCurrentData.reloadTime);
+			PlayReloadEffect(currentData.reloadTime);
+			Invoke("FinishReload", currentData.reloadTime);
 		}
 
 		private void FinishReload()
 		{
-			mShotsInClip.value = mCurrentData.clipSize;
+			mShotsInClip.value = currentData.clipSize;
 			mReloading = false;
 		}
 
@@ -302,7 +329,7 @@ namespace FiringSquad.Gameplay.Weapons
 			ServiceLocator.Get<IAudioManager>()
 				.PlaySound(AudioManager.AudioEvent.Reload, audioProfile, transform);
 
-			AnimationUtility.PlayAnimation(gameObject, "reload");
+			AnimationUtility.PlayAnimation(mAnimator, "reload");
 			StartCoroutine(WaitForReload(time));
 		}
 
@@ -312,13 +339,12 @@ namespace FiringSquad.Gameplay.Weapons
 
 			yield return null;
 			yield return null;
-			Animator anim = GetComponent<Animator>();
-			anim.speed = 1.0f / time;
-			yield return new WaitForAnimation(anim);
-			anim.speed = 1.0f;
+			mAnimator.speed = 1.0f / time;
+			yield return new WaitForAnimation(mAnimator);
+			mAnimator.speed = 1.0f;
 
 			mReloading = false;
-			mShotsInClip.value = mCurrentData.clipSize;
+			mShotsInClip.value = currentData.clipSize;
 		}
 
 		#endregion
@@ -367,9 +393,9 @@ namespace FiringSquad.Gameplay.Weapons
 
 			GameObject projectile = Instantiate(mCurrentParts.mechanism.projectilePrefab, mCurrentParts.barrel.barrelTip.position,
 				Quaternion.identity);
-			projectile.GetComponent<IProjectile>().PreSpawnInitialize(this, shot, mCurrentData);
+			projectile.GetComponent<IProjectile>().PreSpawnInitialize(this, shot, currentData);
 			NetworkServer.Spawn(projectile);
-			projectile.GetComponent<IProjectile>().PostSpawnInitialize(this, shot, mCurrentData);
+			projectile.GetComponent<IProjectile>().PostSpawnInitialize(this, shot, currentData);
 		}
 
 		[Command]
@@ -409,7 +435,7 @@ namespace FiringSquad.Gameplay.Weapons
 		private float GetCurrentDispersionFactor(bool forceNotZero)
 		{
 			float percentage = 0.0f;
-			float inverseFireRate = 1.0f / mCurrentData.fireRate;
+			float inverseFireRate = 1.0f / currentData.fireRate;
 
 			foreach (float shot in mRecentShotTimes)
 			{
@@ -418,13 +444,13 @@ namespace FiringSquad.Gameplay.Weapons
 					continue;
 
 				float p = Mathf.Pow(Mathf.Clamp(inverseFireRate / timeSinceShot, 0.0f, 1.0f), 2);
-				percentage += p * mCurrentData.dispersionRamp;
+				percentage += p * currentData.dispersionRamp;
 			}
 
 			if (!forceNotZero && percentage <= 0.005f)
 				return 0.0f;
 
-			return Mathf.Lerp(mCurrentData.minimumDispersion, mCurrentData.maximumDispersion, percentage);
+			return Mathf.Lerp(currentData.minimumDispersion, currentData.maximumDispersion, percentage);
 		}
 
 		private Transform GetAimRoot()
@@ -457,10 +483,46 @@ namespace FiringSquad.Gameplay.Weapons
 		[Server]
 		private void BreakPart(WeaponPartScript part)
 		{
+			RpcCreateBreakPartEffect();
 			AttachNewPart(bearer.defaultParts[part.attachPoint].partId, WeaponPartScript.INFINITE_DURABILITY);
 
 			// TODO: Send "break" event here (which will then spawn particles)
 			// TODO: spawn "break" particle system here
+		}
+
+		[ClientRpc]
+		private void RpcCreateBreakPartEffect()
+		{
+			ParticleSystem instance = Instantiate(mPartBreakPrefab.gameObject).GetComponent<ParticleSystem>();
+			instance.transform.SetParent(transform);
+			instance.transform.ResetLocalValues();
+			instance.Play();
+
+			StartCoroutine(Coroutines.WaitAndDestroyParticleSystem(instance));
+		}
+
+		#endregion
+
+		#region Aim Down Sights
+
+		[Client]
+		public void OnEnterAimDownSightsMode()
+		{
+			//AnimationUtility.SetVariable(mAnimator, "AimDownSights", true);
+			//StartCoroutine(Coroutines.LerpPosition(mView, new Vector3(-0.33f, 0.0f, 0.0f), 0.2f, Space.Self, Coroutines.MATHF_SMOOTHSTEP));
+			mAimDownSightsActive = true;
+			if (mCurrentParts.scope != null)
+				mCurrentParts.scope.ActivateAimDownSightsEffect(this);
+		}
+
+		[Client]
+		public void OnExitAimDownSightsMode()
+		{
+			//AnimationUtility.SetVariable(mAnimator, "AimDownSights", false);
+			//StartCoroutine(Coroutines.LerpPosition(mView, new Vector3(0.0f, 0.0f, 0.0f), 0.2f, Space.Self, Coroutines.MATHF_SMOOTHSTEP));
+			mAimDownSightsActive = false;
+			if (mCurrentParts.scope != null)
+				mCurrentParts.scope.DeactivateAimDownSightsEffect(this);
 		}
 
 		#endregion
@@ -469,7 +531,7 @@ namespace FiringSquad.Gameplay.Weapons
 
 		private void CleanupRecentShots()
 		{
-			float inverseFireRate = 1.0f / mCurrentData.fireRate * 10.0f;
+			float inverseFireRate = 1.0f / currentData.fireRate * 10.0f;
 
 			for (int i = 0; i < mRecentShotTimes.Count; i++)
 			{
@@ -490,12 +552,12 @@ namespace FiringSquad.Gameplay.Weapons
 			foreach (float v in mRecentShotTimes)
 			{
 				float timeSinceShot = currentTime - v;
-				float percent = Mathf.Clamp(timeSinceShot / mCurrentData.recoilTime, 0.0f, 1.0f);
-				float sample = mCurrentData.recoilCurve.Evaluate(percent);
+				float percent = Mathf.Clamp(timeSinceShot / currentData.recoilTime, 0.0f, 1.0f);
+				float sample = currentData.recoilCurve.Evaluate(percent);
 				value += sample;
 			}
 
-			return value * mCurrentData.recoilAmount;
+			return value * currentData.recoilAmount;
 		}
 
 		public void PlayFireEffect()

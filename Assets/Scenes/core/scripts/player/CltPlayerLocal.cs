@@ -4,6 +4,7 @@ using FiringSquad.Data;
 using KeatsLib.Unity;
 using UnityEngine;
 using Input = UnityEngine.Input;
+using Logger = FiringSquad.Debug.Logger;
 
 namespace FiringSquad.Gameplay
 {
@@ -20,6 +21,8 @@ namespace FiringSquad.Gameplay
 		private Vector3 mCameraOriginalPos;
 		private Quaternion mCameraOriginalRot;
 
+		public bool inAimDownSightsMode { get; private set; }
+
 		// Use this for initialization
 		private void Start()
 		{
@@ -33,6 +36,8 @@ namespace FiringSquad.Gameplay
 				.RegisterInput(Input.GetButtonUp, inputMap.fireGravGunButton, INPUT_MagnetArmUp, InputLevel.Gameplay)
 
 				// local
+				.RegisterInput(Input.GetButtonDown, inputMap.activateADSButton, INPUT_EnterAimDownSights, InputLevel.Gameplay)
+				.RegisterInput(Input.GetButtonUp, inputMap.activateADSButton, INPUT_ExitAimDownSights, InputLevel.Gameplay)
 				.RegisterInput(Input.GetButtonDown, inputMap.pauseButton, INPUT_TogglePause, InputLevel.PauseMenu);
 
 			SetupCamera();
@@ -57,6 +62,8 @@ namespace FiringSquad.Gameplay
 				.UnregisterInput(INPUT_MagnetArmUp)
 
 				// local
+				.UnregisterInput(INPUT_EnterAimDownSights)
+				.UnregisterInput(INPUT_ExitAimDownSights)
 				.UnregisterInput(INPUT_TogglePause);
 		}
 
@@ -114,6 +121,9 @@ namespace FiringSquad.Gameplay
 
 		private void INPUT_MagnetArmHeld()
 		{
+			if (inAimDownSightsMode)
+				return;
+
 			playerRoot.magnetArm.FireHeld();
 		}
 
@@ -129,13 +139,27 @@ namespace FiringSquad.Gameplay
 
 		private void INPUT_TogglePause()
 		{
+			if (inAimDownSightsMode)
+				return;
+
 			EventManager.Local.TogglePause();
+		}
+
+		private void INPUT_EnterAimDownSights()
+		{
+			inAimDownSightsMode = true;
+			EventManager.Notify(EventManager.Local.EnterAimDownSightsMode);
+		}
+
+		private void INPUT_ExitAimDownSights()
+		{
+			inAimDownSightsMode = false;
+			EventManager.Notify(EventManager.Local.ExitAimDownSightsMode);
 		}
 
 		private void ApplyOptionsData(IOptionsData data)
 		{
 			AudioListener.volume = data.masterVolume;
-			// TODO: Apply camera FOV
 			mCameraRef.fieldOfView = data.fieldOfView;
 		}
 	}
