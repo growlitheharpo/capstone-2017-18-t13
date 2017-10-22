@@ -111,9 +111,9 @@ public partial class EventManager
 
 	public static class Server
 	{
-		public static event Action<CltPlayer, List<Ray>> OnPlayerFiredWeapon = (p, s) => { LogEvent(); };
+		public static event Action<IWeaponBearer, List<Ray>> OnPlayerFiredWeapon = (p, s) => { LogEvent(); };
 
-		public static void PlayerFiredWeapon(CltPlayer bearer, List<Ray> shotsFired)
+		public static void PlayerFiredWeapon(IWeaponBearer bearer, List<Ray> shotsFired)
 		{
 			OnPlayerFiredWeapon(bearer, shotsFired);
 		}
@@ -139,9 +139,9 @@ public partial class EventManager
 			OnPlayerHealthHitsZero(player, reason);
 		}
 
-		public static event Action<CltPlayer, CltPlayer, Transform> OnPlayerDied = (d, k, p) => { LogEvent(); };
+		public static event Action<CltPlayer, ICharacter, Transform> OnPlayerDied = (d, k, p) => { LogEvent(); };
 
-		public static void PlayerDied(CltPlayer deadPlayer, CltPlayer killer, Transform respawnPosition)
+		public static void PlayerDied(CltPlayer deadPlayer, ICharacter killer, Transform respawnPosition)
 		{
 			OnPlayerDied(deadPlayer, killer, respawnPosition);
 		}

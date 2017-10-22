@@ -66,7 +66,7 @@ namespace FiringSquad.Gameplay.Weapons
 			if (theSource == null)
 				return;
 
-			sourceWeapon = theSource.GetComponent<CltPlayer>().weapon;
+			sourceWeapon = theSource.GetComponent<IWeaponBearer>().weapon;
 			PositionAndVisualize(endPoint);
 		}
 

@@ -67,7 +67,7 @@ namespace FiringSquad.Gameplay
 
 			// create our weapon & bind
 			BaseWeaponScript wep = Instantiate(mAssets.baseWeaponPrefab).GetComponent<BaseWeaponScript>();
-			BindWeaponToPlayer(wep, true);
+			BindWeaponToBearer(wep, true);
 			AddDefaultPartsToWeapon(wep);
 			NetworkServer.SpawnWithClientAuthority(wep.gameObject, gameObject);
 
@@ -178,11 +178,17 @@ namespace FiringSquad.Gameplay
 			AnimationUtility.SetVariable(mAnimator, "VelocityY", velY);
 		}
 
+		public void PlayFireAnimation()
+		{
+			localAnimator.SetTrigger("Fire");
+			networkAnimator.SetTrigger("Fire");
+		}
+
 		#endregion
 
 		#region Weapons
 
-		public void BindWeaponToPlayer(BaseWeaponScript wep, bool bindUI = false)
+		public void BindWeaponToBearer(IModifiableWeapon wep, bool bindUI = false)
 		{
 			// find attach spot in view and set parent
 			wep.transform.SetParent(mGun1Offset);
@@ -222,9 +228,9 @@ namespace FiringSquad.Gameplay
 
 		[Server]
 		[EventHandler]
-		private void OnPlayerFiredWeapon(CltPlayer p, List<Ray> shots)
+		private void OnPlayerFiredWeapon(IWeaponBearer p, List<Ray> shots)
 		{
-			if (p != this)
+			if (ReferenceEquals(p, this))
 				RpcReflectPlayerShotWeapon(p.netId);
 		}
 
@@ -254,7 +260,7 @@ namespace FiringSquad.Gameplay
 		[ClientRpc]
 		private void RpcReflectPlayerShotWeapon(NetworkInstanceId playerId)
 		{
-			if (playerId == netId)
+			if (isCurrentPlayer)
 				return;
 
 			CltPlayer p = ClientScene.FindLocalObject(playerId).GetComponent<CltPlayer>();
@@ -320,7 +326,7 @@ namespace FiringSquad.Gameplay
 
 		[Server]
 		[EventHandler]
-		private void OnPlayerDied(CltPlayer deadPlayer, CltPlayer killer, Transform spawnPos)
+		private void OnPlayerDied(CltPlayer deadPlayer, ICharacter killer, Transform spawnPos)
 		{
 			if (deadPlayer == this)
 			{
@@ -333,7 +339,7 @@ namespace FiringSquad.Gameplay
 				weapon.ResetToDefaultParts();
 				RpcHandleDeath(transform.position, spawnPos.position, spawnPos.rotation);
 			}
-			else if (killer == this)
+			else if (ReferenceEquals(killer, this))
 				mKills++;
 		}
 

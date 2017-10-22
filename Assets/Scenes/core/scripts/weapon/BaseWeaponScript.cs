@@ -16,7 +16,7 @@ using Random = UnityEngine.Random;
 
 namespace FiringSquad.Gameplay.Weapons
 {
-	public class BaseWeaponScript : NetworkBehaviour, IWeapon
+	public class BaseWeaponScript : NetworkBehaviour, IModifiableWeapon
 	{
 		public static class DebugHelper
 		{
@@ -41,16 +41,16 @@ namespace FiringSquad.Gameplay.Weapons
 			}
 		}
 
+		[Flags]
 		public enum Attachment
 		{
-			Scope,
-			Barrel,
-			Mechanism,
-			Grip
+			Scope = 0x1,
+			Barrel = 0x2,
+			Mechanism = 0x4,
+			Grip = 0x8,
 		}
 
 		public IWeaponBearer bearer { get; set; }
-		private CltPlayer realBearer { get { return bearer as CltPlayer; } }
 		public Transform aimRoot { get; set; }
 		public Vector3 positionOffset { get; set; }
 
@@ -171,7 +171,7 @@ namespace FiringSquad.Gameplay.Weapons
 			using (MemoryStream memstream = new MemoryStream())
 			{
 				// write our bearer
-				writer.Write(realBearer.netId);
+				writer.Write(bearer.netId);
 
 				// serialize our part ids
 				var partIds = mCurrentParts.allParts.Select(x => x.partId).ToArray();
@@ -195,11 +195,11 @@ namespace FiringSquad.Gameplay.Weapons
 
 			// read our bearer
 			NetworkInstanceId bearerId = reader.ReadNetworkId();
-			if (realBearer == null || realBearer.netId != bearerId)
+			if (bearer == null || bearer.netId != bearerId)
 			{
 				GameObject bearerObj = ClientScene.FindLocalObject(bearerId);
 				if (bearerObj != null)
-					bearerObj.GetComponent<CltPlayer>().BindWeaponToPlayer(this);
+					bearerObj.GetComponent<IWeaponBearer>().BindWeaponToBearer(this);
 			}
 
 			// read our weapon parts and durabilities
@@ -261,11 +261,9 @@ namespace FiringSquad.Gameplay.Weapons
 			}
 
 			EventManager.Notify(() => EventManager.Local.LocalPlayerAttachedPart(this, instance));
-			if (realBearer != null && realBearer.audioProfile != null)
-			{
-				ServiceLocator.Get<IAudioManager>()
-					.PlaySound(AudioManager.AudioEvent.InteractReceive, realBearer.audioProfile, transform);
-			}
+
+			if (bearer != null)
+				ServiceLocator.Get<IAudioManager>().PlaySound(AudioManager.AudioEvent.InteractReceive, bearer.audioProfile, transform);
 		}
 
 		private void MoveAttachmentToPoint(WeaponPartScript instance)
@@ -379,8 +377,6 @@ namespace FiringSquad.Gameplay.Weapons
 			foreach (Ray shot in shots)
 				CmdInstantiateShot(shot.origin, shot.direction);
 
-			realBearer.localAnimator.SetTrigger("Fire");
-			realBearer.networkAnimator.SetTrigger("Fire");
 			CmdOnShotFireComplete();
 			PlayFireEffect();
 			OnPostFireShot();
@@ -401,7 +397,7 @@ namespace FiringSquad.Gameplay.Weapons
 		[Command]
 		private void CmdOnShotFireComplete()
 		{
-			EventManager.Server.PlayerFiredWeapon(realBearer, null);
+			EventManager.Server.PlayerFiredWeapon(bearer, null);
 		}
 
 		private bool CanFireShotNow()
@@ -508,6 +504,9 @@ namespace FiringSquad.Gameplay.Weapons
 		[Client]
 		public void OnEnterAimDownSightsMode()
 		{
+			if (!bearer.isCurrentPlayer)
+				return;
+
 			//AnimationUtility.SetVariable(mAnimator, "AimDownSights", true);
 			//StartCoroutine(Coroutines.LerpPosition(mView, new Vector3(-0.33f, 0.0f, 0.0f), 0.2f, Space.Self, Coroutines.MATHF_SMOOTHSTEP));
 			mAimDownSightsActive = true;
@@ -518,6 +517,9 @@ namespace FiringSquad.Gameplay.Weapons
 		[Client]
 		public void OnExitAimDownSightsMode()
 		{
+			if (!bearer.isCurrentPlayer)
+				return;
+
 			//AnimationUtility.SetVariable(mAnimator, "AimDownSights", false);
 			//StartCoroutine(Coroutines.LerpPosition(mView, new Vector3(0.0f, 0.0f, 0.0f), 0.2f, Space.Self, Coroutines.MATHF_SMOOTHSTEP));
 			mAimDownSightsActive = false;
@@ -562,6 +564,7 @@ namespace FiringSquad.Gameplay.Weapons
 
 		public void PlayFireEffect()
 		{
+			bearer.PlayFireAnimation();
 			mShotParticles.transform.position = currentParts.barrel.barrelTip.position;
 			mShotParticles.Play();
 

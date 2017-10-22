@@ -38,6 +38,11 @@ namespace FiringSquad.Gameplay.Weapons
 		Transform transform { get; }
 
 		/// <summary>
+		/// The underlying gameObject property for the weapon.
+		/// </summary>
+		GameObject gameObject { get; }
+
+		/// <summary>
 		/// Get the current set of parts on this weapon
 		/// </summary>
 		WeaponPartCollection currentParts { get; }
