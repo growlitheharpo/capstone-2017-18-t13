@@ -260,8 +260,9 @@ namespace FiringSquad.Gameplay.Weapons
 			}
 
 			EventManager.Notify(() => EventManager.Local.LocalPlayerAttachedPart(this, instance));
-			ServiceLocator.Get<IAudioManager>()
-				.PlaySound(AudioManager.AudioEvent.InteractReceive, bearer.audioProfile, transform);
+
+			if (bearer != null)
+				ServiceLocator.Get<IAudioManager>().PlaySound(AudioManager.AudioEvent.InteractReceive, bearer.audioProfile, transform);
 		}
 
 		private void MoveAttachmentToPoint(WeaponPartScript instance)

@@ -260,7 +260,7 @@ namespace FiringSquad.Gameplay
 		[ClientRpc]
 		private void RpcReflectPlayerShotWeapon(NetworkInstanceId playerId)
 		{
-			if (playerId == netId)
+			if (isCurrentPlayer)
 				return;
 
 			CltPlayer p = ClientScene.FindLocalObject(playerId).GetComponent<CltPlayer>();
