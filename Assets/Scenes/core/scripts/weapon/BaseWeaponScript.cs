@@ -41,12 +41,13 @@ namespace FiringSquad.Gameplay.Weapons
 			}
 		}
 
+		[Flags]
 		public enum Attachment
 		{
-			Scope,
-			Barrel,
-			Mechanism,
-			Grip
+			Scope = 0x1,
+			Barrel = 0x2,
+			Mechanism = 0x4,
+			Grip = 0x8,
 		}
 
 		public IWeaponBearer bearer { get; set; }
@@ -503,6 +504,9 @@ namespace FiringSquad.Gameplay.Weapons
 		[Client]
 		public void OnEnterAimDownSightsMode()
 		{
+			if (!bearer.isCurrentPlayer)
+				return;
+
 			//AnimationUtility.SetVariable(mAnimator, "AimDownSights", true);
 			//StartCoroutine(Coroutines.LerpPosition(mView, new Vector3(-0.33f, 0.0f, 0.0f), 0.2f, Space.Self, Coroutines.MATHF_SMOOTHSTEP));
 			mAimDownSightsActive = true;
@@ -513,6 +517,9 @@ namespace FiringSquad.Gameplay.Weapons
 		[Client]
 		public void OnExitAimDownSightsMode()
 		{
+			if (!bearer.isCurrentPlayer)
+				return;
+
 			//AnimationUtility.SetVariable(mAnimator, "AimDownSights", false);
 			//StartCoroutine(Coroutines.LerpPosition(mView, new Vector3(0.0f, 0.0f, 0.0f), 0.2f, Space.Self, Coroutines.MATHF_SMOOTHSTEP));
 			mAimDownSightsActive = false;
