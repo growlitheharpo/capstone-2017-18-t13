@@ -53,6 +53,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4389931075675772}
   - component: {fileID: 114587789887600824}
+  - component: {fileID: 114312592832268166}
   - component: {fileID: 114096598913174742}
   m_Layer: 11
   m_Name: p_npcTurret01_minigun
@@ -352,12 +353,12 @@ MonoBehaviour:
     mGrip: {fileID: 114035792997203982, guid: bf400f714370ec646bb93b34e1e624d0, type: 2}
   mData:
     mTargetingRange: 500
-    mTargetingCone: 0.6
-    mTargetingDampening: 8
+    mTargetingCone: -0.2
+    mTargetingDampening: 4
     mVisibilityMask:
       serializedVersion: 2
       m_Bits: 4294965247
-    mDefaultHealth: 500
+    mDefaultHealth: 350
     mRespawnTime: 25
     mPartsToDrop: 2
   mWeaponAttachPoint: {fileID: 4209325649630058}
@@ -384,6 +385,27 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
+--- !u!114 &114312592832268166
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1463620131862082}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1768714887, guid: dc443db3e92b4983b9738c1131f555cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_TransformSyncMode: 1
+  m_SendInterval: 0.1
+  m_SyncRotationAxis: 7
+  m_RotationSyncCompression: 0
+  m_SyncSpin: 0
+  m_MovementTheshold: 0.001
+  m_VelocityThreshold: 0.0001
+  m_SnapThreshold: 5
+  m_InterpolateRotation: 1
+  m_InterpolateMovement: 1
 --- !u!114 &114481633106658030
 MonoBehaviour:
   m_ObjectHideFlags: 1
