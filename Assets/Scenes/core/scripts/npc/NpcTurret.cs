@@ -33,6 +33,7 @@ namespace FiringSquad.Gameplay.NPC
 
 		private NpcTurretBrain mBrain;
 		private GameObject mAliveView, mDeadView;
+		private UICircleTimer mTimer;
 		private IPlayerHitIndicator mHitIndicator;
 		private float mHealth;
 
@@ -52,10 +53,12 @@ namespace FiringSquad.Gameplay.NPC
 			AddDefaultPartsToWeapon(wep);
 			NetworkServer.Spawn(wep.gameObject);
 		}
+
 		public override void OnStartClient()
 		{
 			mAliveView = transform.Find("AliveView").gameObject;
 			mDeadView = transform.Find("DeadView").gameObject;
+			mTimer = transform.Find("UICanvas").GetComponentInChildren<UICircleTimer>();
 			mDeadView.SetActive(false);
 
 			// create a hit indicator
@@ -162,8 +165,10 @@ namespace FiringSquad.Gameplay.NPC
 		[Server]
 		private void HandleTurretDeath()
 		{
+			long endTime = DateTime.Now.Ticks + (long)(data.respawnTime * TimeSpan.TicksPerSecond);
+
 			SpawnDeathWeaponParts();
-			RpcReflectDeathLocally();
+			RpcReflectDeathLocally(endTime);
 			StartCoroutine(WaitAndRespawn());
 		}
 
@@ -176,8 +181,13 @@ namespace FiringSquad.Gameplay.NPC
 		}
 
 		[ClientRpc]
-		private void RpcReflectDeathLocally()
+		private void RpcReflectDeathLocally(long respawnTime)
 		{
+			long remainingTicks = respawnTime - DateTime.Now.Ticks;
+			float currentTime = Time.time;
+			float endTime = currentTime + (float)remainingTicks / TimeSpan.TicksPerSecond;
+			mTimer.SetTimes(currentTime, endTime);
+
 			mAliveView.SetActive(false);
 			mDeadView.SetActive(true);
 		}
