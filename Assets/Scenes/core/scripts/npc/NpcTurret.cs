@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using FiringSquad.Data;
+﻿using FiringSquad.Data;
 using FiringSquad.Gameplay.Weapons;
 using KeatsLib.Unity;
 using UnityEngine;
@@ -18,8 +17,6 @@ namespace FiringSquad.Gameplay.NPC
 		[SerializeField] private Transform mWeaponAttachPoint;
 		[SerializeField] private GameObject mBaseWeaponPrefab;
 
-		private Dictionary<int, int> x;
-
 		public IWeapon weapon { get; private set; }
 		public Transform eye { get { return transform; } }
 
@@ -29,12 +26,12 @@ namespace FiringSquad.Gameplay.NPC
 		{
 			// create our weapon & bind
 			BaseWeaponScript wep = Instantiate(mBaseWeaponPrefab).GetComponent<BaseWeaponScript>();
-			BindWeaponToPlayer(wep);
+			BindWeaponToBearer(wep);
 			AddDefaultPartsToWeapon(wep);
 			NetworkServer.Spawn(wep.gameObject);
 		}
 
-		public void BindWeaponToPlayer(BaseWeaponScript wep)
+		public void BindWeaponToBearer(IModifiableWeapon wep, bool bindUI = false)
 		{
 			// find attach spot in view and set parent
 			wep.transform.SetParent(mWeaponAttachPoint);

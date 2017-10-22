@@ -139,9 +139,9 @@ public partial class EventManager
 			OnPlayerHealthHitsZero(player, reason);
 		}
 
-		public static event Action<CltPlayer, CltPlayer, Transform> OnPlayerDied = (d, k, p) => { LogEvent(); };
+		public static event Action<CltPlayer, ICharacter, Transform> OnPlayerDied = (d, k, p) => { LogEvent(); };
 
-		public static void PlayerDied(CltPlayer deadPlayer, CltPlayer killer, Transform respawnPosition)
+		public static void PlayerDied(CltPlayer deadPlayer, ICharacter killer, Transform respawnPosition)
 		{
 			OnPlayerDied(deadPlayer, killer, respawnPosition);
 		}

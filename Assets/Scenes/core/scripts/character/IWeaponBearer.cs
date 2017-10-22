@@ -9,5 +9,6 @@ namespace FiringSquad.Gameplay
 		WeaponPartCollection defaultParts { get; }
 
 		void PlayFireAnimation();
+		void BindWeaponToBearer(IModifiableWeapon wep, bool bindUI = false);
 	}
 }

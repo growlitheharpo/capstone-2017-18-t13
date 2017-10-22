@@ -16,7 +16,7 @@ using Random = UnityEngine.Random;
 
 namespace FiringSquad.Gameplay.Weapons
 {
-	public class BaseWeaponScript : NetworkBehaviour, IWeapon
+	public class BaseWeaponScript : NetworkBehaviour, IModifiableWeapon
 	{
 		public static class DebugHelper
 		{
@@ -198,7 +198,7 @@ namespace FiringSquad.Gameplay.Weapons
 			{
 				GameObject bearerObj = ClientScene.FindLocalObject(bearerId);
 				if (bearerObj != null)
-					bearerObj.GetComponent<CltPlayer>().BindWeaponToPlayer(this);
+					bearerObj.GetComponent<IWeaponBearer>().BindWeaponToBearer(this);
 			}
 
 			// read our weapon parts and durabilities
