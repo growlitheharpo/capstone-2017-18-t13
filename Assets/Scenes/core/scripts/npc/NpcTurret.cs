@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using FiringSquad.Core;
+﻿using FiringSquad.Core;
 using FiringSquad.Core.Weapons;
 using FiringSquad.Data;
 using FiringSquad.Gameplay.UI;
@@ -28,6 +27,7 @@ namespace FiringSquad.Gameplay.NPC
 		public Transform eye { get { return transform; } }
 		public bool isCurrentPlayer { get { return false; } }
 
+		private GameObject mAliveView, mDeadView;
 		private IPlayerHitIndicator mHitIndicator;
 		private float mHealth;
 
@@ -44,6 +44,10 @@ namespace FiringSquad.Gameplay.NPC
 
 		public override void OnStartClient()
 		{
+			mAliveView = transform.Find("AliveView").gameObject;
+			mDeadView = transform.Find("DeadView").gameObject;
+			mDeadView.SetActive(false);
+
 			// create a hit indicator
 			GameObject hitObject = new GameObject("HitIndicator");
 			hitObject.transform.SetParent(transform);
@@ -105,6 +109,7 @@ namespace FiringSquad.Gameplay.NPC
 		private void HandleTurretDeath()
 		{
 			SpawnDeathWeaponParts();
+			RpcReflectDeathLocally();
 		}
 
 		[Server]
@@ -128,6 +133,22 @@ namespace FiringSquad.Gameplay.NPC
 
 				StartCoroutine(Coroutines.InvokeAfterFrames(2, () => { instance.GetComponent<WeaponPickupScript>().RpcInitializePickupView(); }));
 			}
+		}
+
+		[ClientRpc]
+		private void RpcReflectDeathLocally()
+		{
+			weapon.gameObject.SetActive(false);
+			mAliveView.SetActive(false);
+			mDeadView.SetActive(true);
+		}
+
+		[ClientRpc]
+		private void RpcReflectRespawnLocally()
+		{
+			weapon.gameObject.SetActive(true);
+			mAliveView.SetActive(true);
+			mDeadView.SetActive(false);
 		}
 	}
 }
