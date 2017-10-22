@@ -26,6 +26,7 @@ namespace FiringSquad.Gameplay
 		private new Transform transform { get { return mController.transform; } }
 
 		private CltPlayer mPlayer;
+		private CltPlayerLocal mLocalPlayer;
 		private IAudioReference mWalkingSound;
 
 		private PlayerInputMap mInputBindings;
@@ -53,6 +54,7 @@ namespace FiringSquad.Gameplay
 		private void Start()
 		{
 			mPlayer = GetComponentInParent<CltPlayer>();
+			mLocalPlayer = mPlayer.GetComponentInChildren<CltPlayerLocal>();
 			mCollider = mPlayer.GetComponent<CapsuleCollider>();
 			mController = mPlayer.GetComponent<CharacterController>();
 			mStandingHeight = mCollider.height;
@@ -201,7 +203,11 @@ namespace FiringSquad.Gameplay
 		/// </summary>
 		private void HandleRotation()
 		{
-			Vector2 rotation = mRotationAmount * mMovementData.lookSpeed * mMouseSensitivity;
+			float speed = mMovementData.lookSpeed * mMouseSensitivity;
+			if (mLocalPlayer.inAimDownSightsMode)
+				speed *= mMovementData.aimDownSightsLookMultiplier;
+
+			Vector2 rotation = mRotationAmount * speed;
 			transform.RotateAround(transform.position, transform.up, rotation.x);
 
 			mRotationY += rotation.y; // + (mRecoilAmount * Time.deltaTime);
@@ -225,14 +231,12 @@ namespace FiringSquad.Gameplay
 		private void UpdateCrouch()
 		{
 			float currentHeight = mCollider.height;
-			float newHeight = Mathf.Lerp(currentHeight, mCrouching ? mStandingHeight * mMovementData.crouchHeight : mStandingHeight,
-				Time.deltaTime * mMovementData.crouchSpeed);
+			float newHeight = Mathf.Lerp(currentHeight, mCrouching ? mStandingHeight * mMovementData.crouchHeight : mStandingHeight, Time.deltaTime * mMovementData.crouchSpeed);
 			mCollider.height = newHeight;
 			mController.height = newHeight;
 
 			float currentRadius = mCollider.radius;
-			float newRadius = Mathf.Lerp(currentRadius, mCrouching ? mStandingRadius * mMovementData.crouchHeight : mStandingRadius,
-				Time.deltaTime * mMovementData.crouchSpeed);
+			float newRadius = Mathf.Lerp(currentRadius, mCrouching ? mStandingRadius * mMovementData.crouchHeight : mStandingRadius, Time.deltaTime * mMovementData.crouchSpeed);
 			mCollider.radius = newRadius;
 			mController.radius = newRadius;
 		}
@@ -250,13 +254,16 @@ namespace FiringSquad.Gameplay
 			Vector3 desiredMove = transform.forward * mInput.y + transform.right * mInput.x;
 
 			RaycastHit hitInfo;
-			Physics.SphereCast(transform.position, mController.radius, Vector3.down, out hitInfo,
-				mController.height / 2.0f, Physics.AllLayers, QueryTriggerInteraction.Ignore);
+			Physics.SphereCast(transform.position, mController.radius, Vector3.down, out hitInfo, mController.height / 2.0f, Physics.AllLayers, QueryTriggerInteraction.Ignore);
 			desiredMove = Vector3.ProjectOnPlane(desiredMove, hitInfo.normal).normalized;
 
 			float speed = mMovementData.speed;
 			if (mIsRunning)
 				speed *= mMovementData.sprintMultiplier;
+			if (mCrouching)
+				speed *= mMovementData.crouchMoveMultiplier;
+			if (mLocalPlayer.inAimDownSightsMode)
+				speed *= mMovementData.aimDownSightsMoveMultiplier;
 
 			mMoveDirection.x = desiredMove.x * speed;
 			mMoveDirection.z = desiredMove.z * speed;
