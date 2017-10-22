@@ -498,7 +498,7 @@ namespace FiringSquad.Gameplay.Weapons
 			//StartCoroutine(Coroutines.LerpPosition(mView, new Vector3(-0.33f, 0.0f, 0.0f), 0.2f, Space.Self, Coroutines.MATHF_SMOOTHSTEP));
 			mAimDownSightsActive = true;
 			if (mCurrentParts.scope != null)
-				mCurrentParts.scope.ActivateAimDownSightsEffect();
+				mCurrentParts.scope.ActivateAimDownSightsEffect(this);
 		}
 
 		[Client]
@@ -508,7 +508,7 @@ namespace FiringSquad.Gameplay.Weapons
 			//StartCoroutine(Coroutines.LerpPosition(mView, new Vector3(0.0f, 0.0f, 0.0f), 0.2f, Space.Self, Coroutines.MATHF_SMOOTHSTEP));
 			mAimDownSightsActive = false;
 			if (mCurrentParts.scope != null)
-				mCurrentParts.scope.DeactivateAimDownSightsEffect();
+				mCurrentParts.scope.DeactivateAimDownSightsEffect(this);
 		}
 
 		#endregion
