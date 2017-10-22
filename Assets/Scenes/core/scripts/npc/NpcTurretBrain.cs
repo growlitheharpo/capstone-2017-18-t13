@@ -49,7 +49,12 @@ namespace FiringSquad.Gameplay.NPC
 
 		private void TrackTarget()
 		{
-			mTurret.transform.LookAt(mCurrentTarget.transform);
+			Vector3 dirToTarget = (mCurrentTarget.transform.position - mTurret.transform.position).normalized;
+			Quaternion goalRot = Quaternion.LookRotation(dirToTarget, Vector3.up);
+
+			mTurret.transform.rotation = Quaternion.Slerp(mTurret.transform.rotation, goalRot, Time.deltaTime * mTurret.data.targetingSpeed);
+			mTurret.weapon.FireWeaponHold();
+			//mTurret.transform.LookAt(mCurrentTarget.transform);
 		}
 
 		private void FindTarget()
@@ -79,7 +84,7 @@ namespace FiringSquad.Gameplay.NPC
 			Vector3 ourPos = mTurret.transform.position;
 			Vector3 ourForward = mTurret.eye.forward;
 			Vector3 targetDir = targetPos - ourPos;
-			Ray ray = new Ray(mTurret.weapon.currentParts.barrel.barrelTip.position, targetDir.normalized);
+			Ray ray = new Ray(ourPos, targetDir.normalized);
 
 			if (Vector3.Distance(targetPos, ourPos) >= mTurret.data.targetingRange)
 				return false;
@@ -87,8 +92,10 @@ namespace FiringSquad.Gameplay.NPC
 				return false;
 
 			RaycastHit hitInfo;
-			if (!Physics.Raycast(ray, out hitInfo))
+			if (!Physics.Raycast(ray, out hitInfo, mTurret.data.targetingRange + 1000.0f, mTurret.data.visibilityMask))
 				return true;
+
+			UnityEngine.Debug.DrawLine(ray.origin, hitInfo.point, Color.red);
 
 			IDamageReceiver damageReceiver = hitInfo.GetDamageReceiver();
 			return ReferenceEquals(damageReceiver, target);

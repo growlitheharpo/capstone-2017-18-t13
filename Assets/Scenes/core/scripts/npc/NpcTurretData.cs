@@ -14,6 +14,7 @@ namespace FiringSquad.Gameplay.NPC
 		[SerializeField] private float mTargetingDampening;
 
 		[Header("Other")]
+		[SerializeField] private LayerMask mVisibilityMask;
 		[SerializeField] private float mDefaultHealth;
 		[SerializeField] private float mRespawnTime;
 		[SerializeField] [EnumFlags] private BaseWeaponScript.Attachment mPartsToDrop;
@@ -23,6 +24,7 @@ namespace FiringSquad.Gameplay.NPC
 		public float targetingSpeed { get { return mTargetingDampening; } }
 		public float defaultHealth { get { return mDefaultHealth; } }
 		public float respawnTime { get { return mRespawnTime; } }
+		public LayerMask visibilityMask { get { return mVisibilityMask; } }
 
 		public BaseWeaponScript.Attachment partsToDrop { get { return mPartsToDrop; } }
 	}

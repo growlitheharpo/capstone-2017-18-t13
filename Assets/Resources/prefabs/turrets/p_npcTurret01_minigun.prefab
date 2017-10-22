@@ -19,7 +19,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4209325649630058}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: GunAttachPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -37,7 +37,7 @@ GameObject:
   - component: {fileID: 33774457503171372}
   - component: {fileID: 65781631035030714}
   - component: {fileID: 23354107001638134}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Model
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -54,7 +54,7 @@ GameObject:
   - component: {fileID: 4389931075675772}
   - component: {fileID: 114587789887600824}
   - component: {fileID: 114096598913174742}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: p_npcTurret01_minigun
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -69,7 +69,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4195417849057212}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: DeadView
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -87,7 +87,7 @@ GameObject:
   - component: {fileID: 33104494935642688}
   - component: {fileID: 65238196589754712}
   - component: {fileID: 23327524390770616}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Model
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -102,7 +102,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4866423614546846}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: AliveView
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -313,16 +313,19 @@ MonoBehaviour:
     mMechanism: {fileID: 114425948192369884, guid: ac89948562eb23e47810effcccae5243,
       type: 2}
     mGrip: {fileID: 114035792997203982, guid: bf400f714370ec646bb93b34e1e624d0, type: 2}
-  mWeaponAttachPoint: {fileID: 4209325649630058}
-  mBaseWeaponPrefab: {fileID: 1953974638818940, guid: 6c2f708e421ced246b9cfe1018146616,
-    type: 2}
   mData:
     mTargetingRange: 500
     mTargetingCone: 0.6
-    mTargetingSpeed: 0.8
+    mTargetingDampening: 0
+    mVisibilityMask:
+      serializedVersion: 2
+      m_Bits: 4294965247
     mDefaultHealth: 500
     mRespawnTime: 120
     mPartsToDrop: 2
+  mWeaponAttachPoint: {fileID: 4209325649630058}
+  mBaseWeaponPrefab: {fileID: 1953974638818940, guid: 6c2f708e421ced246b9cfe1018146616,
+    type: 2}
 --- !u!114 &114587789887600824
 MonoBehaviour:
   m_ObjectHideFlags: 1

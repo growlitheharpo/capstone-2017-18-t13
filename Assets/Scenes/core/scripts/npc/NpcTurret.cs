@@ -124,8 +124,6 @@ namespace FiringSquad.Gameplay.NPC
 				GameObject instance = prefab.SpawnInWorld();
 
 				instance.transform.position = weapon.transform.position + Random.insideUnitSphere;
-
-				instance.GetComponent<WeaponPickupScript>().overrideDurability = part.durability;
 				instance.GetComponent<Rigidbody>().AddExplosionForce(40.0f, transform.position, 2.0f);
 
 				NetworkServer.Spawn(instance);
