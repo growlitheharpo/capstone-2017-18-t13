@@ -18,17 +18,27 @@ namespace FiringSquad.Gameplay.UI
 		[SerializeField] private BaseFloatProvider mMouseSensitivityProvider;
 		[SerializeField] private BaseFloatProvider mVolumeProvider;
 
-		[SerializeField] private ActionProvider mQuitButton;
+		[SerializeField] private ActionProvider mFirstQuitButton;
+		[SerializeField] private ActionProvider mResumeButton;
+		[SerializeField] private ActionProvider mConfirmQuitButton;
+		[SerializeField] private ActionProvider mCancelQuitButton;
+
+		[SerializeField] private GameObject mConfirmationPanel;
 
 		private void Awake()
 		{
 			EventManager.OnInitialPersistenceLoadComplete += HandleInitialLoad;
 			EventManager.Local.OnApplyOptionsData += ReflectSettings;
 
-			mQuitButton.OnClick += HandleQuit;
+			mFirstQuitButton.OnClick += HandleFirstQuit;
+			mResumeButton.OnClick += HandleResume;
+			mConfirmQuitButton.OnClick += HandleQuit;
+			mCancelQuitButton.OnClick += HandleCancelQuit;
+
 			mFieldOfViewProvider.OnValueChange += HandleValueChange;
 
 			EventManager.LocalGUI.OnTogglePauseMenu += HandleToggle;
+			mConfirmationPanel.SetActive(false);
 			gameObject.SetActive(false);
 		}
 
@@ -39,7 +49,10 @@ namespace FiringSquad.Gameplay.UI
 
 		private void OnDestroy()
 		{
-			mQuitButton.OnClick -= HandleQuit;
+			mFirstQuitButton.OnClick -= HandleFirstQuit;
+			mResumeButton.OnClick -= HandleResume;
+			mConfirmQuitButton.OnClick -= HandleQuit;
+			mCancelQuitButton.OnClick -= HandleCancelQuit;
 			mFieldOfViewProvider.OnValueChange -= HandleValueChange;
 
 			EventManager.OnInitialPersistenceLoadComplete -= HandleInitialLoad;
@@ -49,6 +62,7 @@ namespace FiringSquad.Gameplay.UI
 
 		private void HandleToggle(bool show)
 		{
+			mConfirmationPanel.SetActive(false);
 			gameObject.SetActive(show);
 
 			if (!show)
@@ -103,6 +117,21 @@ namespace FiringSquad.Gameplay.UI
 
 			ServiceLocator.Get<IGamestateManager>()
 				.RequestSceneChange(GamestateManager.MENU_SCENE);
+		}
+
+		private void HandleResume()
+		{
+			EventManager.Notify(EventManager.Local.TogglePause);
+		}
+
+		private void HandleFirstQuit()
+		{
+			mConfirmationPanel.SetActive(true);
+		}
+
+		private void HandleCancelQuit()
+		{
+			mConfirmationPanel.SetActive(false);
 		}
 	}
 }
