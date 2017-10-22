@@ -94,7 +94,7 @@ namespace FiringSquad.Gameplay.Weapons
 		private BoundProperty<int> mShotsInClip, mTotalClipSize;
 		private int mShotsSinceRelease;
 		private List<float> mRecentShotTimes;
-		private ParticleSystem mShotParticles;
+		private ParticleSystem mShotParticles, mPartBreakPrefab;
 		private Animator mAnimator;
 		private bool mAimDownSightsActive;
 
@@ -119,6 +119,8 @@ namespace FiringSquad.Gameplay.Weapons
 			mTotalClipSize = new BoundProperty<int>();
 			mShotParticles = transform.Find("shot_particles").GetComponent<ParticleSystem>();
 			mAnimator = GetComponent<Animator>();
+
+			mPartBreakPrefab = Resources.Load<GameObject>("prefabs/weapons/effects/p_vfxPartBreak").GetComponent<ParticleSystem>();
 		}
 
 		public override void OnStartClient()
@@ -481,10 +483,22 @@ namespace FiringSquad.Gameplay.Weapons
 		[Server]
 		private void BreakPart(WeaponPartScript part)
 		{
+			RpcCreateBreakPartEffect();
 			AttachNewPart(bearer.defaultParts[part.attachPoint].partId, WeaponPartScript.INFINITE_DURABILITY);
 
 			// TODO: Send "break" event here (which will then spawn particles)
 			// TODO: spawn "break" particle system here
+		}
+
+		[ClientRpc]
+		private void RpcCreateBreakPartEffect()
+		{
+			ParticleSystem instance = Instantiate(mPartBreakPrefab.gameObject).GetComponent<ParticleSystem>();
+			instance.transform.SetParent(transform);
+			instance.transform.ResetLocalValues();
+			instance.Play();
+
+			StartCoroutine(Coroutines.WaitAndDestroyParticleSystem(instance));
 		}
 
 		#endregion
