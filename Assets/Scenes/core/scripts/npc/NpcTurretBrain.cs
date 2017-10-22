@@ -49,7 +49,7 @@ namespace FiringSquad.Gameplay.NPC
 
 		private void TrackTarget()
 		{
-			Vector3 dirToTarget = (mCurrentTarget.transform.position - mTurret.transform.position).normalized;
+			Vector3 dirToTarget = (mCurrentTarget.transform.position + Vector3.up - mTurret.transform.position).normalized;
 			Quaternion goalRot = Quaternion.LookRotation(dirToTarget, Vector3.up);
 
 			mTurret.transform.rotation = Quaternion.Slerp(mTurret.transform.rotation, goalRot, Time.deltaTime * mTurret.data.targetingSpeed);
@@ -86,9 +86,12 @@ namespace FiringSquad.Gameplay.NPC
 			Vector3 targetDir = targetPos - ourPos;
 			Ray ray = new Ray(ourPos, targetDir.normalized);
 
-			if (Vector3.Distance(targetPos, ourPos) >= mTurret.data.targetingRange)
+			float distance = Vector3.Distance(targetPos, ourPos);
+			float dot = Vector3.Dot(ray.direction, ourForward);
+
+			if (distance >= mTurret.data.targetingRange)
 				return false;
-			if (Vector3.Dot(ray.direction, ourForward) < mTurret.data.targetingCone)
+			if (dot < mTurret.data.targetingCone)
 				return false;
 
 			RaycastHit hitInfo;
