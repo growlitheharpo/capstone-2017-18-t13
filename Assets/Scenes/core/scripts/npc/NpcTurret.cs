@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections;
+using System.Linq;
 using FiringSquad.Core;
 using FiringSquad.Core.Weapons;
 using FiringSquad.Data;
@@ -7,6 +9,7 @@ using FiringSquad.Gameplay.Weapons;
 using KeatsLib.Unity;
 using UnityEngine;
 using UnityEngine.Networking;
+using Random = UnityEngine.Random;
 
 namespace FiringSquad.Gameplay.NPC
 {
@@ -123,7 +126,7 @@ namespace FiringSquad.Gameplay.NPC
 				WeaponPartScript prefab = partService.GetPrefabScript(part.partId);
 				GameObject instance = prefab.SpawnInWorld();
 
-				instance.transform.position = weapon.transform.position + Random.insideUnitSphere;
+				instance.transform.position = weapon.transform.position + Vector3.up * 1.5f + Random.insideUnitSphere;
 				instance.GetComponent<Rigidbody>().AddExplosionForce(40.0f, transform.position, 2.0f);
 
 				NetworkServer.Spawn(instance);
@@ -161,12 +164,20 @@ namespace FiringSquad.Gameplay.NPC
 		{
 			SpawnDeathWeaponParts();
 			RpcReflectDeathLocally();
+			StartCoroutine(WaitAndRespawn());
+		}
+
+		[Server]
+		private IEnumerator WaitAndRespawn()
+		{
+			yield return new WaitForSeconds(data.respawnTime);
+			mHealth = data.defaultHealth;
+			RpcReflectRespawnLocally();
 		}
 
 		[ClientRpc]
 		private void RpcReflectDeathLocally()
 		{
-			weapon.gameObject.SetActive(false);
 			mAliveView.SetActive(false);
 			mDeadView.SetActive(true);
 		}
@@ -174,7 +185,6 @@ namespace FiringSquad.Gameplay.NPC
 		[ClientRpc]
 		private void RpcReflectRespawnLocally()
 		{
-			weapon.gameObject.SetActive(true);
 			mAliveView.SetActive(true);
 			mDeadView.SetActive(false);
 		}
