@@ -18,17 +18,18 @@ namespace FiringSquad.Gameplay.NPC
 		[SerializeField] private WeaponPartCollection mParts;
 		public WeaponPartCollection defaultParts { get { return mParts; } }
 
+		[SerializeField] private NpcTurretData mData;
+		public NpcTurretData data { get { return mData; } }
+
 		[SerializeField] private Transform mWeaponAttachPoint;
 		[SerializeField] private GameObject mBaseWeaponPrefab;
-
-		[SerializeField] private NpcTurretData mData;
 
 		public IWeapon weapon { get; private set; }
 		public Transform eye { get { return transform; } }
 		public bool isCurrentPlayer { get { return false; } }
 
+		private NpcTurretBrain mBrain;
 		private GameObject mAliveView, mDeadView;
-		private ICharacter[] mPotentialTargets;
 		private IPlayerHitIndicator mHitIndicator;
 		private float mHealth;
 
@@ -36,6 +37,7 @@ namespace FiringSquad.Gameplay.NPC
 
 		public override void OnStartServer()
 		{
+			mBrain = new NpcTurretBrain(this);
 			mHealth = mData.defaultHealth;
 
 			EventManager.Server.OnPlayerJoined += HandlePlayerCountChanged;
@@ -71,7 +73,7 @@ namespace FiringSquad.Gameplay.NPC
 			if (mHealth <= 0.0f)
 				return;
 
-			weapon.FireWeaponHold();
+			mBrain.Think();
 		}
 
 		#endregion
@@ -80,7 +82,7 @@ namespace FiringSquad.Gameplay.NPC
 		[EventHandler]
 		private void HandlePlayerCountChanged(int playerCount)
 		{
-			mPotentialTargets = FindObjectsOfType<CltPlayer>().Select(x => x as ICharacter).ToArray();
+			mBrain.UpdateTargetList(FindObjectsOfType<CltPlayer>().Select(x => x as ICharacter).ToArray());
 		}
 
 		#region Weapons

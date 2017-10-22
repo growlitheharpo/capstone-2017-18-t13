@@ -11,6 +11,7 @@ namespace FiringSquad.Gameplay
 	{
 		NetworkInstanceId netId { get; }
 		GameObject gameObject { get; }
+		Transform transform { get; }
 		Transform eye { get; }
 
 		AudioProfile audioProfile { get; }
