@@ -50,7 +50,6 @@ namespace FiringSquad.Gameplay.Weapons
 		}
 
 		public IWeaponBearer bearer { get; set; }
-		private CltPlayer realBearer { get { return bearer as CltPlayer; } }
 		public Transform aimRoot { get; set; }
 		public Vector3 positionOffset { get; set; }
 
@@ -171,7 +170,7 @@ namespace FiringSquad.Gameplay.Weapons
 			using (MemoryStream memstream = new MemoryStream())
 			{
 				// write our bearer
-				writer.Write(realBearer.netId);
+				writer.Write(bearer.netId);
 
 				// serialize our part ids
 				var partIds = mCurrentParts.allParts.Select(x => x.partId).ToArray();
@@ -195,7 +194,7 @@ namespace FiringSquad.Gameplay.Weapons
 
 			// read our bearer
 			NetworkInstanceId bearerId = reader.ReadNetworkId();
-			if (realBearer == null || realBearer.netId != bearerId)
+			if (bearer == null || bearer.netId != bearerId)
 			{
 				GameObject bearerObj = ClientScene.FindLocalObject(bearerId);
 				if (bearerObj != null)
@@ -261,11 +260,8 @@ namespace FiringSquad.Gameplay.Weapons
 			}
 
 			EventManager.Notify(() => EventManager.Local.LocalPlayerAttachedPart(this, instance));
-			if (realBearer != null && realBearer.audioProfile != null)
-			{
-				ServiceLocator.Get<IAudioManager>()
-					.PlaySound(AudioManager.AudioEvent.InteractReceive, realBearer.audioProfile, transform);
-			}
+			ServiceLocator.Get<IAudioManager>()
+				.PlaySound(AudioManager.AudioEvent.InteractReceive, bearer.audioProfile, transform);
 		}
 
 		private void MoveAttachmentToPoint(WeaponPartScript instance)
@@ -399,7 +395,7 @@ namespace FiringSquad.Gameplay.Weapons
 		[Command]
 		private void CmdOnShotFireComplete()
 		{
-			EventManager.Server.PlayerFiredWeapon(realBearer, null);
+			EventManager.Server.PlayerFiredWeapon(bearer, null);
 		}
 
 		private bool CanFireShotNow()

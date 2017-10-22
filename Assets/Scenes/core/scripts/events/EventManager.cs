@@ -111,9 +111,9 @@ public partial class EventManager
 
 	public static class Server
 	{
-		public static event Action<CltPlayer, List<Ray>> OnPlayerFiredWeapon = (p, s) => { LogEvent(); };
+		public static event Action<IWeaponBearer, List<Ray>> OnPlayerFiredWeapon = (p, s) => { LogEvent(); };
 
-		public static void PlayerFiredWeapon(CltPlayer bearer, List<Ray> shotsFired)
+		public static void PlayerFiredWeapon(IWeaponBearer bearer, List<Ray> shotsFired)
 		{
 			OnPlayerFiredWeapon(bearer, shotsFired);
 		}

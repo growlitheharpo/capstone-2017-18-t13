@@ -228,9 +228,9 @@ namespace FiringSquad.Gameplay
 
 		[Server]
 		[EventHandler]
-		private void OnPlayerFiredWeapon(CltPlayer p, List<Ray> shots)
+		private void OnPlayerFiredWeapon(IWeaponBearer p, List<Ray> shots)
 		{
-			if (p != this)
+			if (ReferenceEquals(p, this))
 				RpcReflectPlayerShotWeapon(p.netId);
 		}
 
