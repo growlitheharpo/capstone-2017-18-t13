@@ -1,4 +1,5 @@
-﻿using FiringSquad.Core;
+﻿using System.Linq;
+using FiringSquad.Core;
 using FiringSquad.Core.Weapons;
 using FiringSquad.Data;
 using FiringSquad.Gameplay.UI;
@@ -17,23 +18,28 @@ namespace FiringSquad.Gameplay.NPC
 		[SerializeField] private WeaponPartCollection mParts;
 		public WeaponPartCollection defaultParts { get { return mParts; } }
 
-		[SerializeField] [EnumFlags] private BaseWeaponScript.Attachment mPartsToDrop;
-		[SerializeField] private float mDefaultHealth;
-		[SerializeField] private float mRespawnTime;
 		[SerializeField] private Transform mWeaponAttachPoint;
 		[SerializeField] private GameObject mBaseWeaponPrefab;
+
+		[SerializeField] private NpcTurretData mData;
 
 		public IWeapon weapon { get; private set; }
 		public Transform eye { get { return transform; } }
 		public bool isCurrentPlayer { get { return false; } }
 
 		private GameObject mAliveView, mDeadView;
+		private ICharacter[] mPotentialTargets;
 		private IPlayerHitIndicator mHitIndicator;
 		private float mHealth;
 
+		#region Unity Callbacks
+
 		public override void OnStartServer()
 		{
-			mHealth = mDefaultHealth;
+			mHealth = mData.defaultHealth;
+
+			EventManager.Server.OnPlayerJoined += HandlePlayerCountChanged;
+			EventManager.Server.OnPlayerLeft += HandlePlayerCountChanged;
 
 			// create our weapon & bind
 			BaseWeaponScript wep = Instantiate(mBaseWeaponPrefab).GetComponent<BaseWeaponScript>();
@@ -41,7 +47,6 @@ namespace FiringSquad.Gameplay.NPC
 			AddDefaultPartsToWeapon(wep);
 			NetworkServer.Spawn(wep.gameObject);
 		}
-
 		public override void OnStartClient()
 		{
 			mAliveView = transform.Find("AliveView").gameObject;
@@ -54,15 +59,10 @@ namespace FiringSquad.Gameplay.NPC
 			mHitIndicator = hitObject.AddComponent<RemotePlayerHitIndicator>();
 		}
 
-		public void BindWeaponToBearer(IModifiableWeapon wep, bool bindUI = false)
+		private void OnDestroy()
 		{
-			// find attach spot in view and set parent
-			wep.transform.SetParent(mWeaponAttachPoint);
-			wep.transform.ResetLocalValues();
-			wep.positionOffset = transform.InverseTransformPoint(mWeaponAttachPoint.position);
-			wep.transform.SetParent(transform);
-			wep.bearer = this;
-			weapon = wep;
+			EventManager.Server.OnPlayerJoined -= HandlePlayerCountChanged;
+			EventManager.Server.OnPlayerLeft -= HandlePlayerCountChanged;
 		}
 
 		[ServerCallback]
@@ -74,6 +74,28 @@ namespace FiringSquad.Gameplay.NPC
 			weapon.FireWeaponHold();
 		}
 
+		#endregion
+
+		[Server]
+		[EventHandler]
+		private void HandlePlayerCountChanged(int playerCount)
+		{
+			mPotentialTargets = FindObjectsOfType<CltPlayer>().Select(x => x as ICharacter).ToArray();
+		}
+
+		#region Weapons
+
+		public void BindWeaponToBearer(IModifiableWeapon wep, bool bindUI = false)
+		{
+			// find attach spot in view and set parent
+			wep.transform.SetParent(mWeaponAttachPoint);
+			wep.transform.ResetLocalValues();
+			wep.positionOffset = transform.InverseTransformPoint(mWeaponAttachPoint.position);
+			wep.transform.SetParent(transform);
+			wep.bearer = this;
+			weapon = wep;
+		}
+
 		[Server]
 		private void AddDefaultPartsToWeapon(IWeapon wep)
 		{
@@ -81,10 +103,38 @@ namespace FiringSquad.Gameplay.NPC
 				wep.AttachNewPart(part.partId, WeaponPartScript.INFINITE_DURABILITY);
 		}
 
+		[Server]
 		public void PlayFireAnimation()
 		{
 			// ignore for now
 		}
+
+		[Server]
+		private void SpawnDeathWeaponParts()
+		{
+			IWeaponPartManager partService = ServiceLocator.Get<IWeaponPartManager>();
+			foreach (WeaponPartScript part in weapon.currentParts)
+			{
+				if ((mData.partsToDrop & part.attachPoint) != part.attachPoint)
+					continue;
+
+				WeaponPartScript prefab = partService.GetPrefabScript(part.partId);
+				GameObject instance = prefab.SpawnInWorld();
+
+				instance.transform.position = weapon.transform.position + Random.insideUnitSphere;
+
+				instance.GetComponent<WeaponPickupScript>().overrideDurability = part.durability;
+				instance.GetComponent<Rigidbody>().AddExplosionForce(40.0f, transform.position, 2.0f);
+
+				NetworkServer.Spawn(instance);
+
+				StartCoroutine(Coroutines.InvokeAfterFrames(2, () => { instance.GetComponent<WeaponPickupScript>().RpcInitializePickupView(); }));
+			}
+		}
+
+		#endregion
+
+		#region Health and Damage
 
 		[Server]
 		public void ApplyDamage(float amount, Vector3 point, Vector3 normal, IDamageSource cause)
@@ -106,33 +156,11 @@ namespace FiringSquad.Gameplay.NPC
 			mHitIndicator.NotifyHit(this, origin, point, normal, amount);
 		}
 
+		[Server]
 		private void HandleTurretDeath()
 		{
 			SpawnDeathWeaponParts();
 			RpcReflectDeathLocally();
-		}
-
-		[Server]
-		private void SpawnDeathWeaponParts()
-		{
-			IWeaponPartManager partService = ServiceLocator.Get<IWeaponPartManager>();
-			foreach (WeaponPartScript part in weapon.currentParts)
-			{
-				if ((mPartsToDrop & part.attachPoint) != part.attachPoint)
-					continue;
-
-				WeaponPartScript prefab = partService.GetPrefabScript(part.partId);
-				GameObject instance = prefab.SpawnInWorld();
-
-				instance.transform.position = weapon.transform.position + Random.insideUnitSphere;
-
-				instance.GetComponent<WeaponPickupScript>().overrideDurability = part.durability;
-				instance.GetComponent<Rigidbody>().AddExplosionForce(40.0f, transform.position, 2.0f);
-
-				NetworkServer.Spawn(instance);
-
-				StartCoroutine(Coroutines.InvokeAfterFrames(2, () => { instance.GetComponent<WeaponPickupScript>().RpcInitializePickupView(); }));
-			}
 		}
 
 		[ClientRpc]
@@ -150,5 +178,7 @@ namespace FiringSquad.Gameplay.NPC
 			mAliveView.SetActive(true);
 			mDeadView.SetActive(false);
 		}
+
+		#endregion
 	}
 }

@@ -313,12 +313,16 @@ MonoBehaviour:
     mMechanism: {fileID: 114425948192369884, guid: ac89948562eb23e47810effcccae5243,
       type: 2}
     mGrip: {fileID: 114035792997203982, guid: bf400f714370ec646bb93b34e1e624d0, type: 2}
-  mPartsToDrop: 2
-  mDefaultHealth: 500
-  mRespawnTime: 30
   mWeaponAttachPoint: {fileID: 4209325649630058}
   mBaseWeaponPrefab: {fileID: 1953974638818940, guid: 6c2f708e421ced246b9cfe1018146616,
     type: 2}
+  mData:
+    mTargetingRange: 500
+    mTargetingCone: 0.6
+    mTargetingSpeed: 0.8
+    mDefaultHealth: 500
+    mRespawnTime: 120
+    mPartsToDrop: 2
 --- !u!114 &114587789887600824
 MonoBehaviour:
   m_ObjectHideFlags: 1
