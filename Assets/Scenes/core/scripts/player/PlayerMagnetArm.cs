@@ -4,6 +4,7 @@ using FiringSquad.Data;
 using FiringSquad.Gameplay.Weapons;
 using UnityEngine;
 using UnityEngine.Networking;
+using Logger = FiringSquad.Debug.Logger;
 
 namespace FiringSquad.Gameplay
 {
@@ -63,15 +64,15 @@ namespace FiringSquad.Gameplay
 			if (bearer == null)
 				return;
 
-			if (bearer.isCurrentPlayer) // WE have authority if our bearer is the local player. No deserializing.
-				return;
-
 			// read if we have a held object
 			if (reader.ReadBoolean())
 			{
 				GameObject heldObject = ClientScene.FindLocalObject(reader.ReadNetworkId());
 				if (heldObject == null)
+				{
+					Logger.Warn("OnDeserialize: Magnet arm server is holding an object that does not exist on client!", Logger.System.Network);
 					return;
+				}
 
 				mHeldObject = heldObject.GetComponent<WeaponPickupScript>();
 				if (mHeldObject.currentHolder != bearer)
@@ -131,6 +132,7 @@ namespace FiringSquad.Gameplay
 			}
 		}
 
+		[Client]
 		private void UpdateSound(bool shouldPlay)
 		{
 			if (shouldPlay && mGrabSound == null)
@@ -145,6 +147,7 @@ namespace FiringSquad.Gameplay
 			}
 		}
 
+		[Client]
 		private void TryFindGrabCandidate()
 		{
 			RaycastHit hitInfo;
@@ -162,6 +165,7 @@ namespace FiringSquad.Gameplay
 				mGrabCandidate = grabbable;
 		}
 
+		[Client]
 		private void ReelGrabCandidate()
 		{
 			if (mGrabCandidate == null)
@@ -173,7 +177,7 @@ namespace FiringSquad.Gameplay
 
 			if (direction.magnitude < 2.5f)
 			{
-				GrabItem();
+				CmdGrabItem(mGrabCandidate.netId);
 				return;
 			}
 
@@ -188,19 +192,8 @@ namespace FiringSquad.Gameplay
 			mGrabCandidate.PullTowards(bearer);
 			CmdReelObject(mGrabCandidate.netId);
 		}
-
-		private void GrabItem()
-		{
-			if (mGrabCandidate.currentlyHeld)
-				return;
-
-			mGrabCandidate.GrabNow(bearer);
-			mHeldObject = mGrabCandidate;
-			mGrabCandidate = null;
-
-			CmdGrabItem(mHeldObject.netId);
-		}
-
+		
+		[Client]
 		private void ThrowOrDropItem()
 		{
 			if (mHeldObject != null && mHeldObject.currentHolder == bearer)
@@ -219,12 +212,13 @@ namespace FiringSquad.Gameplay
 			mState = State.Idle;
 		}
 
-		[Client]
+		[Server]
 		public void ForceDropItem()
 		{
-			// TODO: This should be done server-side.
-			mHeldTimer = 0.0f;
-			ThrowOrDropItem();
+			if (mHeldObject == null)
+				return;
+
+			CmdReleaseItem(mHeldObject.netId, true);
 		}
 
 		[Command]
@@ -238,10 +232,14 @@ namespace FiringSquad.Gameplay
 		private void CmdGrabItem(NetworkInstanceId id)
 		{
 			GameObject go = NetworkServer.FindLocalObject(id);
-			WeaponPickupScript script = go.GetComponent<WeaponPickupScript>();
+			mGrabCandidate = go.GetComponent<WeaponPickupScript>();
 
-			script.GrabNow(bearer);
-			mHeldObject = script;
+			if (mGrabCandidate.currentlyHeld)
+				return;
+
+			mGrabCandidate.GrabNow(bearer);
+			mHeldObject = mGrabCandidate;
+			mGrabCandidate = null;
 		}
 
 		[Command]
