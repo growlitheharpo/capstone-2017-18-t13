@@ -104,7 +104,7 @@ namespace FiringSquad.Gameplay.UI
 		public void ApplySettings()
 		{
 			mData.fieldOfView = mFieldOfViewProvider.GetValue();
-			mData.masterVolume = mVolumeProvider.GetValue() / 100.0f;
+			mData.masterVolume = mVolumeProvider.GetValue();
 			mData.mouseSensitivity = mMouseSensitivityProvider.GetValue();
 
 			EventManager.Notify(() => EventManager.Local.ApplyOptionsData(mData));
