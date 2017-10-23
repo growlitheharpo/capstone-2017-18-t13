@@ -219,6 +219,14 @@ namespace FiringSquad.Gameplay
 				return;
 
 			CmdReleaseItem(mHeldObject.netId, true);
+			RpcForceReleaseItem();
+		}
+
+		[ClientRpc]
+		private void RpcForceReleaseItem()
+		{
+			mState = State.Idle;
+			ThrowOrDropItem();
 		}
 
 		[Command]
