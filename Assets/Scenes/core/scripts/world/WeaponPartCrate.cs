@@ -36,6 +36,17 @@ namespace FiringSquad.Gameplay
 			mView = transform.Find("EnabledView").gameObject;
 		}
 
+		public override void OnStartClient()
+		{
+			base.OnStartClient();
+
+			if (!mVisible)
+			{
+				mCollider.enabled = false;
+				mView.SetActive(false);
+			}
+		}
+
 		[Server]
 		public void ApplyDamage(float amount, Vector3 point, Vector3 normal, IDamageSource cause)
 		{
