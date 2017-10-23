@@ -179,8 +179,8 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1463620131862082}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -3}
+  m_LocalRotation: {x: -0, y: 0.7071064, z: -0, w: 0.7071072}
+  m_LocalPosition: {x: -32, y: 12, z: 6}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4866423614546846}
@@ -189,7 +189,7 @@ Transform:
   - {fileID: 224400585922502236}
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 90.00001, z: 0}
 --- !u!4 &4710724151105424
 Transform:
   m_ObjectHideFlags: 1
@@ -359,7 +359,7 @@ MonoBehaviour:
       serializedVersion: 2
       m_Bits: 4294965247
     mDefaultHealth: 350
-    mRespawnTime: 25
+    mRespawnTime: 50
     mPartsToDrop: 2
   mWeaponAttachPoint: {fileID: 4209325649630058}
   mBaseWeaponPrefab: {fileID: 1953974638818940, guid: 6c2f708e421ced246b9cfe1018146616,
