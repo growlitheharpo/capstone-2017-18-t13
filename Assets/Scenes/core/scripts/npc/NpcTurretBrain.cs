@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using UnityEngine;
+using Logger = FiringSquad.Debug.Logger;
 
 namespace FiringSquad.Gameplay.NPC
 {
@@ -9,11 +10,14 @@ namespace FiringSquad.Gameplay.NPC
 		private NpcTurret mTurret;
 
 		private ICharacter mCurrentTarget;
+		private float mTriggerHoldTimer, mTriggerUpTimer;
 
 		public NpcTurretBrain(NpcTurret turret)
 		{
 			mPotentialTargets = new ICharacter[0];
 			mTurret = turret;
+			mTriggerHoldTimer = 0.0f;
+			mTriggerUpTimer = 0.0f;
 		}
 
 		public void UpdateTargetList(ICharacter[] targets)
@@ -21,14 +25,17 @@ namespace FiringSquad.Gameplay.NPC
 			mPotentialTargets = targets;
 
 			if (mCurrentTarget != null && !mPotentialTargets.Any(x => ReferenceEquals(x, mCurrentTarget)))
-				mCurrentTarget = null;
+				ClearTarget();
 		}
 
 		public void Think()
 		{
 			ValidateCurrentTarget();
 			if (mCurrentTarget != null)
+			{
 				TrackTarget();
+				ManageTrigger();
+			}
 			else
 				FindTarget();
 		}
@@ -53,8 +60,26 @@ namespace FiringSquad.Gameplay.NPC
 			Quaternion goalRot = Quaternion.LookRotation(dirToTarget, Vector3.up);
 
 			mTurret.transform.rotation = Quaternion.Slerp(mTurret.transform.rotation, goalRot, Time.deltaTime * mTurret.data.targetingSpeed);
-			mTurret.weapon.FireWeaponHold();
-			//mTurret.transform.LookAt(mCurrentTarget.transform);
+		}
+		
+		private void ManageTrigger()
+		{
+			if (mTriggerHoldTimer <= mTurret.data.weaponHoldTime)
+			{
+				mTriggerHoldTimer += Time.deltaTime;
+				mTurret.weapon.FireWeaponHold();
+			}
+			else
+			{
+				mTurret.weapon.FireWeaponUp();
+				mTriggerUpTimer += Time.deltaTime;
+
+				if (!(mTriggerUpTimer >= mTurret.data.weaponUpTime))
+					return;
+
+				mTriggerHoldTimer = 0.0f;
+				mTriggerUpTimer = 0.0f;
+			}
 		}
 
 		private void FindTarget()
@@ -76,6 +101,8 @@ namespace FiringSquad.Gameplay.NPC
 			}
 
 			mCurrentTarget = closesetTarget;
+			mTriggerHoldTimer = 0.0f;
+			mTriggerUpTimer = 0.0f;
 		}
 
 		private bool IsTargetValid(ICharacter target)
@@ -84,7 +111,7 @@ namespace FiringSquad.Gameplay.NPC
 			Vector3 ourPos = mTurret.transform.position;
 			Vector3 ourForward = mTurret.eye.forward;
 			Vector3 targetDir = targetPos - ourPos;
-			Ray ray = new Ray(ourPos, targetDir.normalized);
+			Ray ray = new Ray(ourPos + Vector3.up, targetDir.normalized);
 
 			float distance = Vector3.Distance(targetPos, ourPos);
 			float dot = Vector3.Dot(ray.direction, ourForward);
