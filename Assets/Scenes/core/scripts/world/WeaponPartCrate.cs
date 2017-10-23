@@ -25,6 +25,7 @@ namespace FiringSquad.Gameplay
 		[SerializeField] private GameObject mBreakVFX;
 		public float mRespawnTime;
 
+		private Vector3 mColliderExtents;
 		private Collider mCollider;
 		private GameObject mView;
 
@@ -33,6 +34,7 @@ namespace FiringSquad.Gameplay
 		private void Awake()
 		{
 			mCollider = GetComponent<Collider>();
+			mColliderExtents = mCollider.bounds.extents * 0.95f;
 			mView = transform.Find("EnabledView").gameObject;
 		}
 
@@ -82,8 +84,7 @@ namespace FiringSquad.Gameplay
 			do
 			{
 				yield return null;
-				Bounds b = mCollider.bounds;
-				var cols = Physics.OverlapBox(b.center, b.extents, transform.rotation);
+				var cols = Physics.OverlapBox(mCollider.bounds.center, mColliderExtents, transform.rotation);
 				clear = cols.Length == 0;
 			} while (!clear);
 
