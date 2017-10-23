@@ -2,6 +2,7 @@
 using FiringSquad.Core.SaveLoad;
 using FiringSquad.Core.State;
 using UnityEngine;
+using UnityEngine.Networking;
 
 namespace FiringSquad.Gameplay.UI
 {
@@ -112,6 +113,8 @@ namespace FiringSquad.Gameplay.UI
 
 		private void HandleQuit()
 		{
+			NetworkManager.singleton.StopHost();
+
 			// Call event directly so that it is handled immediately.
 			EventManager.Local.TogglePause();
 
