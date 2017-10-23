@@ -340,6 +340,9 @@ namespace FiringSquad.Gameplay
 
 				SpawnDeathWeaponParts();
 
+				if (magnetArm != null)
+					magnetArm.ForceDropItem();
+
 				mHealth = mInformation.defaultHealth;
 				weapon.ResetToDefaultParts();
 				RpcHandleDeath(transform.position, spawnPos.position, spawnPos.rotation);
@@ -363,12 +366,7 @@ namespace FiringSquad.Gameplay
 			StartCoroutine(Coroutines.WaitAndDestroyParticleSystem(particles));
 
 			if (isLocalPlayer)
-			{
-				if (magnetArm != null)
-					magnetArm.ForceDropItem();
-
 				ResetPlayerValues(spawnPos, spawnRot);
-			}
 		}
 
 		[ClientRpc]

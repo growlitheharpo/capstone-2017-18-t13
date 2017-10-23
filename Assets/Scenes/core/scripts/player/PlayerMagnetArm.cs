@@ -192,7 +192,7 @@ namespace FiringSquad.Gameplay
 			mGrabCandidate.PullTowards(bearer);
 			CmdReelObject(mGrabCandidate.netId);
 		}
-		
+
 		[Client]
 		private void ThrowOrDropItem()
 		{
@@ -253,14 +253,20 @@ namespace FiringSquad.Gameplay
 		[Command]
 		private void CmdReleaseItem(NetworkInstanceId itemId, bool drop)
 		{
-			WeaponPickupScript go = NetworkServer.FindLocalObject(itemId).GetComponent<WeaponPickupScript>();
+			mHeldObject = null;
+
+			GameObject obj = NetworkServer.FindLocalObject(itemId);
+			if (obj == null)
+				return;
+
+			WeaponPickupScript script = obj.GetComponent<WeaponPickupScript>();
+			if (script == null)
+				return;
 
 			if (drop)
-				go.Release();
+				script.Release();
 			else
-				go.Throw();
-
-			mHeldObject = null;
+				script.Throw();
 		}
 	}
 }
