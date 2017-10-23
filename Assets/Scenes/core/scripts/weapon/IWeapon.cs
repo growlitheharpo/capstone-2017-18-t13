@@ -26,12 +26,7 @@ namespace FiringSquad.Gameplay.Weapons
 		/// Reset all the parts on this weapon to the default parts of the bearer.
 		/// </summary>
 		void ResetToDefaultParts();
-
-		/// <summary>
-		/// Instantiate and fire a projectile immediately with no rule checking.
-		/// </summary>
-		/// <param name="shotDirections"></param>
-		//void FireShotImmediate(List<Ray> shotDirections);
+		
 		/// <summary>
 		/// Reset the amount of ammo in the clip and play some sort of animation.
 		/// </summary>
@@ -41,6 +36,11 @@ namespace FiringSquad.Gameplay.Weapons
 		/// The underlying transform property for the weapon.
 		/// </summary>
 		Transform transform { get; }
+
+		/// <summary>
+		/// The underlying gameObject property for the weapon.
+		/// </summary>
+		GameObject gameObject { get; }
 
 		/// <summary>
 		/// Get the current set of parts on this weapon

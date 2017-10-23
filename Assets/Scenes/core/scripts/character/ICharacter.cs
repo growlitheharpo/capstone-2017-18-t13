@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using FiringSquad.Data;
+using UnityEngine;
 using UnityEngine.Networking;
 
 namespace FiringSquad.Gameplay
@@ -10,7 +11,10 @@ namespace FiringSquad.Gameplay
 	{
 		NetworkInstanceId netId { get; }
 		GameObject gameObject { get; }
+		Transform transform { get; }
 		Transform eye { get; }
+
+		AudioProfile audioProfile { get; }
 
 		bool isCurrentPlayer { get; }
 	}

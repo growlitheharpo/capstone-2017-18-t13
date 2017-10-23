@@ -46,7 +46,7 @@ namespace FiringSquad.Gameplay.Weapons
 
 		protected AudioManager.AudioEvent GetHitAudioEvent(IDamageReceiver hitObject)
 		{
-			CltPlayer player = hitObject as CltPlayer;
+			ICharacter player = hitObject as ICharacter;
 			if (hitObject == null || player == null)
 				return AudioManager.AudioEvent.ImpactWall;
 

@@ -66,13 +66,13 @@ namespace FiringSquad.Gameplay.Weapons
 			if (theSource == null)
 				return;
 
-			sourceWeapon = theSource.GetComponent<CltPlayer>().weapon;
+			sourceWeapon = theSource.GetComponent<IWeaponBearer>().weapon;
 			PositionAndVisualize(endPoint);
 		}
 
 		private void PositionAndVisualize(Vector3 endPoint)
 		{
-			transform.position = sourceWeapon.transform.position;
+			transform.position = sourceWeapon.currentParts.barrel.barrelTip.position;
 			transform.forward = sourceWeapon.transform.forward;
 
 			mEffect.PlayEffect(endPoint);

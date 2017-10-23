@@ -34,7 +34,7 @@ namespace FiringSquad.Networking
 			{
 				foreach (CltPlayer p in players)
 				{
-					if (p == deadPlayer)
+					if (p == deadPlayer || p == null)
 						continue;
 					scores[i] += Vector3.Distance(p.transform.position, targets[i].position);
 				}
@@ -156,11 +156,8 @@ namespace FiringSquad.Networking
 
 				private void OnPlayerHealthHitsZero(CltPlayer dead, IDamageSource damage)
 				{
-					CltPlayer realSource = damage.source as CltPlayer;
-
 					Transform newPosition = ChooseSafestSpawnPosition(mMachine.mPlayerList, dead, mMachine.mStartPositions);
-
-					EventManager.Notify(() => EventManager.Server.PlayerDied(dead, realSource, newPosition));
+					EventManager.Notify(() => EventManager.Server.PlayerDied(dead, damage.source, newPosition));
 				}
 
 				public override IState GetTransition()

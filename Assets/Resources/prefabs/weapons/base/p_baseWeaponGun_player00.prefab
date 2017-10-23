@@ -185,7 +185,7 @@ GameObject:
   - component: {fileID: 114320469336684846}
   - component: {fileID: 95394249164853166}
   m_Layer: 9
-  m_Name: p_baseWeaponGun
+  m_Name: p_baseWeaponGun_player00
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -567,6 +567,7 @@ MonoBehaviour:
   mScopeAttach: {fileID: 4197488167877586}
   mMechanismAttach: {fileID: 4891504686318262}
   mGripAttach: {fileID: 4904606761592194}
+  mAimDownSightsDispersionMod: 0.75
   mDefaultData:
     mMinimumDispersion: 0.04
     mMaximumDispersion: 0.1
