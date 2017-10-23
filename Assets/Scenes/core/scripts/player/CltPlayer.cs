@@ -358,7 +358,12 @@ namespace FiringSquad.Gameplay
 			StartCoroutine(Coroutines.WaitAndDestroyParticleSystem(particles));
 
 			if (isLocalPlayer)
+			{
+				if (magnetArm != null)
+					magnetArm.ForceDropItem();
+
 				ResetPlayerValues(spawnPos, spawnRot);
+			}
 		}
 
 		[ClientRpc]

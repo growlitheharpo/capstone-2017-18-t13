@@ -219,6 +219,14 @@ namespace FiringSquad.Gameplay
 			mState = State.Idle;
 		}
 
+		[Client]
+		public void ForceDropItem()
+		{
+			// TODO: This should be done server-side.
+			mHeldTimer = 0.0f;
+			ThrowOrDropItem();
+		}
+
 		[Command]
 		private void CmdReelObject(NetworkInstanceId id)
 		{
@@ -248,8 +256,5 @@ namespace FiringSquad.Gameplay
 
 			mHeldObject = null;
 		}
-
-		[ClientRpc]
-		private void RpcReleaseItem(NetworkInstanceId itemId, bool drop) { }
 	}
 }
