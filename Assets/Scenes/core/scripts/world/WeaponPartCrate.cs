@@ -39,6 +39,9 @@ namespace FiringSquad.Gameplay
 		[Server]
 		public void ApplyDamage(float amount, Vector3 point, Vector3 normal, IDamageSource cause)
 		{
+			if (!mVisible)
+				return;
+
 			CmdSpawnPart();
 		}
 
