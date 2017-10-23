@@ -145,7 +145,12 @@ namespace FiringSquad.Gameplay
 			IInteractable interactable = null;
 
 			if (magnetArm != null)
+			{
 				interactable = magnetArm.heldWeaponPart;
+
+				if (interactable != null)
+					magnetArm.ForceDropItem();
+			}
 
 			if (interactable == null)
 			{
@@ -334,6 +339,9 @@ namespace FiringSquad.Gameplay
 					mDeaths++;
 
 				SpawnDeathWeaponParts();
+
+				if (magnetArm != null)
+					magnetArm.ForceDropItem();
 
 				mHealth = mInformation.defaultHealth;
 				weapon.ResetToDefaultParts();

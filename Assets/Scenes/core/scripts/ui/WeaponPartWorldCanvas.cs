@@ -32,15 +32,16 @@ namespace FiringSquad.Gameplay.UI
 
 		private IEnumerator GrabPlayerReference()
 		{
-			while (mPlayerRef == null)
+			while (mPlayerRef == null || mPlayerWeapon == null)
 			{
 				yield return null;
 				CltPlayer script = FindObjectsOfType<CltPlayer>().FirstOrDefault(x => x.isCurrentPlayer);
-				if (script != null)
-				{
-					mPlayerRef = script.eye.transform;
-					mPlayerWeapon = (BaseWeaponScript)script.weapon;
-				}
+
+				if (script == null)
+					continue;
+
+				mPlayerRef = script.eye.transform;
+				mPlayerWeapon = (BaseWeaponScript)script.weapon;
 			}
 		}
 
@@ -74,8 +75,11 @@ namespace FiringSquad.Gameplay.UI
 
 		private void UpdateDoesHave()
 		{
+			if (mPlayerWeapon == null || mPlayerWeapon.currentParts == null)
+				return;
+
 			WeaponPartScript current = mPlayerWeapon.currentParts[mLinkedPart.attachPoint];
-			mAlreadyHasText.gameObject.SetActive(current.partId == mLinkedPart.partId);
+			mAlreadyHasText.gameObject.SetActive(current != null && current.partId == mLinkedPart.partId);
 		}
 	}
 }

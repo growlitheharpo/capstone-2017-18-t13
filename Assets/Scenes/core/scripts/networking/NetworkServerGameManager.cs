@@ -34,7 +34,7 @@ namespace FiringSquad.Networking
 			{
 				foreach (CltPlayer p in players)
 				{
-					if (p == deadPlayer)
+					if (p == deadPlayer || p == null)
 						continue;
 					scores[i] += Vector3.Distance(p.transform.position, targets[i].position);
 				}
