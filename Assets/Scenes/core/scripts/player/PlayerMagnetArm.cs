@@ -22,6 +22,7 @@ namespace FiringSquad.Gameplay
 		public float pullForce { get { return mPullForce; } }
 
 		[SerializeField] private float mPullRadius;
+		[SerializeField] private LayerMask mGrabLayers;
 
 		private WeaponPickupScript mHeldObject;
 		public WeaponPickupScript heldWeaponPart { get { return mHeldObject; } }
@@ -96,6 +97,25 @@ namespace FiringSquad.Gameplay
 
 		#endregion
 
+
+		private void OnGUI()
+		{
+			Rect r = new Rect(Screen.width / 2.0f - 80.0f, Screen.height / 2.0f + 17.0f, 160.0f, 35.0f);
+
+			GUIStyle style = new GUIStyle(GUI.skin.label) { alignment = TextAnchor.MiddleCenter };
+			GUILayout.BeginArea(r);
+			if (mHeldObject != null)
+				GUILayout.Label("Press E to equip\nor F to drop.", style);
+			else
+			{
+				TryFindGrabCandidate();
+
+				if (mGrabCandidate != null)
+					GUILayout.Label("Press F to pull", style);
+			}
+			GUILayout.EndArea();
+		}
+
 		[Client]
 		public void FireHeld()
 		{
@@ -157,7 +177,7 @@ namespace FiringSquad.Gameplay
 
 			UnityEngine.Debug.DrawLine(r.origin, r.origin + r.direction * 1000.0f, Color.green, 0.1f, true);
 
-			var hits = Physics.SphereCastAll(r, mPullRadius);
+			var hits = Physics.SphereCastAll(r, mPullRadius, mGrabLayers);
 			if (hits.Length == 0)
 				return;
 
@@ -169,9 +189,11 @@ namespace FiringSquad.Gameplay
 				if (grabbable != null && !grabbable.currentlyHeld)
 				{
 					mGrabCandidate = grabbable;
-					break;
+					return;
 				}
 			}
+
+			mGrabCandidate = null;
 
 		}
 
