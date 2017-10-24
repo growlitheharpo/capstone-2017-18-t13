@@ -1,4 +1,5 @@
 ﻿using System;
+using FiringSquad.Core.Audio;
 using UnityEngine;
 
 namespace FiringSquad.Data
@@ -16,7 +17,7 @@ namespace FiringSquad.Data
 		[SerializeField] private bool mInstantiateParts = true;
 
 		[SerializeField] private AudioProfile mAudioProfile;
-		public AudioProfile audioProfile { get { return mAudioProfile; } }
+		public IAudioProfile audioProfile { get { return mAudioProfile; } }
 
 		public WeaponPartCollection defaultWeaponParts { get { return mDefaultWeaponParts; } }
 		public float interactDistance { get { return mInteractDistance; } }
