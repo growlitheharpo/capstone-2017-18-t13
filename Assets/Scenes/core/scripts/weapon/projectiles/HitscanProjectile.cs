@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using FiringSquad.Core.Audio;
 using FiringSquad.Data;
+using FMOD;
+using FMOD.Studio;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -37,7 +39,14 @@ namespace FiringSquad.Gameplay.Weapons
 				}
 
 				//PlaySound(GetHitAudioEvent(hitObject), endPoint);
-				FMODUnity.RuntimeManager.PlayOneShot(GetHitAudioEvent(hitObject), endPoint);
+				//FMODUnity.RuntimeManager.PlayOneShot(GetHitAudioEvent(hitObject), endPoint);
+				EventInstance e = FMODUnity.RuntimeManager.CreateInstance("event:/bullet-hit");
+				ATTRIBUTES_3D position = FMODUnity.RuntimeUtils.To3DAttributes(transform);
+				position.position = FMODUnity.RuntimeUtils.ToFMODVector(endPoint);
+				e.setParameterValue("surface", hitObject is ICharacter ? ((ICharacter)hitObject).isCurrentPlayer ? 0 : 1 : 2);
+				e.set3DAttributes(position);
+				e.start();
+				e.release();
 			}
 			else
 				endPoint = initialDirection.origin + initialDirection.direction * 5000.0f;
