@@ -4,6 +4,7 @@ using System.Reflection;
 using FiringSquad.Core;
 using FiringSquad.Debug;
 using FiringSquad.Gameplay;
+using FiringSquad.Gameplay.UI;
 using FiringSquad.Gameplay.Weapons;
 using UnityEngine;
 using Logger = FiringSquad.Debug.Logger;
@@ -102,6 +103,13 @@ public partial class EventManager
 		public static void ShowGameoverPanel(string whoWins)
 		{
 			OnShowGameoverPanel(whoWins);
+		}
+
+		public static event Action<CrosshairHintText.Hint, bool> OnSetHintState = (h, b) => { LogEvent(); };
+
+		public static void SetHintState(CrosshairHintText.Hint hint, bool state)
+		{
+			OnSetHintState(hint, state);
 		}
 	}
 
