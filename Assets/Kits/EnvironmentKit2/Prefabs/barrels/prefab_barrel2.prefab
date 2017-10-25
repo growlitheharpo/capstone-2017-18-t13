@@ -36,6 +36,7 @@ GameObject:
   - component: {fileID: 4416117174294568}
   - component: {fileID: 33882090839215244}
   - component: {fileID: 23546497610749668}
+  - component: {fileID: 136122995907760884}
   m_Layer: 0
   m_Name: mesh_barrel
   m_TagString: Untagged
@@ -110,3 +111,16 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1699016917864370}
   m_Mesh: {fileID: 4300000, guid: 6c13caea3a1f4804980c59bb641932c5, type: 3}
+--- !u!136 &136122995907760884
+CapsuleCollider:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1699016917864370}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  m_Radius: 0.30929703
+  m_Height: 0.95643777
+  m_Direction: 1
+  m_Center: {x: 0, y: 0.47821888, z: 0}
