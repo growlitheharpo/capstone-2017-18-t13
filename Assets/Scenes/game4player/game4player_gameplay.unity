@@ -3274,31 +3274,6 @@ Prefab:
       propertyPath: m_Pivot.y
       value: 0.5
       objectReference: {fileID: 0}
-    - target: {fileID: 224916387857044742, guid: cd2461e56b739624db6964a9eeb5f31d,
-        type: 2}
-      propertyPath: m_AnchorMax.x
-      value: 0.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 224916387857044742, guid: cd2461e56b739624db6964a9eeb5f31d,
-        type: 2}
-      propertyPath: m_AnchorMax.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 224270626948129966, guid: cd2461e56b739624db6964a9eeb5f31d,
-        type: 2}
-      propertyPath: m_AnchorMin.x
-      value: 0.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 224270626948129966, guid: cd2461e56b739624db6964a9eeb5f31d,
-        type: 2}
-      propertyPath: m_AnchorMax.x
-      value: 0.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 224270626948129966, guid: cd2461e56b739624db6964a9eeb5f31d,
-        type: 2}
-      propertyPath: m_AnchorMax.y
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 224994298527975192, guid: cd2461e56b739624db6964a9eeb5f31d,
         type: 2}
       propertyPath: m_AnchorMax.x
@@ -3320,6 +3295,31 @@ Prefab:
       value: 0.16666667
       objectReference: {fileID: 0}
     - target: {fileID: 224486708497425418, guid: cd2461e56b739624db6964a9eeb5f31d,
+        type: 2}
+      propertyPath: m_AnchorMax.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 224916387857044742, guid: cd2461e56b739624db6964a9eeb5f31d,
+        type: 2}
+      propertyPath: m_AnchorMax.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 224916387857044742, guid: cd2461e56b739624db6964a9eeb5f31d,
+        type: 2}
+      propertyPath: m_AnchorMax.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 224270626948129966, guid: cd2461e56b739624db6964a9eeb5f31d,
+        type: 2}
+      propertyPath: m_AnchorMin.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 224270626948129966, guid: cd2461e56b739624db6964a9eeb5f31d,
+        type: 2}
+      propertyPath: m_AnchorMax.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 224270626948129966, guid: cd2461e56b739624db6964a9eeb5f31d,
         type: 2}
       propertyPath: m_AnchorMax.y
       value: 1
@@ -3347,25 +3347,6 @@ Prefab:
     - target: {fileID: 224361217730292716, guid: cd2461e56b739624db6964a9eeb5f31d,
         type: 2}
       propertyPath: m_AnchorMax.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 114687191983553230, guid: cd2461e56b739624db6964a9eeb5f31d,
-        type: 2}
-      propertyPath: mDefaultFieldOfView
-      value: 60
-      objectReference: {fileID: 0}
-    - target: {fileID: 114030080380930506, guid: cd2461e56b739624db6964a9eeb5f31d,
-        type: 2}
-      propertyPath: m_MaxValue
-      value: 110
-      objectReference: {fileID: 0}
-    - target: {fileID: 114030080380930506, guid: cd2461e56b739624db6964a9eeb5f31d,
-        type: 2}
-      propertyPath: m_Value
-      value: 60
-      objectReference: {fileID: 0}
-    - target: {fileID: 1038374550459072, guid: cd2461e56b739624db6964a9eeb5f31d, type: 2}
-      propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -3809,7 +3790,7 @@ GameObject:
   - component: {fileID: 1656137893}
   - component: {fileID: 1656137892}
   m_Layer: 5
-  m_Name: PartDataCanvas
+  m_Name: CameraCanvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5544,17 +5525,17 @@ Prefab:
     - target: {fileID: 224939658174624686, guid: cf4e8828806124e47aac370817cbba86,
         type: 2}
       propertyPath: m_AnchorMin.y
-      value: 0.3
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 224939658174624686, guid: cf4e8828806124e47aac370817cbba86,
         type: 2}
       propertyPath: m_AnchorMax.x
-      value: 0.48
+      value: 0.4
       objectReference: {fileID: 0}
     - target: {fileID: 224939658174624686, guid: cf4e8828806124e47aac370817cbba86,
         type: 2}
       propertyPath: m_AnchorMax.y
-      value: 0.9
+      value: 0.93
       objectReference: {fileID: 0}
     - target: {fileID: 224939658174624686, guid: cf4e8828806124e47aac370817cbba86,
         type: 2}

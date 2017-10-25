@@ -56,7 +56,7 @@ namespace FiringSquad.Gameplay.Weapons
 
 		[SerializeField] private AudioProfile mAudioProfile;
 
-		private AudioProfile audioProfile
+		private IAudioProfile audioProfile
 		{
 			get
 			{
