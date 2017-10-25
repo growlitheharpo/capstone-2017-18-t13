@@ -49,7 +49,7 @@ namespace FiringSquad.Gameplay.Weapons
 				mDirectHit = hit.transform;
 			}
 
-			PlaySound(GetHitAudioEvent(component), hit.contacts[0].point);
+			//PlaySound(GetHitAudioEvent(component), hit.contacts[0].point);
 
 			ApplySplashDamage();
 			RpcActivateExplodeEffect();

@@ -36,7 +36,8 @@ namespace FiringSquad.Gameplay.Weapons
 					hitObject.ApplyDamage(damage, endPoint, hitInfo.normal, this);
 				}
 
-				PlaySound(GetHitAudioEvent(hitObject), endPoint);
+				//PlaySound(GetHitAudioEvent(hitObject), endPoint);
+				FMODUnity.RuntimeManager.PlayOneShot(GetHitAudioEvent(hitObject), endPoint);
 			}
 			else
 				endPoint = initialDirection.origin + initialDirection.direction * 5000.0f;
