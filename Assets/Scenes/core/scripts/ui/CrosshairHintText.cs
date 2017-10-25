@@ -37,7 +37,7 @@ namespace FiringSquad.Gameplay.UI
 
 		private void OnSetHintState(Hint hint, bool state)
 		{
-			if (state)
+			if (state && !mActiveHints.Contains(hint))
 				mActiveHints.Push(hint);
 			if (!state)
 				mActiveHints = new Stack<Hint>(mActiveHints.Where(x => x != hint).ToArray());

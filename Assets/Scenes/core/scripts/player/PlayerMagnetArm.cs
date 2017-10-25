@@ -2,6 +2,7 @@
 using FiringSquad.Core;
 using FiringSquad.Core.Audio;
 using FiringSquad.Data;
+using FiringSquad.Gameplay.UI;
 using FiringSquad.Gameplay.Weapons;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -93,28 +94,18 @@ namespace FiringSquad.Gameplay
 		private void Update()
 		{
 			SetDirtyBit(99999);
+
+			if (bearer == null)
+				return;
+			if (!bearer.isCurrentPlayer)
+				return;
+
+			TryFindGrabCandidate();
+			EventManager.Notify(() => EventManager.LocalGUI.SetHintState(CrosshairHintText.Hint.MagnetArmGrab, mGrabCandidate != null));
+			EventManager.Notify(() => EventManager.LocalGUI.SetHintState(CrosshairHintText.Hint.ItemEquipOrDrop, mHeldObject != null));
 		}
 
 		#endregion
-
-
-		private void OnGUI()
-		{
-			Rect r = new Rect(Screen.width / 2.0f - 80.0f, Screen.height / 2.0f + 17.0f, 160.0f, 35.0f);
-
-			GUIStyle style = new GUIStyle(GUI.skin.label) { alignment = TextAnchor.MiddleCenter };
-			GUILayout.BeginArea(r);
-			if (mHeldObject != null)
-				GUILayout.Label("Press E to equip\nor F to drop.", style);
-			else
-			{
-				TryFindGrabCandidate();
-
-				if (mGrabCandidate != null)
-					GUILayout.Label("Press F to pull", style);
-			}
-			GUILayout.EndArea();
-		}
 
 		[Client]
 		public void FireHeld()
@@ -194,7 +185,6 @@ namespace FiringSquad.Gameplay
 			}
 
 			mGrabCandidate = null;
-
 		}
 
 		[Client]
@@ -209,6 +199,8 @@ namespace FiringSquad.Gameplay
 
 			if (direction.magnitude < 2.5f)
 			{
+				EventManager.Notify(() => EventManager.LocalGUI.SetHintState(CrosshairHintText.Hint.MagnetArmGrab, false));
+				EventManager.Notify(() => EventManager.LocalGUI.SetHintState(CrosshairHintText.Hint.ItemEquipOrDrop, true));
 				CmdGrabItem(mGrabCandidate.netId);
 				return;
 			}
@@ -228,6 +220,7 @@ namespace FiringSquad.Gameplay
 		[Client]
 		private void ThrowOrDropItem()
 		{
+			EventManager.Notify(() => EventManager.LocalGUI.SetHintState(CrosshairHintText.Hint.ItemEquipOrDrop, false));
 			if (mHeldObject != null && mHeldObject.currentHolder == bearer)
 			{
 				if (mHeldTimer >= 1.0f)
