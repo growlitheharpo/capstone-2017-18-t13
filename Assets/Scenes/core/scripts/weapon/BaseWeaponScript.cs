@@ -568,8 +568,9 @@ namespace FiringSquad.Gameplay.Weapons
 			mShotParticles.transform.position = currentParts.barrel.barrelTip.position;
 			mShotParticles.Play();
 
-			ServiceLocator.Get<IAudioManager>()
-				.PlaySound(AudioManager.AudioEvent.Shoot, audioProfile, transform);
+			/*ServiceLocator.Get<IAudioManager>()
+				.PlaySound(AudioManager.AudioEvent.Shoot, audioProfile, transform);*/
+			FMODUnity.RuntimeManager.PlayOneShot("event:/fire-weapon", transform.position);
 		}
 
 		#endregion
