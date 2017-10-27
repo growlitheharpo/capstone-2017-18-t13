@@ -42,62 +42,90 @@ namespace FiringSquad.Core.Audio
 		/// <summary>
 		/// Private implementation of the IAudioReference interface.
 		/// </summary>
+		/// <inheritdoc />
 		private class AudioReference : IAudioReference
 		{
-			/// <summary>
-			/// The clip(s) played by this reference.
-			/// </summary>
-			public List<IAudioClip> mClipData;
-
-			/// <summary>
-			/// The actual GameObject audio sources created by this reference.
-			/// </summary>
-			public List<AudioSource> mSources;
+			private EventInstance mEvent;
 
 			/// <inheritdoc />
-			public void Kill()
+			public AudioReference(EventInstance e)
 			{
-				instance.StopSoundImmediate(this);
+				mEvent = e;
 			}
 
 			/// <inheritdoc />
-			public void FadeOut(float time)
+			public void Start()
 			{
-				throw new NotImplementedException("Fading audio in and out is not yet supported!");
+				mEvent.start();
 			}
 
 			/// <inheritdoc />
-			public void SetRepeat(bool repeat)
+			public void Kill(bool allowFade = true)
 			{
-				foreach (AudioSource source in mSources)
-					source.loop = repeat;
+				mEvent.stop(allowFade ? STOP_MODE.ALLOWFADEOUT : STOP_MODE.IMMEDIATE);
+				mEvent.release();
 			}
 
 			/// <inheritdoc />
 			public void SetVolume(float vol)
 			{
-				for (int i = 0; i < mClipData.Count; i++)
-					mSources[i].volume = mClipData[i].volume * vol;
+				mEvent.setVolume(vol);
 			}
 
 			/// <inheritdoc />
-			public void SetPitch(float pitch)
+			public void AttachToRigidbody(Rigidbody rb)
 			{
-				for (int i = 0; i < mClipData.Count; i++)
-					mSources[i].pitch = pitch;
+				FMODUnity.RuntimeManager.AttachInstanceToGameObject(mEvent, rb.transform, rb);
 			}
 
-			public bool isPlaying { get { return mSources.Any(x => x.loop || !(x.time >= x.clip.length - Time.deltaTime)); } }
-		}
+			/// <inheritdoc />
+			public bool isPlaying
+			{
+				get
+				{
+					PLAYBACK_STATE state;
+					mEvent.getPlaybackState(out state);
+					return state == PLAYBACK_STATE.PLAYING || state == PLAYBACK_STATE.STARTING || state == PLAYBACK_STATE.SUSTAINING;
+				}
+			}
 
-		[SerializeField] private AudioDatabase mAudioDatabase;
-		[SerializeField] private bool mShouldSelfInitialize;
-		private HashSet<IAudioReference> mCurrentSounds;
+			public bool isAlive
+			{
+				get { return mEvent.isValid() && mEvent.hasHandle() && isPlaying; }
+			}
 
-		protected override void Awake()
-		{
-			base.Awake();
-			mCurrentSounds = new HashSet<IAudioReference>();
+			/// <inheritdoc />
+			public float playerSpeed { get { return GetParameter("PlayerSpeed"); } set { SetParameter("PlayerSpeed", value); } }
+
+			/// <inheritdoc />
+			public float weaponType { get { return GetParameter("WeaponType"); } set { SetParameter("WeaponType", value); } }
+
+			/// <inheritdoc />
+			public void SetParameter(string name, float value)
+			{
+				RESULT result = mEvent.setParameterValue(name, value);
+				if (result != RESULT.OK)
+				{
+					throw new ArgumentException(
+						string.Format("Could not set parameter: {0} value {1:##.000}. Result was: {2}", name, value, result.ToString()));
+				}
+			}
+
+			/// <inheritdoc />
+			public float GetParameter(string name)
+			{
+				ParameterInstance instance;
+				RESULT result = mEvent.getParameter(name, out instance);
+				if (result != RESULT.OK)
+					throw new ArgumentException(string.Format("Could not get parameter: {0}. Result was: {1}", name, result.ToString()));
+
+				float val;
+				result = instance.getValue(out val);
+				if (result != RESULT.OK)
+					throw new ArgumentException(string.Format("Could not get parameter: {0}. Result was: {1}", name, result.ToString()));
+
+				return val;
+			}
 		}
 
 		private void Start()
