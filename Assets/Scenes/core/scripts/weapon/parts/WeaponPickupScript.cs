@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using FiringSquad.Gameplay.UI;
 using KeatsLib.Unity;
 using UnityEngine;
@@ -8,6 +9,8 @@ namespace FiringSquad.Gameplay.Weapons
 {
 	public class WeaponPickupScript : NetworkBehaviour, IInteractable, INetworkGrabbable
 	{
+		private const float PICKUP_LIFETIME = 30.0f; // in seconds
+
 		[SerializeField] private GameObject mGunView;
 		[SerializeField] private GameObject mPickupView;
 		[SerializeField] private GameObject mParticleSystem;
@@ -22,6 +25,8 @@ namespace FiringSquad.Gameplay.Weapons
 		private WeaponPartScript mPartScript;
 		private Rigidbody mRigidbody;
 
+		private Coroutine mTimeoutRoutine;
+
 		private void Awake()
 		{
 			mPartScript = GetComponent<WeaponPartScript>();
@@ -35,6 +40,9 @@ namespace FiringSquad.Gameplay.Weapons
 
 		private void OnDestroy()
 		{
+			if (mTimeoutRoutine != null)
+				StopCoroutine(mTimeoutRoutine);
+
 			DestroyPickupView();
 
 			transform.ResetLocalValues();
@@ -58,23 +66,57 @@ namespace FiringSquad.Gameplay.Weapons
 			InitializePickupView();
 		}
 
-		public void InitializePickupView()
+		private void InitializePickupView()
 		{
 			if (!mGunView.activeInHierarchy && mPickupView.activeInHierarchy)
 				return;
 
+			// flip the model views
 			mGunView.SetActive(false);
 			mPickupView.SetActive(true);
 
+			// create the vfx
 			GameObject ps = Instantiate(mParticleSystem);
-
 			ps.transform.SetParent(mPickupView.transform);
 			ps.transform.ResetLocalValues();
 
+			// Update the particle systems to the correct lifetime, then start them.
+			var psScripts = ps.GetComponentsInChildren<ParticleSystem>();
+			foreach (ParticleSystem psScript in psScripts)
+			{
+				ParticleSystem.MainModule main = psScript.main;
+				main.duration = PICKUP_LIFETIME - 2.0f;
+				psScript.Play(false);
+			}
+
+			// Spawn and setup the UI name canvas
 			GameObject cvPrefab = Resources.Load<GameObject>("prefabs/weapons/effects/p_partWorldCanvas");
 			GameObject cv = Instantiate(cvPrefab, transform);
 			mCanvas = cv.GetComponent<WeaponPartWorldCanvas>();
 			mCanvas.LinkToObject(mPartScript);
+
+			// if we're the server, destroy ourselves when the timeout is up
+			if (isServer)
+				mTimeoutRoutine = StartCoroutine(Timeout(ps));
+		}
+
+		[Server]
+		private IEnumerator Timeout(GameObject vfxPack)
+		{
+			Light vfxLight = vfxPack.GetComponentInChildren<Light>();
+			float originalIntensity = vfxLight.intensity;
+			float currentTime = PICKUP_LIFETIME;
+
+			while (currentTime >= 0.0f)
+			{
+				vfxLight.intensity = Mathf.Lerp(0.0f, originalIntensity, currentTime / 5.0f);
+				mCanvas.SetMaxAlpha(Mathf.Clamp(currentTime / 5.0f, 0.0f, 1.0f));
+
+				currentTime -= Time.deltaTime;
+				yield return null;
+			}
+
+			NetworkServer.Destroy(gameObject);
 		}
 
 		[Server]
@@ -111,7 +153,7 @@ namespace FiringSquad.Gameplay.Weapons
 		{
 			currentHolder = player;
 
-			// TODO: Lerp this
+			// TODO: Lerp this?
 
 			mPickupView.transform.localScale = Vector3.one * 0.45f;
 			mRigidbody.isKinematic = true;
