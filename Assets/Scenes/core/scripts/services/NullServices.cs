@@ -100,12 +100,24 @@ namespace FiringSquad.Core
 		{
 			private class NullAudioReference : IAudioReference
 			{
-				public void Kill() { }
-				public void FadeOut(float time) { }
-				public void SetRepeat(bool repeat) { }
-				public void SetVolume(float vol) { }
-				public void SetPitch(float pitch) { }
+				public void Start(){}
+
+				public void Kill(bool allowFade = true) {}
+
+				public void SetVolume(float vol){}
+
+				public void AttachToRigidbody(Rigidbody rb) {}
+
 				public bool isPlaying { get { return false; } }
+				public float playerSpeed { get { return default(float); } set { } }
+				public float weaponType { get { return default(float); } set { } }
+
+				public void SetParameter(string name, float value) { }
+
+				public float GetParameter(string name)
+				{
+					return default(float);
+				}
 			}
 
 			public void InitializeDatabase()
@@ -114,15 +126,15 @@ namespace FiringSquad.Core
 				EventManager.Notify(EventManager.InitialAudioLoadComplete);
 			}
 
-			public IAudioReference PlaySound(AudioManager.AudioEvent e, IAudioProfile profile, Transform location)
+			public IAudioReference CreateSound(AudioEvent e, Transform location, bool autoPlay = true)
 			{
-				Logger.Info("NULL SERVICE: IAudioManager.PlaySound()", Logger.System.Services);
+				Logger.Info("NULL SERVICE: IAudioManager.CreateSound()", Logger.System.Services);
 				return new NullAudioReference();
 			}
 
-			public IAudioReference PlaySound(AudioManager.AudioEvent e, IAudioProfile profile, Transform location, Vector3 offset)
+			public IAudioReference CreateSound(AudioEvent e, Transform location, Vector3 offset, Space offsetType = Space.Self, bool autoPlay = true)
 			{
-				Logger.Info("NULL SERVICE: IAudioManager.PlaySound()", Logger.System.Services);
+				Logger.Info("NULL SERVICE: IAudioManager.CreateSound()", Logger.System.Services);
 				return new NullAudioReference();
 			}
 
