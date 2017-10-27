@@ -36,7 +36,10 @@ namespace FiringSquad.Gameplay.Weapons
 
 		private void Start()
 		{
-			InitializePickupView();
+			if (isServer)
+				InitializePickupView();
+			else
+				StartCoroutine(Coroutines.InvokeAfterFrames(5, InitializePickupView));
 		}
 
 		private void OnDestroy()
@@ -111,14 +114,18 @@ namespace FiringSquad.Gameplay.Weapons
 
 			while (true)
 			{
+				yield return null;
+
 				float remaining = (mDeathTimeTicks - DateTime.Now.Ticks) / (float)TimeSpan.TicksPerSecond;
 				if (remaining <= 0.0f)
-					break;
+				{
+					if (isServer)
+						break;
+					continue;
+				}
 
 				vfxLight.intensity = Mathf.Lerp(0.0f, originalIntensity, remaining / 5.0f);
 				mCanvas.SetMaxAlpha(Mathf.Clamp(remaining / 5.0f, 0.0f, 1.0f));
-
-				yield return null;
 			}
 
 			if (isServer)
