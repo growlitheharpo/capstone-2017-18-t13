@@ -315,6 +315,7 @@ namespace FiringSquad.Gameplay.Weapons
 			IAudioReference effect = ServiceLocator.Get<IAudioManager>().CreateSound(AudioEvent.Reload, transform, false);
 			if (mCurrentParts.mechanism != null)
 				effect.weaponType = mCurrentParts.mechanism.audioOverrideWeaponType;
+			effect.AttachToRigidbody(bearer.gameObject.GetComponent<Rigidbody>()); // TODO: Cache this??
 			effect.Start();
 
 			AnimationUtility.PlayAnimation(mAnimator, "reload");
