@@ -188,7 +188,7 @@ namespace FiringSquad.Gameplay
 		[Client]
 		private void ReelGrabCandidate()
 		{
-			if (mGrabCandidate == null)
+			if (mGrabCandidate == null || mHeldObject != null)
 				return;
 
 			mState = State.Reeling;
