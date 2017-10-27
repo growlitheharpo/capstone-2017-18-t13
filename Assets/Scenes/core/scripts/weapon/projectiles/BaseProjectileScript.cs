@@ -1,5 +1,4 @@
-﻿using System;
-using FiringSquad.Core;
+﻿using FiringSquad.Core;
 using FiringSquad.Core.Audio;
 using FiringSquad.Data;
 using UnityEngine;
@@ -36,7 +35,6 @@ namespace FiringSquad.Gameplay.Weapons
 				.PlaySound(e, mAudioProfile, transform);
 		}
 
-		[Obsolete("This call is no longer valid.", true)]
 		protected void PlaySound(AudioManager.AudioEvent e, Vector3 position)
 		{
 			if (!isClient)
@@ -46,17 +44,13 @@ namespace FiringSquad.Gameplay.Weapons
 				.PlaySound(e, mAudioProfile, transform, position);
 		}
 
-		protected string GetHitAudioEvent(IDamageReceiver hitObject)
+		protected AudioManager.AudioEvent GetHitAudioEvent(IDamageReceiver hitObject)
 		{
 			ICharacter player = hitObject as ICharacter;
 			if (hitObject == null || player == null)
-				return "event:/bullet-hit-wall";
+				return AudioManager.AudioEvent.ImpactWall;
 
-			return player.isCurrentPlayer ? "event:/bullet-hit-current-player" : "event:/bullet-hit-other-player";
-
-			/*return AudioManager.AudioEvent.ImpactWall;
-
-		return player.isCurrentPlayer ? AudioManager.AudioEvent.ImpactCurrentPlayer : AudioManager.AudioEvent.ImpactOtherPlayer;*/
+			return player.isCurrentPlayer ? AudioManager.AudioEvent.ImpactCurrentPlayer : AudioManager.AudioEvent.ImpactOtherPlayer;
 		}
 	}
 }
