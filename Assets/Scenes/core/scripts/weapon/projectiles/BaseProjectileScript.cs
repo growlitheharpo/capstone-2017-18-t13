@@ -8,7 +8,7 @@ namespace FiringSquad.Gameplay.Weapons
 {
 	public abstract class BaseProjectileScript : NetworkBehaviour, IProjectile
 	{
-		[SerializeField] private AudioProfile mAudioProfile;
+		[SerializeField] private float mAudioWeaponType;
 
 		public ICharacter source { get { return sourceWeapon.bearer; } }
 		public IWeapon sourceWeapon { get; protected set; }
