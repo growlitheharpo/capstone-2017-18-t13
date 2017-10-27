@@ -20,12 +20,6 @@
 		string id { get; }
 
 		/// <summary>
-		/// Gets whether the list of clips this profile provides
-		/// should be played all at once, or chosen from randomly.
-		/// </summary>
-		AudioManager.ProfileType profile { get; }
-
-		/// <summary>
 		/// Get all clips associated with this AudioProfile.
 		/// </summary>
 		IAudioClip[] GetAllClips();
@@ -35,13 +29,13 @@
 		/// </summary>
 		/// <param name="e">The event to check for.</param>
 		/// <returns>The list of associated audio clips. Can be empty.</returns>
-		IAudioClip[] GetClip(AudioManager.AudioEvent e);
+		IAudioClip[] GetClip(AudioEvent e);
 
 		/// <summary>
 		/// Get a clip for a particular event for this AudioProfile or its parents.
 		/// </summary>
 		/// <param name="e">The event to check for.</param>
 		/// <returns>The list of associated audio clips. Can be empty.</returns>
-		IAudioClip[] GetClipInParents(AudioManager.AudioEvent e);
+		IAudioClip[] GetClipInParents(AudioEvent e);
 	}
 }

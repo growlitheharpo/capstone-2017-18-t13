@@ -1,7 +1,6 @@
 ﻿using System.Linq;
 using FiringSquad.Core;
 using FiringSquad.Core.Audio;
-using FiringSquad.Data;
 using FiringSquad.Gameplay.UI;
 using FiringSquad.Gameplay.Weapons;
 using UnityEngine;
@@ -28,7 +27,6 @@ namespace FiringSquad.Gameplay
 		private WeaponPickupScript mHeldObject;
 		public WeaponPickupScript heldWeaponPart { get { return mHeldObject; } }
 
-		[SerializeField] private AudioProfile mAudioProfile;
 		private IAudioReference mGrabSound;
 
 		public CltPlayer bearer { get; set; }
@@ -152,7 +150,7 @@ namespace FiringSquad.Gameplay
 			if (shouldPlay && mGrabSound == null)
 			{
 				mGrabSound = ServiceLocator.Get<IAudioManager>()
-					.PlaySound(AudioManager.AudioEvent.LoopGravGun, mAudioProfile, transform);
+					.CreateSound(AudioEvent.LoopGravGun, transform);
 			}
 			else if (!shouldPlay && mGrabSound != null)
 			{

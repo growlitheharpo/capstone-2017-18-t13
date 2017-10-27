@@ -25,32 +25,33 @@ namespace FiringSquad.Gameplay.Weapons
 			sourceWeapon = weapon;
 		}
 
-		// TODO: Add audio calls here
-		protected void PlaySound(AudioManager.AudioEvent e)
+		protected void PlaySound(AudioEvent e)
 		{
 			if (!isClient)
 				return;
 
-			ServiceLocator.Get<IAudioManager>()
-				.PlaySound(e, mAudioProfile, transform);
+			IAudioReference effect = ServiceLocator.Get<IAudioManager>().CreateSound(e, transform, false);
+			effect.weaponType = mAudioWeaponType;
+			effect.Start();
 		}
 
-		protected void PlaySound(AudioManager.AudioEvent e, Vector3 position)
+		protected void PlaySound(AudioEvent e, Vector3 position)
 		{
 			if (!isClient)
 				return;
 
-			ServiceLocator.Get<IAudioManager>()
-				.PlaySound(e, mAudioProfile, transform, position);
+			IAudioReference effect = ServiceLocator.Get<IAudioManager>().CreateSound(e, transform, position, Space.World, false);
+			effect.weaponType = mAudioWeaponType;
+			effect.Start();
 		}
 
-		protected AudioManager.AudioEvent GetHitAudioEvent(IDamageReceiver hitObject)
+		protected AudioEvent GetHitAudioEvent(IDamageReceiver hitObject)
 		{
 			ICharacter player = hitObject as ICharacter;
 			if (hitObject == null || player == null)
-				return AudioManager.AudioEvent.ImpactWall;
+				return AudioEvent.ImpactWall;
 
-			return player.isCurrentPlayer ? AudioManager.AudioEvent.ImpactCurrentPlayer : AudioManager.AudioEvent.ImpactOtherPlayer;
+			return player.isCurrentPlayer ? AudioEvent.ImpactCurrentPlayer : AudioEvent.ImpactOtherPlayer;
 		}
 	}
 }

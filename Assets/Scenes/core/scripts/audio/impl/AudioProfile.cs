@@ -17,7 +17,7 @@ namespace FiringSquad.Data
 		[Serializable]
 		public struct EventToClipList
 		{
-			public AudioManager.AudioEvent mEvent;
+			public AudioEvent mEvent;
 			public AudioClipData[] mClips;
 		}
 
@@ -26,11 +26,8 @@ namespace FiringSquad.Data
 		[SerializeField] private string mId;
 		public string id { get { return mId; } set { mId = value; } }
 
-		[SerializeField] private AudioManager.ProfileType mProfile;
-		public AudioManager.ProfileType profile { get { return mProfile; } }
-
 		[SerializeField] private List<EventToClipList> mClipsArray;
-		[SerializeField] private Dictionary<AudioManager.AudioEvent, AudioClipData[]> mClips;
+		[SerializeField] private Dictionary<AudioEvent, AudioClipData[]> mClips;
 
 		/// <summary>
 		/// Used to synchronize the two 
@@ -49,7 +46,7 @@ namespace FiringSquad.Data
 	private void SynchronizeCollections()
 #endif
 		{
-			mClips = new Dictionary<AudioManager.AudioEvent, AudioClipData[]>();
+			mClips = new Dictionary<AudioEvent, AudioClipData[]>();
 			foreach (EventToClipList st in mClipsArray)
 				mClips[st.mEvent] = st.mClips;
 		}
@@ -61,14 +58,14 @@ namespace FiringSquad.Data
 		}
 
 		/// <inheritdoc />
-		public IAudioClip[] GetClip(AudioManager.AudioEvent e)
+		public IAudioClip[] GetClip(AudioEvent e)
 		{
 			AudioClipData[] clips;
 			return mClips.TryGetValue(e, out clips) ? ChooseClip(clips) : null;
 		}
 
 		/// <inheritdoc />
-		public IAudioClip[] GetClipInParents(AudioManager.AudioEvent e)
+		public IAudioClip[] GetClipInParents(AudioEvent e)
 		{
 			AudioClipData[] clips;
 			if (mClips.TryGetValue(e, out clips))
@@ -83,10 +80,7 @@ namespace FiringSquad.Data
 		/// <param name="clips">The clip array to choose from.</param>
 		private IAudioClip[] ChooseClip(IEnumerable<AudioClipData> clips)
 		{
-			if (mProfile == AudioManager.ProfileType.ChooseRandom)
-				return new IAudioClip[] { clips.ChooseRandom() };
-
-			return clips.Select(x => x as IAudioClip).ToArray();
+			return new IAudioClip[] { clips.ChooseRandom() };
 		}
 	}
 }
