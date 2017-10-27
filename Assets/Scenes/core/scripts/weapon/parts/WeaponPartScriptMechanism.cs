@@ -1,6 +1,4 @@
-﻿using FiringSquad.Core.Audio;
-using FiringSquad.Data;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace FiringSquad.Gameplay.Weapons
 {
@@ -8,8 +6,8 @@ namespace FiringSquad.Gameplay.Weapons
 	{
 		public override BaseWeaponScript.Attachment attachPoint { get { return BaseWeaponScript.Attachment.Mechanism; } }
 
-		[SerializeField] private AudioProfile mAudioOverride;
-		public IAudioProfile audioOverride { get { return mAudioOverride; } }
+		[SerializeField] private float mAudioOverrideWeaponType;
+		public float audioOverrideWeaponType { get { return mAudioOverrideWeaponType; } }
 
 		[SerializeField] private GameObject mProjectilePrefab;
 		public GameObject projectilePrefab { get { return mProjectilePrefab; } }

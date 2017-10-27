@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using FiringSquad.Core;
-using FiringSquad.Core.Audio;
 using FiringSquad.Core.UI;
 using FiringSquad.Core.Weapons;
 using FiringSquad.Data;
@@ -31,7 +30,6 @@ namespace FiringSquad.Gameplay
 
 		public IWeapon weapon { get; private set; }
 		public WeaponPartCollection defaultParts { get { return mInformation.defaultWeaponParts; } }
-		public IAudioProfile audioProfile { get { return mInformation.audioProfile; } }
 		public Transform eye { get { return mCameraOffset; } }
 
 		private PlayerMagnetArm mMagnetArm;

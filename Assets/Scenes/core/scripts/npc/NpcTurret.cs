@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Linq;
 using FiringSquad.Core;
-using FiringSquad.Core.Audio;
 using FiringSquad.Core.Weapons;
 using FiringSquad.Data;
 using FiringSquad.Gameplay.UI;
@@ -16,9 +15,6 @@ namespace FiringSquad.Gameplay.NPC
 {
 	public class NpcTurret : NetworkBehaviour, IWeaponBearer, IDamageReceiver
 	{
-		[SerializeField] private AudioProfile mAudioProfile;
-		public IAudioProfile audioProfile { get { return mAudioProfile; } }
-
 		[SerializeField] private WeaponPartCollection mParts;
 		public WeaponPartCollection defaultParts { get { return mParts; } }
 

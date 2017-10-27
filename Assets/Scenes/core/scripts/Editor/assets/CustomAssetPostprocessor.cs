@@ -79,22 +79,7 @@ namespace UnityEditor
 		/// </summary>
 		private void OnPostprocessAudio(AudioClip clip)
 		{
-			string folderPath = Path.GetDirectoryName(assetImporter.assetPath);
-			string fileName = Path.GetFileNameWithoutExtension(assetImporter.assetPath) ?? "";
-			string dataPath = folderPath + "/" + fileName + ".asset";
-
-			AudioMixer mixer = AssetDatabase.LoadAssetAtPath<AudioMixer>("Assets/Scenes/core/audio/MasterAudioMixer.mixer");
-
-			AudioClipData data = AssetDatabase.LoadAssetAtPath<AudioClipData>(dataPath);
-			if (data == null && !File.Exists(dataPath))
-			{
-				data = ScriptableObject.CreateInstance<AudioClipData>();
-				AssetDatabase.CreateAsset(data, dataPath);
-			}
-
-			if (data != null)
-				data.group = mixer.FindMatchingGroups("sfx")[0];
-
+			Debug.LogWarning("It appears you are importing an audio file. Please place ALL audio in the FMOD project, not directly in Unity.", clip);
 			AssetDatabase.SaveAssets();
 		}
 	}

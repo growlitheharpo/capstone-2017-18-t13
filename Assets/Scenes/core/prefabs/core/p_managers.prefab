@@ -384,8 +384,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bd36079e4a511db44a57d28fe0d9e8d7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mAudioDatabase: {fileID: 11400000, guid: e86fdbd8876a98541ab391d742290ba7, type: 2}
   mShouldSelfInitialize: 1
+  mEventBindList:
+  - mEnumVal: 15
+    mFmodVal: event:/SFX/Weapons/Reload
+  - mEnumVal: 20
+    mFmodVal: event:/SFX/Weapons/Shoot
+  - mEnumVal: 30
+    mFmodVal: event:/SFX/Player/Walk
+  - mEnumVal: 40
+    mFmodVal: event:/SFX/Player/MagnetArm
+  - mEnumVal: 50
+    mFmodVal: event:/SFX/Player/EquipItem
+  - mEnumVal: 60
+    mFmodVal: event:/SFX/Weapons/BulletHitWall
+  - mEnumVal: 65
+    mFmodVal: event:/SFX/Weapons/BulletHitOtherPlayer
+  - mEnumVal: 70
+    mFmodVal: event:/SFX/Weapons/BulletHitCurrentPlayer
 --- !u!114 &114395789350535634
 MonoBehaviour:
   m_ObjectHideFlags: 1

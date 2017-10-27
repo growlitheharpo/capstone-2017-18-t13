@@ -53,19 +53,7 @@ namespace FiringSquad.Gameplay.Weapons
 		public IWeaponBearer bearer { get; set; }
 		public Transform aimRoot { get; set; }
 		public Vector3 positionOffset { get; set; }
-
-		[SerializeField] private AudioProfile mAudioProfile;
-
-		private IAudioProfile audioProfile
-		{
-			get
-			{
-				if (mCurrentParts.mechanism != null && mCurrentParts.mechanism.audioOverride != null)
-					return mCurrentParts.mechanism.audioOverride;
-				return mAudioProfile;
-			}
-		}
-
+		
 		[SerializeField] private Transform mBarrelAttach;
 		[SerializeField] private Transform mScopeAttach;
 		[SerializeField] private Transform mMechanismAttach;
@@ -263,7 +251,7 @@ namespace FiringSquad.Gameplay.Weapons
 			EventManager.Notify(() => EventManager.Local.LocalPlayerAttachedPart(this, instance));
 
 			if (bearer != null)
-				ServiceLocator.Get<IAudioManager>().PlaySound(AudioManager.AudioEvent.InteractReceive, bearer.audioProfile, transform);
+				ServiceLocator.Get<IAudioManager>().CreateSound(AudioEvent.EquipItem, transform);
 		}
 
 		private void MoveAttachmentToPoint(WeaponPartScript instance)
@@ -324,8 +312,11 @@ namespace FiringSquad.Gameplay.Weapons
 
 		private void PlayReloadEffect(float time)
 		{
-			ServiceLocator.Get<IAudioManager>()
-				.PlaySound(AudioManager.AudioEvent.Reload, audioProfile, transform);
+			IAudioReference effect = ServiceLocator.Get<IAudioManager>().CreateSound(AudioEvent.Reload, transform, false);
+			if (mCurrentParts.mechanism != null)
+				effect.weaponType = mCurrentParts.mechanism.audioOverrideWeaponType;
+			effect.AttachToRigidbody(bearer.gameObject.GetComponent<Rigidbody>()); // TODO: Cache this??
+			effect.Start();
 
 			AnimationUtility.PlayAnimation(mAnimator, "reload");
 			StartCoroutine(WaitForReload(time));
@@ -568,8 +559,9 @@ namespace FiringSquad.Gameplay.Weapons
 			mShotParticles.transform.position = currentParts.barrel.barrelTip.position;
 			mShotParticles.Play();
 
-			ServiceLocator.Get<IAudioManager>()
-				.PlaySound(AudioManager.AudioEvent.Shoot, audioProfile, transform);
+			IAudioReference effect = ServiceLocator.Get<IAudioManager>().CreateSound(AudioEvent.Shoot, transform, false);
+			effect.weaponType = mCurrentParts.mechanism.audioOverrideWeaponType;
+			effect.Start();
 		}
 
 		#endregion
