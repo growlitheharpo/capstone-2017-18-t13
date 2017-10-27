@@ -36,6 +36,7 @@ GameObject:
   - component: {fileID: 4310811143056484}
   - component: {fileID: 33122778573775518}
   - component: {fileID: 23574805039412164}
+  - component: {fileID: 64800912957695282}
   m_Layer: 0
   m_Name: mesh_ramp1
   m_TagString: Untagged
@@ -109,4 +110,18 @@ MeshFilter:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1873161286924378}
+  m_Mesh: {fileID: 4300000, guid: be9e0fc427396134e8921da7c5839011, type: 3}
+--- !u!64 &64800912957695282
+MeshCollider:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1873161286924378}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Convex: 0
+  m_InflateMesh: 0
+  m_SkinWidth: 0.01
   m_Mesh: {fileID: 4300000, guid: be9e0fc427396134e8921da7c5839011, type: 3}
