@@ -85,6 +85,9 @@
         </relationship>
     </object>
     <object class="EventMixerMaster" id="{836b6593-12d3-45ca-9bbb-b63abf47cf3c}">
+        <property name="volume">
+            <value>-19.5</value>
+        </property>
         <relationship name="effectChain">
             <destination>{05562344-745d-4021-9dbb-05b35bee1641}</destination>
         </relationship>
@@ -120,6 +123,9 @@
         </property>
         <property name="delayType">
             <value>0</value>
+        </property>
+        <property name="volume">
+            <value>-7.5</value>
         </property>
         <relationship name="audioFile">
             <destination>{78a205a8-2170-416c-a767-e2de3791ac8e}</destination>
@@ -191,7 +197,7 @@
     </object>
     <object class="NamedMarker" id="{b633783f-0463-41e0-a48a-95b3975db63d}">
         <property name="position">
-            <value>4.4000000000000004</value>
+            <value>4.7000000000000002</value>
         </property>
         <property name="name">
             <value>END</value>
