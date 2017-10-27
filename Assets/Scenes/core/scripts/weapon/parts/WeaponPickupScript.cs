@@ -25,6 +25,7 @@ namespace FiringSquad.Gameplay.Weapons
 		private WeaponPartScript mPartScript;
 		private Rigidbody mRigidbody;
 
+		[SyncVar] private long mDeathTimeTicks;
 		private Coroutine mTimeoutRoutine;
 
 		private void Awake()
@@ -71,6 +72,9 @@ namespace FiringSquad.Gameplay.Weapons
 			if (!mGunView.activeInHierarchy && mPickupView.activeInHierarchy)
 				return;
 
+			if (isServer)
+				mDeathTimeTicks = DateTime.Now.Ticks + (int)(PICKUP_LIFETIME * TimeSpan.TicksPerSecond);
+
 			// flip the model views
 			mGunView.SetActive(false);
 			mPickupView.SetActive(true);
@@ -82,10 +86,11 @@ namespace FiringSquad.Gameplay.Weapons
 
 			// Update the particle systems to the correct lifetime, then start them.
 			var psScripts = ps.GetComponentsInChildren<ParticleSystem>();
+			float remaining = (mDeathTimeTicks - DateTime.Now.Ticks) / (float)TimeSpan.TicksPerSecond;
 			foreach (ParticleSystem psScript in psScripts)
 			{
 				ParticleSystem.MainModule main = psScript.main;
-				main.duration = PICKUP_LIFETIME - 2.0f;
+				main.duration = remaining - 2.0f; // the extra two seconds are for the lifetime of the particles
 				psScript.Play(false);
 			}
 
@@ -95,28 +100,29 @@ namespace FiringSquad.Gameplay.Weapons
 			mCanvas = cv.GetComponent<WeaponPartWorldCanvas>();
 			mCanvas.LinkToObject(mPartScript);
 
-			// if we're the server, destroy ourselves when the timeout is up
-			if (isServer)
-				mTimeoutRoutine = StartCoroutine(Timeout(ps));
+			// tick our lifetime timer
+			mTimeoutRoutine = StartCoroutine(Timeout(ps));
 		}
 
-		[Server]
 		private IEnumerator Timeout(GameObject vfxPack)
 		{
 			Light vfxLight = vfxPack.GetComponentInChildren<Light>();
 			float originalIntensity = vfxLight.intensity;
-			float currentTime = PICKUP_LIFETIME;
 
-			while (currentTime >= 0.0f)
+			while (true)
 			{
-				vfxLight.intensity = Mathf.Lerp(0.0f, originalIntensity, currentTime / 5.0f);
-				mCanvas.SetMaxAlpha(Mathf.Clamp(currentTime / 5.0f, 0.0f, 1.0f));
+				float remaining = (mDeathTimeTicks - DateTime.Now.Ticks) / (float)TimeSpan.TicksPerSecond;
+				if (remaining <= 0.0f)
+					break;
 
-				currentTime -= Time.deltaTime;
+				vfxLight.intensity = Mathf.Lerp(0.0f, originalIntensity, remaining / 5.0f);
+				mCanvas.SetMaxAlpha(Mathf.Clamp(remaining / 5.0f, 0.0f, 1.0f));
+
 				yield return null;
 			}
 
-			NetworkServer.Destroy(gameObject);
+			if (isServer)
+				NetworkServer.Destroy(gameObject);
 		}
 
 		[Server]
