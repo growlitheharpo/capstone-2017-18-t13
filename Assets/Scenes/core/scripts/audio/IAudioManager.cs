@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using AudioEvent = FiringSquad.Core.Audio.AudioManager.AudioEvent;
 
 namespace FiringSquad.Core.Audio
 {
@@ -17,20 +16,21 @@ namespace FiringSquad.Core.Audio
 		/// Start a sound based on an event.
 		/// </summary>
 		/// <param name="e">The event that has occurred.</param>
-		/// <param name="profile">The profile that the event is linked to.</param>
 		/// <param name="location">The location of the event.</param>
+		/// <param name="autoPlay">Whether the service should auto-start the event.</param>
 		/// <returns>An IAudioReference to the new sound.</returns>
-		IAudioReference PlaySound(AudioEvent e, IAudioProfile profile, Transform location);
+		IAudioReference CreateSound(AudioEvent e, Transform location, bool autoPlay = true);
 
 		/// <summary>
 		/// Start a sound based on an event.
 		/// </summary>
 		/// <param name="e">The event that has occurred.</param>
-		/// <param name="profile">The profile that the event is linked to.</param>
 		/// <param name="location">The location of the event.</param>
 		/// <param name="offset">The offset from the location to place the sound.</param>
+		/// <param name="offsetType">Whether the offset is an offset from self, or an exact world position.</param>
+		/// <param name="autoPlay">Whether the service should auto-start the event.</param>
 		/// <returns>An IAudioReference to the new sound.</returns>
-		IAudioReference PlaySound(AudioEvent e, IAudioProfile profile, Transform location, Vector3 offset);
+		IAudioReference CreateSound(AudioEvent e, Transform location, Vector3 offset, Space offsetType, bool autoPlay = true);
 
 		/// <summary>
 		/// Check if a reference is still playing. Will set the reference to null if it is not.

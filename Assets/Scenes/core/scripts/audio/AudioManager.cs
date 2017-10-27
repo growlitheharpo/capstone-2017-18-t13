@@ -1,42 +1,35 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using FiringSquad.Core.State;
-using FiringSquad.Data;
+using FMOD;
+using FMOD.Studio;
 using UnityEngine;
-using Logger = FiringSquad.Debug.Logger;
 
 namespace FiringSquad.Core.Audio
 {
+	public enum AudioEvent
+	{
+		Reload = 15, //done
+		Shoot = 20, //done
+		LoopWalking = 30, // done
+		LoopGravGun = 40, // done
+		EquipItem = 50, // not yet!
+
+		ImpactWall = 60, // done
+		ImpactOtherPlayer = 65, // done
+		ImpactCurrentPlayer = 70 // done
+	}
+
 	/// <inheritdoc cref="IAudioManager"/>
 	public class AudioManager : MonoSingleton<AudioManager>, IAudioManager
 	{
-		public enum ProfileType
+		[SerializeField] private bool mShouldSelfInitialize;
+
+		[Serializable]
+		private struct EnumFmodBind
 		{
-			ChooseRandom,
-			PlayAll
-		}
-
-		public enum AudioEvent
-		{
-			TestExplosionEffect = -1,
-			MainBackgroundEffect = 0,
-			PrimaryEffect1 = 1,
-			PrimaryEffect2 = 2,
-			PrimaryEffect3 = 3,
-			DeathSound = 10,
-
-			Reload = 15, //done
-			Shoot = 20, //done
-			StartWalking = 25, // not yet!
-			LoopWalking = 30, // done
-			StartGravGun = 35, // not yet!
-			LoopGravGun = 40, // done
-			InteractReceive = 50, // not yet!
-
-			ImpactWall = 60, // done
-			ImpactOtherPlayer = 65, // done
-			ImpactCurrentPlayer = 70 // done
+			public AudioEvent mEnumVal;
+			public string mFmodVal;
 		}
 
 		/// <summary>
@@ -128,6 +121,9 @@ namespace FiringSquad.Core.Audio
 			}
 		}
 
+		[SerializeField] private List<EnumFmodBind> mEventBindList;
+		private Dictionary<AudioEvent, string> mEventDictionary;
+
 		private void Start()
 		{
 			if (!ServiceLocator.Get<IGamestateManager>().isAlive && mShouldSelfInitialize)
@@ -137,125 +133,68 @@ namespace FiringSquad.Core.Audio
 		/// <inheritdoc />
 		public void InitializeDatabase()
 		{
-			mAudioDatabase.InitializePrefabs(transform);
+			// TODO: We can wait async here
+			FMODUnity.RuntimeManager.LoadBank("Weapons", true);
+			FMODUnity.RuntimeManager.LoadBank("Player", true);
+			FMODUnity.RuntimeManager.WaitForAllLoads();
+
+			mEventDictionary = new Dictionary<AudioEvent, string>(mEventBindList.Count);
+			foreach (EnumFmodBind e in mEventBindList)
+				mEventDictionary.Add(e.mEnumVal, e.mFmodVal);
+
 			EventManager.Notify(EventManager.InitialAudioLoadComplete);
 		}
 
-		// Update is called once per frame
-		private void Update()
+		/// <inheritdoc />
+		public IAudioReference CreateSound(AudioEvent e, Transform location, bool autoPlay = true)
 		{
-			ProcessFinishedAudio();
-		}
+			EventInstance fmodEvent = FMODUnity.RuntimeManager.CreateInstance(mEventDictionary[e]);
+			AudioReference reference = new AudioReference(fmodEvent);
 
-		/// <summary>
-		/// Loop through all of our currently active references and Destroy any that have finished.
-		/// </summary>
-		private void ProcessFinishedAudio()
-		{
-			var refsToDelete = new List<IAudioReference>();
-			foreach (IAudioReference reference in mCurrentSounds)
+			if (location != null)
 			{
-				AudioReference r = reference as AudioReference;
-				if (r == null || r.mSources.Count == 0)
-				{
-					refsToDelete.Add(reference);
-					continue;
-				}
-
-				for (int i = 0; i < r.mSources.Count; i++)
-				{
-					if (r.mSources[i] == null)
-					{
-						r.mSources.RemoveAt(i);
-						r.mClipData.RemoveAt(i);
-						i--;
-						continue;
-					}
-
-					if (r.mSources[i].loop || !(r.mSources[i].time >= r.mSources[i].clip.length - Time.deltaTime))
-						continue;
-
-					Destroy(r.mSources[i].gameObject);
-					r.mSources.RemoveAt(i);
-					r.mClipData.RemoveAt(i);
-					i--;
-				}
+				ATTRIBUTES_3D locationData = FMODUnity.RuntimeUtils.To3DAttributes(location);
+				fmodEvent.set3DAttributes(locationData);
 			}
 
-			foreach (IAudioReference r in refsToDelete)
-				mCurrentSounds.Remove(r);
+			if (autoPlay)
+				reference.Start();
+
+			return reference;
 		}
 
 		/// <inheritdoc />
-		public IAudioReference PlaySound(AudioEvent e, IAudioProfile profile, Transform location)
+		public IAudioReference CreateSound(AudioEvent e, Transform location, Vector3 offset, Space offsetType = Space.Self, bool autoPlay = true)
 		{
-			return PlaySound(e, profile, location, Vector3.zero);
-		}
+			EventInstance fmodEvent = FMODUnity.RuntimeManager.CreateInstance(mEventDictionary[e]);
+			AudioReference reference = new AudioReference(fmodEvent);
 
-		/// <inheritdoc />
-		public IAudioReference PlaySound(AudioEvent e, IAudioProfile profile, Transform location, Vector3 offset)
-		{
-			if (profile == null)
+			if (location != null)
 			{
-				Logger.Warn("Trying to play a null profile: " + e, Logger.System.Audio);
-				return null;
+				ATTRIBUTES_3D locationData = FMODUnity.RuntimeUtils.To3DAttributes(location);
+
+				Vector3 worldPos = offsetType == Space.World ? offset : location.TransformPoint(offset);
+				VECTOR realPos = FMODUnity.RuntimeUtils.ToFMODVector(worldPos);
+				locationData.position = realPos;
+
+				fmodEvent.set3DAttributes(locationData);
 			}
 
-			var clips = profile.GetClipInParents(e);
-			var sources = new List<AudioSource>();
+			if (autoPlay)
+				reference.Start();
 
-			foreach (IAudioClip clip in clips)
-			{
-				GameObject newGameObject = Instantiate(mAudioDatabase.GetPrefab(profile, clip));
-				newGameObject.name += "__" + e;
-				if (clip.playAtSource)
-				{
-					newGameObject.transform.SetParent(location);
-					newGameObject.transform.localPosition = offset;
-				}
-
-				AudioSource s = newGameObject.GetComponent<AudioSource>();
-				sources.Add(s);
-
-				s.Play();
-			}
-
-			//TODO: Remove this!
-			if (clips.Any(x => x.fadeInTime > 0.0f || x.fadeOutTime > 0.0f))
-				Logger.Warn("Fading audio in and out is not supported yet!", Logger.System.Audio);
-
-			AudioReference newRef = new AudioReference { mClipData = clips.ToList(), mSources = sources };
-			mCurrentSounds.Add(newRef);
-			return newRef;
+			return reference;
 		}
 
 		/// <inheritdoc />
 		public IAudioReference CheckReferenceAlive(ref IAudioReference reference)
 		{
-			if (reference == null || mCurrentSounds.Contains(reference))
+			AudioReference realRef = reference as AudioReference;
+			if (realRef != null && realRef.isAlive)
 				return reference;
 
 			reference = null;
 			return null;
-		}
-
-		private void StopSoundImmediate(IAudioReference sound)
-		{
-			if (!mCurrentSounds.Contains(sound))
-				return;
-
-			AudioReference soundImpl = sound as AudioReference;
-			if (soundImpl == null)
-				return;
-
-			foreach (AudioSource source in soundImpl.mSources)
-			{
-				source.Stop();
-				Destroy(source.gameObject);
-			}
-
-			soundImpl.mSources.Clear();
-			soundImpl.mClipData.Clear();
 		}
 	}
 }
