@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using FiringSquad.Gameplay.UI;
 using KeatsLib.Unity;
 using UnityEngine;
@@ -8,6 +9,8 @@ namespace FiringSquad.Gameplay.Weapons
 {
 	public class WeaponPickupScript : NetworkBehaviour, IInteractable, INetworkGrabbable
 	{
+		private const float PICKUP_LIFETIME = 30.0f; // in seconds
+
 		[SerializeField] private GameObject mGunView;
 		[SerializeField] private GameObject mPickupView;
 		[SerializeField] private GameObject mParticleSystem;
@@ -22,6 +25,9 @@ namespace FiringSquad.Gameplay.Weapons
 		private WeaponPartScript mPartScript;
 		private Rigidbody mRigidbody;
 
+		[SyncVar] private long mDeathTimeTicks;
+		private Coroutine mTimeoutRoutine;
+
 		private void Awake()
 		{
 			mPartScript = GetComponent<WeaponPartScript>();
@@ -30,11 +36,17 @@ namespace FiringSquad.Gameplay.Weapons
 
 		private void Start()
 		{
-			InitializePickupView();
+			if (isServer)
+				InitializePickupView();
+			else
+				StartCoroutine(Coroutines.InvokeAfterFrames(5, InitializePickupView));
 		}
 
 		private void OnDestroy()
 		{
+			if (mTimeoutRoutine != null)
+				StopCoroutine(mTimeoutRoutine);
+
 			DestroyPickupView();
 
 			transform.ResetLocalValues();
@@ -58,23 +70,66 @@ namespace FiringSquad.Gameplay.Weapons
 			InitializePickupView();
 		}
 
-		public void InitializePickupView()
+		private void InitializePickupView()
 		{
 			if (!mGunView.activeInHierarchy && mPickupView.activeInHierarchy)
 				return;
 
+			if (isServer)
+				mDeathTimeTicks = DateTime.Now.Ticks + (int)(PICKUP_LIFETIME * TimeSpan.TicksPerSecond);
+
+			// flip the model views
 			mGunView.SetActive(false);
 			mPickupView.SetActive(true);
 
+			// create the vfx
 			GameObject ps = Instantiate(mParticleSystem);
-
 			ps.transform.SetParent(mPickupView.transform);
 			ps.transform.ResetLocalValues();
 
+			// Update the particle systems to the correct lifetime, then start them.
+			var psScripts = ps.GetComponentsInChildren<ParticleSystem>();
+			float remaining = (mDeathTimeTicks - DateTime.Now.Ticks) / (float)TimeSpan.TicksPerSecond;
+			foreach (ParticleSystem psScript in psScripts)
+			{
+				ParticleSystem.MainModule main = psScript.main;
+				main.duration = remaining - 2.0f; // the extra two seconds are for the lifetime of the particles
+				psScript.Play(false);
+			}
+
+			// Spawn and setup the UI name canvas
 			GameObject cvPrefab = Resources.Load<GameObject>("prefabs/weapons/effects/p_partWorldCanvas");
 			GameObject cv = Instantiate(cvPrefab, transform);
 			mCanvas = cv.GetComponent<WeaponPartWorldCanvas>();
 			mCanvas.LinkToObject(mPartScript);
+
+			// tick our lifetime timer
+			mTimeoutRoutine = StartCoroutine(Timeout(ps));
+		}
+
+		private IEnumerator Timeout(GameObject vfxPack)
+		{
+			Light vfxLight = vfxPack.GetComponentInChildren<Light>();
+			float originalIntensity = vfxLight.intensity;
+
+			while (true)
+			{
+				yield return null;
+
+				float remaining = (mDeathTimeTicks - DateTime.Now.Ticks) / (float)TimeSpan.TicksPerSecond;
+				if (remaining <= 0.0f)
+				{
+					if (isServer)
+						break;
+					continue;
+				}
+
+				vfxLight.intensity = Mathf.Lerp(0.0f, originalIntensity, remaining / 5.0f);
+				mCanvas.SetMaxAlpha(Mathf.Clamp(remaining / 5.0f, 0.0f, 1.0f));
+			}
+
+			if (isServer)
+				NetworkServer.Destroy(gameObject);
 		}
 
 		[Server]
@@ -111,7 +166,7 @@ namespace FiringSquad.Gameplay.Weapons
 		{
 			currentHolder = player;
 
-			// TODO: Lerp this
+			// TODO: Lerp this?
 
 			mPickupView.transform.localScale = Vector3.one * 0.45f;
 			mRigidbody.isKinematic = true;
