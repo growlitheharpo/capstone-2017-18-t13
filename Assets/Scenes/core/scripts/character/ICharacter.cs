@@ -1,5 +1,4 @@
-﻿using FiringSquad.Core.Audio;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Networking;
 
 namespace FiringSquad.Gameplay
@@ -13,8 +12,6 @@ namespace FiringSquad.Gameplay
 		GameObject gameObject { get; }
 		Transform transform { get; }
 		Transform eye { get; }
-
-		IAudioProfile audioProfile { get; }
 
 		bool isCurrentPlayer { get; }
 	}
