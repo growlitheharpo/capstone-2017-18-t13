@@ -1,6 +1,7 @@
-﻿using FiringSquad.Core;
+﻿using System.Linq;
+using FiringSquad.Core;
 using FiringSquad.Core.Audio;
-using FiringSquad.Data;
+using FiringSquad.Gameplay.UI;
 using FiringSquad.Gameplay.Weapons;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -20,10 +21,12 @@ namespace FiringSquad.Gameplay
 		[SerializeField] private float mPullForce;
 		public float pullForce { get { return mPullForce; } }
 
+		[SerializeField] private float mPullRadius;
+		[SerializeField] private LayerMask mGrabLayers;
+
 		private WeaponPickupScript mHeldObject;
 		public WeaponPickupScript heldWeaponPart { get { return mHeldObject; } }
 
-		[SerializeField] private AudioProfile mAudioProfile;
 		private IAudioReference mGrabSound;
 
 		public CltPlayer bearer { get; set; }
@@ -89,6 +92,15 @@ namespace FiringSquad.Gameplay
 		private void Update()
 		{
 			SetDirtyBit(99999);
+
+			if (bearer == null)
+				return;
+			if (!bearer.isCurrentPlayer)
+				return;
+
+			TryFindGrabCandidate();
+			EventManager.Notify(() => EventManager.LocalGUI.SetHintState(CrosshairHintText.Hint.MagnetArmGrab, mGrabCandidate != null));
+			EventManager.Notify(() => EventManager.LocalGUI.SetHintState(CrosshairHintText.Hint.ItemEquipOrDrop, mHeldObject != null));
 		}
 
 		#endregion
@@ -138,7 +150,7 @@ namespace FiringSquad.Gameplay
 			if (shouldPlay && mGrabSound == null)
 			{
 				mGrabSound = ServiceLocator.Get<IAudioManager>()
-					.PlaySound(AudioManager.AudioEvent.LoopGravGun, mAudioProfile, transform);
+					.CreateSound(AudioEvent.LoopGravGun, transform);
 			}
 			else if (!shouldPlay && mGrabSound != null)
 			{
@@ -150,25 +162,33 @@ namespace FiringSquad.Gameplay
 		[Client]
 		private void TryFindGrabCandidate()
 		{
-			RaycastHit hitInfo;
-
 			Ray r = new Ray(bearer.eye.position, bearer.eye.forward);
 
 			UnityEngine.Debug.DrawLine(r.origin, r.origin + r.direction * 1000.0f, Color.green, 0.1f, true);
 
-			//if (!Physics.SphereCast(r, 0.6f, out hitInfo))
-			if (!Physics.Raycast(r, out hitInfo))
+			var hits = Physics.SphereCastAll(r, mPullRadius, mGrabLayers);
+			if (hits.Length == 0)
 				return;
 
-			WeaponPickupScript grabbable = hitInfo.collider.GetComponentUpwards<WeaponPickupScript>();
-			if (grabbable != null && !grabbable.currentlyHeld)
-				mGrabCandidate = grabbable;
+			hits = hits.OrderBy(x => x.distance).ToArray(); // could also sort by dot product
+
+			foreach (RaycastHit hitInfo in hits)
+			{
+				WeaponPickupScript grabbable = hitInfo.collider.GetComponentUpwards<WeaponPickupScript>();
+				if (grabbable != null && !grabbable.currentlyHeld)
+				{
+					mGrabCandidate = grabbable;
+					return;
+				}
+			}
+
+			mGrabCandidate = null;
 		}
 
 		[Client]
 		private void ReelGrabCandidate()
 		{
-			if (mGrabCandidate == null)
+			if (mGrabCandidate == null || mHeldObject != null)
 				return;
 
 			mState = State.Reeling;
@@ -177,6 +197,8 @@ namespace FiringSquad.Gameplay
 
 			if (direction.magnitude < 2.5f)
 			{
+				EventManager.Notify(() => EventManager.LocalGUI.SetHintState(CrosshairHintText.Hint.MagnetArmGrab, false));
+				EventManager.Notify(() => EventManager.LocalGUI.SetHintState(CrosshairHintText.Hint.ItemEquipOrDrop, true));
 				CmdGrabItem(mGrabCandidate.netId);
 				return;
 			}
@@ -196,6 +218,7 @@ namespace FiringSquad.Gameplay
 		[Client]
 		private void ThrowOrDropItem()
 		{
+			EventManager.Notify(() => EventManager.LocalGUI.SetHintState(CrosshairHintText.Hint.ItemEquipOrDrop, false));
 			if (mHeldObject != null && mHeldObject.currentHolder == bearer)
 			{
 				if (mHeldTimer >= 1.0f)

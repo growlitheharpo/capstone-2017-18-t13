@@ -1,4 +1,6 @@
-﻿namespace FiringSquad.Core.Audio
+﻿using UnityEngine;
+
+namespace FiringSquad.Core.Audio
 {
 	/// <summary>
 	/// A simple interface for maintaining a reference to a currently-playing audio.
@@ -7,34 +9,37 @@
 	public interface IAudioReference
 	{
 		/// <summary>
+		/// Start playing the actual sound.
+		/// </summary>
+		void Start();
+
+		/// <summary>
 		/// Immediately stop playing the sound.
 		/// </summary>
-		void Kill();
-
-		/// <summary>
-		/// Slowly fade out the sound.
-		/// </summary>
-		/// <param name="time">Length of time to fade out over.</param>
-		void FadeOut(float time);
-
-		/// <summary>
-		/// Set whether or not the audio should repeat.
-		/// </summary>
-		void SetRepeat(bool repeat);
-
+		void Kill(bool allowFade = true);
+		
 		/// <summary>
 		/// Set the volume of the sound to a new level.
 		/// </summary>
 		void SetVolume(float vol);
 
 		/// <summary>
-		/// Set the pitch of the sound to a new level.
+		/// Sets the sound to follow a GameObject.
 		/// </summary>
-		void SetPitch(float pitch);
-
+		/// <param name="rb">The rigidbody to attach to.</param>
+		void AttachToRigidbody(Rigidbody rb);
+		
 		/// <summary>
 		/// Returns true if the audio is currently playing.
 		/// </summary>
 		bool isPlaying { get; }
+
+		// Common variables:
+
+		float playerSpeed { get; set; }
+		float weaponType { get; set; }
+
+		void SetParameter(string name, float value);
+		float GetParameter(string name);
 	}
 }

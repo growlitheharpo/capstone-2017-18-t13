@@ -159,7 +159,7 @@ namespace FiringSquad.Gameplay
 
 		private void ApplyOptionsData(IOptionsData data)
 		{
-			AudioListener.volume = data.masterVolume;
+			FMODUnity.RuntimeManager.GetBus("bus:/").setVolume(data.masterVolume);
 			mCameraRef.fieldOfView = data.fieldOfView;
 		}
 	}

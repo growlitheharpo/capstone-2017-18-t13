@@ -39,9 +39,7 @@ namespace FiringSquad.Gameplay.Weapons
 			GameObject copy = Instantiate(gameObject);
 			copy.name = name;
 
-			// initialize the pickup script
-			WeaponPickupScript pickup = copy.GetComponent<WeaponPickupScript>();
-			pickup.InitializePickupView();
+			// let the pickup script self-initialize in Start()
 
 			return copy;
 		}

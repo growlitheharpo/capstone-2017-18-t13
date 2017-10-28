@@ -15,12 +15,14 @@ namespace FiringSquad.Gameplay.UI
 		private Transform mPlayerRef;
 		private BaseWeaponScript mPlayerWeapon;
 		private WeaponPartScript mLinkedPart;
+		private float mMaxAlpha;
 
 		private void Awake()
 		{
 			StartCoroutine(GrabPlayerReference());
 			mAlreadyHasText.gameObject.SetActive(false);
 			mCanvasGroup.gameObject.SetActive(false);
+			mMaxAlpha = 1.0f;
 		}
 
 		public void LinkToObject(WeaponPartScript part)
@@ -28,6 +30,11 @@ namespace FiringSquad.Gameplay.UI
 			mCanvasGroup.gameObject.SetActive(true);
 			mLinkedPart = part;
 			mPartText.text = part.prettyName;
+		}
+
+		public void SetMaxAlpha(float a)
+		{
+			mMaxAlpha = a;
 		}
 
 		private IEnumerator GrabPlayerReference()
@@ -70,7 +77,7 @@ namespace FiringSquad.Gameplay.UI
 			float dot = Vector3.Dot(direction.normalized, mPlayerRef.forward);
 			dot = (Mathf.Pow(dot, 10.0f) - 0.6f) * 2.5f;
 
-			mCanvasGroup.alpha = dot;
+			mCanvasGroup.alpha = dot * mMaxAlpha;
 		}
 
 		private void UpdateDoesHave()

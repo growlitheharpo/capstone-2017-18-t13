@@ -15,9 +15,6 @@ namespace FiringSquad.Gameplay.NPC
 {
 	public class NpcTurret : NetworkBehaviour, IWeaponBearer, IDamageReceiver
 	{
-		[SerializeField] private AudioProfile mAudioProfile;
-		public AudioProfile audioProfile { get { return mAudioProfile; } }
-
 		[SerializeField] private WeaponPartCollection mParts;
 		public WeaponPartCollection defaultParts { get { return mParts; } }
 

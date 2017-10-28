@@ -101,33 +101,32 @@ namespace FiringSquad.Gameplay
 		private void INPUT_ForwardBackMovement(float val)
 		{
 			mInput.y = val;
-
-			if (mInput.magnitude >= 0.1f && mWalkingSound == null)
-			{
-				mWalkingSound = ServiceLocator.Get<IAudioManager>()
-					.PlaySound(AudioManager.AudioEvent.LoopWalking, mPlayer.audioProfile, mPlayer.transform);
-			}
-			else if (mInput.magnitude < 0.1f && mWalkingSound != null)
-			{
-				mWalkingSound.Kill();
-				mWalkingSound = null;
-			}
+			HandleMovementSound();
 		}
 
 		private void INPUT_LeftRightMovement(float val)
 		{
 			mInput.x = val;
+			HandleMovementSound();
+		}
 
-			if (mInput.magnitude >= 0.1f && mWalkingSound == null)
+		private void HandleMovementSound()
+		{
+			IAudioManager audioService = ServiceLocator.Get<IAudioManager>();
+			mWalkingSound = audioService.CheckReferenceAlive(ref mWalkingSound);
+
+			if (mWalkingSound == null)
 			{
-				mWalkingSound = ServiceLocator.Get<IAudioManager>()
-					.PlaySound(AudioManager.AudioEvent.LoopWalking, mPlayer.audioProfile, mPlayer.transform);
+				if (mInput.magnitude < 0.11f)
+					return;
+
+				mWalkingSound = ServiceLocator.Get<IAudioManager>().CreateSound(AudioEvent.LoopWalking, mPlayer.transform, false);
+				mWalkingSound.AttachToRigidbody(mController.GetComponent<Rigidbody>());
+				mWalkingSound.playerSpeed = mInput.magnitude;
+				mWalkingSound.Start();
 			}
-			else if (mInput.magnitude < 0.1f && mWalkingSound != null)
-			{
-				mWalkingSound.Kill();
-				mWalkingSound = null;
-			}
+			else
+				mWalkingSound.playerSpeed = mInput.magnitude;
 		}
 
 		private void INPUT_LookHorizontal(float val)

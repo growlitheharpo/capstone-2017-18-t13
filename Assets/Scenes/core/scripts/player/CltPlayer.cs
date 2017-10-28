@@ -30,7 +30,6 @@ namespace FiringSquad.Gameplay
 
 		public IWeapon weapon { get; private set; }
 		public WeaponPartCollection defaultParts { get { return mInformation.defaultWeaponParts; } }
-		public AudioProfile audioProfile { get { return mInformation.audioProfile; } }
 		public Transform eye { get { return mCameraOffset; } }
 
 		private PlayerMagnetArm mMagnetArm;
