@@ -32,12 +32,14 @@ namespace FiringSquad.Gameplay
 			mBlockingPlayers = new List<CltPlayer>(4);
 			mCapturingPlayer = null;
 			mCapturable = true;
+			RpcReflectActiveState(true);
 		}
 
 		[ServerCallback]
 		private void OnDisable()
 		{
 			mCapturable = false;
+			RpcReflectActiveState(false);
 		}
 
 		[ServerCallback]
@@ -125,6 +127,13 @@ namespace FiringSquad.Gameplay
 				mCapturingPlayer = null;
 			else
 				mBlockingPlayers.Remove(player);
+		}
+
+		[ClientRpc]
+		private void RpcReflectActiveState(bool state)
+		{
+			foreach (Transform t in transform)
+				t.gameObject.SetActive(state);
 		}
 	}
 }
