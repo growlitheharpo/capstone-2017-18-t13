@@ -87,7 +87,7 @@ namespace FiringSquad.Networking
 				{
 					mMachine.mCaptureAreas = FindObjectsOfType<StageCaptureArea>();
 					foreach (StageCaptureArea area in mMachine.mCaptureAreas)
-						area.gameObject.SetActive(false);
+						area.Disable();
 
 					EventManager.Server.OnPlayerJoined += OnPlayerJoined;
 					EventManager.Server.OnPlayerHealthHitsZero += OnPlayerHealthHitsZero;
@@ -180,7 +180,7 @@ namespace FiringSquad.Networking
 
 				private void OnPlayerCapturedStage(StageCaptureArea stage, CltPlayer player)
 				{
-					stage.gameObject.SetActive(false);
+					stage.Disable();
 
 					SpawnLegendaryPart(stage, player);
 
@@ -205,7 +205,7 @@ namespace FiringSquad.Networking
 
 				private void OnStageTimedOut(StageCaptureArea stage)
 				{
-					stage.gameObject.SetActive(false);
+					stage.Enable();
 
 					StageCaptureArea nextStage = mMachine.mCaptureAreas.Where(x => x != stage).ChooseRandom();
 					mStageEnableRoutine = mMachine.mScript.StartCoroutine(EnableStageArea(nextStage));
@@ -220,7 +220,7 @@ namespace FiringSquad.Networking
 				private IEnumerator EnableStageArea(StageCaptureArea stage)
 				{
 					yield return new WaitForSeconds(Random.Range(mMachine.mScript.mMinStageWaitTime, mMachine.mScript.mMaxStageWaitTime));
-					stage.gameObject.SetActive(true);
+					stage.Enable();
 				}
 
 				public override void OnExit()

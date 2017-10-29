@@ -11,7 +11,7 @@ namespace FiringSquad.Gameplay
 		[SerializeField] private float mCaptureTime;
 		[SerializeField] private CollisionForwarder mTrigger;
 
-		private bool mCapturable;
+		[SyncVar(hook = "OnCapturableChanged")] private bool mCapturable;
 		private float mCapturePercentageTimer;
 		private float mTimeoutTimer;
 
@@ -33,29 +33,43 @@ namespace FiringSquad.Gameplay
 		}
 
 		private List<CltPlayer> mBlockingPlayers;
+		private List<GameObject> mChildren;
 
 		private void Awake()
 		{
 			mTrigger.mTriggerEnterDelegate = OnTriggerEnter;
 			mTrigger.mTriggerExitDelegate = OnTriggerExit;
+
+			mChildren = new List<GameObject>(transform.childCount);
+			foreach (Transform c in transform)
+				mChildren.Add(c.gameObject);
 		}
 
-		[ServerCallback]
-		private void OnEnable()
+		public override void OnStartServer()
+		{
+			Enable();
+			Disable();
+		}
+
+		public override void OnStartClient()
+		{
+			ReflectActiveState(mCapturable);
+		}
+
+		[Server]
+		public void Enable()
 		{
 			mTimeoutTimer = 0.0f;
 			mCapturePercentageTimer = 0.0f;
 			mBlockingPlayers = new List<CltPlayer>(4);
 			currentCapturingPlayer = null;
 			mCapturable = true;
-			RpcReflectActiveState(true);
 		}
 
-		[ServerCallback]
-		private void OnDisable()
+		[Server]
+		public void Disable()
 		{
 			mCapturable = false;
-			RpcReflectActiveState(false);
 		}
 
 		[ServerCallback]
@@ -145,11 +159,16 @@ namespace FiringSquad.Gameplay
 				mBlockingPlayers.Remove(player);
 		}
 
-		[ClientRpc]
-		private void RpcReflectActiveState(bool state)
+		private void OnCapturableChanged(bool newValue)
 		{
-			foreach (Transform t in transform)
-				t.gameObject.SetActive(state);
+			mCapturable = newValue;
+			ReflectActiveState(mCapturable);
+		}
+
+		private void ReflectActiveState(bool state)
+		{
+			foreach (GameObject child in mChildren)
+				child.SetActive(state);
 		}
 	}
 }
