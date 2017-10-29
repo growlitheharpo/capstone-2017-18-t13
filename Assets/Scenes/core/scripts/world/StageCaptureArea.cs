@@ -16,6 +16,22 @@ namespace FiringSquad.Gameplay
 		private float mTimeoutTimer;
 
 		private CltPlayer mCapturingPlayer;
+		private CltPlayer currentCapturingPlayer
+		{
+			get
+			{
+				return mCapturingPlayer;
+			}
+			set
+			{
+				if (value != mCapturingPlayer)
+				{
+					mCapturingPlayer = value;
+					mTimeoutTimer = 0.0f;
+				}
+			}
+		}
+
 		private List<CltPlayer> mBlockingPlayers;
 
 		private void Awake()
@@ -30,7 +46,7 @@ namespace FiringSquad.Gameplay
 			mTimeoutTimer = mTimeoutPeriod;
 			mCapturePercentageTimer = 0.0f;
 			mBlockingPlayers = new List<CltPlayer>(4);
-			mCapturingPlayer = null;
+			currentCapturingPlayer = null;
 			mCapturable = true;
 			RpcReflectActiveState(true);
 		}
@@ -57,9 +73,9 @@ namespace FiringSquad.Gameplay
 		private void UpdateCapturingPlayer()
 		{
 			// check if the previous capturer left or died
-			if (mCapturingPlayer == null && mBlockingPlayers.Count > 0)
+			if (currentCapturingPlayer == null && mBlockingPlayers.Count > 0)
 			{
-				mCapturingPlayer = mBlockingPlayers[0];
+				currentCapturingPlayer = mBlockingPlayers[0];
 				mBlockingPlayers.RemoveAt(0);
 			}
 		}
@@ -67,13 +83,13 @@ namespace FiringSquad.Gameplay
 		[Server]
 		private void UpdateCapturePercent()
 		{
-			if (mCapturingPlayer != null && mBlockingPlayers.Count == 0)
+			if (currentCapturingPlayer != null && mBlockingPlayers.Count == 0)
 			{
 				mCapturePercentageTimer += Time.deltaTime;
 
 				if (mCapturePercentageTimer >= mCaptureTime)
 				{
-					EventManager.Notify(() => EventManager.Server.PlayerCapturedStage(this, mCapturingPlayer));
+					EventManager.Notify(() => EventManager.Server.PlayerCapturedStage(this, currentCapturingPlayer));
 					mCapturable = false;
 				}
 			}
@@ -82,7 +98,7 @@ namespace FiringSquad.Gameplay
 		[Server]
 		private void UpdateTimeout()
 		{
-			if (mCapturingPlayer == null)
+			if (currentCapturingPlayer == null)
 			{
 				mTimeoutTimer -= Time.deltaTime;
 
@@ -104,11 +120,11 @@ namespace FiringSquad.Gameplay
 			if (player == null)
 				return;
 
-			if (mBlockingPlayers.Contains(player) || mCapturingPlayer == player)
+			if (mBlockingPlayers.Contains(player) || currentCapturingPlayer == player)
 				return;
 
-			if (mCapturingPlayer == null)
-				mCapturingPlayer = player;
+			if (currentCapturingPlayer == null)
+				currentCapturingPlayer = player;
 			else
 				mBlockingPlayers.Add(player);
 		}
@@ -123,8 +139,8 @@ namespace FiringSquad.Gameplay
 			if (player == null)
 				return;
 
-			if (mCapturingPlayer == player)
-				mCapturingPlayer = null;
+			if (currentCapturingPlayer == player)
+				currentCapturingPlayer = null;
 			else
 				mBlockingPlayers.Remove(player);
 		}
