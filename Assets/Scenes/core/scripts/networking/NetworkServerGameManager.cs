@@ -2,9 +2,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using FiringSquad.Data;
 using FiringSquad.Gameplay;
+using FiringSquad.Gameplay.Weapons;
 using KeatsLib.Collections;
 using KeatsLib.State;
+using KeatsLib.Unity;
 using UnityEngine;
 using UnityEngine.Networking;
 using Logger = FiringSquad.Debug.Logger;
@@ -14,6 +17,7 @@ namespace FiringSquad.Networking
 {
 	public class NetworkServerGameManager : NetworkBehaviour
 	{
+		[SerializeField] private List<WeaponPartScript> mStageCaptureParts;
 		[SerializeField] private float mMinStageWaitTime;
 		[SerializeField] private float mMaxStageWaitTime;
 		[SerializeField] private int mRoundTime;
@@ -178,10 +182,25 @@ namespace FiringSquad.Networking
 				{
 					stage.gameObject.SetActive(false);
 
-					// TODO: Spawn a legendary part here
+					SpawnLegendaryPart(stage, player);
 
 					StageCaptureArea nextStage = mMachine.mCaptureAreas.Where(x => x != stage).ChooseRandom();
 					mStageEnableRoutine = mMachine.mScript.StartCoroutine(EnableStageArea(nextStage));
+				}
+
+				private void SpawnLegendaryPart(StageCaptureArea stage, CltPlayer player)
+				{
+					WeaponPartCollection currentParts = player.weapon.currentParts;
+					var allPossibilities = mMachine.mScript.mStageCaptureParts;
+					var possibilities = allPossibilities.Where(x => !currentParts.Contains(x));
+					WeaponPartScript choice = possibilities.ChooseRandom();
+
+					GameObject instance = choice.SpawnInWorld();
+					instance.transform.position = stage.transform.position + Vector3.up * 45.0f;
+					instance.name = choice.partId;
+
+					NetworkServer.Spawn(instance);
+					mMachine.mScript.StartCoroutine(Coroutines.InvokeAfterFrames(2, () => { instance.GetComponent<WeaponPickupScript>().RpcInitializePickupView(); }));
 				}
 
 				private void OnStageTimedOut(StageCaptureArea stage)
