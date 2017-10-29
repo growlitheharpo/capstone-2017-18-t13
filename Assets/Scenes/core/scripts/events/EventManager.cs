@@ -174,6 +174,13 @@ public partial class EventManager
 		{
 			OnPlayerCapturedStage(area, player);
 		}
+
+		public static event Action<StageCaptureArea> OnStageTimedOut = (s) => { LogEvent(); };
+
+		public static void StageTimedOut(StageCaptureArea stage)
+		{
+			OnStageTimedOut(stage);
+		}
 	}
 
 	#endregion

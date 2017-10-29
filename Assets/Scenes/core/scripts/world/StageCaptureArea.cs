@@ -11,8 +11,9 @@ namespace FiringSquad.Gameplay
 		[SerializeField] private float mCaptureTime;
 		[SerializeField] private CollisionForwarder mTrigger;
 
-		private float mCapturePercentage;
-		private float mTimeout;
+		private bool mCapturable;
+		private float mCapturePercentageTimer;
+		private float mTimeoutTimer;
 
 		private CltPlayer mCapturingPlayer;
 		private List<CltPlayer> mBlockingPlayers;
@@ -26,38 +27,72 @@ namespace FiringSquad.Gameplay
 		[ServerCallback]
 		private void OnEnable()
 		{
-			mTimeout = mTimeoutPeriod;
-			mCapturePercentage = 0.0f;
+			mTimeoutTimer = mTimeoutPeriod;
+			mCapturePercentageTimer = 0.0f;
 			mBlockingPlayers = new List<CltPlayer>(4);
 			mCapturingPlayer = null;
+			mCapturable = true;
+		}
+
+		[ServerCallback]
+		private void OnDisable()
+		{
+			mCapturable = false;
 		}
 
 		[ServerCallback]
 		private void Update()
 		{
+			if (!mCapturable)
+				return;
+
 			UpdateCapturingPlayer();
 			UpdateCapturePercent();
 			UpdateTimeout();
 		}
 
+		[Server]
 		private void UpdateCapturingPlayer()
 		{
 			// check if the previous capturer left or died
 			if (mCapturingPlayer == null && mBlockingPlayers.Count > 0)
+			{
 				mCapturingPlayer = mBlockingPlayers[0];
+				mBlockingPlayers.RemoveAt(0);
+			}
 		}
 
+		[Server]
 		private void UpdateCapturePercent()
 		{
 			if (mCapturingPlayer != null && mBlockingPlayers.Count == 0)
-				mCapturePercentage += Time.deltaTime;
+			{
+				mCapturePercentageTimer += Time.deltaTime;
+
+				if (mCapturePercentageTimer >= mCaptureTime)
+				{
+					EventManager.Notify(() => EventManager.Server.PlayerCapturedStage(this, mCapturingPlayer));
+					mCapturable = false;
+				}
+			}
 		}
 
+		[Server]
 		private void UpdateTimeout()
 		{
-			
+			if (mCapturingPlayer == null)
+			{
+				mTimeoutTimer -= Time.deltaTime;
+
+				if (mTimeoutTimer >= mTimeoutPeriod)
+				{
+					mCapturable = false;
+					EventManager.Notify(() => EventManager.Server.StageTimedOut(this));
+				}
+			}
 		}
 
+		// [Server] through return check
 		private void OnTriggerEnter(Collider other)
 		{
 			if (!isServer)
@@ -76,6 +111,7 @@ namespace FiringSquad.Gameplay
 				mBlockingPlayers.Add(player);
 		}
 
+		// [Server] through return check
 		private void OnTriggerExit(Collider other)
 		{
 			if (!isServer)
