@@ -167,6 +167,13 @@ public partial class EventManager
 		{
 			OnFinishGame();
 		}
+
+		public static event Action<StageCaptureArea, CltPlayer> OnPlayerCapturedStage = (s, p) => { LogEvent(); };
+
+		public static void PlayerCapturedStage(StageCaptureArea area, CltPlayer player)
+		{
+			OnPlayerCapturedStage(area, player);
+		}
 	}
 
 	#endregion
