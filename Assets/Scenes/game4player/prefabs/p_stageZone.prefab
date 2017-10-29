@@ -104,6 +104,8 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4858603433685418}
+  - component: {fileID: 114239871231317296}
+  - component: {fileID: 114254250448632062}
   m_Layer: 0
   m_Name: p_stageZone
   m_TagString: Untagged
@@ -135,6 +137,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4984448578483670}
   - component: {fileID: 65731188378899522}
+  - component: {fileID: 114501853253463418}
   m_Layer: 0
   m_Name: Trigger
   m_TagString: Untagged
@@ -670,3 +673,58 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &114239871231317296
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1341832284757590}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 372142912, guid: dc443db3e92b4983b9738c1131f555cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SceneId:
+    m_Value: 0
+  m_AssetId:
+    i0: 22
+    i1: 236
+    i2: 208
+    i3: 17
+    i4: 182
+    i5: 127
+    i6: 34
+    i7: 180
+    i8: 122
+    i9: 67
+    i10: 124
+    i11: 19
+    i12: 251
+    i13: 104
+    i14: 124
+    i15: 245
+  m_ServerOnly: 0
+  m_LocalPlayerAuthority: 0
+--- !u!114 &114254250448632062
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1341832284757590}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b34ba9a3328aa949a8444a8217cdc08, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mTrigger: {fileID: 114501853253463418}
+--- !u!114 &114501853253463418
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1419911305031946}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bf5a83d4906fb494180378b550ec36cd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
