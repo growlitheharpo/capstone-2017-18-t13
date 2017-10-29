@@ -122,7 +122,7 @@ namespace FiringSquad.Gameplay.NPC
 				return false;
 
 			RaycastHit hitInfo;
-			if (!Physics.Raycast(ray, out hitInfo, mTurret.data.targetingRange + 1000.0f, mTurret.data.visibilityMask))
+			if (!Physics.Raycast(ray, out hitInfo, mTurret.data.targetingRange + 1000.0f, mTurret.data.visibilityMask, QueryTriggerInteraction.Ignore))
 				return true;
 
 			UnityEngine.Debug.DrawLine(ray.origin, hitInfo.point, Color.red);

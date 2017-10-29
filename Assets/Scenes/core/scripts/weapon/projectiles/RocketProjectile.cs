@@ -71,7 +71,7 @@ namespace FiringSquad.Gameplay.Weapons
 
 				Ray ray = new Ray(transform.position, col.transform.position - transform.position);
 				RaycastHit hitInfo;
-				Physics.Raycast(ray, out hitInfo);
+				Physics.Raycast(ray, out hitInfo, mSplashDamageRadius * 1.5f, int.MaxValue, QueryTriggerInteraction.Ignore);
 
 				if (hitInfo.collider != col)
 					continue;
