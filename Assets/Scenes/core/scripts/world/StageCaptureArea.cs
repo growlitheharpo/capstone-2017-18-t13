@@ -43,7 +43,7 @@ namespace FiringSquad.Gameplay
 		[ServerCallback]
 		private void OnEnable()
 		{
-			mTimeoutTimer = mTimeoutPeriod;
+			mTimeoutTimer = 0.0f;
 			mCapturePercentageTimer = 0.0f;
 			mBlockingPlayers = new List<CltPlayer>(4);
 			currentCapturingPlayer = null;
@@ -100,7 +100,7 @@ namespace FiringSquad.Gameplay
 		{
 			if (currentCapturingPlayer == null)
 			{
-				mTimeoutTimer -= Time.deltaTime;
+				mTimeoutTimer += Time.deltaTime;
 
 				if (mTimeoutTimer >= mTimeoutPeriod)
 				{
