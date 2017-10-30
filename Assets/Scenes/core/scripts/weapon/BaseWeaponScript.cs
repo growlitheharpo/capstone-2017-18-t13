@@ -388,7 +388,15 @@ namespace FiringSquad.Gameplay.Weapons
 		[Command]
 		private void CmdOnShotFireComplete()
 		{
+			RpcReflectPlayerShotWeapon();
 			EventManager.Server.PlayerFiredWeapon(bearer, null);
+		}
+
+		[ClientRpc]
+		private void RpcReflectPlayerShotWeapon()
+		{
+			if (!bearer.isCurrentPlayer)
+				PlayFireEffect();
 		}
 
 		private bool CanFireShotNow()
