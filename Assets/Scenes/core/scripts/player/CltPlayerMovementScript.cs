@@ -181,6 +181,7 @@ namespace FiringSquad.Gameplay
 				mPlayer.localAnimator.SetTrigger("Land");
 				mPlayer.networkAnimator.SetTrigger("Land");
 
+				mJump = false;
 				mIsJumping = false;
 			}
 			if (!mController.isGrounded && !mIsJumping && mPreviouslyGrounded)

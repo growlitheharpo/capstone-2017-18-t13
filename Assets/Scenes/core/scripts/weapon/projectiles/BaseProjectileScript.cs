@@ -24,31 +24,29 @@ namespace FiringSquad.Gameplay.Weapons
 		{
 			sourceWeapon = weapon;
 		}
-
-		protected void PlaySound(AudioEvent e)
+		
+		[ClientRpc]
+		protected void RpcPlaySound(NetworkInstanceId hitObj, Vector3 position)
 		{
-			if (!isClient)
-				return;
-
-			IAudioReference effect = ServiceLocator.Get<IAudioManager>().CreateSound(e, transform, false);
-			effect.weaponType = mAudioWeaponType;
-			effect.Start();
-		}
-
-		protected void PlaySound(AudioEvent e, Vector3 position)
-		{
-			if (!isClient)
-				return;
+			AudioEvent e = GetHitAudioEvent(hitObj);
 
 			IAudioReference effect = ServiceLocator.Get<IAudioManager>().CreateSound(e, transform, position, Space.World, false);
 			effect.weaponType = mAudioWeaponType;
 			effect.Start();
 		}
 
-		protected AudioEvent GetHitAudioEvent(IDamageReceiver hitObject)
+		[Client]
+		private AudioEvent GetHitAudioEvent(NetworkInstanceId hitObject)
 		{
-			ICharacter player = hitObject as ICharacter;
-			if (hitObject == null || player == null)
+			if (hitObject == NetworkInstanceId.Invalid)
+				return AudioEvent.ImpactWall;
+
+			GameObject obj = ClientScene.FindLocalObject(hitObject);
+			if (obj == null)
+				return AudioEvent.ImpactWall;
+
+			ICharacter player = obj.GetComponent<ICharacter>();
+			if (player == null)
 				return AudioEvent.ImpactWall;
 
 			return player.isCurrentPlayer ? AudioEvent.ImpactCurrentPlayer : AudioEvent.ImpactOtherPlayer;

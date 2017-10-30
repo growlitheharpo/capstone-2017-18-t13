@@ -17,8 +17,6 @@ namespace FiringSquad.Gameplay.Weapons
 		private Renderer mRenderer;
 		private WeaponData mData; // server-only
 
-		private GameObject mSpawnedParticles;
-
 		private void Awake()
 		{
 			mRigidbody = GetComponent<Rigidbody>();
@@ -49,7 +47,8 @@ namespace FiringSquad.Gameplay.Weapons
 				mDirectHit = hit.transform;
 			}
 
-			PlaySound(GetHitAudioEvent(component), hit.contacts[0].point);
+			NetworkBehaviour netObject = component as NetworkBehaviour;
+			RpcPlaySound(netObject == null ? NetworkInstanceId.Invalid : netId, hit.contacts[0].point);
 
 			ApplySplashDamage();
 			RpcActivateExplodeEffect();

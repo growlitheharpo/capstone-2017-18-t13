@@ -55,7 +55,6 @@ namespace FiringSquad.Gameplay
 			base.OnStartServer();
 
 			// register for server events
-			EventManager.Server.OnPlayerFiredWeapon += OnPlayerFiredWeapon;
 			EventManager.Server.OnPlayerDied += OnPlayerDied;
 
 			EventManager.Server.OnStartGame += OnStartGame;
@@ -111,7 +110,6 @@ namespace FiringSquad.Gameplay
 
 		private void OnDestroy()
 		{
-			EventManager.Server.OnPlayerFiredWeapon -= OnPlayerFiredWeapon;
 			EventManager.Server.OnPlayerDied -= OnPlayerDied;
 			EventManager.Server.OnStartGame -= OnStartGame;
 			EventManager.Server.OnFinishGame -= OnFinishGame;
@@ -229,15 +227,7 @@ namespace FiringSquad.Gameplay
 		{
 			weapon.AttachNewPart(part);
 		}
-
-		[Server]
-		[EventHandler]
-		private void OnPlayerFiredWeapon(IWeaponBearer p, List<Ray> shots)
-		{
-			if (ReferenceEquals(p, this))
-				RpcReflectPlayerShotWeapon(p.netId);
-		}
-
+		
 		[Server]
 		private void SpawnDeathWeaponParts()
 		{
@@ -259,16 +249,6 @@ namespace FiringSquad.Gameplay
 
 				StartCoroutine(Coroutines.InvokeAfterFrames(2, () => { instance.GetComponent<WeaponPickupScript>().RpcInitializePickupView(); }));
 			}
-		}
-
-		[ClientRpc]
-		private void RpcReflectPlayerShotWeapon(NetworkInstanceId playerId)
-		{
-			if (isCurrentPlayer)
-				return;
-
-			CltPlayer p = ClientScene.FindLocalObject(playerId).GetComponent<CltPlayer>();
-			p.weapon.PlayFireEffect();
 		}
 
 		#endregion
