@@ -1,4 +1,5 @@
 ﻿using System;
+using KeatsLib.Unity;
 using UnityEngine;
 using UIText = UnityEngine.UI.Text;
 
@@ -16,6 +17,7 @@ namespace FiringSquad.Gameplay.UI
 		}
 
 		[SerializeField] private UIText mStatusLine;
+		[SerializeField] private UIFillBarScript mTimerBar;
 
 		public void SetMode(Mode m)
 		{
@@ -24,9 +26,13 @@ namespace FiringSquad.Gameplay.UI
 			{
 				case Mode.NoPoints:
 					mStatusLine.text = "";
+					mTimerBar.gameObject.SetActive(false);
+					mTimerBar.SetFillAmount(0.0f, true);
 					break;
 				case Mode.NoCapturing:
 					mStatusLine.text = "A Stage is Available for Capture!";
+					mTimerBar.gameObject.SetActive(true);
+					mTimerBar.SetFillAmount(0.0f, true);
 					break;
 				case Mode.WereCapturing:
 					mStatusLine.text = "Capturing Stage...";
@@ -36,6 +42,8 @@ namespace FiringSquad.Gameplay.UI
 					break;
 				case Mode.PointCaptured:
 					mStatusLine.text = "";
+					mTimerBar.gameObject.SetActive(false);
+					mTimerBar.SetFillAmount(0.0f, true);
 					break;
 				default:
 					throw new ArgumentOutOfRangeException("m", m, null);
@@ -44,7 +52,7 @@ namespace FiringSquad.Gameplay.UI
 
 		public void SetCapturePercent(float p)
 		{
-			
+			mTimerBar.SetFillAmount(p, !mTimerBar.gameObject.activeInHierarchy);
 		}
 	}
 }

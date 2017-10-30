@@ -33,9 +33,17 @@ namespace KeatsLib.Unity
 		/// Set the new fill amount of the bar (from 0 to 1)
 		/// </summary>
 		/// <param name="amount">The new amount.</param>
-		public void SetFillAmount(float amount)
+		/// <param name="immediate">Whether to force the value to the new amount immediately</param>
+		public void SetFillAmount(float amount, bool immediate = false)
 		{
 			StopAllCoroutines();
+			if (immediate)
+			{
+				mFillBar.fillAmount = amount;
+				mDelayBar.fillAmount = amount;
+				return;
+			}
+
 			if (mFillBar.fillAmount > amount)
 			{
 				mFillBar.fillAmount = amount;
