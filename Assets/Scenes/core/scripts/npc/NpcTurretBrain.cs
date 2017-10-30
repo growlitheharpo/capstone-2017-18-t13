@@ -107,6 +107,9 @@ namespace FiringSquad.Gameplay.NPC
 
 		private bool IsTargetValid(ICharacter target)
 		{
+			if (target == null)
+				return false;
+
 			Vector3 targetPos = target.transform.position;
 			Vector3 ourPos = mTurret.transform.position;
 			Vector3 ourForward = mTurret.eye.forward;
