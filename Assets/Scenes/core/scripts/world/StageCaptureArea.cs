@@ -14,7 +14,7 @@ namespace FiringSquad.Gameplay
 
 		[SyncVar(hook = "OnCapturableChanged")] private bool mCapturable;
 		[SyncVar(hook = "OnCapturePercentageChanged")] private float mCapturePercentageTimer;
-		private float mTimeoutTimer;
+		[SyncVar(hook = "OnTimeoutTimerChanged")] private float mTimeoutTimer;
 
 		[SyncVar(hook = "OnCapturePlayerIdChanged")] private NetworkInstanceId mCapturingPlayerId;
 		private CltPlayer mCapturingPlayer;
@@ -31,7 +31,7 @@ namespace FiringSquad.Gameplay
 
 				mCapturingPlayerId = value == null ? NetworkInstanceId.Invalid : value.netId;
 				mCapturingPlayer = value;
-				mTimeoutTimer = 0.0f;
+				mCapturePercentageTimer = 0.0f;
 			}
 		}
 
@@ -189,6 +189,12 @@ namespace FiringSquad.Gameplay
 		{
 			mCapturePercentageTimer = p;
 			kUIManager.SetCapturePercent(p / mCaptureTime);
+		}
+
+		private void OnTimeoutTimerChanged(float t)
+		{
+			mTimeoutTimer = t;
+			kUIManager.SetRemainingTime(mTimeoutPeriod - t);
 		}
 
 		private void ReflectActiveState(bool active)

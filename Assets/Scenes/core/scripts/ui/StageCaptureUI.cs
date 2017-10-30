@@ -17,31 +17,37 @@ namespace FiringSquad.Gameplay.UI
 		}
 
 		[SerializeField] private UIText mStatusLine;
+		[SerializeField] private UIText mTimerLine;
 		[SerializeField] private UIFillBarScript mTimerBar;
 
 		public void SetMode(Mode m)
 		{
-			UnityEngine.Debug.Log("MODE: " + m);
 			switch (m)
 			{
 				case Mode.NoPoints:
 					mStatusLine.text = "";
+					mTimerLine.gameObject.SetActive(false);
 					mTimerBar.gameObject.SetActive(false);
-					mTimerBar.SetFillAmount(0.0f, true);
 					break;
 				case Mode.NoCapturing:
 					mStatusLine.text = "A Stage is Available for Capture!";
-					mTimerBar.gameObject.SetActive(true);
+					mTimerLine.gameObject.SetActive(true);
+					mTimerBar.gameObject.SetActive(false);
 					mTimerBar.SetFillAmount(0.0f, true);
 					break;
 				case Mode.WereCapturing:
+					mTimerLine.gameObject.SetActive(false);
+					mTimerBar.gameObject.SetActive(true);
 					mStatusLine.text = "Capturing Stage...";
 					break;
 				case Mode.OtherCapturing:
 					mStatusLine.text = "A Stage is Being Contested!";
+					mTimerLine.gameObject.SetActive(false);
+					mTimerBar.gameObject.SetActive(true);
 					break;
 				case Mode.PointCaptured:
 					mStatusLine.text = "";
+					mTimerLine.gameObject.SetActive(false);
 					mTimerBar.gameObject.SetActive(false);
 					mTimerBar.SetFillAmount(0.0f, true);
 					break;
@@ -53,6 +59,11 @@ namespace FiringSquad.Gameplay.UI
 		public void SetCapturePercent(float p)
 		{
 			mTimerBar.SetFillAmount(p, !mTimerBar.gameObject.activeInHierarchy);
+		}
+
+		public void SetRemainingTime(float p)
+		{
+			mTimerLine.text = p.ToString("##");
 		}
 	}
 }
