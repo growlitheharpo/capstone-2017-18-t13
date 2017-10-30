@@ -1,11 +1,9 @@
-﻿using UnityEngine;
-using UIText = UnityEngine.UI.Text;
+﻿using UIText = UnityEngine.UI.Text;
 
 namespace FiringSquad.Gameplay.UI
 {
-	public class BoundIntField : BoundUIElement<int>
+	public class BoundStringField : BoundUIElement<string>
 	{
-		[SerializeField] private string mDisplayFormat;
 		private UIText mTextElement;
 
 		protected override void Awake()
@@ -16,7 +14,7 @@ namespace FiringSquad.Gameplay.UI
 
 		protected override void HandlePropertyChanged()
 		{
-			mTextElement.text = property.value.ToString(mDisplayFormat);
+			mTextElement.text = property.value;
 		}
 	}
 }
