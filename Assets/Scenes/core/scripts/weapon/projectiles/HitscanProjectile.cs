@@ -25,7 +25,7 @@ namespace FiringSquad.Gameplay.Weapons
 
 			Vector3 endPoint;
 			RaycastHit hitInfo;
-			if (Physics.Raycast(initialDirection, out hitInfo))
+			if (Physics.Raycast(initialDirection, out hitInfo, 10000f, int.MaxValue, QueryTriggerInteraction.Ignore))
 			{
 				endPoint = hitInfo.point;
 

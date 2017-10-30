@@ -156,7 +156,7 @@ namespace FiringSquad.Gameplay
 				RaycastHit hit;
 
 				Ray ray = new Ray(eyePosition, eyeForward);
-				if (!Physics.Raycast(ray, out hit, mInformation.interactDistance))
+				if (!Physics.Raycast(ray, out hit, mInformation.interactDistance, int.MaxValue, QueryTriggerInteraction.Ignore))
 					return;
 
 				interactable = hit.GetInteractableComponent();

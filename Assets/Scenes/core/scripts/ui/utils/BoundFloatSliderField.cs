@@ -1,76 +1,28 @@
-﻿using System.Collections;
-using FiringSquad.Core;
-using FiringSquad.Core.UI;
-using KeatsLib.Unity;
+﻿using KeatsLib.Unity;
 using UnityEngine;
 
 namespace FiringSquad.Gameplay.UI
 {
-	public class BoundFloatSliderField : MonoBehaviour
+	public class BoundFloatSliderField : BoundUIElement<float>
 	{
-		[SerializeField] private string mBoundProperty;
 		[SerializeField] private float mMinValue;
 		[SerializeField] private float mMaxValue;
-
-		private IGameplayUIManager mUIManagerRef;
-		private BoundProperty<float> mProperty;
 		private UIFillBarScript mBar;
-		private int mPropertyHash;
-		private bool mSearching;
 
-		private void Awake()
+		protected override void Awake()
 		{
+			base.Awake();
 			mBar = GetComponentInChildren<UIFillBarScript>();
-			mPropertyHash = mBoundProperty.GetHashCode();
-			mProperty = null;
 		}
 
-		private void Start()
+		protected override void Start()
 		{
-			mUIManagerRef = ServiceLocator.Get<IGameplayUIManager>();
-			StartCoroutine(CheckForProperty());
-
 			mBar.SetFillAmount(0.0f);
 		}
-
-		private IEnumerator CheckForProperty()
+		
+		protected override void HandlePropertyChanged()
 		{
-			mSearching = true;
-			yield return null;
-
-			while (mProperty == null)
-			{
-				mProperty = mUIManagerRef.GetProperty<float>(mPropertyHash);
-				yield return null;
-			}
-
-			AttachProperty();
-		}
-
-		private void Update()
-		{
-			if (mProperty == null && !mSearching)
-				StartCoroutine(CheckForProperty());
-		}
-
-		private void AttachProperty()
-		{
-			mProperty.ValueChanged += HandlePropertyChanged;
-			mProperty.BeingDestroyed += CleanupProperty;
-			HandlePropertyChanged();
-			mSearching = false;
-		}
-
-		private void CleanupProperty()
-		{
-			mProperty.ValueChanged -= HandlePropertyChanged;
-			mProperty.BeingDestroyed -= CleanupProperty;
-			mProperty = null;
-		}
-
-		private void HandlePropertyChanged()
-		{
-			float rawVal = mProperty.value;
+			float rawVal = property.value;
 			float fill = (rawVal - mMinValue) / mMaxValue;
 			mBar.SetFillAmount(fill);
 		}
