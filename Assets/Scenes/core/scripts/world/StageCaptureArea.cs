@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using FiringSquad.Gameplay.UI;
 using KeatsLib.Unity;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -12,9 +13,10 @@ namespace FiringSquad.Gameplay
 		[SerializeField] private CollisionForwarder mTrigger;
 
 		[SyncVar(hook = "OnCapturableChanged")] private bool mCapturable;
-		private float mCapturePercentageTimer;
+		[SyncVar(hook = "OnCapturePercentageChanged")] private float mCapturePercentageTimer;
 		private float mTimeoutTimer;
 
+		[SyncVar(hook = "OnCapturePlayerIdChanged")] private NetworkInstanceId mCapturingPlayerId;
 		private CltPlayer mCapturingPlayer;
 		private CltPlayer currentCapturingPlayer
 		{
@@ -24,19 +26,24 @@ namespace FiringSquad.Gameplay
 			}
 			set
 			{
-				if (value != mCapturingPlayer)
-				{
-					mCapturingPlayer = value;
-					mTimeoutTimer = 0.0f;
-				}
+				if (value == mCapturingPlayer)
+					return;
+
+				mCapturingPlayerId = value == null ? NetworkInstanceId.Invalid : value.netId;
+				mCapturingPlayer = value;
+				mTimeoutTimer = 0.0f;
 			}
 		}
 
+		private static StageCaptureUI kUIManager;
 		private List<CltPlayer> mBlockingPlayers;
 		private List<GameObject> mChildren;
 
 		private void Awake()
 		{
+			if (kUIManager == null)
+				kUIManager = FindObjectOfType<StageCaptureUI>();
+
 			mTrigger.mTriggerEnterDelegate = OnTriggerEnter;
 			mTrigger.mTriggerExitDelegate = OnTriggerExit;
 
@@ -165,10 +172,31 @@ namespace FiringSquad.Gameplay
 			ReflectActiveState(mCapturable);
 		}
 
-		private void ReflectActiveState(bool state)
+		private void OnCapturePlayerIdChanged(NetworkInstanceId id)
+		{
+			mCapturingPlayerId = id;
+			if (id == NetworkInstanceId.Invalid)
+			{
+				kUIManager.SetMode(StageCaptureUI.Mode.NoCapturing);
+				return;
+			}
+
+			CltPlayer player = ClientScene.FindLocalObject(id).GetComponent<CltPlayer>();
+			kUIManager.SetMode(player.isCurrentPlayer ? StageCaptureUI.Mode.WereCapturing : StageCaptureUI.Mode.OtherCapturing);
+		}
+
+		private void OnCapturePercentageChanged(float p)
+		{
+			mCapturePercentageTimer = p;
+			kUIManager.SetCapturePercent(p / mCaptureTime);
+		}
+
+		private void ReflectActiveState(bool active)
 		{
 			foreach (GameObject child in mChildren)
-				child.SetActive(state);
+				child.SetActive(active);
+
+			kUIManager.SetMode(active ? StageCaptureUI.Mode.NoCapturing : StageCaptureUI.Mode.NoPoints);
 		}
 	}
 }
