@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using FiringSquad.Core.Audio;
 using FiringSquad.Data;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -11,7 +10,6 @@ namespace FiringSquad.Gameplay.Weapons
 		[SerializeField] private AnimationCurve mFalloffCurve;
 
 		private HitscanShootEffect mEffect;
-		private IAudioReference mSoundRef;
 
 		private void Awake()
 		{
@@ -25,7 +23,7 @@ namespace FiringSquad.Gameplay.Weapons
 
 			Vector3 endPoint;
 			RaycastHit hitInfo;
-			if (Physics.Raycast(initialDirection, out hitInfo))
+			if (Physics.Raycast(initialDirection, out hitInfo, 10000f, int.MaxValue, QueryTriggerInteraction.Ignore))
 			{
 				endPoint = hitInfo.point;
 
@@ -36,7 +34,8 @@ namespace FiringSquad.Gameplay.Weapons
 					hitObject.ApplyDamage(damage, endPoint, hitInfo.normal, this);
 				}
 
-				PlaySound(GetHitAudioEvent(hitObject), endPoint);
+				NetworkBehaviour netObject = hitObject as NetworkBehaviour;
+				RpcPlaySound(netObject == null ? NetworkInstanceId.Invalid : netObject.netId, endPoint);
 			}
 			else
 				endPoint = initialDirection.origin + initialDirection.direction * 5000.0f;

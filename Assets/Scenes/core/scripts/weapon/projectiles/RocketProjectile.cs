@@ -17,8 +17,6 @@ namespace FiringSquad.Gameplay.Weapons
 		private Renderer mRenderer;
 		private WeaponData mData; // server-only
 
-		private GameObject mSpawnedParticles;
-
 		private void Awake()
 		{
 			mRigidbody = GetComponent<Rigidbody>();
@@ -49,7 +47,8 @@ namespace FiringSquad.Gameplay.Weapons
 				mDirectHit = hit.transform;
 			}
 
-			PlaySound(GetHitAudioEvent(component), hit.contacts[0].point);
+			NetworkBehaviour netObject = component as NetworkBehaviour;
+			RpcPlaySound(netObject == null ? NetworkInstanceId.Invalid : netId, hit.contacts[0].point);
 
 			ApplySplashDamage();
 			RpcActivateExplodeEffect();
@@ -71,7 +70,7 @@ namespace FiringSquad.Gameplay.Weapons
 
 				Ray ray = new Ray(transform.position, col.transform.position - transform.position);
 				RaycastHit hitInfo;
-				Physics.Raycast(ray, out hitInfo);
+				Physics.Raycast(ray, out hitInfo, mSplashDamageRadius * 1.5f, int.MaxValue, QueryTriggerInteraction.Ignore);
 
 				if (hitInfo.collider != col)
 					continue;

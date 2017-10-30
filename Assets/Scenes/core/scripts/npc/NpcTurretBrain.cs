@@ -107,6 +107,9 @@ namespace FiringSquad.Gameplay.NPC
 
 		private bool IsTargetValid(ICharacter target)
 		{
+			if (target == null)
+				return false;
+
 			Vector3 targetPos = target.transform.position;
 			Vector3 ourPos = mTurret.transform.position;
 			Vector3 ourForward = mTurret.eye.forward;
@@ -122,7 +125,7 @@ namespace FiringSquad.Gameplay.NPC
 				return false;
 
 			RaycastHit hitInfo;
-			if (!Physics.Raycast(ray, out hitInfo, mTurret.data.targetingRange + 1000.0f, mTurret.data.visibilityMask))
+			if (!Physics.Raycast(ray, out hitInfo, mTurret.data.targetingRange + 1000.0f, mTurret.data.visibilityMask, QueryTriggerInteraction.Ignore))
 				return true;
 
 			UnityEngine.Debug.DrawLine(ray.origin, hitInfo.point, Color.red);

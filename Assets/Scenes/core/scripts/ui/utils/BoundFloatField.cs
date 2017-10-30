@@ -1,73 +1,22 @@
-﻿using System.Collections;
-using FiringSquad.Core;
-using FiringSquad.Core.UI;
-using UnityEngine;
+﻿using UnityEngine;
 using UIText = UnityEngine.UI.Text;
 
 namespace FiringSquad.Gameplay.UI
 {
-	public class BoundFloatField : MonoBehaviour
+	public class BoundFloatField : BoundUIElement<float>
 	{
-		[SerializeField] private string mBoundProperty;
 		[SerializeField] private string mDisplayFormat;
-
-		private IGameplayUIManager mUIManagerRef;
-		private BoundProperty<float> mProperty;
 		private UIText mTextElement;
-		private int mPropertyHash;
-		private bool mSearching;
 
-		private void Awake()
+		protected override void Awake()
 		{
+			base.Awake();
 			mTextElement = GetComponent<UIText>();
-			mPropertyHash = mBoundProperty.GetHashCode();
-			mProperty = null;
 		}
 
-		private void Start()
+		protected override void HandlePropertyChanged()
 		{
-			mUIManagerRef = ServiceLocator.Get<IGameplayUIManager>();
-		}
-
-		private IEnumerator CheckForProperty()
-		{
-			mSearching = true;
-
-			yield return new WaitForEndOfFrame();
-			yield return new WaitForEndOfFrame();
-			while (mProperty == null)
-			{
-				mProperty = mUIManagerRef.GetProperty<float>(mPropertyHash);
-				yield return null;
-			}
-
-			AttachProperty();
-		}
-
-		private void Update()
-		{
-			if (mProperty == null && !mSearching)
-				StartCoroutine(CheckForProperty());
-		}
-
-		private void AttachProperty()
-		{
-			mProperty.ValueChanged += HandlePropertyChanged;
-			mProperty.BeingDestroyed += CleanupProperty;
-			HandlePropertyChanged();
-			mSearching = false;
-		}
-
-		private void CleanupProperty()
-		{
-			mProperty.ValueChanged -= HandlePropertyChanged;
-			mProperty.BeingDestroyed -= CleanupProperty;
-			mProperty = null;
-		}
-
-		private void HandlePropertyChanged()
-		{
-			mTextElement.text = mProperty.value.ToString(mDisplayFormat);
+			mTextElement.text = property.value.ToString(mDisplayFormat);
 		}
 	}
 }
