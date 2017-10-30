@@ -205,7 +205,7 @@ namespace FiringSquad.Networking
 
 				private void OnStageTimedOut(StageCaptureArea stage)
 				{
-					stage.Enable();
+					stage.Disable();
 
 					StageCaptureArea nextStage = mMachine.mCaptureAreas.Where(x => x != stage).ChooseRandom();
 					mStageEnableRoutine = mMachine.mScript.StartCoroutine(EnableStageArea(nextStage));
