@@ -109,46 +109,6 @@ NavMeshSettings:
     tileSize: 256
     accuratePlacement: 0
   m_NavMeshData: {fileID: 0}
---- !u!1 &4366418
-GameObject:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  serializedVersion: 5
-  m_Component:
-  - component: {fileID: 4366419}
-  - component: {fileID: 4366420}
-  m_Layer: 0
-  m_Name: SpawnPoint (5)
-  m_TagString: Untagged
-  m_Icon: {fileID: 5721338939258241955, guid: 0000000000000000d000000000000000, type: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &4366419
-Transform:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 4366418}
-  m_LocalRotation: {x: -0, y: 0.90058184, z: -0, w: -0.4346865}
-  m_LocalPosition: {x: 48.49, y: 6.62, z: 16.67}
-  m_LocalScale: {x: 1.0000004, y: 1, z: 1.0000004}
-  m_Children: []
-  m_Father: {fileID: 839935456}
-  m_RootOrder: 8
-  m_LocalEulerAnglesHint: {x: 0, y: 231.53099, z: 0}
---- !u!114 &4366420
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 4366418}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: -1050975500, guid: dc443db3e92b4983b9738c1131f555cb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &24723891
 Prefab:
   m_ObjectHideFlags: 0
@@ -432,46 +392,6 @@ Transform:
   m_PrefabParentObject: {fileID: 4153540426220584, guid: 58276ecbe88e88b4bb796ca762d1c9d3,
     type: 2}
   m_PrefabInternal: {fileID: 114108910}
---- !u!1 &116193085
-GameObject:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  serializedVersion: 5
-  m_Component:
-  - component: {fileID: 116193086}
-  - component: {fileID: 116193087}
-  m_Layer: 0
-  m_Name: SpawnPoint (4)
-  m_TagString: Untagged
-  m_Icon: {fileID: 5721338939258241955, guid: 0000000000000000d000000000000000, type: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &116193086
-Transform:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 116193085}
-  m_LocalRotation: {x: -0, y: 0.65296286, z: -0, w: 0.75739}
-  m_LocalPosition: {x: -56.27, y: 6.62, z: 23.75}
-  m_LocalScale: {x: 1.0000004, y: 1, z: 1.0000004}
-  m_Children: []
-  m_Father: {fileID: 839935456}
-  m_RootOrder: 7
-  m_LocalEulerAnglesHint: {x: 0, y: 81.531006, z: 0}
---- !u!114 &116193087
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 116193085}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: -1050975500, guid: dc443db3e92b4983b9738c1131f555cb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &123864996
 Prefab:
   m_ObjectHideFlags: 0
@@ -2090,8 +2010,6 @@ Transform:
   - {fileID: 464026572}
   - {fileID: 243075687}
   - {fileID: 1560534360}
-  - {fileID: 116193086}
-  - {fileID: 4366419}
   - {fileID: 1688662369}
   m_Father: {fileID: 0}
   m_RootOrder: 7
@@ -2503,7 +2421,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 1463620131862082, guid: 616b26a98846a3042a18df2323af3a31, type: 2}
       propertyPath: m_Name
-      value: p_npcTurret01_minigun (3)
+      value: p_npcTurret01_auto (3)
       objectReference: {fileID: 0}
     - target: {fileID: 4389931075675772, guid: 616b26a98846a3042a18df2323af3a31, type: 2}
       propertyPath: m_LocalEulerAnglesHint.y
@@ -4648,7 +4566,7 @@ Transform:
   m_LocalScale: {x: 1.0000004, y: 1, z: 1.0000004}
   m_Children: []
   m_Father: {fileID: 839935456}
-  m_RootOrder: 9
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 291.531, z: 0}
 --- !u!114 &1688662370
 MonoBehaviour:
