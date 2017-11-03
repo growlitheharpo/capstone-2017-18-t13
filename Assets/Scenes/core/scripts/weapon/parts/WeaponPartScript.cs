@@ -83,7 +83,7 @@ namespace FiringSquad.Gameplay.Weapons
 			Destroy(copy.GetComponent<NetworkIdentity>());
 
 			WeaponPartScript script = copy.GetComponent<WeaponPartScript>();
-			if (weapon.bearer.isCurrentPlayer)
+			if (weapon.bearer != null && weapon.bearer.isCurrentPlayer)
 				script.BindDurabilityToUI();
 
 			return script;
