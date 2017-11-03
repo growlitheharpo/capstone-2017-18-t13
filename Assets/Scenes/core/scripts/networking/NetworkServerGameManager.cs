@@ -2,7 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using FiringSquad.Core;
 using FiringSquad.Data;
+using FiringSquad.Debug;
 using FiringSquad.Gameplay;
 using FiringSquad.Gameplay.Weapons;
 using KeatsLib.Collections;
@@ -28,11 +30,23 @@ namespace FiringSquad.Networking
 		public override void OnStartServer()
 		{
 			mStateMachine = new ServerStateMachine(this);
+
+			ServiceLocator.Get<IGameConsole>().RegisterCommand("force-start", CONSOLE_ForceStartGame);
+		}
+
+		private void OnDestroy()
+		{
+			ServiceLocator.Get<IGameConsole>().UnregisterCommand(CONSOLE_ForceStartGame);
 		}
 
 		private void Update()
 		{
 			mStateMachine.Update();
+		}
+
+		private void CONSOLE_ForceStartGame(string[] obj)
+		{
+			mStateMachine.ForceStartGameNow();
 		}
 
 		private static Transform ChooseSafestSpawnPosition(CltPlayer[] players, CltPlayer deadPlayer, IList<Transform> targets)
@@ -61,6 +75,11 @@ namespace FiringSquad.Networking
 				mScript = script;
 				mStartPositions = FindObjectsOfType<NetworkStartPosition>().Select(x => x.transform).ToArray();
 				TransitionStates(new WaitingForConnectionState(this));
+			}
+
+			public void ForceStartGameNow()
+			{
+				TransitionStates(new StartGameState(this));
 			}
 
 			public new void Update()
