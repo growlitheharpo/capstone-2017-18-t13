@@ -19,12 +19,17 @@ namespace FiringSquad.Gameplay.UI
 		{
 			mImages = mImageHolder.GetComponentsInChildren<Image>();
 			mOriginalColors = mImages.Select(x => x.color).ToArray();
+
+			EventManager.Local.OnEnterAimDownSightsMode += OnEnterAimDownSightsMode;
+			EventManager.Local.OnExitAimDownSightsMode += OnExitAimDownSightsMode;
 			EventManager.Local.OnLocalPlayerSpawned += OnLocalPlayerSpawned;
 			EventManager.Local.OnLocalPlayerCausedDamage += OnLocalPlayerCausedDamage;
 		}
 
 		private void OnDestroy()
 		{
+			EventManager.Local.OnEnterAimDownSightsMode -= OnEnterAimDownSightsMode;
+			EventManager.Local.OnExitAimDownSightsMode -= OnExitAimDownSightsMode;
 			EventManager.Local.OnLocalPlayerSpawned -= OnLocalPlayerSpawned;
 			EventManager.Local.OnLocalPlayerCausedDamage -= OnLocalPlayerCausedDamage;
 		}
@@ -33,6 +38,16 @@ namespace FiringSquad.Gameplay.UI
 		{
 			mPlayerRef = obj;
 			EventManager.Local.OnLocalPlayerSpawned -= OnLocalPlayerSpawned;
+		}
+
+		private void OnEnterAimDownSightsMode()
+		{
+			mImageHolder.gameObject.SetActive(false);
+		}
+
+		private void OnExitAimDownSightsMode()
+		{
+			mImageHolder.gameObject.SetActive(true);
 		}
 
 		private void Update()
