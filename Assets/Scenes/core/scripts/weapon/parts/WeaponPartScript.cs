@@ -9,6 +9,11 @@ namespace FiringSquad.Gameplay.Weapons
 		public const int INFINITE_DURABILITY = -1;
 		public const int USE_DEFAULT_DURABILITY = -2;
 
+		public abstract BaseWeaponScript.Attachment attachPoint { get; }
+
+		[SerializeField] private Sprite mDurabilitySprite;
+		public Sprite durabilitySprite { get { return mDurabilitySprite; } }
+
 		[SerializeField] private WeaponPartData mData;
 		public WeaponPartData[] data { get { return new[] { mData }; } }
 
@@ -32,7 +37,6 @@ namespace FiringSquad.Gameplay.Weapons
 			}
 		}
 
-		public abstract BaseWeaponScript.Attachment attachPoint { get; }
 
 		public GameObject SpawnInWorld()
 		{
