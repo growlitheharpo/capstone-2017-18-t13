@@ -427,7 +427,7 @@ namespace FiringSquad.Gameplay.Weapons
 			return new Ray(root.position, root.forward + randomness);
 		}
 
-		private float GetCurrentDispersionFactor(bool forceNotZero)
+		public float GetCurrentDispersionFactor(bool forceNotZero)
 		{
 			float percentage = 0.0f;
 			float inverseFireRate = 1.0f / currentData.fireRate;
