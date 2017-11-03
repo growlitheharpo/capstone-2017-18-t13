@@ -87,6 +87,13 @@ public partial class EventManager
 		{
 			OnExitAimDownSightsMode();
 		}
+
+		public static event Action<float> OnLocalPlayerCausedDamage = a => { LogEvent(); };
+
+		public static void LocalPlayerCausedDamage(float amount)
+		{
+			OnLocalPlayerCausedDamage(amount);
+		}
 	}
 
 	public static class LocalGUI

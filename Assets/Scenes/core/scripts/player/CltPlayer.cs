@@ -297,7 +297,7 @@ namespace FiringSquad.Gameplay
 			if (ReferenceEquals(cause.source, this))
 				amount *= 0.5f;
 
-			RpcReflectDamageLocally(point, normal, cause.source.gameObject.transform.position, amount);
+			RpcReflectDamageLocally(point, normal, cause.source.gameObject.transform.position, amount, cause.source.netId);
 
 			if (mHealth <= 0.0f)
 				return;
@@ -331,8 +331,12 @@ namespace FiringSquad.Gameplay
 		}
 
 		[ClientRpc]
-		private void RpcReflectDamageLocally(Vector3 point, Vector3 normal, Vector3 origin, float amount)
+		private void RpcReflectDamageLocally(Vector3 point, Vector3 normal, Vector3 origin, float amount, NetworkInstanceId source)
 		{
+			ICharacter realSource = ClientScene.FindLocalObject(source).GetComponent<ICharacter>();
+			if (realSource.isCurrentPlayer)
+				EventManager.Notify(() => EventManager.Local.LocalPlayerCausedDamage(amount));
+
 			mHitIndicator.NotifyHit(this, origin, point, normal, amount);
 		}
 
