@@ -283,7 +283,7 @@ namespace FiringSquad.Networking
 
 				public override void OnEnter()
 				{
-					EventManager.Server.FinishGame();
+					EventManager.Server.FinishGame(mMachine.mPlayerScores.Values.ToArray());
 				}
 
 				public override IState GetTransition()

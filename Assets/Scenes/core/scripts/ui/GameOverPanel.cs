@@ -1,5 +1,6 @@
 ﻿using FiringSquad.Core;
 using FiringSquad.Core.State;
+using FiringSquad.Data;
 using UnityEngine;
 using UIText = UnityEngine.UI.Text;
 
@@ -30,10 +31,10 @@ namespace FiringSquad.Gameplay.UI
 				.RequestSceneChange(GamestateManager.MENU_SCENE);
 		}
 
-		private void HandleGameover(string whoWins)
+		private void HandleGameover(PlayerScore[] scores)
 		{
 			gameObject.SetActive(true);
-			mWhoWinsText.text = whoWins;
+			//mWhoWinsText.text = whoWins;
 		}
 	}
 }

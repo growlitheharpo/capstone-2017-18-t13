@@ -270,9 +270,9 @@ namespace FiringSquad.Gameplay
 
 		[Server]
 		[EventHandler]
-		private void OnFinishGame()
+		private void OnFinishGame(PlayerScore[] scores)
 		{
-			RpcHandleFinishGame();
+			RpcHandleFinishGame(PlayerScore.SerializeArray(scores));
 		}
 
 		[ClientRpc]
@@ -282,9 +282,10 @@ namespace FiringSquad.Gameplay
 		}
 
 		[ClientRpc]
-		private void RpcHandleFinishGame()
+		private void RpcHandleFinishGame(byte[] serializedArray)
 		{
-			EventManager.Notify(EventManager.Local.ReceiveFinishEvent);
+			var scores = PlayerScore.DeserializeArray(serializedArray);
+			EventManager.Notify(() => EventManager.Local.ReceiveFinishEvent(scores));
 		}
 
 		#endregion
