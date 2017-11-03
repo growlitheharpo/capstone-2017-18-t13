@@ -1,14 +1,16 @@
-﻿using FiringSquad.Core;
+﻿using System.Linq;
+using FiringSquad.Core;
 using FiringSquad.Core.State;
 using FiringSquad.Data;
 using UnityEngine;
-using UIText = UnityEngine.UI.Text;
+using UnityEngine.Networking;
+using UnityEngine.UI;
 
 namespace FiringSquad.Gameplay.UI
 {
 	public class GameOverPanel : MonoBehaviour
 	{
-		[SerializeField] private UIText mWhoWinsText;
+		[SerializeField] private GridLayoutGroup mScoreGrid;
 		[SerializeField] private ActionProvider mQuitButton;
 
 		private void Start()
@@ -33,8 +35,23 @@ namespace FiringSquad.Gameplay.UI
 
 		private void HandleGameover(PlayerScore[] scores)
 		{
+			NetworkInstanceId localPlayerId = FindObjectsOfType<CltPlayer>().First(x => x.isCurrentPlayer).netId;
+
 			gameObject.SetActive(true);
-			//mWhoWinsText.text = whoWins;
+			for (int i = 0; i < scores.Length; i++)
+			{
+				PlayerScore score = scores[i];
+
+				GameObject go = new GameObject("Score", typeof(RectTransform), typeof(Text));
+				go.transform.SetParent(mScoreGrid.transform);
+
+				Text text = go.GetComponent<Text>();
+				text.text = string.Format("{0}\n{1}\n{2}\n{3}",
+					score.playerId == localPlayerId ? "You" : "",
+					"P" + (i + 1),
+					score.kills,
+					score.deaths);
+			}
 		}
 	}
 }
