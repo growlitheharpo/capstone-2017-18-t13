@@ -42,6 +42,7 @@ namespace FiringSquad.Gameplay.UI
 					mTimerLine.gameObject.SetActive(false);
 					mTimerBar.gameObject.SetActive(true);
 					mStatusLine.text = "Capturing Stage...";
+					mPointer.StopPointing();
 					break;
 				case Mode.OtherCapturing:
 					mStatusLine.text = "A Stage is Being Contested!";
