@@ -37,7 +37,25 @@ namespace FiringSquad.Gameplay.UI
 		private void MoveAndFaceTarget()
 		{
 			Vector3 targetPos = mTarget.transform.position;
-			Vector3 viewportPos = Camera.main.WorldToViewportPoint(targetPos);
+			Vector3 cameraForward = Camera.main.transform.forward;
+			Vector2 viewportPos = Camera.main.WorldToViewportPoint(targetPos);
+
+			float dot = Vector3.Dot((targetPos - Camera.main.transform.position).normalized, cameraForward);
+
+			if (Mathf.Abs(viewportPos.x - 0.5f) > 0.45f || Mathf.Abs(viewportPos.y - 0.5f) > 0.45f || dot < 0.05f) // off screen
+			{
+				Vector2 center = Vector2.one * 0.5f;
+				Vector2 adjustedPos = (viewportPos - center).normalized / 2.0f + center;
+
+				mRealTransform.anchorMin = new Vector2(adjustedPos.x, adjustedPos.y);
+				mRealTransform.anchorMax = new Vector2(adjustedPos.x, adjustedPos.y);
+			}
+			else
+			{
+				mRealTransform.anchorMin = new Vector2(viewportPos.x, viewportPos.y);
+				mRealTransform.anchorMax = new Vector2(viewportPos.x, viewportPos.y);
+				mRealTransform.localRotation = Quaternion.identity;
+			}
 		}
 	}
 }
