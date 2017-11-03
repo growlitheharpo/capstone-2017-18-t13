@@ -1149,7 +1149,7 @@ Prefab:
     - target: {fileID: 224939658174624686, guid: cf4e8828806124e47aac370817cbba86,
         type: 2}
       propertyPath: m_RootOrder
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 224939658174624686, guid: cf4e8828806124e47aac370817cbba86,
         type: 2}
@@ -1374,7 +1374,7 @@ Canvas:
   serializedVersion: 3
   m_RenderMode: 1
   m_Camera: {fileID: 538957509}
-  m_PlaneDistance: 0.35
+  m_PlaneDistance: 0.15
   m_PixelPerfect: 0
   m_ReceivesEvents: 1
   m_OverrideSorting: 0
@@ -1394,6 +1394,7 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_Children:
+  - {fileID: 1502542375}
   - {fileID: 738267886}
   m_Father: {fileID: 732805538}
   m_RootOrder: 2
@@ -2352,7 +2353,7 @@ Prefab:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
-    m_TransformParent: {fileID: 1624843850}
+    m_TransformParent: {fileID: 966679936}
     m_Modifications:
     - target: {fileID: 224769994694418866, guid: 0cef40ddebff53843941f1813c10124c,
         type: 2}
@@ -2372,17 +2373,17 @@ Prefab:
     - target: {fileID: 224769994694418866, guid: 0cef40ddebff53843941f1813c10124c,
         type: 2}
       propertyPath: m_LocalRotation.x
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224769994694418866, guid: 0cef40ddebff53843941f1813c10124c,
         type: 2}
       propertyPath: m_LocalRotation.y
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224769994694418866, guid: 0cef40ddebff53843941f1813c10124c,
         type: 2}
       propertyPath: m_LocalRotation.z
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224769994694418866, guid: 0cef40ddebff53843941f1813c10124c,
         type: 2}
@@ -2392,7 +2393,7 @@ Prefab:
     - target: {fileID: 224769994694418866, guid: 0cef40ddebff53843941f1813c10124c,
         type: 2}
       propertyPath: m_RootOrder
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224769994694418866, guid: 0cef40ddebff53843941f1813c10124c,
         type: 2}
@@ -2754,7 +2755,6 @@ RectTransform:
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_Children:
   - {fileID: 446327254}
-  - {fileID: 1502542375}
   m_Father: {fileID: 732805538}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
