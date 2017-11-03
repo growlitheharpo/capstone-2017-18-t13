@@ -1,4 +1,6 @@
-﻿using FiringSquad.Data;
+﻿using FiringSquad.Core;
+using FiringSquad.Core.Weapons;
+using FiringSquad.Data;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -24,8 +26,25 @@ namespace FiringSquad.Gameplay.Weapons
 		public string prettyName { get { return mPrettyName; } }
 
 		[SerializeField] private int mDurability = INFINITE_DURABILITY;
+		private BoundProperty<float> mDurabilityPercent = new BoundProperty<float>();
+		private int mBaseDurability;
 
-		public int durability { get { return mDurability; } set { mDurability = value; } }
+		public int durability
+		{
+			get
+			{
+				return mDurability;
+			}
+			set
+			{
+				mDurability = value;
+				if (mBaseDurability <= 0)
+					return;
+
+				float percent = value / (float)mBaseDurability;
+				mDurabilityPercent.value = percent;
+			}
+		}
 
 		public string partId
 		{
@@ -37,6 +56,10 @@ namespace FiringSquad.Gameplay.Weapons
 			}
 		}
 
+		private void OnDestroy()
+		{
+			mDurabilityPercent.Cleanup(); // force this so that the UI is unbound
+		}
 
 		public GameObject SpawnInWorld()
 		{
@@ -59,7 +82,17 @@ namespace FiringSquad.Gameplay.Weapons
 			Destroy(copy.GetComponent<NetworkTransform>());
 			Destroy(copy.GetComponent<NetworkIdentity>());
 
-			return copy.GetComponent<WeaponPartScript>();
+			WeaponPartScript script = copy.GetComponent<WeaponPartScript>();
+			if (weapon.bearer.isCurrentPlayer)
+				script.BindDurabilityToUI();
+
+			return script;
+		}
+
+		private void BindDurabilityToUI()
+		{
+			mBaseDurability = durability;
+			mDurabilityPercent = new BoundProperty<float>(1.0f, ("player_part_durability_" + attachPoint.ToString().ToLower()).GetHashCode());
 		}
 	}
 }
