@@ -50,7 +50,29 @@ namespace FiringSquad.Gameplay.Weapons
 			Grip = 0x8,
 		}
 
-		public IWeaponBearer bearer { get; set; }
+		[Flags]
+		private enum DirtyBitFlags
+		{
+			None = 0x0,
+			Bearer = 0x1,
+			ScopeId = 0x2,
+			BarrelId = 0x4,
+			MechanismId = 0x8,
+			GripId = 0x10,
+			Durability = 0x11,
+		}
+
+		private IWeaponBearer mBearer;
+		public IWeaponBearer bearer
+		{
+			get { return mBearer; }
+			set
+			{
+				mBearer = value;
+				
+			}
+		}
+
 		public Transform aimRoot { get; set; }
 		public Vector3 positionOffset { get; set; }
 		
@@ -134,8 +156,6 @@ namespace FiringSquad.Gameplay.Weapons
 		// [Client] AND [Server]
 		private void Update()
 		{
-			SetDirtyBit(99999);
-
 			// Follow my player
 			if (bearer == null || bearer.eye == null)
 				return;
