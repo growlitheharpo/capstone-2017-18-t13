@@ -177,12 +177,12 @@ namespace FiringSquad.Gameplay
 			mCapturingPlayerId = id;
 			if (id == NetworkInstanceId.Invalid)
 			{
-				kUIManager.SetMode(StageCaptureUI.Mode.NoCapturing);
+				kUIManager.SetMode(StageCaptureUI.Mode.NoCapturing, this);
 				return;
 			}
 
 			CltPlayer player = ClientScene.FindLocalObject(id).GetComponent<CltPlayer>();
-			kUIManager.SetMode(player.isCurrentPlayer ? StageCaptureUI.Mode.WereCapturing : StageCaptureUI.Mode.OtherCapturing);
+			kUIManager.SetMode(player.isCurrentPlayer ? StageCaptureUI.Mode.WereCapturing : StageCaptureUI.Mode.OtherCapturing, this);
 		}
 
 		private void OnCapturePercentageChanged(float p)
@@ -202,7 +202,7 @@ namespace FiringSquad.Gameplay
 			foreach (GameObject child in mChildren)
 				child.SetActive(active);
 
-			kUIManager.SetMode(active ? StageCaptureUI.Mode.NoCapturing : StageCaptureUI.Mode.NoPoints);
+			kUIManager.SetMode(active ? StageCaptureUI.Mode.NoCapturing : StageCaptureUI.Mode.NoPoints, this);
 		}
 	}
 }

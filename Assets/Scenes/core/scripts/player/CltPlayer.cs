@@ -270,9 +270,9 @@ namespace FiringSquad.Gameplay
 
 		[Server]
 		[EventHandler]
-		private void OnFinishGame()
+		private void OnFinishGame(PlayerScore[] scores)
 		{
-			RpcHandleFinishGame();
+			TargetHandleFinishGame(connectionToClient, PlayerScore.SerializeArray(scores));
 		}
 
 		[ClientRpc]
@@ -281,10 +281,14 @@ namespace FiringSquad.Gameplay
 			EventManager.Notify(() => EventManager.Local.ReceiveStartEvent(gameEndTime));
 		}
 
-		[ClientRpc]
-		private void RpcHandleFinishGame()
+		[TargetRpc]
+		private void TargetHandleFinishGame(NetworkConnection connection, byte[] serializedArray)
 		{
-			EventManager.Notify(EventManager.Local.ReceiveFinishEvent);
+			if (!isLocalPlayer)
+				return;
+			
+			var scores = PlayerScore.DeserializeArray(serializedArray);
+			EventManager.Notify(() => EventManager.Local.ReceiveFinishEvent(scores));
 		}
 
 		#endregion
@@ -297,7 +301,7 @@ namespace FiringSquad.Gameplay
 			if (ReferenceEquals(cause.source, this))
 				amount *= 0.5f;
 
-			RpcReflectDamageLocally(point, normal, cause.source.gameObject.transform.position, amount);
+			RpcReflectDamageLocally(point, normal, cause.source.gameObject.transform.position, amount, cause.source.netId);
 
 			if (mHealth <= 0.0f)
 				return;
@@ -331,8 +335,12 @@ namespace FiringSquad.Gameplay
 		}
 
 		[ClientRpc]
-		private void RpcReflectDamageLocally(Vector3 point, Vector3 normal, Vector3 origin, float amount)
+		private void RpcReflectDamageLocally(Vector3 point, Vector3 normal, Vector3 origin, float amount, NetworkInstanceId source)
 		{
+			ICharacter realSource = ClientScene.FindLocalObject(source).GetComponent<ICharacter>();
+			if (realSource.isCurrentPlayer)
+				EventManager.Notify(() => EventManager.Local.LocalPlayerCausedDamage(amount));
+
 			mHitIndicator.NotifyHit(this, origin, point, normal, amount);
 		}
 

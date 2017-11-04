@@ -1,6 +1,7 @@
 ﻿using System;
 using FiringSquad.Core.Input;
 using FiringSquad.Core.UI;
+using FiringSquad.Data;
 using FiringSquad.Gameplay;
 using KeatsLib.State;
 using UnityEngine;
@@ -106,20 +107,12 @@ namespace FiringSquad.Core.State
 					mRemainingTime = new BoundProperty<float>(CalculateRemainingTime(), GameplayUIManager.ARENA_ROUND_TIME);
 				}
 
-				private void OnReceiveFinishEvent()
+				private void OnReceiveFinishEvent(PlayerScore[] scores)
 				{
 					int myScore = ServiceLocator.Get<IGameplayUIManager>().GetProperty<int>(GameplayUIManager.PLAYER_KILLS).value;
 					int myDeaths = ServiceLocator.Get<IGameplayUIManager>().GetProperty<int>(GameplayUIManager.PLAYER_DEATHS).value;
-
-					string resultText;
-					if (myScore > myDeaths)
-						resultText = "You win!";
-					else if (myScore < myDeaths)
-						resultText = "You lost.";
-					else
-						resultText = "It's a tie!";
-
-					EventManager.Notify(() => EventManager.LocalGUI.ShowGameoverPanel(resultText));
+					
+					EventManager.Notify(() => EventManager.LocalGUI.ShowGameoverPanel(scores));
 					ServiceLocator.Get<IInput>().DisableInputLevel(InputLevel.Gameplay);
 				}
 

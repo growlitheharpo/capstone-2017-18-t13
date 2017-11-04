@@ -2,7 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using FiringSquad.Core;
 using FiringSquad.Data;
+using FiringSquad.Debug;
 using FiringSquad.Gameplay;
 using FiringSquad.Gameplay.Weapons;
 using KeatsLib.Collections;
@@ -28,11 +30,23 @@ namespace FiringSquad.Networking
 		public override void OnStartServer()
 		{
 			mStateMachine = new ServerStateMachine(this);
+
+			ServiceLocator.Get<IGameConsole>().RegisterCommand("force-start", CONSOLE_ForceStartGame);
+		}
+
+		private void OnDestroy()
+		{
+			ServiceLocator.Get<IGameConsole>().UnregisterCommand(CONSOLE_ForceStartGame);
 		}
 
 		private void Update()
 		{
 			mStateMachine.Update();
+		}
+
+		private void CONSOLE_ForceStartGame(string[] obj)
+		{
+			mStateMachine.ForceStartGameNow();
 		}
 
 		private static Transform ChooseSafestSpawnPosition(CltPlayer[] players, CltPlayer deadPlayer, IList<Transform> targets)
@@ -63,6 +77,11 @@ namespace FiringSquad.Networking
 				TransitionStates(new WaitingForConnectionState(this));
 			}
 
+			public void ForceStartGameNow()
+			{
+				TransitionStates(new StartGameState(this));
+			}
+
 			public new void Update()
 			{
 				base.Update();
@@ -73,6 +92,7 @@ namespace FiringSquad.Networking
 			private readonly Transform[] mStartPositions;
 			private StageCaptureArea[] mCaptureAreas;
 			private CltPlayer[] mPlayerList;
+			private Dictionary<NetworkInstanceId, PlayerScore> mPlayerScores;
 
 			/// <summary>
 			/// The state we hold in until we have the required number of players
@@ -173,6 +193,8 @@ namespace FiringSquad.Networking
 					EventManager.Server.OnPlayerCapturedStage += OnPlayerCapturedStage;
 					EventManager.Server.OnStageTimedOut += OnStageTimedOut;
 
+					mMachine.mPlayerScores = mMachine.mPlayerList.Select(x => new PlayerScore(x)).ToDictionary(x => x.playerId);
+
 					mStageEnableRoutine = mMachine.mScript.StartCoroutine(EnableStageArea(mMachine.mCaptureAreas.ChooseRandom()));
 
 					EventManager.Notify(() => EventManager.Server.StartGame(mEndTime));
@@ -236,6 +258,12 @@ namespace FiringSquad.Networking
 				private void OnPlayerHealthHitsZero(CltPlayer dead, IDamageSource damage)
 				{
 					Transform newPosition = ChooseSafestSpawnPosition(mMachine.mPlayerList, dead, mMachine.mStartPositions);
+
+					if (damage.source is CltPlayer)
+						mMachine.mPlayerScores[damage.source.netId].kills++;
+
+					mMachine.mPlayerScores[dead.netId].deaths++;
+
 					EventManager.Notify(() => EventManager.Server.PlayerDied(dead, damage.source, newPosition));
 				}
 
@@ -255,7 +283,7 @@ namespace FiringSquad.Networking
 
 				public override void OnEnter()
 				{
-					EventManager.Server.FinishGame();
+					EventManager.Server.FinishGame(mMachine.mPlayerScores.Values.ToArray());
 				}
 
 				public override IState GetTransition()

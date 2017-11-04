@@ -252,6 +252,9 @@ namespace FiringSquad.Gameplay.Weapons
 
 			if (bearer != null)
 				ServiceLocator.Get<IAudioManager>().CreateSound(AudioEvent.EquipItem, transform);
+
+			if (instance.attachPoint == Attachment.Scope && mAimDownSightsActive)
+				currentParts.scope.ActivateAimDownSightsEffect(this);
 		}
 
 		private void MoveAttachmentToPoint(WeaponPartScript instance)
@@ -427,7 +430,7 @@ namespace FiringSquad.Gameplay.Weapons
 			return new Ray(root.position, root.forward + randomness);
 		}
 
-		private float GetCurrentDispersionFactor(bool forceNotZero)
+		public float GetCurrentDispersionFactor(bool forceNotZero)
 		{
 			float percentage = 0.0f;
 			float inverseFireRate = 1.0f / currentData.fireRate;

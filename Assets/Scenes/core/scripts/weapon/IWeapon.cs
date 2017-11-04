@@ -16,6 +16,11 @@ namespace FiringSquad.Gameplay.Weapons
 		WeaponData baseData { get; }
 
 		/// <summary>
+		/// The current data for this weapon, including things like recoil effects.
+		/// </summary>
+		WeaponData currentData { get; }
+
+		/// <summary>
 		/// Attach a new part to this weapon.
 		/// </summary>
 		/// <param name="partId">The part to be attached.</param>
@@ -51,6 +56,13 @@ namespace FiringSquad.Gameplay.Weapons
 		/// Gets the current recoil to apply to the bearer's view.
 		/// </summary>
 		float GetCurrentRecoil();
+
+		/// <summary>
+		/// Get the current dispersion factor based on the current stats of the weapon.
+		/// </summary>
+		/// <param name="forceNotZero">Whether or not this is the first shot and should be 0.</param>
+		/// <returns></returns>
+		float GetCurrentDispersionFactor(bool forceNotZero);
 
 		void FireWeaponHold();
 		void FireWeaponUp();
