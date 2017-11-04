@@ -1,4 +1,5 @@
-﻿using FiringSquad.Core;
+﻿using System;
+using FiringSquad.Core;
 using FiringSquad.Core.Weapons;
 using FiringSquad.Data;
 using UnityEngine;
@@ -94,5 +95,32 @@ namespace FiringSquad.Gameplay.Weapons
 			mBaseDurability = durability;
 			mDurabilityPercent = new BoundProperty<float>(1.0f, ("player_part_durability_" + attachPoint.ToString().ToLower()).GetHashCode());
 		}
+
+		#region Serialization
+
+		public void SerializeId(NetworkWriter writer)
+		{
+			writer.Write(partId);
+		}
+
+		public static string DeserializeId(NetworkReader reader)
+		{
+			return reader.ReadString();
+		}
+
+		public void SerializeDurability(NetworkWriter writer)
+		{
+			if (mDurability > byte.MaxValue)
+				throw new ArgumentException("Durability cannot be higher than " + byte.MaxValue);
+
+			writer.Write((byte)mDurability);
+		}
+
+		public static int DeserializeDurability(NetworkReader reader)
+		{
+			return reader.ReadByte();
+		}
+		
+		#endregion
 	}
 }
