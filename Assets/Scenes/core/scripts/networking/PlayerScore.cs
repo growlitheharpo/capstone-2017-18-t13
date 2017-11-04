@@ -10,7 +10,7 @@ namespace FiringSquad.Data
 		[SerializeField] private byte mKills;
 		[SerializeField] private byte mDeaths;
 
-		public NetworkInstanceId playerId { get; set; }
+		public NetworkInstanceId playerId { get { return mPlayerId; } }
 		public byte kills { get { return mKills; } set { mKills = value; } }
 		public byte deaths { get { return mDeaths; } set { mDeaths = value; } }
 

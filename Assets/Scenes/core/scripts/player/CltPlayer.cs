@@ -272,7 +272,7 @@ namespace FiringSquad.Gameplay
 		[EventHandler]
 		private void OnFinishGame(PlayerScore[] scores)
 		{
-			RpcHandleFinishGame(PlayerScore.SerializeArray(scores));
+			TargetHandleFinishGame(connectionToClient, PlayerScore.SerializeArray(scores));
 		}
 
 		[ClientRpc]
@@ -281,9 +281,12 @@ namespace FiringSquad.Gameplay
 			EventManager.Notify(() => EventManager.Local.ReceiveStartEvent(gameEndTime));
 		}
 
-		[ClientRpc]
-		private void RpcHandleFinishGame(byte[] serializedArray)
+		[TargetRpc]
+		private void TargetHandleFinishGame(NetworkConnection connection, byte[] serializedArray)
 		{
+			if (!isLocalPlayer)
+				return;
+			
 			var scores = PlayerScore.DeserializeArray(serializedArray);
 			EventManager.Notify(() => EventManager.Local.ReceiveFinishEvent(scores));
 		}

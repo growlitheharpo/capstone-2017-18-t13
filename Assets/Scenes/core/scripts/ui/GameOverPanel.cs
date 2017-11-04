@@ -2,6 +2,7 @@
 using FiringSquad.Core;
 using FiringSquad.Core.State;
 using FiringSquad.Data;
+using KeatsLib.Unity;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
@@ -10,6 +11,7 @@ namespace FiringSquad.Gameplay.UI
 {
 	public class GameOverPanel : MonoBehaviour
 	{
+		[SerializeField] private GameObject mScorePrefab;
 		[SerializeField] private GridLayoutGroup mScoreGrid;
 		[SerializeField] private ActionProvider mQuitButton;
 
@@ -42,7 +44,7 @@ namespace FiringSquad.Gameplay.UI
 			{
 				PlayerScore score = scores[i];
 
-				GameObject go = new GameObject("Score", typeof(RectTransform), typeof(Text));
+				GameObject go = Instantiate(mScorePrefab);
 				go.transform.SetParent(mScoreGrid.transform);
 
 				Text text = go.GetComponent<Text>();
@@ -51,6 +53,8 @@ namespace FiringSquad.Gameplay.UI
 					"P" + (i + 1),
 					score.kills,
 					score.deaths);
+
+				go.GetComponent<RectTransform>().position = Vector3.zero;
 			}
 		}
 	}
