@@ -8,7 +8,7 @@ namespace FiringSquad.Networking
 		void Deserialize(NetworkReader reader, out object target);
 	}
 
-	public interface INetworkable<out T> : INetworkable where T : new()
+	public interface INetworkable<out T> : INetworkable where T : struct
 	{
 		T Deserialize(NetworkReader reader);
 	}
