@@ -252,6 +252,9 @@ namespace FiringSquad.Gameplay.Weapons
 
 			if (bearer != null)
 				ServiceLocator.Get<IAudioManager>().CreateSound(AudioEvent.EquipItem, transform);
+
+			if (instance.attachPoint == Attachment.Scope && mAimDownSightsActive)
+				currentParts.scope.ActivateAimDownSightsEffect(this);
 		}
 
 		private void MoveAttachmentToPoint(WeaponPartScript instance)
