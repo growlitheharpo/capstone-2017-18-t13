@@ -562,15 +562,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 012ed6da583da6149b8ecf1dd8032c61, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mAudioProfile: {fileID: 11400000, guid: 4bd979dee78bfff48a35481c999b1209, type: 2}
   mBarrelAttach: {fileID: 4096145057804758}
   mScopeAttach: {fileID: 4197488167877586}
   mMechanismAttach: {fileID: 4891504686318262}
   mGripAttach: {fileID: 4904606761592194}
-  mAimDownSightsDispersionMod: 0.75
+  mAimDownSightsDispersionMod: 0.25
   mDefaultData:
-    mMinimumDispersion: 0.04
-    mMaximumDispersion: 0.1
+    mMinimumDispersion: 0.02
+    mMaximumDispersion: 0.06
     mDispersionRamp: 0.2
     mRecoilAmount: 0.75
     mRecoilTime: 0.35
@@ -599,7 +598,7 @@ MonoBehaviour:
       m_PostInfinity: 2
       m_RotationOrder: 0
     mDamage: 50
-    mDamageFalloffDistance: 25
+    mDamageFalloffDistance: 40
     mFireRate: 2
     mReloadTime: 1
     mClipSize: 10

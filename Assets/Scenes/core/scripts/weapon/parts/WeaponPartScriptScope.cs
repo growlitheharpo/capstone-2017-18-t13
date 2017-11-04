@@ -19,13 +19,16 @@ namespace FiringSquad.Gameplay.Weapons
 			mMoveRoutine = StartCoroutine(Coroutines.LerpPosition(subView, mAimDownSightsPosition, 0.2f, Space.Self, Coroutines.MATHF_SMOOTHSTEP));
 		}
 
-		public void DeactivateAimDownSightsEffect(IWeapon weapon)
+		public void DeactivateAimDownSightsEffect(IWeapon weapon, bool immediate = false)
 		{
 			Transform subView = weapon.transform.Find("View").GetChild(0);
 			if (mMoveRoutine != null)
 				StopCoroutine(mMoveRoutine);
 
-			mMoveRoutine = StartCoroutine(Coroutines.LerpPosition(subView, Vector3.zero, 0.2f, Space.Self, Coroutines.MATHF_SMOOTHSTEP));
+			if (!immediate)
+				mMoveRoutine = StartCoroutine(Coroutines.LerpPosition(subView, Vector3.zero, 0.2f, Space.Self, Coroutines.MATHF_SMOOTHSTEP));
+			else
+				subView.transform.localPosition = Vector3.zero;
 		}
 	}
 }

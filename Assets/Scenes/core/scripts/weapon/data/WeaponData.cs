@@ -1,4 +1,5 @@
 ﻿using System;
+using FiringSquad.Networking;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.Serialization;
@@ -6,7 +7,7 @@ using UnityEngine.Serialization;
 namespace FiringSquad.Data
 {
 	[Serializable]
-	public struct WeaponData
+	public struct WeaponData : INetworkable<WeaponData>
 	{
 		[FormerlySerializedAs("mSpread")] [SerializeField] private float mMinimumDispersion;
 		[SerializeField] private float mMaximumDispersion;
@@ -83,29 +84,40 @@ namespace FiringSquad.Data
 
 			stream.Write(mDamage);
 			stream.Write(mDamageFalloffDistance);
+
 			stream.Write(mFireRate);
 			stream.Write(mReloadTime);
 			stream.Write(mClipSize);
 		}
 
-		public static WeaponData Deserialize(WeaponData baseData, NetworkReader stream)
+		public void Deserialize(NetworkReader stream, out object target)
 		{
-			WeaponData result = new WeaponData(baseData)
+			target = new WeaponData
 			{
 				mMinimumDispersion = stream.ReadSingle(),
 				mMaximumDispersion = stream.ReadSingle(),
 				mDispersionRamp = stream.ReadSingle(),
+
+				mRecoilAmount = stream.ReadSingle(),
 				mRecoilTime = stream.ReadSingle(),
+
 				mDamage = stream.ReadSingle(),
 				mDamageFalloffDistance = stream.ReadSingle(),
+
 				mFireRate = stream.ReadSingle(),
 				mReloadTime = stream.ReadSingle(),
 				mClipSize = stream.ReadInt32()
 			};
-
-			return result;
 		}
 
+		public WeaponData Deserialize(NetworkReader reader)
+		{
+			object result;
+			Deserialize(reader, out result);
+			this = (WeaponData)result;
+			return this;
+		}
+		
 		public void ForceModifyMinDispersion(Modifier.Float modification)
 		{
 			mMinimumDispersion = modification.Apply(mMinimumDispersion);

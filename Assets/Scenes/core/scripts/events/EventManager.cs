@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using FiringSquad.Core;
+using FiringSquad.Data;
 using FiringSquad.Debug;
 using FiringSquad.Gameplay;
 using FiringSquad.Gameplay.UI;
@@ -39,11 +40,11 @@ public partial class EventManager
 			OnReceiveStartEvent(endTime);
 		}
 
-		public static event Action OnReceiveFinishEvent = () => { LogEvent(); };
+		public static event Action<PlayerScore[]> OnReceiveFinishEvent = (s) => { LogEvent(); };
 
-		public static void ReceiveFinishEvent()
+		public static void ReceiveFinishEvent(PlayerScore[] scores)
 		{
-			OnReceiveFinishEvent();
+			OnReceiveFinishEvent(scores);
 		}
 
 		public static event Action<CltPlayer> OnLocalPlayerSpawned = p => { LogEvent(); };
@@ -87,6 +88,13 @@ public partial class EventManager
 		{
 			OnExitAimDownSightsMode();
 		}
+
+		public static event Action<float> OnLocalPlayerCausedDamage = a => { LogEvent(); };
+
+		public static void LocalPlayerCausedDamage(float amount)
+		{
+			OnLocalPlayerCausedDamage(amount);
+		}
 	}
 
 	public static class LocalGUI
@@ -98,11 +106,11 @@ public partial class EventManager
 			OnTogglePauseMenu(visible);
 		}
 
-		public static event Action<string> OnShowGameoverPanel = s => { LogEvent(); };
+		public static event Action<PlayerScore[]> OnShowGameoverPanel = s => { LogEvent(); };
 
-		public static void ShowGameoverPanel(string whoWins)
+		public static void ShowGameoverPanel(PlayerScore[] scores)
 		{
-			OnShowGameoverPanel(whoWins);
+			OnShowGameoverPanel(scores);
 		}
 
 		public static event Action<CrosshairHintText.Hint, bool> OnSetHintState = (h, b) => { LogEvent(); };
@@ -161,11 +169,11 @@ public partial class EventManager
 			OnStartGame(endTime);
 		}
 
-		public static event Action OnFinishGame = () => { LogEvent(); };
+		public static event Action<PlayerScore[]> OnFinishGame = (s) => { LogEvent(); };
 
-		public static void FinishGame()
+		public static void FinishGame(PlayerScore[] scores)
 		{
-			OnFinishGame();
+			OnFinishGame(scores);
 		}
 
 		public static event Action<StageCaptureArea, CltPlayer> OnPlayerCapturedStage = (s, p) => { LogEvent(); };

@@ -56,7 +56,9 @@ namespace FiringSquad.Gameplay.UI
 		private void SpawnHitIndicator(ICharacter receiver, Vector3 sourcePosition, float amount)
 		{
 			GameObject newObj = mIndicatorPool.ReleaseNewItem();
-			RectTransform t = newObj.GetComponent<RectTransform>().ResetEverything(100.0f);
+			RectTransform t = newObj.GetComponent<RectTransform>();
+			t.SetParent(transform);
+			t.ResetEverything(new Vector2(0.4f, 0.4f), new Vector2(0.6f, 0.6f));
 
 			Vector3 cam = receiver.gameObject.transform.forward;
 			Vector3 a = receiver.gameObject.transform.position;
@@ -67,7 +69,7 @@ namespace FiringSquad.Gameplay.UI
 			dir = new Vector3(dir.x, 0.0f, dir.z);
 
 			float angle = Vector3.SignedAngle(cam.normalized, dir.normalized, Vector3.down);
-			t.rotation = Quaternion.Euler(0.0f, 0.0f, angle);
+			t.localRotation = Quaternion.Euler(0.0f, 0.0f, angle);
 
 			StartCoroutine(FadeOutColor(newObj.GetComponent<UIImage>(), mVisibleRadColor, mHiddenRadColor, FADE_OUT_TIME * 1.75f, true));
 		}

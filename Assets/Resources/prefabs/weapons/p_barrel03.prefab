@@ -397,12 +397,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7024d1c3bbf87e0498ff935403a3540e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mDurabilitySprite: {fileID: 21300000, guid: 7b92c0e9d26208746b38fc49bcb442bf, type: 3}
   mData:
     mMinDispersionModifier:
-      mAmount: 0.5
+      mAmount: 0.65
       mType: 3
     mMaxDispersionModifier:
-      mAmount: 0.5
+      mAmount: 0.85
       mType: 3
     mDispersionRampModifier:
       mAmount: 0
@@ -414,10 +415,10 @@ MonoBehaviour:
       mAmount: 2
       mType: 3
     mDamageModifier:
-      mAmount: 0.75
+      mAmount: 5
       mType: 2
     mDamageFalloffDistanceModifier:
-      mAmount: 75
+      mAmount: 200
       mType: 0
     mFireRateModifier:
       mAmount: 0.4

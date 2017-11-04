@@ -256,8 +256,25 @@ namespace KeatsLib.Unity
 		{
 			t.anchorMax = new Vector2(0.5f, 0.5f);
 			t.anchorMin = new Vector2(0.5f, 0.5f);
-			t.anchoredPosition = Vector2.zero;
+
+			t.localScale = Vector3.one;
+			t.anchoredPosition3D = Vector3.zero;
+			t.localRotation = Quaternion.identity;
 			t.sizeDelta = new Vector2(size, size);
+
+			return t;
+		}
+
+		public static RectTransform ResetEverything(this RectTransform t, Vector2 anchorMin, Vector2 anchorMax)
+		{
+			t.anchorMin = anchorMin;
+			t.anchorMax = anchorMax;
+
+			t.localScale = Vector3.one;
+			t.anchoredPosition3D = Vector3.zero;
+			t.localRotation = Quaternion.identity;
+			t.sizeDelta = new Vector2(0.0f, 0.0f);
+
 			return t;
 		}
 	}
