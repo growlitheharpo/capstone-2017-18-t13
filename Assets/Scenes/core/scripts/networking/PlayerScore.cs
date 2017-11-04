@@ -1,10 +1,11 @@
 ﻿using FiringSquad.Gameplay;
+using FiringSquad.Networking;
 using UnityEngine;
 using UnityEngine.Networking;
 
 namespace FiringSquad.Data
 {
-	public class PlayerScore
+	public class PlayerScore : INetworkable<PlayerScore>
 	{
 		[SerializeField] private NetworkInstanceId mPlayerId;
 		[SerializeField] private byte mKills;
@@ -56,16 +57,27 @@ namespace FiringSquad.Data
 			writer.Write(mDeaths);
 		}
 
-		public static PlayerScore Deserialize(NetworkReader reader)
+		public void Deserialize(NetworkReader reader, out object result)
 		{
-			PlayerScore result = new PlayerScore
+			result = new PlayerScore
 			{
 				mPlayerId = reader.ReadNetworkId(),
 				mKills = reader.ReadByte(),
 				mDeaths = reader.ReadByte()
 			};
+		}
 
-			return result;
+		public PlayerScore Deserialize(NetworkReader reader)
+		{
+			object result;
+			Deserialize(reader, out result);
+
+			PlayerScore realResult = (PlayerScore)result;
+			mPlayerId = realResult.mPlayerId;
+			mKills = realResult.mKills;
+			mDeaths = realResult.mDeaths;
+
+			return this;
 		}
 
 		public static byte[] SerializeArray(PlayerScore[] array)
@@ -86,7 +98,7 @@ namespace FiringSquad.Data
 
 			var result = new PlayerScore[size];
 			for (int i = 0; i < size; i++)
-				result[i] = Deserialize(r);
+				result[i] = result[i].Deserialize(r);
 
 			return result;
 		}

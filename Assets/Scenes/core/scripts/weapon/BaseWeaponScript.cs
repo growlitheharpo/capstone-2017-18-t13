@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Runtime.Serialization.Formatters.Binary;
 using FiringSquad.Core;
 using FiringSquad.Core.Audio;
 using FiringSquad.Core.UI;
@@ -50,10 +48,32 @@ namespace FiringSquad.Gameplay.Weapons
 			Grip = 0x8,
 		}
 
-		public IWeaponBearer bearer { get; set; }
+		[Flags]
+		private enum DirtyBitFlags
+		{
+			None = 0x0,
+			Bearer = 0x1,
+			ScopeId = 0x2,
+			BarrelId = 0x4,
+			MechanismId = 0x8,
+			GripId = 0x10,
+			Durability = 0x11,
+		}
+
+		private IWeaponBearer mBearer;
+		public IWeaponBearer bearer
+		{
+			get { return mBearer; }
+			set
+			{
+				mBearer = value;
+				SetDirtyBit(syncVarDirtyBits | (uint)DirtyBitFlags.Bearer);
+			}
+		}
+
 		public Transform aimRoot { get; set; }
 		public Vector3 positionOffset { get; set; }
-		
+
 		[SerializeField] private Transform mBarrelAttach;
 		[SerializeField] private Transform mScopeAttach;
 		[SerializeField] private Transform mMechanismAttach;
@@ -134,8 +154,6 @@ namespace FiringSquad.Gameplay.Weapons
 		// [Client] AND [Server]
 		private void Update()
 		{
-			SetDirtyBit(99999);
-
 			// Follow my player
 			if (bearer == null || bearer.eye == null)
 				return;
@@ -153,67 +171,158 @@ namespace FiringSquad.Gameplay.Weapons
 		#region Serialization
 
 		// Todo: Optimize these to only send changes
-		public override bool OnSerialize(NetworkWriter writer, bool initialState)
+		public override bool OnSerialize(NetworkWriter writer, bool forceAll)
 		{
-			BinaryFormatter bf = new BinaryFormatter();
-			using (MemoryStream memstream = new MemoryStream())
+			if (forceAll)
 			{
-				// write our bearer
 				writer.Write(bearer.netId);
 
-				// serialize our part ids
-				var partIds = mCurrentParts.allParts.Select(x => x.partId).ToArray();
-				bf.Serialize(memstream, partIds);
-				writer.WriteBytesAndSize(memstream.ToArray(), memstream.ToArray().Length);
+				foreach (WeaponPartScript p in currentParts)
+				{
+					p.SerializeId(writer);
+					p.SerializeDurability(writer);
+				}
 			}
-			using (MemoryStream memstream = new MemoryStream())
+			else // if (!forceAll)
 			{
-				// serialize our durability
-				var durabilities = mCurrentParts.allParts.Select(x => x.durability).ToArray();
-				bf.Serialize(memstream, durabilities);
-				writer.WriteBytesAndSize(memstream.ToArray(), memstream.ToArray().Length);
+				DirtyBitFlags flags = (DirtyBitFlags)syncVarDirtyBits;
+
+				writer.Write((byte)flags);
+
+				if ((flags & DirtyBitFlags.Bearer) != 0)
+					writer.Write(bearer.netId);
+				if ((flags & DirtyBitFlags.ScopeId) != 0)
+				{
+					currentParts.scope.SerializeId(writer);
+					currentParts.scope.SerializeDurability(writer);
+				}
+				if ((flags & DirtyBitFlags.BarrelId) != 0)
+				{
+					currentParts.barrel.SerializeId(writer);
+					currentParts.barrel.SerializeDurability(writer);
+				}
+				if ((flags & DirtyBitFlags.MechanismId) != 0)
+				{
+					currentParts.mechanism.SerializeId(writer);
+					currentParts.mechanism.SerializeDurability(writer);
+				}
+				if ((flags & DirtyBitFlags.GripId) != 0)
+				{
+					currentParts.grip.SerializeId(writer);
+					currentParts.grip.SerializeDurability(writer);
+				}
+				if ((flags & DirtyBitFlags.Durability) != 0)
+				{
+					foreach (WeaponPartScript p in currentParts)
+						p.SerializeDurability(writer);
+				}
 			}
 
+			ClearAllDirtyBits();
 			return true;
 		}
 
-		public override void OnDeserialize(NetworkReader reader, bool initialState)
+		public override void OnDeserialize(NetworkReader reader, bool forceAll)
 		{
-			BinaryFormatter binFormatter = new BinaryFormatter();
-
-			// read our bearer
-			NetworkInstanceId bearerId = reader.ReadNetworkId();
-			if (bearer == null || bearer.netId != bearerId)
+			if (forceAll)
 			{
-				GameObject bearerObj = ClientScene.FindLocalObject(bearerId);
-				if (bearerObj != null)
-					bearerObj.GetComponent<IWeaponBearer>().BindWeaponToBearer(this);
+				NetworkInstanceId bearerId = reader.ReadNetworkId();
+				StartCoroutine(BindToBearer(bearerId));
+
+				for (int i = 0; i < 4; i++)
+				{
+					string id = WeaponPartScript.DeserializeId(reader);
+					int durability = WeaponPartScript.DeserializeDurability(reader);
+
+					AttachNewPart(id, durability);
+				}
 			}
+			else // if (!forceAll)
+			{
+				DirtyBitFlags flags = (DirtyBitFlags)reader.ReadByte();
 
-			// read our weapon parts and durabilities
-			var bytearray = reader.ReadBytesAndSize();
-			var partList = (string[])binFormatter.Deserialize(new MemoryStream(bytearray));
+				if ((flags & DirtyBitFlags.Bearer) != 0)
+				{
+					NetworkInstanceId bearerId = reader.ReadNetworkId();
+					StartCoroutine(BindToBearer(bearerId));
+				}
 
-			bytearray = reader.ReadBytesAndSize();
-			var durabilityList = (int[])binFormatter.Deserialize(new MemoryStream(bytearray));
+				if ((flags & DirtyBitFlags.ScopeId) != 0)
+				{
+					string id = WeaponPartScript.DeserializeId(reader);
+					int durability = WeaponPartScript.DeserializeDurability(reader);
 
-			if (mCurrentParts == null)
-				mCurrentParts = new WeaponPartCollection();
+					AttachNewPart(id, durability);
+				}
+				if ((flags & DirtyBitFlags.BarrelId) != 0)
+				{
+					string id = WeaponPartScript.DeserializeId(reader);
+					int durability = WeaponPartScript.DeserializeDurability(reader);
 
-			if (mCurrentParts.scope == null || mCurrentParts.scope.partId != partList[0])
-				AttachNewPart(partList[0], durabilityList[0]);
-			if (mCurrentParts.barrel == null || mCurrentParts.barrel.partId != partList[1])
-				AttachNewPart(partList[1], durabilityList[1]);
-			if (mCurrentParts.mechanism == null || mCurrentParts.mechanism.partId != partList[2])
-				AttachNewPart(partList[2], durabilityList[2]);
-			if (mCurrentParts.grip == null || mCurrentParts.grip.partId != partList[3])
-				AttachNewPart(partList[3], durabilityList[3]);
+					AttachNewPart(id, durability);
+				}
+				if ((flags & DirtyBitFlags.MechanismId) != 0)
+				{
+					string id = WeaponPartScript.DeserializeId(reader);
+					int durability = WeaponPartScript.DeserializeDurability(reader);
+
+					AttachNewPart(id, durability);
+				}
+				if ((flags & DirtyBitFlags.GripId) != 0)
+				{
+					string id = WeaponPartScript.DeserializeId(reader);
+					int durability = WeaponPartScript.DeserializeDurability(reader);
+
+					AttachNewPart(id, durability);
+				}
+
+				if ((flags & DirtyBitFlags.Durability) != 0)
+				{
+					foreach (WeaponPartScript p in currentParts)
+						p.durability = WeaponPartScript.DeserializeDurability(reader);
+				}
+			}
+		}
+
+		private IEnumerator BindToBearer(NetworkInstanceId bearerId)
+		{
+			while (bearer == null || bearer.netId != bearerId)
+			{
+				GameObject obj = ClientScene.FindLocalObject(bearerId);
+				if (obj != null)
+					bearer = obj.GetComponent<IWeaponBearer>();
+
+				if (bearer != null)
+				{
+					bearer.BindWeaponToBearer(this);
+					yield break;
+				}
+
+				yield return null;
+			}
+		}
+
+		private DirtyBitFlags GetBitFromAttach(Attachment a)
+		{
+			switch (a)
+			{
+				case Attachment.Scope:
+					return DirtyBitFlags.ScopeId;
+				case Attachment.Barrel:
+					return DirtyBitFlags.BarrelId;
+				case Attachment.Mechanism:
+					return DirtyBitFlags.MechanismId;
+				case Attachment.Grip:
+					return DirtyBitFlags.GripId;
+				default:
+					return DirtyBitFlags.None;
+			}
 		}
 
 		#endregion
 
 		#region Part Attachment
-		
+
 		public void ResetToDefaultParts()
 		{
 			foreach (WeaponPartScript p in bearer.defaultParts)
@@ -226,6 +335,10 @@ namespace FiringSquad.Gameplay.Weapons
 				return;
 
 			WeaponPartScript prefab = ServiceLocator.Get<IWeaponPartManager>().GetPrefabScript(partId);
+			if (currentParts[prefab.attachPoint] != null && currentParts[prefab.attachPoint].partId == partId)
+				return;
+
+			SetDirtyBit(syncVarDirtyBits | (uint)GetBitFromAttach(prefab.attachPoint));
 			WeaponPartScript instance = prefab.SpawnForWeapon(this);
 
 			int originalClipsize = mCurrentData.clipSize;
@@ -476,6 +589,8 @@ namespace FiringSquad.Gameplay.Weapons
 				if (part.durability == 0)
 					BreakPart(part);
 			}
+
+			SetDirtyBit(syncVarDirtyBits | (uint)DirtyBitFlags.Durability);
 		}
 
 		[Server]

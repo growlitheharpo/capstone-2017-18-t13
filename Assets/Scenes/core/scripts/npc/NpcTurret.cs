@@ -108,7 +108,6 @@ namespace FiringSquad.Gameplay.NPC
 				wep.AttachNewPart(part.partId, WeaponPartScript.INFINITE_DURABILITY);
 		}
 
-		[Server]
 		public void PlayFireAnimation()
 		{
 			// ignore for now
