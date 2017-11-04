@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using FiringSquad.Core;
 using FiringSquad.Core.Audio;
 using FiringSquad.Gameplay.UI;
@@ -11,6 +12,14 @@ namespace FiringSquad.Gameplay
 {
 	public class PlayerMagnetArm : NetworkBehaviour
 	{
+		[Flags]
+		private enum DirtyBitFlags
+		{
+			None = 0x0,
+			Bearer = 0x1,
+			HeldObject = 0x2,
+		}
+
 		private enum State
 		{
 			Idle,
@@ -29,7 +38,16 @@ namespace FiringSquad.Gameplay
 
 		private IAudioReference mGrabSound;
 
-		public CltPlayer bearer { get; set; }
+		private CltPlayer mBearer;
+		public CltPlayer bearer
+		{
+			get { return mBearer; }
+			set
+			{
+				mBearer = value;
+				SetDirtyBit(syncVarDirtyBits | (uint)DirtyBitFlags.Bearer);
+			}
+		}
 
 		private WeaponPickupScript mGrabCandidate;
 		private float mHeldTimer;
