@@ -292,10 +292,14 @@ namespace FiringSquad.Gameplay.Weapons
 				if (obj != null)
 					bearer = obj.GetComponent<IWeaponBearer>();
 
+				if (bearer != null)
+				{
+					bearer.BindWeaponToBearer(this);
+					yield break;
+				}
+
 				yield return null;
 			}
-
-			bearer.BindWeaponToBearer(this);
 		}
 
 		private DirtyBitFlags GetBitFromAttach(Attachment a)
