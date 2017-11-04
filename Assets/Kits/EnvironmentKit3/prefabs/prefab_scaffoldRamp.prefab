@@ -36,6 +36,7 @@ GameObject:
   - component: {fileID: 4794289240362432}
   - component: {fileID: 33561718706651036}
   - component: {fileID: 23781254556072838}
+  - component: {fileID: 65048405105660264}
   m_Layer: 0
   m_Name: mesh_scaffoldRamp
   m_TagString: Untagged
@@ -50,7 +51,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1780195922729254}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: -1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4794289240362432}
@@ -110,3 +111,15 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1854494561685544}
   m_Mesh: {fileID: 4300000, guid: 4a1ce1464c8bf85468ced07f6994694e, type: 3}
+--- !u!65 &65048405105660264
+BoxCollider:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1854494561685544}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1.0000002, y: 0.057857916, z: 4.0000005}
+  m_Center: {x: 0.5000001, y: 0.028928958, z: -2.0000002}
