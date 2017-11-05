@@ -59,7 +59,7 @@ namespace FiringSquad.Gameplay.Weapons
 		}
 
 		[ClientRpc]
-		private void RpcCreateShot(NetworkInstanceId s, Vector3 endPoint)
+		private void RpcCreateShot(NetworkInstanceId s, Vector3 endPoint) // TODO: Does this need to be an RPC?? Poorly optimized
 		{
 			GameObject theSource = ClientScene.FindLocalObject(s);
 			if (theSource == null)

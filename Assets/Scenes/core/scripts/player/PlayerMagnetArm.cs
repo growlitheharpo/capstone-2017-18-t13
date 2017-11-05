@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections;
+using System.Linq;
 using FiringSquad.Core;
 using FiringSquad.Core.Audio;
 using FiringSquad.Gameplay.UI;
@@ -11,6 +13,13 @@ namespace FiringSquad.Gameplay
 {
 	public class PlayerMagnetArm : NetworkBehaviour
 	{
+		[Flags]
+		private enum DirtyBitFlags
+		{
+			Bearer = 0x1,
+			HeldObject = 0x2,
+		}
+
 		private enum State
 		{
 			Idle,
@@ -25,11 +34,32 @@ namespace FiringSquad.Gameplay
 		[SerializeField] private LayerMask mGrabLayers;
 
 		private WeaponPickupScript mHeldObject;
-		public WeaponPickupScript heldWeaponPart { get { return mHeldObject; } }
+
+		public WeaponPickupScript heldWeaponPart
+		{
+			get { return mHeldObject; }
+			set
+			{
+				if (mHeldObject == value)
+					return;
+
+				mHeldObject = value;
+				SetDirtyBit(syncVarDirtyBits | (uint)DirtyBitFlags.HeldObject);
+			}
+		}
 
 		private IAudioReference mGrabSound;
 
-		public CltPlayer bearer { get; set; }
+		private CltPlayer mBearer;
+		public CltPlayer bearer
+		{
+			get { return mBearer; }
+			set
+			{
+				mBearer = value;
+				SetDirtyBit(syncVarDirtyBits | (uint)DirtyBitFlags.Bearer);
+			}
+		}
 
 		private WeaponPickupScript mGrabCandidate;
 		private float mHeldTimer;
@@ -37,38 +67,73 @@ namespace FiringSquad.Gameplay
 
 		#region Serialization
 
-		// Todo: Optimize these to only send changes
-		public override bool OnSerialize(NetworkWriter writer, bool initialState)
+		public override bool OnSerialize(NetworkWriter writer, bool forceAll)
 		{
-			writer.Write(bearer.netId);
+			if (forceAll)
+			{
+				writer.Write(bearer.netId);
 
-			if (mHeldObject == null)
-				writer.Write(false);
+				if (heldWeaponPart == null)
+					writer.Write(false);
+				else
+				{
+					writer.Write(true);
+					writer.Write(heldWeaponPart.netId);
+				}
+			}
 			else
 			{
-				writer.Write(true);
-				writer.Write(mHeldObject.netId);
+				writer.Write((byte)syncVarDirtyBits);
+				DirtyBitFlags flags = (DirtyBitFlags)syncVarDirtyBits;
+
+				if ((flags & DirtyBitFlags.Bearer) != 0)
+					writer.Write(bearer.netId);
+				if ((flags & DirtyBitFlags.HeldObject) != 0)
+				{
+					if (heldWeaponPart == null)
+						writer.Write(false);
+					else
+					{
+						writer.Write(true);
+						writer.Write(heldWeaponPart.netId);
+					}
+				}
 			}
 
+			ClearAllDirtyBits();
 			return true;
 		}
 
-		public override void OnDeserialize(NetworkReader reader, bool initialState)
+		public override void OnDeserialize(NetworkReader reader, bool forceAll)
 		{
-			// read our bearer
-			NetworkInstanceId bearerId = reader.ReadNetworkId();
-			if (bearer == null || bearer.netId != bearerId)
+			if (forceAll)
 			{
-				GameObject bearerObj = ClientScene.FindLocalObject(bearerId);
-				if (bearerObj != null)
-					bearerObj.GetComponent<CltPlayer>().BindMagnetArmToPlayer(this);
+				NetworkInstanceId id = reader.ReadNetworkId();
+				StartCoroutine(BindToBearer(id));
+
+				DeserializeHeldObject(reader);
 			}
+			else
+			{
+				DirtyBitFlags flags = (DirtyBitFlags)reader.ReadByte();
 
-			if (bearer == null)
-				return;
+				if ((flags & DirtyBitFlags.Bearer) != 0)
+					StartCoroutine(BindToBearer(reader.ReadNetworkId()));
+				if ((flags & DirtyBitFlags.HeldObject) != 0)
+					DeserializeHeldObject(reader);
+			}
+		}
 
-			// read if we have a held object
-			if (reader.ReadBoolean())
+		private void DeserializeHeldObject(NetworkReader reader)
+		{
+			bool hasPart = reader.ReadBoolean();
+			if (!hasPart)
+			{
+				if (mHeldObject != null)
+					mHeldObject.Release();
+				mHeldObject = null;
+			}
+			else
 			{
 				GameObject heldObject = ClientScene.FindLocalObject(reader.ReadNetworkId());
 				if (heldObject == null)
@@ -78,29 +143,43 @@ namespace FiringSquad.Gameplay
 				}
 
 				mHeldObject = heldObject.GetComponent<WeaponPickupScript>();
+				if (mHeldObject == null)
+				{
+					Logger.Warn("OnDeserialize: Magnet arm server is holding an object that does not exist on client!", Logger.System.Network);
+					return;
+				}
+
 				if (mHeldObject.currentHolder != bearer)
 					mHeldObject.GrabNow(bearer);
 			}
-			else
+		}
+
+		private IEnumerator BindToBearer(NetworkInstanceId bearerId)
+		{
+			while (bearer == null || bearer.netId != bearerId)
 			{
-				if (mHeldObject != null)
-					mHeldObject.Release();
-				mHeldObject = null;
+				GameObject obj = ClientScene.FindLocalObject(bearerId);
+				if (obj != null)
+					bearer = obj.GetComponent<CltPlayer>();
+
+				if (bearer != null)
+				{
+					bearer.BindMagnetArmToPlayer(this);
+					yield break;
+				}
+
+				yield return null;
 			}
 		}
 
 		private void Update()
 		{
-			SetDirtyBit(99999);
-
-			if (bearer == null)
-				return;
-			if (!bearer.isCurrentPlayer)
+			if (bearer == null || !bearer.isCurrentPlayer)
 				return;
 
 			TryFindGrabCandidate();
 			EventManager.Notify(() => EventManager.LocalGUI.SetHintState(CrosshairHintText.Hint.MagnetArmGrab, mGrabCandidate != null));
-			EventManager.Notify(() => EventManager.LocalGUI.SetHintState(CrosshairHintText.Hint.ItemEquipOrDrop, mHeldObject != null));
+			EventManager.Notify(() => EventManager.LocalGUI.SetHintState(CrosshairHintText.Hint.ItemEquipOrDrop, heldWeaponPart != null));
 		}
 
 		#endregion
@@ -135,7 +214,7 @@ namespace FiringSquad.Gameplay
 					UpdateSound(false);
 					break;
 				case State.Reeling:
-					mState = mHeldObject != null ? State.Locked : State.Idle;
+					mState = heldWeaponPart != null ? State.Locked : State.Idle;
 					UpdateSound(false);
 					break;
 				case State.Locked:
@@ -188,7 +267,7 @@ namespace FiringSquad.Gameplay
 		[Client]
 		private void ReelGrabCandidate()
 		{
-			if (mGrabCandidate == null || mHeldObject != null)
+			if (mGrabCandidate == null || heldWeaponPart != null)
 				return;
 
 			mState = State.Reeling;
@@ -219,17 +298,17 @@ namespace FiringSquad.Gameplay
 		private void ThrowOrDropItem()
 		{
 			EventManager.Notify(() => EventManager.LocalGUI.SetHintState(CrosshairHintText.Hint.ItemEquipOrDrop, false));
-			if (mHeldObject != null && mHeldObject.currentHolder == bearer)
+			if (heldWeaponPart != null && heldWeaponPart.currentHolder == bearer)
 			{
 				if (mHeldTimer >= 1.0f)
-					mHeldObject.Throw();
+					heldWeaponPart.Throw();
 				else
-					mHeldObject.Release();
+					heldWeaponPart.Release();
 
-				CmdReleaseItem(mHeldObject.netId, mHeldTimer < 1.0f);
+				CmdReleaseItem(heldWeaponPart.netId, mHeldTimer < 1.0f);
 			}
 
-			mHeldObject = null;
+			heldWeaponPart = null;
 			mGrabCandidate = null;
 			mHeldTimer = 0.0f;
 			mState = State.Idle;
@@ -238,10 +317,10 @@ namespace FiringSquad.Gameplay
 		[Server]
 		public void ForceDropItem()
 		{
-			if (mHeldObject == null)
+			if (heldWeaponPart == null)
 				return;
 
-			CmdReleaseItem(mHeldObject.netId, true);
+			CmdReleaseItem(heldWeaponPart.netId, true);
 			RpcForceReleaseItem();
 		}
 
@@ -269,14 +348,14 @@ namespace FiringSquad.Gameplay
 				return;
 
 			mGrabCandidate.GrabNow(bearer);
-			mHeldObject = mGrabCandidate;
+			heldWeaponPart = mGrabCandidate;
 			mGrabCandidate = null;
 		}
 
 		[Command]
 		private void CmdReleaseItem(NetworkInstanceId itemId, bool drop)
 		{
-			mHeldObject = null;
+			heldWeaponPart = null;
 
 			GameObject obj = NetworkServer.FindLocalObject(itemId);
 			if (obj == null)

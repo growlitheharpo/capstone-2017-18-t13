@@ -26,7 +26,7 @@ namespace FiringSquad.Gameplay.Weapons
 		}
 		
 		[ClientRpc]
-		protected void RpcPlaySound(NetworkInstanceId hitObj, Vector3 position)
+		protected void RpcPlaySound(NetworkInstanceId hitObj, Vector3 position) // TODO: Should this be an RPC?? Poorly optimized!!
 		{
 			AudioEvent e = GetHitAudioEvent(hitObj);
 

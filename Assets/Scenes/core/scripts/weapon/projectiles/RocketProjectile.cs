@@ -86,7 +86,7 @@ namespace FiringSquad.Gameplay.Weapons
 		}
 
 		[ClientRpc]
-		private void RpcActivateExplodeEffect()
+		private void RpcActivateExplodeEffect() // TODO: Does this really need to be an RPC?
 		{
 			StartCoroutine(DisplayExplodeParticles());
 		}
