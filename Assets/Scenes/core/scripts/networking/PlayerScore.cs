@@ -5,15 +5,15 @@ using UnityEngine.Networking;
 
 namespace FiringSquad.Data
 {
-	public class PlayerScore : INetworkable<PlayerScore>
+	public struct PlayerScore : INetworkable<PlayerScore>
 	{
 		[SerializeField] private NetworkInstanceId mPlayerId;
-		[SerializeField] private byte mKills;
-		[SerializeField] private byte mDeaths;
+		[SerializeField] private int mKills;
+		[SerializeField] private int mDeaths;
 
 		public NetworkInstanceId playerId { get { return mPlayerId; } }
-		public byte kills { get { return mKills; } set { mKills = value; } }
-		public byte deaths { get { return mDeaths; } set { mDeaths = value; } }
+		public int kills { get { return mKills; } }
+		public int deaths { get { return mDeaths; } }
 
 		public CltPlayer player
 		{
@@ -24,28 +24,30 @@ namespace FiringSquad.Data
 			set { mPlayerId = value.netId; }
 		}
 
-		public PlayerScore() { }
-
 		public PlayerScore(NetworkInstanceId p)
 		{
 			mPlayerId = p;
+			mKills = 0;
+			mDeaths = 0;
 		}
 
 		public PlayerScore(CltPlayer p)
 		{
-			player = p;
+			mPlayerId = p.netId;
+			mKills = 0;
+			mDeaths = 0;
 		}
 
-		public PlayerScore(NetworkInstanceId p, byte kill, byte death)
+		public PlayerScore(NetworkInstanceId p, int kill, int death)
 		{
 			mPlayerId = p;
 			mKills = kill;
 			mDeaths = death;
 		}
 
-		public PlayerScore(CltPlayer p, byte kill, byte death)
+		public PlayerScore(CltPlayer p, int kill, int death)
 		{
-			player = p;
+			mPlayerId = p.netId;
 			mKills = kill;
 			mDeaths = death;
 		}
@@ -53,8 +55,8 @@ namespace FiringSquad.Data
 		public void Serialize(NetworkWriter writer)
 		{
 			writer.Write(mPlayerId);
-			writer.Write(mKills);
-			writer.Write(mDeaths);
+			writer.Write((byte)mKills);
+			writer.Write((byte)mDeaths);
 		}
 
 		public void Deserialize(NetworkReader reader, out object result)
@@ -71,13 +73,7 @@ namespace FiringSquad.Data
 		{
 			object result;
 			Deserialize(reader, out result);
-
-			PlayerScore realResult = (PlayerScore)result;
-			mPlayerId = realResult.mPlayerId;
-			mKills = realResult.mKills;
-			mDeaths = realResult.mDeaths;
-
-			return this;
+			return (PlayerScore)result;
 		}
 
 		public static byte[] SerializeArray(PlayerScore[] array)
