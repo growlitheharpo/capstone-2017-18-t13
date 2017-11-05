@@ -361,10 +361,14 @@ namespace FiringSquad.Gameplay.Weapons
 				mTotalClipSize.value = mCurrentData.clipSize;
 			}
 
-			EventManager.Notify(() => EventManager.Local.LocalPlayerAttachedPart(this, instance));
 
 			if (bearer != null)
+			{
 				ServiceLocator.Get<IAudioManager>().CreateSound(AudioEvent.EquipItem, transform);
+				
+				if (bearer.isCurrentPlayer)
+					EventManager.Notify(() => EventManager.Local.LocalPlayerAttachedPart(this, instance));
+			}
 
 			if (instance.attachPoint == Attachment.Scope && mAimDownSightsActive)
 				currentParts.scope.ActivateAimDownSightsEffect(this);
