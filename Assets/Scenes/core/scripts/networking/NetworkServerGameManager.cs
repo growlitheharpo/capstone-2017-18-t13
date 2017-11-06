@@ -260,9 +260,13 @@ namespace FiringSquad.Networking
 					Transform newPosition = ChooseSafestSpawnPosition(mMachine.mPlayerList, dead, mMachine.mStartPositions);
 
 					if (damage.source is CltPlayer)
-						mMachine.mPlayerScores[damage.source.netId].kills++;
+					{
+						PlayerScore killerScore = mMachine.mPlayerScores[damage.source.netId];
+						mMachine.mPlayerScores[dead.netId] = new PlayerScore(killerScore.playerId, killerScore.kills + 1, killerScore.deaths);
+					}
 
-					mMachine.mPlayerScores[dead.netId].deaths++;
+					PlayerScore deadScore = mMachine.mPlayerScores[dead.netId];
+					mMachine.mPlayerScores[dead.netId] = new PlayerScore(deadScore.playerId, deadScore.kills, deadScore.deaths + 1);
 
 					EventManager.Notify(() => EventManager.Server.PlayerDied(dead, damage.source, newPosition));
 				}
