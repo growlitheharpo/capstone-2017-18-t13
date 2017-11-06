@@ -262,7 +262,7 @@ namespace FiringSquad.Networking
 					if (damage.source is CltPlayer)
 					{
 						PlayerScore killerScore = mMachine.mPlayerScores[damage.source.netId];
-						mMachine.mPlayerScores[dead.netId] = new PlayerScore(killerScore.playerId, killerScore.kills + 1, killerScore.deaths);
+						mMachine.mPlayerScores[damage.source.netId] = new PlayerScore(killerScore.playerId, killerScore.kills + 1, killerScore.deaths);
 					}
 
 					PlayerScore deadScore = mMachine.mPlayerScores[dead.netId];
