@@ -170,22 +170,33 @@ namespace FiringSquad.Gameplay
 			mCameraRef.fieldOfView = data.fieldOfView;
 		}
 
-		private void OnLocalPlayerDied(Vector3 spawnPosition, Quaternion spawnRotation)
+		private void OnLocalPlayerDied(Vector3 spawnPosition, Quaternion spawnRotation, ICharacter killer)
 		{
 			ServiceLocator.Get<IInput>()
 				.DisableInputLevel(InputLevel.Gameplay)
 				.DisableInputLevel(InputLevel.PauseMenu);
 
 			// do a cool thing with the camera
+			mCameraRef.transform.SetParent(null); // leave the camera here for a second
+			if (killer != null && !ReferenceEquals(killer, playerRoot))
+			{
+				StartCoroutine(Coroutines.LerpRotation(mCameraRef.transform,
+					Quaternion.LookRotation(killer.transform.position - mCameraRef.transform.position, Vector3.up), 0.75f));
+			}
 
-			StartCoroutine(Coroutines.InvokeAfterSeconds(1.0f, () =>
+
+			playerRoot.transform.position = Vector3.one * -5000.0f;
+
+			StartCoroutine(Coroutines.InvokeAfterSeconds(4.0f, () =>
 			{
 				ServiceLocator.Get<IInput>()
 					.EnableInputLevel(InputLevel.Gameplay)
 					.EnableInputLevel(InputLevel.PauseMenu);
-			}));
 
-			playerRoot.ResetPlayerValues(spawnPosition, spawnRotation);
+				playerRoot.ResetPlayerValues(spawnPosition, spawnRotation);
+				mCameraRef.transform.SetParent(playerRoot.eye, false);
+				mCameraRef.transform.ResetLocalValues();
+			}));
 		}
 	}
 }

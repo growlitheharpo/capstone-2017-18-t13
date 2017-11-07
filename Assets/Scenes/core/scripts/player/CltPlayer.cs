@@ -318,8 +318,15 @@ namespace FiringSquad.Gameplay
 		{
 			if (deadPlayer == this)
 			{
+				NetworkInstanceId killerId;
+
 				if (killer != null)
+				{
 					mDeaths++;
+					killerId = killer.netId;
+				}
+				else
+					killerId = NetworkInstanceId.Invalid;
 
 				SpawnDeathWeaponParts();
 
@@ -328,7 +335,7 @@ namespace FiringSquad.Gameplay
 
 				mHealth = mInformation.defaultHealth;
 				weapon.ResetToDefaultParts();
-				RpcHandleDeath(transform.position, spawnPos.position, spawnPos.rotation);
+				RpcHandleDeath(transform.position, spawnPos.position, spawnPos.rotation, killerId);
 			}
 			else if (ReferenceEquals(killer, this))
 				mKills++;
@@ -345,15 +352,19 @@ namespace FiringSquad.Gameplay
 		}
 
 		[ClientRpc]
-		private void RpcHandleDeath(Vector3 deathPosition, Vector3 spawnPos, Quaternion spawnRot)
+		private void RpcHandleDeath(Vector3 deathPosition, Vector3 spawnPos, Quaternion spawnRot, NetworkInstanceId killer)
 		{
-			ParticleSystem particles =
-				Instantiate(mAssets.deathParticlesPrefab, deathPosition, Quaternion.identity).GetComponent<ParticleSystem>();
+			ParticleSystem particles = Instantiate(mAssets.deathParticlesPrefab, deathPosition, Quaternion.identity).GetComponent<ParticleSystem>();
 			particles.Play();
 			StartCoroutine(Coroutines.WaitAndDestroyParticleSystem(particles));
 
+			ICharacter killerObj = killer == NetworkInstanceId.Invalid ? null : ClientScene.FindLocalObject(killer).GetComponent<ICharacter>();
+
 			if (isLocalPlayer)
-				EventManager.Local.LocalPlayerDied(spawnPos, spawnRot);
+			{
+				mLocalHealthVar.value = 0.0f;
+				EventManager.Local.LocalPlayerDied(spawnPos, spawnRot, killerObj);
+			}
 		}
 
 		[ClientRpc]
@@ -368,6 +379,7 @@ namespace FiringSquad.Gameplay
 			transform.position = position;
 			transform.rotation = rotation;
 			mHealth = mInformation.defaultHealth;
+			mLocalHealthVar.value = mInformation.defaultHealth;
 
 			if (weapon != null)
 				weapon.ResetToDefaultParts();

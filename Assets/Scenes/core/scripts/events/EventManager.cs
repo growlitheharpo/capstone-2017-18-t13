@@ -96,11 +96,11 @@ public partial class EventManager
 			OnLocalPlayerCausedDamage(amount);
 		}
 
-		public static event Action<Vector3, Quaternion> OnLocalPlayerDied = (p, r) => { LogEvent(); };
+		public static event Action<Vector3, Quaternion, ICharacter> OnLocalPlayerDied = (p, r, k) => { LogEvent(); };
 
-		public static void LocalPlayerDied(Vector3 spawnPos, Quaternion spawnRot)
+		public static void LocalPlayerDied(Vector3 spawnPos, Quaternion spawnRot, ICharacter killer)
 		{
-			OnLocalPlayerDied(spawnPos, spawnRot);
+			OnLocalPlayerDied(spawnPos, spawnRot, killer);
 		}
 	}
 

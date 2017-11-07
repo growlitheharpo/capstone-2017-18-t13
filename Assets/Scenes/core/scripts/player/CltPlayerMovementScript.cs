@@ -298,7 +298,7 @@ namespace FiringSquad.Gameplay
 			mMouseSensitivity = settings.mouseSensitivity;
 		}
 
-		private void OnLocalPlayerDied(Vector3 spawnPos, Quaternion spawnRot)
+		private void OnLocalPlayerDied(Vector3 spawnPos, Quaternion spawnRot, ICharacter killer)
 		{
 			mRotationY = 0.0f;
 		}
