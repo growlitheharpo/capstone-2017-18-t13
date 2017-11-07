@@ -9,15 +9,23 @@ namespace FiringSquad.Core.Audio
 {
 	public enum AudioEvent
 	{
-		Reload = 15, //done
-		Shoot = 20, //done
-		LoopWalking = 30, // done
-		LoopGravGun = 40, // done
-		EquipItem = 50, // not yet!
+		EquipItem = 50,
+		LoopGravGun = 40,
+		LoopWalking = 30,
 
-		ImpactWall = 60, // done
-		ImpactOtherPlayer = 65, // done
-		ImpactCurrentPlayer = 70 // done
+		// Weapons
+		Reload = 15,
+		Shoot = 20,
+		ImpactWall = 60,
+		ImpactOtherPlayer = 65,
+		ImpactCurrentPlayer = 70,
+		EnterAimDownSights = 75,
+
+		// VO
+		AnnouncerMatchStarts = 80,
+		AnnouncerMatchEnds = 85,
+		AnnouncerStageAreaSpawns = 90,
+		AnnouncerStageAreaCaptured = 95,
 	}
 
 	/// <inheritdoc cref="IAudioManager"/>
