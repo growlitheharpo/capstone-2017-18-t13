@@ -44,10 +44,12 @@ namespace FiringSquad.Gameplay
 			SetupUI();
 
 			EventManager.Local.OnApplyOptionsData += ApplyOptionsData;
+			EventManager.Local.OnLocalPlayerDied += OnLocalPlayerDied;
 		}
 
 		private void OnDestroy()
 		{
+			EventManager.Local.OnLocalPlayerDied -= OnLocalPlayerDied;
 			EventManager.Local.OnApplyOptionsData -= ApplyOptionsData;
 			CleanupUI();
 			CleanupCamera();
@@ -161,6 +163,11 @@ namespace FiringSquad.Gameplay
 		{
 			FMODUnity.RuntimeManager.GetBus("bus:/").setVolume(data.masterVolume);
 			mCameraRef.fieldOfView = data.fieldOfView;
+		}
+
+		private void OnLocalPlayerDied(Vector3 spawnPosition, Quaternion spawnRotation)
+		{
+			playerRoot.ResetPlayerValues(spawnPosition, spawnRotation);
 		}
 	}
 }

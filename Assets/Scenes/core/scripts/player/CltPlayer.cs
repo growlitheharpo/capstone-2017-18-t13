@@ -353,7 +353,7 @@ namespace FiringSquad.Gameplay
 			StartCoroutine(Coroutines.WaitAndDestroyParticleSystem(particles));
 
 			if (isLocalPlayer)
-				ResetPlayerValues(spawnPos, spawnRot);
+				EventManager.Notify(() => EventManager.Local.LocalPlayerDied(spawnPos, spawnRot));
 		}
 
 		[ClientRpc]
@@ -363,7 +363,7 @@ namespace FiringSquad.Gameplay
 		}
 
 		[Client]
-		private void ResetPlayerValues(Vector3 position, Quaternion rotation)
+		public void ResetPlayerValues(Vector3 position, Quaternion rotation)
 		{
 			transform.position = position;
 			transform.rotation = rotation;

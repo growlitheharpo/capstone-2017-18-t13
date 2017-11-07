@@ -95,6 +95,13 @@ public partial class EventManager
 		{
 			OnLocalPlayerCausedDamage(amount);
 		}
+
+		public static event Action<Vector3, Quaternion> OnLocalPlayerDied = (p, r) => { LogEvent(); };
+
+		public static void LocalPlayerDied(Vector3 spawnPos, Quaternion spawnRot)
+		{
+			OnLocalPlayerDied(spawnPos, spawnRot);
+		}
 	}
 
 	public static class LocalGUI
