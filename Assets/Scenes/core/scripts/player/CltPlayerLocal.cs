@@ -3,6 +3,7 @@ using FiringSquad.Core.Input;
 using FiringSquad.Data;
 using KeatsLib.Unity;
 using UnityEngine;
+using UnityEngine.Rendering.PostProcessing;
 using Input = UnityEngine.Input;
 using Logger = FiringSquad.Debug.Logger;
 
@@ -184,6 +185,14 @@ namespace FiringSquad.Gameplay
 					Quaternion.LookRotation(killer.transform.position - mCameraRef.transform.position, Vector3.up), 0.75f));
 			}
 
+			Vignette temporaryVignette = ScriptableObject.CreateInstance<Vignette>();
+			temporaryVignette.enabled.Override(true);
+			temporaryVignette.intensity.Override(1.0f);
+			temporaryVignette.color.Override(Color.red);
+			temporaryVignette.smoothness.Override(1.0f);
+			temporaryVignette.roundness.Override(1.0f);
+			PostProcessVolume volume = PostProcessManager.instance.QuickVolume(LayerMask.NameToLayer("postprocessing"), 100, temporaryVignette);
+			volume.weight = 1.0f;
 
 			playerRoot.transform.position = Vector3.one * -5000.0f;
 
@@ -196,6 +205,8 @@ namespace FiringSquad.Gameplay
 				playerRoot.ResetPlayerValues(spawnPosition, spawnRotation);
 				mCameraRef.transform.SetParent(playerRoot.eye, false);
 				mCameraRef.transform.ResetLocalValues();
+
+				RuntimeUtilities.DestroyVolume(volume, false);
 			}));
 		}
 	}
