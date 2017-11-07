@@ -11,23 +11,23 @@ namespace FiringSquad.Core.Audio
 		/// <summary>
 		/// Start playing the actual sound.
 		/// </summary>
-		void Start();
+		IAudioReference Start();
 
 		/// <summary>
 		/// Immediately stop playing the sound.
 		/// </summary>
-		void Kill(bool allowFade = true);
-		
+		IAudioReference Kill(bool allowFade = true);
+
 		/// <summary>
 		/// Set the volume of the sound to a new level.
 		/// </summary>
-		void SetVolume(float vol);
+		IAudioReference SetVolume(float vol);
 
 		/// <summary>
 		/// Sets the sound to follow a GameObject.
 		/// </summary>
 		/// <param name="rb">The rigidbody to attach to.</param>
-		void AttachToRigidbody(Rigidbody rb);
+		IAudioReference AttachToRigidbody(Rigidbody rb);
 		
 		/// <summary>
 		/// Returns true if the audio is currently playing.
@@ -39,7 +39,7 @@ namespace FiringSquad.Core.Audio
 		float playerSpeed { get; set; }
 		float weaponType { get; set; }
 
-		void SetParameter(string name, float value);
+		IAudioReference SetParameter(string name, float value);
 		float GetParameter(string name);
 	}
 }
