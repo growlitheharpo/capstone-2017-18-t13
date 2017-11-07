@@ -172,6 +172,19 @@ namespace FiringSquad.Gameplay
 
 		private void OnLocalPlayerDied(Vector3 spawnPosition, Quaternion spawnRotation)
 		{
+			ServiceLocator.Get<IInput>()
+				.DisableInputLevel(InputLevel.Gameplay)
+				.DisableInputLevel(InputLevel.PauseMenu);
+
+			// do a cool thing with the camera
+
+			StartCoroutine(Coroutines.InvokeAfterSeconds(1.0f, () =>
+			{
+				ServiceLocator.Get<IInput>()
+					.EnableInputLevel(InputLevel.Gameplay)
+					.EnableInputLevel(InputLevel.PauseMenu);
+			}));
+
 			playerRoot.ResetPlayerValues(spawnPosition, spawnRotation);
 		}
 	}

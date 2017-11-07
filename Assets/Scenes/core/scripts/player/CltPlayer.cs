@@ -353,7 +353,7 @@ namespace FiringSquad.Gameplay
 			StartCoroutine(Coroutines.WaitAndDestroyParticleSystem(particles));
 
 			if (isLocalPlayer)
-				EventManager.Notify(() => EventManager.Local.LocalPlayerDied(spawnPos, spawnRot));
+				EventManager.Local.LocalPlayerDied(spawnPos, spawnRot);
 		}
 
 		[ClientRpc]
