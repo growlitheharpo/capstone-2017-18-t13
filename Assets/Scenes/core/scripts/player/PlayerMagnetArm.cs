@@ -229,7 +229,7 @@ namespace FiringSquad.Gameplay
 			if (shouldPlay && mGrabSound == null)
 			{
 				mGrabSound = ServiceLocator.Get<IAudioManager>()
-					.CreateSound(AudioEvent.LoopGravGun, transform);
+					.CreateSound(AudioEvent.LoopGravGun, transform).AttachToRigidbody(mBearer.GetComponent<Rigidbody>());
 			}
 			else if (!shouldPlay && mGrabSound != null)
 			{

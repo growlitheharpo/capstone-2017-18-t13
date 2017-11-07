@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using FiringSquad.Core;
+using FiringSquad.Core.Audio;
 using FiringSquad.Core.UI;
 using FiringSquad.Core.Weapons;
 using FiringSquad.Data;
@@ -280,6 +281,8 @@ namespace FiringSquad.Gameplay
 		private void RpcHandleStartGame(long gameEndTime)
 		{
 			EventManager.Notify(() => EventManager.Local.ReceiveStartEvent(gameEndTime));
+			ServiceLocator.Get<IAudioManager>()
+				.CreateSound(AudioEvent.AnnouncerMatchStarts, transform);
 		}
 
 		[TargetRpc]
@@ -290,6 +293,8 @@ namespace FiringSquad.Gameplay
 			
 			var scores = PlayerScore.DeserializeArray(serializedArray);
 			EventManager.Notify(() => EventManager.Local.ReceiveFinishEvent(scores));
+			ServiceLocator.Get<IAudioManager>()
+				.CreateSound(AudioEvent.AnnouncerMatchEnds, transform);
 		}
 
 		#endregion
