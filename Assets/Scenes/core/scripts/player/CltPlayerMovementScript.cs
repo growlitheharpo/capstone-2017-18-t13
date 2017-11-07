@@ -289,11 +289,7 @@ namespace FiringSquad.Gameplay
 			else
 				mMoveDirection += Physics.gravity * mMovementData.gravityMultiplier * Time.fixedDeltaTime;
 
-			Vector3 oldPos = transform.position;
 			mController.Move(mMoveDirection * Time.fixedDeltaTime);
-
-			if (Vector3.Distance(oldPos, transform.position) < 0.1f)
-				mIsRunning = false;
 		}
 
 		private void ApplyOptionsData(IOptionsData settings)
