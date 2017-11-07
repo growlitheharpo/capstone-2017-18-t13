@@ -38,7 +38,12 @@ namespace FiringSquad.Gameplay
 				// local
 				.RegisterInput(Input.GetButtonDown, inputMap.activateADSButton, INPUT_EnterAimDownSights, InputLevel.Gameplay)
 				.RegisterInput(Input.GetButtonUp, inputMap.activateADSButton, INPUT_ExitAimDownSights, InputLevel.Gameplay)
-				.RegisterInput(Input.GetButtonDown, inputMap.pauseButton, INPUT_TogglePause, InputLevel.PauseMenu);
+				.RegisterInput(Input.GetButtonDown, inputMap.pauseButton, INPUT_TogglePause, InputLevel.PauseMenu)
+
+				// input levels
+				.EnableInputLevel(InputLevel.Gameplay)
+				.EnableInputLevel(InputLevel.HideCursor)
+				.EnableInputLevel(InputLevel.PauseMenu);
 
 			SetupCamera();
 			SetupUI();

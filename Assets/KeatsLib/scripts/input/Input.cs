@@ -10,6 +10,7 @@ namespace FiringSquad.Core.Input
 	{
 		None = 0,
 		Gameplay = 1,
+		HideCursor = 2,
 		InGameMenu = 32,
 		PauseMenu = 64,
 		DevConsole = 128,
