@@ -196,7 +196,7 @@ namespace FiringSquad.Gameplay
 
 			playerRoot.transform.position = Vector3.one * -5000.0f;
 
-			StartCoroutine(Coroutines.InvokeAfterSeconds(4.0f, () =>
+			StartCoroutine(Coroutines.InvokeAfterSeconds(playerRoot.defaultData.respawnTime, () =>
 			{
 				ServiceLocator.Get<IInput>()
 					.EnableInputLevel(InputLevel.Gameplay)

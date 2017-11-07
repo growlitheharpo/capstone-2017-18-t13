@@ -29,6 +29,7 @@ namespace FiringSquad.Gameplay
 		public bool isCurrentPlayer { get { return isLocalPlayer; } }
 
 		public IWeapon weapon { get; private set; }
+		public PlayerDefaultsData defaultData { get { return mInformation; } }
 		public WeaponPartCollection defaultParts { get { return mInformation.defaultWeaponParts; } }
 		public Transform eye { get { return mCameraOffset; } }
 
