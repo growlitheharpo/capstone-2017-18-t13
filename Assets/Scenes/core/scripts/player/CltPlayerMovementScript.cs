@@ -77,6 +77,7 @@ namespace FiringSquad.Gameplay
 			EventManager.Local.OnApplyOptionsData += ApplyOptionsData;
 			EventManager.Local.OnEnterAimDownSightsMode += OnEnterAimDownSightsMode;
 			EventManager.Local.OnExitAimDownSightsMode += OnExitAimDownSightsMode;
+			EventManager.Local.OnLocalPlayerDied += OnLocalPlayerDied;
 			mInputBindings = input;
 		}
 
@@ -94,6 +95,7 @@ namespace FiringSquad.Gameplay
 			EventManager.Local.OnApplyOptionsData -= ApplyOptionsData;
 			EventManager.Local.OnEnterAimDownSightsMode -= OnEnterAimDownSightsMode;
 			EventManager.Local.OnExitAimDownSightsMode -= OnExitAimDownSightsMode;
+			EventManager.Local.OnLocalPlayerDied -= OnLocalPlayerDied;
 		}
 
 		#region Input Delegates
@@ -295,6 +297,11 @@ namespace FiringSquad.Gameplay
 		private void ApplyOptionsData(IOptionsData settings)
 		{
 			mMouseSensitivity = settings.mouseSensitivity;
+		}
+
+		private void OnLocalPlayerDied(Vector3 spawnPos, Quaternion spawnRot)
+		{
+			mRotationY = 0.0f;
 		}
 
 		private void OnEnterAimDownSightsMode()
