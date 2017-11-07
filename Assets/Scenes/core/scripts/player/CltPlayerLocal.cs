@@ -207,6 +207,7 @@ namespace FiringSquad.Gameplay
 				mCameraRef.transform.ResetLocalValues();
 
 				RuntimeUtilities.DestroyVolume(volume, false);
+				Destroy(temporaryVignette);
 			}));
 		}
 	}
