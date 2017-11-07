@@ -85,6 +85,7 @@ namespace FiringSquad.Debug
 			IInput input = ServiceLocator.Get<IInput>();
 			input.SetInputLevelState(InputLevel.DevConsole, mViewEnabled);
 			input.SetInputLevelState(InputLevel.Gameplay, !mViewEnabled);
+			input.SetInputLevelState(InputLevel.HideCursor, !mViewEnabled);
 
 			ForceScrollToBottom();
 		}

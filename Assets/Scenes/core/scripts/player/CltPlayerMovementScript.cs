@@ -71,12 +71,12 @@ namespace FiringSquad.Gameplay
 				.RegisterInput(Input.GetButtonDown, input.crouchButton, INPUT_CrouchStart, InputLevel.Gameplay)
 				.RegisterInput(Input.GetButtonUp, input.crouchButton, INPUT_CrouchStop, InputLevel.Gameplay)
 				.RegisterInput(Input.GetButtonDown, input.sprintButton, INPUT_SprintStart, InputLevel.Gameplay)
-				.RegisterInput(Input.GetButtonUp, input.sprintButton, INPUT_SprintStop, InputLevel.Gameplay)
-				.EnableInputLevel(InputLevel.Gameplay);
+				.RegisterInput(Input.GetButtonUp, input.sprintButton, INPUT_SprintStop, InputLevel.Gameplay);
 
 			EventManager.Local.OnApplyOptionsData += ApplyOptionsData;
 			EventManager.Local.OnEnterAimDownSightsMode += OnEnterAimDownSightsMode;
 			EventManager.Local.OnExitAimDownSightsMode += OnExitAimDownSightsMode;
+			EventManager.Local.OnLocalPlayerDied += OnLocalPlayerDied;
 			mInputBindings = input;
 		}
 
@@ -94,6 +94,7 @@ namespace FiringSquad.Gameplay
 			EventManager.Local.OnApplyOptionsData -= ApplyOptionsData;
 			EventManager.Local.OnEnterAimDownSightsMode -= OnEnterAimDownSightsMode;
 			EventManager.Local.OnExitAimDownSightsMode -= OnExitAimDownSightsMode;
+			EventManager.Local.OnLocalPlayerDied -= OnLocalPlayerDied;
 		}
 
 		#region Input Delegates
@@ -289,16 +290,17 @@ namespace FiringSquad.Gameplay
 			else
 				mMoveDirection += Physics.gravity * mMovementData.gravityMultiplier * Time.fixedDeltaTime;
 
-			Vector3 oldPos = transform.position;
 			mController.Move(mMoveDirection * Time.fixedDeltaTime);
-
-			if (Vector3.Distance(oldPos, transform.position) < 0.1f)
-				mIsRunning = false;
 		}
 
 		private void ApplyOptionsData(IOptionsData settings)
 		{
 			mMouseSensitivity = settings.mouseSensitivity;
+		}
+
+		private void OnLocalPlayerDied(Vector3 spawnPos, Quaternion spawnRot, ICharacter killer)
+		{
+			mRotationY = 0.0f;
 		}
 
 		private void OnEnterAimDownSightsMode()

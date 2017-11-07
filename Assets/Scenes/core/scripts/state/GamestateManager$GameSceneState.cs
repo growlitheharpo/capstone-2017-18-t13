@@ -31,7 +31,9 @@ namespace FiringSquad.Core.State
 
 			private void HandlePlayerCreated(CltPlayer obj)
 			{
-				ServiceLocator.Get<IInput>().SetInputLevelState(InputLevel.Gameplay | InputLevel.PauseMenu, true);
+				ServiceLocator.Get<IInput>()
+					.EnableInputLevel(InputLevel.Gameplay)
+					.EnableInputLevel(InputLevel.PauseMenu);
 				SetCursorState(true);
 
 				EventManager.Local.OnLocalPlayerSpawned -= HandlePlayerCreated;
@@ -50,7 +52,7 @@ namespace FiringSquad.Core.State
 
 			private void HandleInputChange(InputLevel input, bool state)
 			{
-				if (input != InputLevel.Gameplay)
+				if (input != InputLevel.HideCursor)
 					return;
 
 				SetCursorState(state);
@@ -150,13 +152,16 @@ namespace FiringSquad.Core.State
 
 					IInput input = ServiceLocator.Get<IInput>();
 					mOriginalGameplayState = input.IsInputEnabled(InputLevel.Gameplay);
-					input.DisableInputLevel(InputLevel.Gameplay);
+					input.DisableInputLevel(InputLevel.Gameplay)
+						.DisableInputLevel(InputLevel.HideCursor);
 				}
 
 				public override void OnExit()
 				{
 					EventManager.Notify(() => EventManager.LocalGUI.TogglePauseMenu(false));
-					ServiceLocator.Get<IInput>().SetInputLevelState(InputLevel.Gameplay, mOriginalGameplayState);
+					ServiceLocator.Get<IInput>()
+						.SetInputLevelState(InputLevel.Gameplay, mOriginalGameplayState)
+						.SetInputLevelState(InputLevel.HideCursor, mOriginalGameplayState);
 				}
 
 				public override IState GetTransition()
