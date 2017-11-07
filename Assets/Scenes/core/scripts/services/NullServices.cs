@@ -206,24 +206,28 @@ namespace FiringSquad.Core
 				return this;
 			}
 
-			public void SetInputLevel(InputLevel level)
+			public IInput SetInputLevel(InputLevel level)
 			{
 				Logger.Info("NULL SERVICE: IInput.SetInputLevel()", Logger.System.Services);
+				return this;
 			}
 
-			public void SetInputLevelState(InputLevel level, bool state)
+			public IInput SetInputLevelState(InputLevel level, bool state)
 			{
 				Logger.Info("NULL SERVICE: IInput.SetInputLevelState()", Logger.System.Services);
+				return this;
 			}
 
-			public void EnableInputLevel(InputLevel level)
+			public IInput EnableInputLevel(InputLevel level)
 			{
 				Logger.Info("NULL SERVICE: IInput.EnableInputLevel()", Logger.System.Services);
+				return this;
 			}
 
-			public void DisableInputLevel(InputLevel level)
+			public IInput DisableInputLevel(InputLevel level)
 			{
 				Logger.Info("NULL SERVICE: IInput.DisableInputLevel()", Logger.System.Services);
+				return this;
 			}
 
 			public bool IsInputEnabled(InputLevel level)

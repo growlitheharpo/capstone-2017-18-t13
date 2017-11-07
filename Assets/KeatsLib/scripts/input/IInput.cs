@@ -41,22 +41,22 @@ namespace FiringSquad.Core.Input
 		/// <summary>
 		/// Directly set the current input level.
 		/// </summary>
-		void SetInputLevel(InputLevel level);
+		IInput SetInputLevel(InputLevel level);
 
 		/// <summary>
 		/// Modify a particular input level to the given state.
 		/// </summary>
-		void SetInputLevelState(InputLevel level, bool state);
+		IInput SetInputLevelState(InputLevel level, bool state);
 
 		/// <summary>
 		/// Set a particular input level to enabled.
 		/// </summary>
-		void EnableInputLevel(InputLevel level);
+		IInput EnableInputLevel(InputLevel level);
 
 		/// <summary>
 		/// Set a particular input level to disabled.
 		/// </summary>
-		void DisableInputLevel(InputLevel level);
+		IInput DisableInputLevel(InputLevel level);
 
 		/// <summary>
 		/// Check if a particular input level or combination of levels are enabled.
