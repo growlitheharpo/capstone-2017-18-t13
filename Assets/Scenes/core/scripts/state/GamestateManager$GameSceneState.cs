@@ -115,7 +115,9 @@ namespace FiringSquad.Core.State
 					int myDeaths = ServiceLocator.Get<IGameplayUIManager>().GetProperty<int>(GameplayUIManager.PLAYER_DEATHS).value;
 					
 					EventManager.Notify(() => EventManager.LocalGUI.ShowGameoverPanel(scores));
-					ServiceLocator.Get<IInput>().DisableInputLevel(InputLevel.Gameplay);
+					ServiceLocator.Get<IInput>()
+						.DisableInputLevel(InputLevel.Gameplay)
+						.DisableInputLevel(InputLevel.HideCursor);
 				}
 
 				public override void Update()
