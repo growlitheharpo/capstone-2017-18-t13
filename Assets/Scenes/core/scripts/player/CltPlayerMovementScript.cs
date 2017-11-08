@@ -311,6 +311,8 @@ namespace FiringSquad.Gameplay
 				StopCoroutine(mZoomInRoutine);
 
 			mZoomInRoutine = StartCoroutine(ZoomCameraFov(25.0f, 0.25f));
+			ServiceLocator.Get<IAudioManager>()
+				.CreateSound(AudioEvent.EnterAimDownSights, transform).AttachToRigidbody(mPlayer.GetComponent<Rigidbody>());
 		}
 
 		private void OnExitAimDownSightsMode()

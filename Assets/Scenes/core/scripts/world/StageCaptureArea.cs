@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using FiringSquad.Core;
+using FiringSquad.Core.Audio;
 using FiringSquad.Gameplay.UI;
 using KeatsLib.Unity;
 using UnityEngine;
@@ -189,6 +191,9 @@ namespace FiringSquad.Gameplay
 		{
 			mCapturePercentageTimer = p;
 			kUIManager.SetCapturePercent(p / mCaptureTime);
+
+			if (p / mCaptureTime >= 1.0f)
+				ServiceLocator.Get<IAudioManager>().CreateSound(AudioEvent.AnnouncerStageAreaCaptured, transform);
 		}
 
 		private void OnTimeoutTimerChanged(float t)
@@ -203,6 +208,8 @@ namespace FiringSquad.Gameplay
 				child.SetActive(active);
 
 			kUIManager.SetMode(active ? StageCaptureUI.Mode.NoCapturing : StageCaptureUI.Mode.NoPoints, this);
+			if (active)
+				ServiceLocator.Get<IAudioManager>().CreateSound(AudioEvent.AnnouncerStageAreaSpawns, transform);
 		}
 	}
 }

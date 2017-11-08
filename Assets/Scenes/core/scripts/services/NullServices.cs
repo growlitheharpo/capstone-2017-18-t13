@@ -100,19 +100,34 @@ namespace FiringSquad.Core
 		{
 			private class NullAudioReference : IAudioReference
 			{
-				public void Start(){}
+				public IAudioReference Start()
+				{
+					return this;
+				}
 
-				public void Kill(bool allowFade = true) {}
+				public IAudioReference Kill(bool allowFade = true)
+				{
+					return this;
+				}
 
-				public void SetVolume(float vol){}
+				public IAudioReference SetVolume(float vol)
+				{
+					return this;
+				}
 
-				public void AttachToRigidbody(Rigidbody rb) {}
+				public IAudioReference AttachToRigidbody(Rigidbody rb)
+				{
+					return this;
+				}
 
 				public bool isPlaying { get { return false; } }
 				public float playerSpeed { get { return default(float); } set { } }
 				public float weaponType { get { return default(float); } set { } }
 
-				public void SetParameter(string name, float value) { }
+				public IAudioReference SetParameter(string name, float value)
+				{
+					return this;
+				}
 
 				public float GetParameter(string name)
 				{

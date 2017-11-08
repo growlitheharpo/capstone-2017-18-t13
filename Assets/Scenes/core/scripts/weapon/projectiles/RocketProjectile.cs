@@ -14,13 +14,13 @@ namespace FiringSquad.Gameplay.Weapons
 
 		private Transform mDirectHit;
 		private Rigidbody mRigidbody;
-		private Renderer mRenderer;
+		private GameObject mView;
 		private WeaponData mData; // server-only
 
 		private void Awake()
 		{
 			mRigidbody = GetComponent<Rigidbody>();
-			mRenderer = GetComponent<Renderer>();
+			mView = transform.Find("View").gameObject;
 		}
 
 		public override void PreSpawnInitialize(IWeapon weapon, Ray ray, WeaponData data)
@@ -93,7 +93,7 @@ namespace FiringSquad.Gameplay.Weapons
 
 		private IEnumerator DisplayExplodeParticles()
 		{
-			mRenderer.enabled = false;
+			mView.SetActive(false);
 			mRigidbody.velocity = Vector3.zero;
 			mRigidbody.angularVelocity = Vector3.zero;
 
