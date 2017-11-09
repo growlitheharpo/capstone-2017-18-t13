@@ -16,29 +16,6 @@ namespace FiringSquad.Gameplay.Weapons
 {
 	public class BaseWeaponScript : NetworkBehaviour, IModifiableWeapon
 	{
-		public static class DebugHelper
-		{
-			public static WeaponData GetWeaponData(BaseWeaponScript p)
-			{
-				return new WeaponData(p.currentData);
-			}
-
-			public static WeaponPartCollection GetAttachments(BaseWeaponScript p)
-			{
-				return new WeaponPartCollection(p.currentParts);
-			}
-
-			public static Transform GetWeaponAimRoot(BaseWeaponScript p, bool forceBarrel = false)
-			{
-				return !forceBarrel ? p.GetAimRoot() : p.currentParts.barrel.barrelTip;
-			}
-
-			public static float GetCurrentDispersion(BaseWeaponScript p)
-			{
-				return p.GetCurrentDispersionFactor(false);
-			}
-		}
-
 		[Flags]
 		public enum Attachment
 		{

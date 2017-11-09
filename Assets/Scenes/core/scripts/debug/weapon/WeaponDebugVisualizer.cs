@@ -71,14 +71,15 @@ namespace FiringSquad.Debug
 			if (mCurrentScript == null)
 				return;
 
-			WeaponData weaponStats = BaseWeaponScript.DebugHelper.GetWeaponData(mCurrentScript);
-			Transform target = BaseWeaponScript.DebugHelper.GetWeaponAimRoot(mCurrentScript, mOverrideEye);
+			WeaponData weaponStats = mCurrentScript.currentData;
+			float currentDispersion = mCurrentScript.GetCurrentDispersionFactor(true);
+			Transform target = mCurrentScript.aimRoot;
 
 			Vector3 hitPoint = GetHitPoint(target);
 
 			float scaleVal1 = Mathf.Tan(Mathf.Asin(weaponStats.minimumDispersion));
 			float scaleVal2 = Mathf.Tan(Mathf.Asin(weaponStats.maximumDispersion));
-			float scaleVal3 = Mathf.Tan(Mathf.Asin(BaseWeaponScript.DebugHelper.GetCurrentDispersion(mCurrentScript)));
+			float scaleVal3 = Mathf.Tan(Mathf.Asin(currentDispersion));
 			float lengthScale = Vector3.Distance(target.position, hitPoint);
 
 			Matrix4x4 dotScaleMin = Matrix4x4.Scale(new Vector3(scaleVal1, scaleVal1, 1.0f));
