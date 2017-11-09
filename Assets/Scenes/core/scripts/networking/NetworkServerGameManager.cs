@@ -73,7 +73,7 @@ namespace FiringSquad.Networking
 			public ServerStateMachine(NetworkServerGameManager script)
 			{
 				mScript = script;
-				mStartPositions = FindObjectsOfType<NetworkStartPosition>().Select(x => x.transform).ToArray();
+				mStartPositions = GameObject.FindGameObjectsWithTag("matchspawn").Select(x => x.transform).ToArray();
 				TransitionStates(new WaitingForConnectionState(this));
 			}
 
