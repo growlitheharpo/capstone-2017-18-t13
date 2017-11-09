@@ -257,6 +257,12 @@ namespace FiringSquad.Gameplay
 
 		#region GameState
 
+		[ClientRpc]
+		public void RpcStartLobbyCountdown(long endTime)
+		{
+			EventManager.Notify(() => EventManager.Local.ReceiveLobbyEndTime(endTime));
+		}
+
 		[Server]
 		public void MoveToStartPosition(Vector3 position, Quaternion rotation)
 		{
