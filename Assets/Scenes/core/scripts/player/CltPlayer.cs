@@ -41,6 +41,8 @@ namespace FiringSquad.Gameplay
 		private CharacterController mCharacterController;
 		private CltPlayerLocal mLocalPlayerScript;
 
+		[SyncVar(hook = "OnPlayerNameUpdate")] private string mName;
+
 		[SyncVar(hook = "OnHealthUpdate")] private float mHealth;
 		private BoundProperty<float> mLocalHealthVar;
 
@@ -417,6 +419,15 @@ namespace FiringSquad.Gameplay
 			mDeaths = value;
 			if (mLocalDeathsVar != null)
 				mLocalDeathsVar.value = value;
+		}
+
+		[Client]
+		private void OnPlayerNameUpdate(string value)
+		{
+			mName = value;
+			PlayerNameWorldCanvas display = GetComponentInChildren<PlayerNameWorldCanvas>();
+			if (display != null)
+				display.SetPlayerName(mName);
 		}
 
 		#endregion
