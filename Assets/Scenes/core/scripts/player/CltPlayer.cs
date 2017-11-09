@@ -41,8 +41,6 @@ namespace FiringSquad.Gameplay
 		private CharacterController mCharacterController;
 		private CltPlayerLocal mLocalPlayerScript;
 
-		[SyncVar(hook = "OnPlayerNameUpdate")] private string mName;
-
 		[SyncVar(hook = "OnHealthUpdate")] private float mHealth;
 		private BoundProperty<float> mLocalHealthVar;
 
@@ -282,6 +280,9 @@ namespace FiringSquad.Gameplay
 		[ClientRpc]
 		private void RpcHandleStartGame(long gameEndTime)
 		{
+			// TODO: Move this next line to the lobby event
+			EventManager.Notify(() => EventManager.LocalGUI.RequestNameChange(this));
+
 			EventManager.Notify(() => EventManager.Local.ReceiveStartEvent(gameEndTime));
 			ServiceLocator.Get<IAudioManager>()
 				.CreateSound(AudioEvent.AnnouncerMatchStarts, transform);
@@ -421,17 +422,18 @@ namespace FiringSquad.Gameplay
 				mLocalDeathsVar.value = value;
 		}
 
-		public void SetPlayerName(string newName)
+		[Command]
+		public void CmdSetPlayerName(string newName)
 		{
-			mName = newName;
+			RpcSetPlayerName(newName);
 		}
 
-		private void OnPlayerNameUpdate(string value)
+		[ClientRpc]
+		private void RpcSetPlayerName(string value)
 		{
-			mName = value;
 			PlayerNameWorldCanvas display = GetComponentInChildren<PlayerNameWorldCanvas>();
 			if (display != null)
-				display.SetPlayerName(mName);
+				display.SetPlayerName(value);
 		}
 
 		#endregion

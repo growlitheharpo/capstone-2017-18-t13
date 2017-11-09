@@ -42,7 +42,8 @@ namespace FiringSquad.Gameplay.UI
 				.EnableInputLevel(InputLevel.Gameplay)
 				.EnableInputLevel(InputLevel.HideCursor);
 
-			mPlayerRef.SetPlayerName(mInputField.text);
+			UnityEngine.Debug.Log("Name: " + mInputField.text);
+			mPlayerRef.CmdSetPlayerName(mInputField.text);
 			Destroy(gameObject);
 		}
 	}
