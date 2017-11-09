@@ -23,6 +23,7 @@ namespace FiringSquad.Networking
 		[SerializeField] private float mMinStageWaitTime;
 		[SerializeField] private float mMaxStageWaitTime;
 		[SerializeField] private int mRoundTime;
+		[SerializeField] private int mLobbyTime;
 		[SerializeField] private int mGoalPlayerCount;
 
 		private ServerStateMachine mStateMachine;
@@ -46,7 +47,12 @@ namespace FiringSquad.Networking
 
 		private void CONSOLE_ForceStartGame(string[] obj)
 		{
-			mStateMachine.ForceStartGameNow();
+			if (obj[0] == "1")
+				mStateMachine.ForceStartGameNow(true);
+			else if (obj[1] == "2")
+				mStateMachine.ForceStartGameNow(false);
+			else
+				throw new ArgumentException("force-start called with invalid parameters.\nUse \"force-start 1\" to start with lobby, or \"force-start 2\" to start the game.");
 		}
 
 		private static Transform ChooseSafestSpawnPosition(CltPlayer[] players, CltPlayer deadPlayer, IList<Transform> targets)
@@ -77,9 +83,12 @@ namespace FiringSquad.Networking
 				TransitionStates(new WaitingForConnectionState(this));
 			}
 
-			public void ForceStartGameNow()
+			public void ForceStartGameNow(bool lobby)
 			{
-				TransitionStates(new StartGameState(this));
+				if (lobby)
+					TransitionStates(new StartLobbyState(this));
+				else
+					TransitionStates(new StartGameState(this));
 			}
 
 			public new void Update()
@@ -134,7 +143,36 @@ namespace FiringSquad.Networking
 
 				public override IState GetTransition()
 				{
-					return !mReady ? this : (IState)new StartGameState(mMachine);
+					return !mReady ? this : (IState)new StartLobbyState(mMachine);
+				}
+			}
+
+			private class StartLobbyState : BaseState<ServerStateMachine>
+			{
+				public StartLobbyState(ServerStateMachine machine) : base(machine) { }
+
+				private long mEndTime;
+
+				public override void OnEnter()
+				{
+					mMachine.mPlayerList = FindObjectsOfType<CltPlayer>();
+					mEndTime = DateTime.Now.Ticks + mMachine.mScript.mLobbyTime * TimeSpan.TicksPerSecond;
+
+					foreach (CltPlayer player in mMachine.mPlayerList)
+						player.RpcStartLobbyCountdown(mEndTime);
+				}
+
+				private bool IsWaitingTimeOver()
+				{
+					return DateTime.Now.Ticks >= mEndTime;
+				}
+
+				public override IState GetTransition()
+				{
+					if (IsWaitingTimeOver())
+						return new StartGameState(mMachine);
+
+					return this;
 				}
 			}
 
