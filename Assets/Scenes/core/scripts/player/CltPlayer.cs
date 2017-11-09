@@ -421,7 +421,11 @@ namespace FiringSquad.Gameplay
 				mLocalDeathsVar.value = value;
 		}
 
-		[Client]
+		public void SetPlayerName(string newName)
+		{
+			mName = newName;
+		}
+
 		private void OnPlayerNameUpdate(string value)
 		{
 			mName = value;
