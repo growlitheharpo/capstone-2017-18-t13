@@ -36,8 +36,7 @@ namespace FiringSquad.Gameplay.UI
 			mMainElementHolder.SetActive(false);
 
 			ServiceLocator.Get<IGamestateManager>()
-				.RequestSceneChange(GamestateManager.FOURPLAYER_WORLD)
-				.RequestSceneChange(GamestateManager.FOURPLAYER_GAMEPLAY, LoadSceneMode.Additive);
+				.RequestSceneChange(GamestateManager.FOURPLAYER_GAMEPLAY);
 		}
 
 		private void ClickQuit()
