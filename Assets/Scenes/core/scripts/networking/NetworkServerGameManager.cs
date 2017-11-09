@@ -47,12 +47,12 @@ namespace FiringSquad.Networking
 
 		private void CONSOLE_ForceStartGame(string[] obj)
 		{
-			if (obj[0] == "1")
+			if (obj.Length == 1 && obj[0] == "1")
 				mStateMachine.ForceStartGameNow(true);
-			else if (obj[1] == "2")
+			else if (obj.Length == 1 && obj[0] == "2")
 				mStateMachine.ForceStartGameNow(false);
 			else
-				throw new ArgumentException("force-start called with invalid parameters.\nUse \"force-start 1\" to start with lobby, or \"force-start 2\" to start the game.");
+				throw new ArgumentException("force-start called with invalid parameters.\nUse \"force-start 1\" to start with lobby, or \"force-start 2\" to start the match directly.");
 		}
 
 		private static Transform ChooseSafestSpawnPosition(CltPlayer[] players, CltPlayer deadPlayer, IList<Transform> targets)
