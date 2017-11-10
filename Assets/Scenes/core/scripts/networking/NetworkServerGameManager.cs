@@ -159,7 +159,7 @@ namespace FiringSquad.Networking
 					mEndTime = DateTime.Now.Ticks + mMachine.mScript.mLobbyTime * TimeSpan.TicksPerSecond;
 
 					foreach (CltPlayer player in mMachine.mPlayerList)
-						player.RpcStartLobbyCountdown(mEndTime);
+						player.TargetStartLobbyCountdown(player.connectionToClient, mEndTime);
 				}
 
 				private bool IsWaitingTimeOver()

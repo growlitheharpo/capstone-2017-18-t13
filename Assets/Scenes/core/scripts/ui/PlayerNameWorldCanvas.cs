@@ -9,13 +9,13 @@ namespace FiringSquad.Gameplay.UI
 	public class PlayerNameWorldCanvas : MonoBehaviour
 	{
 		[SerializeField] private Text mDisplayText;
-		[SerializeField] private CanvasGroup mCanvasGroup;
 
 		private Transform mLocalPlayerRef;
 		private float mMaxAlpha;
 
 		private void Awake()
 		{
+			mMaxAlpha = 1.0f;
 			StartCoroutine(GrabPlayerReference());
 		}
 
@@ -44,11 +44,12 @@ namespace FiringSquad.Gameplay.UI
 
 		private void DoAlpha()
 		{
-			Vector3 direction = transform.position - mLocalPlayerRef.position;
+			// TODO: Reevaluate if we want this?
+			/*Vector3 direction = transform.position - mLocalPlayerRef.position;
 			float dot = Vector3.Dot(direction.normalized, mLocalPlayerRef.forward);
 			dot = (Mathf.Pow(dot, 10.0f) - 0.6f) * 2.5f;
 
-			mCanvasGroup.alpha = dot * mMaxAlpha;
+			mCanvasGroup.alpha = dot * mMaxAlpha;*/
 		}
 
 		private void DoRotate()
