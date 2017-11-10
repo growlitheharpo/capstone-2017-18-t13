@@ -133,6 +133,13 @@ public partial class EventManager
 		{
 			OnSetHintState(hint, state);
 		}
+
+		public static event Action<CltPlayer> OnRequestNameChange = p => { LogEvent(); };
+
+		public static void RequestNameChange(CltPlayer localPlayer)
+		{
+			OnRequestNameChange(localPlayer);
+		}
 	}
 
 	#endregion

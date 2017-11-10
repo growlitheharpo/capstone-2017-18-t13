@@ -257,9 +257,10 @@ namespace FiringSquad.Gameplay
 
 		#region GameState
 
-		[ClientRpc]
-		public void RpcStartLobbyCountdown(long endTime)
+		[TargetRpc]
+		public void TargetStartLobbyCountdown(NetworkConnection connection, long endTime)
 		{
+			EventManager.Notify(() => EventManager.LocalGUI.RequestNameChange(this));
 			EventManager.Notify(() => EventManager.Local.ReceiveLobbyEndTime(endTime));
 		}
 
@@ -273,7 +274,7 @@ namespace FiringSquad.Gameplay
 		[EventHandler]
 		private void OnStartGame(long gameEndTime)
 		{
-			RpcHandleStartGame(gameEndTime);
+			TargetHandleStartGame(connectionToClient, gameEndTime);
 		}
 
 		[Server]
@@ -283,8 +284,8 @@ namespace FiringSquad.Gameplay
 			TargetHandleFinishGame(connectionToClient, PlayerScore.SerializeArray(scores));
 		}
 
-		[ClientRpc]
-		private void RpcHandleStartGame(long gameEndTime)
+		[TargetRpc]
+		private void TargetHandleStartGame(NetworkConnection connection, long gameEndTime)
 		{
 			EventManager.Notify(() => EventManager.Local.ReceiveStartEvent(gameEndTime));
 			ServiceLocator.Get<IAudioManager>()
@@ -423,6 +424,20 @@ namespace FiringSquad.Gameplay
 			mDeaths = value;
 			if (mLocalDeathsVar != null)
 				mLocalDeathsVar.value = value;
+		}
+
+		[Command]
+		public void CmdSetPlayerName(string newName)
+		{
+			RpcSetPlayerName(newName);
+		}
+
+		[ClientRpc]
+		private void RpcSetPlayerName(string value)
+		{
+			PlayerNameWorldCanvas display = GetComponentInChildren<PlayerNameWorldCanvas>();
+			if (display != null)
+				display.SetPlayerName(value);
 		}
 
 		#endregion
