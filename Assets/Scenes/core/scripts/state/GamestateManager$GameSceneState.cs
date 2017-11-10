@@ -122,9 +122,6 @@ namespace FiringSquad.Core.State
 
 				private void OnReceiveFinishEvent(PlayerScore[] scores)
 				{
-					int myScore = ServiceLocator.Get<IGameplayUIManager>().GetProperty<int>(GameplayUIManager.PLAYER_KILLS).value;
-					int myDeaths = ServiceLocator.Get<IGameplayUIManager>().GetProperty<int>(GameplayUIManager.PLAYER_DEATHS).value;
-					
 					EventManager.Notify(() => EventManager.LocalGUI.ShowGameoverPanel(scores));
 					ServiceLocator.Get<IInput>()
 						.DisableInputLevel(InputLevel.Gameplay)
