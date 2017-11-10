@@ -40,17 +40,15 @@ namespace FiringSquad.Gameplay.UI
 			NetworkInstanceId localPlayerId = FindObjectsOfType<CltPlayer>().First(x => x.isCurrentPlayer).netId;
 
 			gameObject.SetActive(true);
-			for (int i = 0; i < scores.Length; i++)
+			foreach (PlayerScore score in scores)
 			{
-				PlayerScore score = scores[i];
-
 				GameObject go = Instantiate(mScorePrefab);
 				go.transform.SetParent(mScoreGrid.transform);
 
 				Text text = go.GetComponent<Text>();
 				text.text = string.Format("{0}\n{1}\n{2}\n{3}",
 					score.playerId == localPlayerId ? "You" : "",
-					"P" + (i + 1),
+					score.player.playerName,
 					score.kills,
 					score.deaths);
 

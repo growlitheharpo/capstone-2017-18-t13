@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using FiringSquad.Core;
 using FiringSquad.Core.Audio;
@@ -51,6 +50,8 @@ namespace FiringSquad.Gameplay
 
 		[SyncVar(hook = "OnDeathsUpdate")] private int mDeaths;
 		private BoundProperty<int> mLocalDeathsVar;
+
+		public string playerName { get; private set; }
 
 		#region Unity Callbacks
 
@@ -443,6 +444,8 @@ namespace FiringSquad.Gameplay
 			PlayerNameWorldCanvas display = GetComponentInChildren<PlayerNameWorldCanvas>();
 			if (display != null)
 				display.SetPlayerName(value);
+
+			playerName = value;
 		}
 
 		#endregion
