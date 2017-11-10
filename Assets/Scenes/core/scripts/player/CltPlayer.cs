@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using FiringSquad.Core;
 using FiringSquad.Core.Audio;
@@ -10,6 +11,7 @@ using FiringSquad.Gameplay.Weapons;
 using KeatsLib.Unity;
 using UnityEngine;
 using UnityEngine.Networking;
+using Random = UnityEngine.Random;
 
 namespace FiringSquad.Gameplay
 {
@@ -194,6 +196,9 @@ namespace FiringSquad.Gameplay
 
 		public void BindWeaponToBearer(IModifiableWeapon wep, bool bindUI = false)
 		{
+			if (weapon != null)
+				throw new InvalidOperationException("This IWeaponBearer already has a weapon bound!");
+
 			// find attach spot in view and set parent
 			wep.transform.SetParent(mGun1Offset);
 			wep.aimRoot = eye;
