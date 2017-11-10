@@ -81,7 +81,10 @@ namespace FiringSquad.Debug
 			string label = system == System.Generic ? "Info" : system.ToString();
 			UnityEngine.Debug.LogError(colorPair.first + label + ": " + message + colorPair.second);
 		}
-
+		
+		/// <summary>
+		/// Returns true if the given system should print to the console based on current settings.
+		/// </summary>
 		private static bool CheckLevel(System system)
 		{
 			try

@@ -5,6 +5,9 @@ using FiringSquad.Debug;
 
 namespace FiringSquad.Core.Input
 {
+	/// <summary>
+	/// Used to mark which input types are currently enabled.
+	/// </summary>
 	[Flags]
 	public enum InputLevel
 	{
@@ -185,9 +188,9 @@ namespace FiringSquad.Core.Input
 				InputLevel v = (InputLevel)value;
 
 				if ((level & v) == v)
-					EventManager.Notify(() => EventManager.InputLevelChanged(v, true));
+					EventManager.Notify(() => EventManager.Local.InputLevelChanged(v, true));
 				else
-					EventManager.Notify(() => EventManager.InputLevelChanged(v, false));
+					EventManager.Notify(() => EventManager.Local.InputLevelChanged(v, false));
 			}
 
 			return this;
@@ -206,7 +209,7 @@ namespace FiringSquad.Core.Input
 				return this;
 
 			mEnabledInputs &= ~level;
-			EventManager.Notify(() => EventManager.InputLevelChanged(level, false));
+			EventManager.Notify(() => EventManager.Local.InputLevelChanged(level, false));
 
 			return this;
 		}
@@ -218,7 +221,7 @@ namespace FiringSquad.Core.Input
 				return this;
 
 			mEnabledInputs |= level;
-			EventManager.Notify(() => EventManager.InputLevelChanged(level, true));
+			EventManager.Notify(() => EventManager.Local.InputLevelChanged(level, true));
 
 			return this;
 		}
@@ -254,6 +257,7 @@ namespace FiringSquad.Core.Input
 		/// </summary>
 		private void Update()
 		{
+			// TODO: Examine the performance of the LINQ here.
 			foreach (var i in mCommands)
 			{
 				if (i.Value.Any(x => x.Enabled() && x.Activated()))

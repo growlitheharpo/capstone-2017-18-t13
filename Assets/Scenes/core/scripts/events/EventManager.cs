@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using FiringSquad.Core;
+using FiringSquad.Core.Input;
 using FiringSquad.Data;
 using FiringSquad.Debug;
 using FiringSquad.Gameplay;
@@ -108,6 +109,13 @@ public partial class EventManager
 		public static void ReceiveLobbyEndTime(long endTime)
 		{
 			OnReceiveLobbyEndTime(endTime);
+		}
+
+		public static event Action<InputLevel, bool> OnInputLevelChanged = (a, b) => { LogEvent(); };
+
+		public static void InputLevelChanged(InputLevel level, bool state)
+		{
+			OnInputLevelChanged(level, state);
 		}
 	}
 

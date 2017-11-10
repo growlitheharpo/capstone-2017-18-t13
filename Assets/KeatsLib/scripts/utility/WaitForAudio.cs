@@ -3,28 +3,25 @@ using UnityEngine;
 
 namespace KeatsLib.Unity
 {
+	/// <summary>
+	/// Custom Yield Instruction that holds a Coroutine until the provided audio finishes.
+	/// </summary>
 	public class WaitForAudio : CustomYieldInstruction
 	{
 		private readonly IAudioReference mRef;
-		private readonly AudioSource mSource;
 
+		/// <summary>
+		/// Custom Yield Instruction that holds a Coroutine until the provided audio finishes.
+		/// </summary>
 		public WaitForAudio(IAudioReference reference)
 		{
 			mRef = reference;
 		}
-
-		public WaitForAudio(AudioSource source)
-		{
-			mSource = source;
-		}
-
+		
 		public override bool keepWaiting
 		{
 			get
 			{
-				if (mSource != null)
-					return mSource.time + Time.deltaTime < mSource.clip.length;
-
 				return mRef.isPlaying;
 			}
 		}

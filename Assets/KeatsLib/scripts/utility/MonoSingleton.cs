@@ -13,6 +13,9 @@ namespace FiringSquad.Core
 
 		public static T instance { get; private set; }
 
+		/// <summary>
+		/// Unity's Awake function.
+		/// </summary>
 		protected virtual void Awake()
 		{
 			lock (LOCK)
@@ -46,6 +49,10 @@ namespace FiringSquad.Core
 			}
 		}
 
+		/// <summary>
+		/// Sets up the given instance to be the singleton.
+		/// </summary>
+		/// <param name="inst"></param>
 		private void SetupInstance(T inst)
 		{
 			instance = inst;

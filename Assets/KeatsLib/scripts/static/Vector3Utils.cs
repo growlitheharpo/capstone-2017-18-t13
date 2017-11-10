@@ -4,6 +4,9 @@ using UnityEngine;
 
 namespace KeatsLib.Unity
 {
+	/// <summary>
+	/// A collection of useful Vector2, Vector3, and Rect functions.
+	/// </summary>
 	public static class Vector3Ext
 	{
 		/// <summary>
@@ -221,21 +224,43 @@ namespace KeatsLib.Unity
 
 	public static class RectExt
 	{
+		/// <summary>
+		/// Shift a rectangle's X position to the right by its width.
+		/// </summary>
+		/// <param name="r">The rectangle to shift.</param>
+		/// <param name="width">The width of the resulting rectangle.</param>
 		public static Rect ShiftAlongX(this Rect r, float width)
 		{
 			return new Rect(r.x + r.width, r.y, width, r.height);
 		}
 
+		/// <summary>
+		/// Shift a rectangle's Y position down by its height.
+		/// </summary>
+		/// <param name="r">The rectangle to shift.</param>
+		/// <param name="width">The WIDTH of the resulting rectangle.</param>
 		public static Rect ShiftAlongY(this Rect r, float width)
 		{
 			return new Rect(r.x, r.y + r.height, width, r.height);
 		}
 
+		/// <summary>
+		/// Shift a rectangle's X position to the right by its width.
+		/// </summary>
+		/// <param name="r">The rectangle to shift.</param>
+		/// <param name="width">The width of the resulting rectangle.</param>
+		/// <param name="height">The height of the resulting rectangle.</param>
 		public static Rect ShiftAlongX(this Rect r, float width, float height)
 		{
 			return new Rect(r.x + r.width, r.y, width, height);
 		}
 
+		/// <summary>
+		/// Shift a rectangle's Y position down by its height.
+		/// </summary>
+		/// <param name="r">The rectangle to shift.</param>
+		/// <param name="width">The width of the resulting rectangle.</param>
+		/// <param name="height">The height of the resulting rectangle.</param>
 		public static Rect ShiftAlongY(this Rect r, float width, float height)
 		{
 			return new Rect(r.x, r.y + r.height, width, height);
@@ -244,6 +269,9 @@ namespace KeatsLib.Unity
 
 	public static class TransformExt
 	{
+		/// <summary>
+		/// Sets local position and rotation to (0,0,0), and local scale to (1,1,1)
+		/// </summary>
 		public static Transform ResetLocalValues(this Transform t)
 		{
 			t.localPosition = Vector3.zero;
@@ -252,6 +280,12 @@ namespace KeatsLib.Unity
 			return t;
 		}
 
+		/// <summary>
+		/// Resets everything on a RectTransform to how it appears by default when adding
+		/// a new canvas item. (Anchors of (0.5, 0.5) (0.5, 0.5) and a given size.
+		/// </summary>
+		/// <param name="t">The RectTransform to affect.</param>
+		/// <param name="size">The square size of the new Rect.</param>
 		public static RectTransform ResetEverything(this RectTransform t, float size)
 		{
 			t.anchorMax = new Vector2(0.5f, 0.5f);
@@ -265,6 +299,14 @@ namespace KeatsLib.Unity
 			return t;
 		}
 
+		/// <summary>
+		/// Resets everything on a RectTransform to how it appears by default, except
+		/// with the provided anchors and no sizeDelta.
+		/// </summary>
+		/// <param name="t">The RectTransform to affect.</param>
+		/// <param name="anchorMin">The new minimum anchors.</param>
+		/// <param name="anchorMax">The new maximum anchors.</param>
+		/// <returns></returns>
 		public static RectTransform ResetEverything(this RectTransform t, Vector2 anchorMin, Vector2 anchorMax)
 		{
 			t.anchorMin = anchorMin;
