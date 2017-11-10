@@ -138,7 +138,11 @@ namespace FiringSquad.Networking
 
 				private void OnPlayerHealthHitsZero(CltPlayer deadPlayer, IDamageSource source)
 				{
-					EventManager.Server.PlayerDied(deadPlayer, null, mMachine.mStartPositions.ChooseRandom());
+					NetworkStartPosition localSpawn = FindObjectsOfType<NetworkStartPosition>()
+						.OrderByDescending(x => Vector3.Distance(x.transform.position.normalized, deadPlayer.transform.position))
+						.FirstOrDefault();
+
+					EventManager.Server.PlayerDied(deadPlayer, null, localSpawn != null ? localSpawn.transform : deadPlayer.transform);
 				}
 
 				public override IState GetTransition()
@@ -160,6 +164,22 @@ namespace FiringSquad.Networking
 
 					foreach (CltPlayer player in mMachine.mPlayerList)
 						player.TargetStartLobbyCountdown(player.connectionToClient, mEndTime);
+
+					EventManager.Server.OnPlayerHealthHitsZero += OnPlayerHealthHitsZero;
+				}
+
+				private void OnPlayerHealthHitsZero(CltPlayer deadPlayer, IDamageSource source)
+				{
+					NetworkStartPosition localSpawn = FindObjectsOfType<NetworkStartPosition>()
+						.OrderByDescending(x => Vector3.Distance(x.transform.position.normalized, deadPlayer.transform.position))
+						.FirstOrDefault();
+
+					EventManager.Server.PlayerDied(deadPlayer, null, localSpawn != null ? localSpawn.transform : deadPlayer.transform);
+				}
+
+				public override void OnExit()
+				{
+					EventManager.Server.OnPlayerHealthHitsZero -= OnPlayerHealthHitsZero;
 				}
 
 				private bool IsWaitingTimeOver()

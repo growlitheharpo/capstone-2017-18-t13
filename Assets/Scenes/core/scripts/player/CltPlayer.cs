@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using System;
 using System.Linq;
 using FiringSquad.Core;
 using FiringSquad.Core.Audio;
@@ -10,6 +10,7 @@ using FiringSquad.Gameplay.Weapons;
 using KeatsLib.Unity;
 using UnityEngine;
 using UnityEngine.Networking;
+using Random = UnityEngine.Random;
 
 namespace FiringSquad.Gameplay
 {
@@ -49,6 +50,8 @@ namespace FiringSquad.Gameplay
 
 		[SyncVar(hook = "OnDeathsUpdate")] private int mDeaths;
 		private BoundProperty<int> mLocalDeathsVar;
+
+		public string playerName { get; private set; }
 
 		#region Unity Callbacks
 
@@ -194,6 +197,9 @@ namespace FiringSquad.Gameplay
 
 		public void BindWeaponToBearer(IModifiableWeapon wep, bool bindUI = false)
 		{
+			if (weapon != null)
+				throw new InvalidOperationException("This IWeaponBearer already has a weapon bound!");
+
 			// find attach spot in view and set parent
 			wep.transform.SetParent(mGun1Offset);
 			wep.aimRoot = eye;
@@ -438,6 +444,8 @@ namespace FiringSquad.Gameplay
 			PlayerNameWorldCanvas display = GetComponentInChildren<PlayerNameWorldCanvas>();
 			if (display != null)
 				display.SetPlayerName(value);
+
+			playerName = value;
 		}
 
 		#endregion
