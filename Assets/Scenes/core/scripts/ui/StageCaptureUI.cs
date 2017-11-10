@@ -21,6 +21,11 @@ namespace FiringSquad.Gameplay.UI
 		[SerializeField] private StageCapturePointer mPointer;
 		[SerializeField] private UIFillBarScript mTimerBar;
 
+		private void Awake()
+		{
+			SetMode(Mode.NoPoints, null);
+		}
+
 		public void SetMode(Mode m, StageCaptureArea area)
 		{
 			switch (m)
