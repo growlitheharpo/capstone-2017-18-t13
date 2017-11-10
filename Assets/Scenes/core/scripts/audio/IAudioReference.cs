@@ -34,12 +34,28 @@ namespace FiringSquad.Core.Audio
 		/// </summary>
 		bool isPlaying { get; }
 
-		// Common variables:
-
+		/// <summary>
+		/// FMOD PARAMETER "playerSpeed"
+		/// </summary>
 		float playerSpeed { get; set; }
+
+		/// <summary>
+		/// FMOD PARAMETER "weaponType"
+		/// </summary>
 		float weaponType { get; set; }
 
+		/// <summary>
+		/// Directly set an FMOD parameter for this audio clip.
+		/// </summary>
+		/// <param name="name">The name of the parameter.</param>
+		/// <param name="value">The new target value of the parameter.</param>
+		/// <returns>Fluently returns this.</returns>
 		IAudioReference SetParameter(string name, float value);
+
+		/// <summary>
+		/// Gets the current value of an FMOD parameter.
+		/// </summary>
+		/// <param name="name">The name of the desired parameter.</param>
 		float GetParameter(string name);
 	}
 }

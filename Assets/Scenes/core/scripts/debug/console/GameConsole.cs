@@ -19,14 +19,18 @@ namespace FiringSquad.Debug
 		[SerializeField] [EnumFlags] private Logger.System mEnabledLogSystems;
 		public Logger.System enabledLogLevels { get { return mEnabledLogSystems; } }
 
+		/// <inheritdoc/>
 		protected override void Awake()
 		{
-			base.Awake();
-			Assert.raiseExceptions = true;
+			base.Awake(); // initialize the MonoSingleton.
 
+			Assert.raiseExceptions = true;
 			mCommandHandlers = new Dictionary<string, Action<string[]>>();
 		}
 
+		/// <summary>
+		/// Unity's Start function.
+		/// </summary>
 		private void Start()
 		{
 			Application.logMessageReceived += UnityLogToConsole;
@@ -50,12 +54,14 @@ namespace FiringSquad.Debug
 			return this;
 		}
 
+		/// <inheritdoc />
 		public IGameConsole UnregisterCommand(string command)
 		{
 			mCommandHandlers.Remove(command);
 			return this;
 		}
 
+		/// <inheritdoc />
 		public IGameConsole UnregisterCommand(Action<string[]> handle)
 		{
 			var keys = mCommandHandlers.Where(x => x.Value == handle).ToArray();

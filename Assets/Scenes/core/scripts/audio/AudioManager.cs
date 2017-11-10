@@ -7,6 +7,9 @@ using UnityEngine;
 
 namespace FiringSquad.Core.Audio
 {
+	/// <summary>
+	/// The enum for the audio events. Mapped 1-1 to our FMOD events.
+	/// </summary>
 	public enum AudioEvent
 	{
 		EquipItem = 50,
@@ -94,6 +97,9 @@ namespace FiringSquad.Core.Audio
 				}
 			}
 
+			/// <summary>
+			/// True if this reference is valid and currently playing.
+			/// </summary>
 			public bool isAlive
 			{
 				get { return mEvent.isValid() && mEvent.hasHandle() && isPlaying; }
@@ -138,6 +144,9 @@ namespace FiringSquad.Core.Audio
 		[SerializeField] private List<EnumFmodBind> mEventBindList;
 		private Dictionary<AudioEvent, string> mEventDictionary;
 
+		/// <summary>
+		/// Unity's Start function.
+		/// </summary>
 		private void Start()
 		{
 			if (!ServiceLocator.Get<IGamestateManager>().isAlive && mShouldSelfInitialize)

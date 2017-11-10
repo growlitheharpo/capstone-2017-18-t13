@@ -16,6 +16,9 @@ namespace FiringSquad.Data
 			[SerializeField] private float mAmount;
 			[SerializeField] private ModType mType;
 
+			/// <summary>
+			/// Apply this Modifier's effect to the provided number.
+			/// </summary>
 			public float Apply(float input)
 			{
 				switch (mType)
@@ -46,6 +49,9 @@ namespace FiringSquad.Data
 			[SerializeField] private int mAmount;
 			[SerializeField] private ModType mType;
 
+			/// <summary>
+			/// Apply this Modifier's effect to the provided number.
+			/// </summary>
 			public int Apply(int input)
 			{
 				switch (mType)
@@ -76,6 +82,9 @@ namespace FiringSquad.Data
 			[SerializeField] private T[] mAmount;
 			[SerializeField] private ModType mType;
 
+			/// <summary>
+			/// Apply this Modifier's effect to the provided number.
+			/// </summary>
 			public T[] Apply(T[] input)
 			{
 				switch (mType)

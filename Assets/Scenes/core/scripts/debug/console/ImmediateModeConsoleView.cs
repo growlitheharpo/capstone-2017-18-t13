@@ -29,18 +29,27 @@ namespace FiringSquad.Debug
 		private bool mViewEnabled;
 		private Vector2 mViewScrollPosition;
 
+		/// <summary>
+		/// Unity's Awake function.
+		/// </summary>
 		private void Awake()
 		{
 			// ReSharper disable once InconsistentlySynchronizedField  (null object cannot be locked)
 			mEntries = new Queue<LogEntryHolder>(MAX_LOGS);
 		}
 
+		/// <summary>
+		/// Unity's Start function.
+		/// </summary>
 		private void Start()
 		{
 			ServiceLocator.Get<IInput>()
 				.RegisterInput(Input.GetKeyDown, CONSOLE_TOGGLE, INPUT_ToggleConsole, InputLevel.None);
 		}
 
+		/// <summary>
+		/// INPUT HANDLER: Toggle the debug game console.
+		/// </summary>
 		private void INPUT_ToggleConsole()
 		{
 			ToggleConsole();
@@ -123,6 +132,9 @@ namespace FiringSquad.Debug
 			DrawEntryBox(baseX, baseY);
 		}
 
+		/// <summary>
+		/// Called from immediate mode OnGUI. Draws the debug console logs.
+		/// </summary>
 		private void DrawLogs(float baseX, float baseY)
 		{
 			Rect consoleRect = new Rect(10.0f, baseY * 0.5f, baseX - 20.0f, baseY * 0.45f);
@@ -164,6 +176,9 @@ namespace FiringSquad.Debug
 			GUILayout.EndArea();
 		}
 
+		/// <summary>
+		/// Called from immediate mode OnGUI. Draws the text entry box.
+		/// </summary>
 		private void DrawEntryBox(float baseX, float baseY)
 		{
 			if (Event.current.type == EventType.keyDown)
