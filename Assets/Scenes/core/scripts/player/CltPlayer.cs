@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Linq;
 using FiringSquad.Core;
 using FiringSquad.Core.Audio;
@@ -101,16 +102,30 @@ namespace FiringSquad.Gameplay
 			mLocalPlayerScript.transform.SetParent(transform);
 			mLocalPlayerScript.playerRoot = this;
 
-			mHitIndicator = (IPlayerHitIndicator)FindObjectOfType<LocalPlayerHitIndicator>() ?? new NullHitIndicator();
 			mLocalHealthVar = new BoundProperty<float>(mInformation.defaultHealth, GameplayUIManager.PLAYER_HEALTH);
 			mLocalKillsVar = new BoundProperty<int>(0, GameplayUIManager.PLAYER_KILLS);
 			mLocalDeathsVar = new BoundProperty<int>(0, GameplayUIManager.PLAYER_DEATHS);
+			StartCoroutine(GrabLocalHitIndicator());
 
 			var renderers = mAnimator.transform.GetComponentsInChildren<Renderer>();
 			foreach (Renderer r in renderers)
 				Destroy(r);
 
 			EventManager.Notify(() => EventManager.Local.LocalPlayerSpawned(this));
+		}
+
+		private IEnumerator GrabLocalHitIndicator()
+		{
+			mHitIndicator = new NullHitIndicator(); // a placeholder to avoid errors
+			LocalPlayerHitIndicator realIndicator = null;
+
+			while (realIndicator == null)
+			{
+				realIndicator = FindObjectOfType<LocalPlayerHitIndicator>();
+				yield return null;
+			}
+
+			mHitIndicator = realIndicator;
 		}
 
 		private void OnDestroy()
