@@ -93,20 +93,31 @@ namespace FiringSquad.Core.State
 
 				public override void OnEnter()
 				{
+					EventManager.Local.OnReceiveLobbyEndTime += OnReceiveLobbyEndTime;
 					EventManager.Local.OnReceiveStartEvent += OnReceiveStartEvent;
 					EventManager.Local.OnReceiveFinishEvent += OnReceiveFinishEvent;
 				}
 
 				public override void OnExit()
 				{
+					EventManager.Local.OnReceiveLobbyEndTime -= OnReceiveLobbyEndTime;
 					EventManager.Local.OnReceiveStartEvent -= OnReceiveStartEvent;
 					EventManager.Local.OnReceiveFinishEvent -= OnReceiveFinishEvent;
+				}
+
+				private void OnReceiveLobbyEndTime(long time)
+				{
+					OnReceiveStartEvent(time);
 				}
 
 				private void OnReceiveStartEvent(long time)
 				{
 					mRoundEndTime = time;
-					mRemainingTime = new BoundProperty<float>(CalculateRemainingTime(), GameplayUIManager.ARENA_ROUND_TIME);
+
+					if (mRemainingTime == null)
+						mRemainingTime = new BoundProperty<float>(CalculateRemainingTime(), GameplayUIManager.ARENA_ROUND_TIME);
+					else
+						mRemainingTime.value = CalculateRemainingTime();
 				}
 
 				private void OnReceiveFinishEvent(PlayerScore[] scores)
