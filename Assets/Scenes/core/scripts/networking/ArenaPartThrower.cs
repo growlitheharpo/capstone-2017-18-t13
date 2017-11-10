@@ -12,6 +12,10 @@ using Logger = FiringSquad.Debug.Logger;
 
 namespace FiringSquad.Gameplay
 {
+	/// <summary>
+	/// Debug tool for literally just throwing weapon parts at the player from the points on a mesh.
+	/// It's recommended to use a sphere or a dome for this purpose.
+	/// </summary>
 	public class ArenaPartThrower : NetworkBehaviour
 	{
 		[SerializeField] private float mMinimumThrowTime;
@@ -23,6 +27,9 @@ namespace FiringSquad.Gameplay
 
 		private List<GameObject> mSpawnedObjects;
 
+		/// <summary>
+		/// Unity's Awake function. Only called on server.
+		/// </summary>
 		[ServerCallback]
 		private void Awake()
 		{
@@ -31,6 +38,9 @@ namespace FiringSquad.Gameplay
 #endif
 		}
 
+		/// <summary>
+		/// Unity's Start function. Only called on server.
+		/// </summary>
 		[ServerCallback]
 		private void Start()
 		{
@@ -44,6 +54,9 @@ namespace FiringSquad.Gameplay
 			}
 		}
 
+		/// <summary>
+		/// [SERVER] Forces the IWeaponPartManager service to lazy-initialize and caches all values.
+		/// </summary>
 		[Server]
 		private void LoadWeaponPrefabs()
 		{
@@ -57,6 +70,9 @@ namespace FiringSquad.Gameplay
 			}
 		}
 
+		/// <summary>
+		/// [SERVER] Generates a series of world points from our mesh's verticies.
+		/// </summary>
 		[Server]
 		private void GenerateMeshPoints()
 		{
@@ -67,6 +83,9 @@ namespace FiringSquad.Gameplay
 		}
 
 #if UNITY_EDITOR
+		/// <summary>
+		/// Unity's Gizmos function.
+		/// </summary>
 		private void OnDrawGizmos()
 		{
 			if (!UnityEditor.EditorApplication.isPlaying || mMeshPoints == null)
@@ -79,6 +98,9 @@ namespace FiringSquad.Gameplay
 		}
 #endif
 
+		/// <summary>
+		/// Tick the timer and then throw parts when it hits zero and reset it.
+		/// </summary>
 		[Server]
 		private IEnumerator ThrowPartTimer()
 		{
@@ -94,8 +116,13 @@ namespace FiringSquad.Gameplay
 				GameObject instance = CustomInstantiatePart(prefab);
 				mSpawnedObjects.Add(instance);
 			}
+			
+			// ReSharper disable once IteratorNeverReturns
 		}
 
+		/// <summary>
+		/// Instantiate a part and throw it into the arena.
+		/// </summary>
 		[Server]
 		private GameObject CustomInstantiatePart(GameObject prefab)
 		{
@@ -114,6 +141,9 @@ namespace FiringSquad.Gameplay
 			return instance;
 		}
 
+		/// <summary>
+		/// Cleanup our list of instances that have been grabbed by players.
+		/// </summary>
 		[Server]
 		private void CleanupInstanceList()
 		{
