@@ -102,6 +102,13 @@ public partial class EventManager
 		{
 			OnLocalPlayerDied(spawnPos, spawnRot, killer);
 		}
+
+		public static event Action<long> OnReceiveLobbyEndTime = t => { LogEvent(); };
+
+		public static void ReceiveLobbyEndTime(long endTime)
+		{
+			OnReceiveLobbyEndTime(endTime);
+		}
 	}
 
 	public static class LocalGUI
