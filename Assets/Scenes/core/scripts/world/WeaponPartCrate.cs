@@ -68,7 +68,7 @@ namespace FiringSquad.Gameplay
 			instance.transform.position = transform.position + Vector3.up * 0.5f;
 			instance.name = prefab.name;
 
-			instance.GetComponent<Rigidbody>().AddForce(Vector3.up * 7.0f, ForceMode.Impulse);
+			instance.GetComponent<Rigidbody>().AddForce(Vector3.up * 1.5f, ForceMode.Impulse);
 			NetworkServer.Spawn(instance);
 
 			StartCoroutine(WaitAndReappear());

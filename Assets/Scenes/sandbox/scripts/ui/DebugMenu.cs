@@ -46,7 +46,8 @@ namespace FiringSquad.Debug
 		{
 			mActive = !mActive;
 			ServiceLocator.Get<IInput>()
-				.SetInputLevelState(InputLevel.Gameplay, !mActive);
+				.SetInputLevelState(InputLevel.Gameplay, !mActive)
+				.SetInputLevelState(InputLevel.HideCursor, !mActive);
 		}
 
 		private void OnGUI()

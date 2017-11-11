@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections;
 using System.Linq;
 using FiringSquad.Core;
+using FiringSquad.Core.Audio;
 using FiringSquad.Core.UI;
 using FiringSquad.Core.Weapons;
 using FiringSquad.Data;
@@ -9,6 +11,7 @@ using FiringSquad.Gameplay.Weapons;
 using KeatsLib.Unity;
 using UnityEngine;
 using UnityEngine.Networking;
+using Random = UnityEngine.Random;
 
 namespace FiringSquad.Gameplay
 {
@@ -29,6 +32,7 @@ namespace FiringSquad.Gameplay
 		public bool isCurrentPlayer { get { return isLocalPlayer; } }
 
 		public IWeapon weapon { get; private set; }
+		public PlayerDefaultsData defaultData { get { return mInformation; } }
 		public WeaponPartCollection defaultParts { get { return mInformation.defaultWeaponParts; } }
 		public Transform eye { get { return mCameraOffset; } }
 
@@ -47,6 +51,8 @@ namespace FiringSquad.Gameplay
 
 		[SyncVar(hook = "OnDeathsUpdate")] private int mDeaths;
 		private BoundProperty<int> mLocalDeathsVar;
+
+		public string playerName { get; private set; }
 
 		#region Unity Callbacks
 
@@ -96,16 +102,30 @@ namespace FiringSquad.Gameplay
 			mLocalPlayerScript.transform.SetParent(transform);
 			mLocalPlayerScript.playerRoot = this;
 
-			mHitIndicator = (IPlayerHitIndicator)FindObjectOfType<LocalPlayerHitIndicator>() ?? new NullHitIndicator();
 			mLocalHealthVar = new BoundProperty<float>(mInformation.defaultHealth, GameplayUIManager.PLAYER_HEALTH);
 			mLocalKillsVar = new BoundProperty<int>(0, GameplayUIManager.PLAYER_KILLS);
 			mLocalDeathsVar = new BoundProperty<int>(0, GameplayUIManager.PLAYER_DEATHS);
+			StartCoroutine(GrabLocalHitIndicator());
 
 			var renderers = mAnimator.transform.GetComponentsInChildren<Renderer>();
 			foreach (Renderer r in renderers)
 				Destroy(r);
 
 			EventManager.Notify(() => EventManager.Local.LocalPlayerSpawned(this));
+		}
+
+		private IEnumerator GrabLocalHitIndicator()
+		{
+			mHitIndicator = new NullHitIndicator(); // a placeholder to avoid errors
+			LocalPlayerHitIndicator realIndicator = null;
+
+			while (realIndicator == null)
+			{
+				realIndicator = FindObjectOfType<LocalPlayerHitIndicator>();
+				yield return null;
+			}
+
+			mHitIndicator = realIndicator;
 		}
 
 		private void OnDestroy()
@@ -192,6 +212,9 @@ namespace FiringSquad.Gameplay
 
 		public void BindWeaponToBearer(IModifiableWeapon wep, bool bindUI = false)
 		{
+			if (weapon != null)
+				throw new InvalidOperationException("This IWeaponBearer already has a weapon bound!");
+
 			// find attach spot in view and set parent
 			wep.transform.SetParent(mGun1Offset);
 			wep.aimRoot = eye;
@@ -255,6 +278,13 @@ namespace FiringSquad.Gameplay
 
 		#region GameState
 
+		[TargetRpc]
+		public void TargetStartLobbyCountdown(NetworkConnection connection, long endTime)
+		{
+			EventManager.Notify(() => EventManager.LocalGUI.RequestNameChange(this));
+			EventManager.Notify(() => EventManager.Local.ReceiveLobbyEndTime(endTime));
+		}
+
 		[Server]
 		public void MoveToStartPosition(Vector3 position, Quaternion rotation)
 		{
@@ -265,7 +295,7 @@ namespace FiringSquad.Gameplay
 		[EventHandler]
 		private void OnStartGame(long gameEndTime)
 		{
-			RpcHandleStartGame(gameEndTime);
+			TargetHandleStartGame(connectionToClient, gameEndTime);
 		}
 
 		[Server]
@@ -275,10 +305,12 @@ namespace FiringSquad.Gameplay
 			TargetHandleFinishGame(connectionToClient, PlayerScore.SerializeArray(scores));
 		}
 
-		[ClientRpc]
-		private void RpcHandleStartGame(long gameEndTime)
+		[TargetRpc]
+		private void TargetHandleStartGame(NetworkConnection connection, long gameEndTime)
 		{
 			EventManager.Notify(() => EventManager.Local.ReceiveStartEvent(gameEndTime));
+			ServiceLocator.Get<IAudioManager>()
+				.CreateSound(AudioEvent.AnnouncerMatchStarts, transform);
 		}
 
 		[TargetRpc]
@@ -289,6 +321,8 @@ namespace FiringSquad.Gameplay
 			
 			var scores = PlayerScore.DeserializeArray(serializedArray);
 			EventManager.Notify(() => EventManager.Local.ReceiveFinishEvent(scores));
+			ServiceLocator.Get<IAudioManager>()
+				.CreateSound(AudioEvent.AnnouncerMatchEnds, transform);
 		}
 
 		#endregion
@@ -318,8 +352,15 @@ namespace FiringSquad.Gameplay
 		{
 			if (deadPlayer == this)
 			{
+				NetworkInstanceId killerId;
+
 				if (killer != null)
+				{
 					mDeaths++;
+					killerId = killer.netId;
+				}
+				else
+					killerId = NetworkInstanceId.Invalid;
 
 				SpawnDeathWeaponParts();
 
@@ -328,7 +369,7 @@ namespace FiringSquad.Gameplay
 
 				mHealth = mInformation.defaultHealth;
 				weapon.ResetToDefaultParts();
-				RpcHandleDeath(transform.position, spawnPos.position, spawnPos.rotation);
+				RpcHandleDeath(transform.position, spawnPos.position, spawnPos.rotation, killerId);
 			}
 			else if (ReferenceEquals(killer, this))
 				mKills++;
@@ -345,15 +386,19 @@ namespace FiringSquad.Gameplay
 		}
 
 		[ClientRpc]
-		private void RpcHandleDeath(Vector3 deathPosition, Vector3 spawnPos, Quaternion spawnRot)
+		private void RpcHandleDeath(Vector3 deathPosition, Vector3 spawnPos, Quaternion spawnRot, NetworkInstanceId killer)
 		{
-			ParticleSystem particles =
-				Instantiate(mAssets.deathParticlesPrefab, deathPosition, Quaternion.identity).GetComponent<ParticleSystem>();
+			ParticleSystem particles = Instantiate(mAssets.deathParticlesPrefab, deathPosition, Quaternion.identity).GetComponent<ParticleSystem>();
 			particles.Play();
 			StartCoroutine(Coroutines.WaitAndDestroyParticleSystem(particles));
 
+			ICharacter killerObj = killer == NetworkInstanceId.Invalid ? null : ClientScene.FindLocalObject(killer).GetComponent<ICharacter>();
+
 			if (isLocalPlayer)
-				ResetPlayerValues(spawnPos, spawnRot);
+			{
+				mLocalHealthVar.value = 0.0f;
+				EventManager.Local.LocalPlayerDied(spawnPos, spawnRot, killerObj);
+			}
 		}
 
 		[ClientRpc]
@@ -363,11 +408,12 @@ namespace FiringSquad.Gameplay
 		}
 
 		[Client]
-		private void ResetPlayerValues(Vector3 position, Quaternion rotation)
+		public void ResetPlayerValues(Vector3 position, Quaternion rotation)
 		{
 			transform.position = position;
 			transform.rotation = rotation;
 			mHealth = mInformation.defaultHealth;
+			mLocalHealthVar.value = mInformation.defaultHealth;
 
 			if (weapon != null)
 				weapon.ResetToDefaultParts();
@@ -399,6 +445,22 @@ namespace FiringSquad.Gameplay
 			mDeaths = value;
 			if (mLocalDeathsVar != null)
 				mLocalDeathsVar.value = value;
+		}
+
+		[Command]
+		public void CmdSetPlayerName(string newName)
+		{
+			RpcSetPlayerName(newName);
+		}
+
+		[ClientRpc]
+		private void RpcSetPlayerName(string value)
+		{
+			PlayerNameWorldCanvas display = GetComponentInChildren<PlayerNameWorldCanvas>();
+			if (display != null)
+				display.SetPlayerName(value);
+
+			playerName = value;
 		}
 
 		#endregion

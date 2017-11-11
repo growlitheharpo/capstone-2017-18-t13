@@ -10,6 +10,7 @@ namespace FiringSquad.Core.UI
 		public static readonly int CLIP_TOTAL = "player_clip_total".GetHashCode();
 		public static readonly int PLAYER_HEALTH = "player_health_current".GetHashCode();
 
+		public static readonly int PLAYER_RESPAWN_TIME = "player_current_respawn_timer".GetHashCode();
 		public static readonly int PLAYER_KILLS = "player_current_kills".GetHashCode();
 		public static readonly int PLAYER_DEATHS = "player_current_deaths".GetHashCode();
 		public static readonly int ARENA_ROUND_TIME = "arena_current_time".GetHashCode();

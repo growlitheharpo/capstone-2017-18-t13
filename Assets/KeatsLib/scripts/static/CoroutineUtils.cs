@@ -224,8 +224,26 @@ namespace KeatsLib.Unity
 		public static IEnumerator InvokeAfterSeconds(float seconds, Action callback)
 		{
 			yield return new WaitForSeconds(seconds);
-
 			callback.Invoke();
+		}
+
+		/// <summary>
+		/// Call a given function every tick and pass in the current time since started, until it returns false.
+		/// </summary>
+		/// <param name="callback">
+		/// The function to invoke.
+		/// The first parameter is the amount of time (in seconds) since the coroutine began.
+		/// The function returns true if it should continue, and returns false if it should end.
+		/// </param>
+		/// <returns></returns>
+		public static IEnumerator InvokeEveryTick(Func<float, bool> callback)
+		{
+			float currentTime = 0.0f;
+			while (callback(currentTime))
+			{
+				currentTime += Time.deltaTime;
+				yield return null;
+			}
 		}
 
 		/// <summary>

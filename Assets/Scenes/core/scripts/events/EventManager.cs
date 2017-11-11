@@ -95,6 +95,20 @@ public partial class EventManager
 		{
 			OnLocalPlayerCausedDamage(amount);
 		}
+
+		public static event Action<Vector3, Quaternion, ICharacter> OnLocalPlayerDied = (p, r, k) => { LogEvent(); };
+
+		public static void LocalPlayerDied(Vector3 spawnPos, Quaternion spawnRot, ICharacter killer)
+		{
+			OnLocalPlayerDied(spawnPos, spawnRot, killer);
+		}
+
+		public static event Action<long> OnReceiveLobbyEndTime = t => { LogEvent(); };
+
+		public static void ReceiveLobbyEndTime(long endTime)
+		{
+			OnReceiveLobbyEndTime(endTime);
+		}
 	}
 
 	public static class LocalGUI
@@ -118,6 +132,13 @@ public partial class EventManager
 		public static void SetHintState(CrosshairHintText.Hint hint, bool state)
 		{
 			OnSetHintState(hint, state);
+		}
+
+		public static event Action<CltPlayer> OnRequestNameChange = p => { LogEvent(); };
+
+		public static void RequestNameChange(CltPlayer localPlayer)
+		{
+			OnRequestNameChange(localPlayer);
 		}
 	}
 

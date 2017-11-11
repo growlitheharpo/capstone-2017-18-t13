@@ -1,8 +1,10 @@
 ﻿using FiringSquad.Core;
 using FiringSquad.Core.Input;
+using FiringSquad.Core.UI;
 using FiringSquad.Data;
 using KeatsLib.Unity;
 using UnityEngine;
+using UnityEngine.Rendering.PostProcessing;
 using Input = UnityEngine.Input;
 using Logger = FiringSquad.Debug.Logger;
 
@@ -20,6 +22,7 @@ namespace FiringSquad.Gameplay
 		private Camera mCameraRef;
 		private Vector3 mCameraOriginalPos;
 		private Quaternion mCameraOriginalRot;
+		private BoundProperty<float> mRespawnTimer;
 
 		public bool inAimDownSightsMode { get; private set; }
 
@@ -38,16 +41,25 @@ namespace FiringSquad.Gameplay
 				// local
 				.RegisterInput(Input.GetButtonDown, inputMap.activateADSButton, INPUT_EnterAimDownSights, InputLevel.Gameplay)
 				.RegisterInput(Input.GetButtonUp, inputMap.activateADSButton, INPUT_ExitAimDownSights, InputLevel.Gameplay)
-				.RegisterInput(Input.GetButtonDown, inputMap.pauseButton, INPUT_TogglePause, InputLevel.PauseMenu);
+				.RegisterInput(Input.GetButtonDown, inputMap.pauseButton, INPUT_TogglePause, InputLevel.PauseMenu)
+
+				// input levels
+				.EnableInputLevel(InputLevel.Gameplay)
+				.EnableInputLevel(InputLevel.HideCursor)
+				.EnableInputLevel(InputLevel.PauseMenu);
 
 			SetupCamera();
 			SetupUI();
 
+			mRespawnTimer = new BoundProperty<float>(0, GameplayUIManager.PLAYER_RESPAWN_TIME);
+
 			EventManager.Local.OnApplyOptionsData += ApplyOptionsData;
+			EventManager.Local.OnLocalPlayerDied += OnLocalPlayerDied;
 		}
 
 		private void OnDestroy()
 		{
+			EventManager.Local.OnLocalPlayerDied -= OnLocalPlayerDied;
 			EventManager.Local.OnApplyOptionsData -= ApplyOptionsData;
 			CleanupUI();
 			CleanupCamera();
@@ -161,6 +173,63 @@ namespace FiringSquad.Gameplay
 		{
 			FMODUnity.RuntimeManager.GetBus("bus:/").setVolume(data.masterVolume);
 			mCameraRef.fieldOfView = data.fieldOfView;
+		}
+
+		private void OnLocalPlayerDied(Vector3 spawnPosition, Quaternion spawnRotation, ICharacter killer)
+		{
+			ServiceLocator.Get<IInput>()
+				.DisableInputLevel(InputLevel.Gameplay)
+				.DisableInputLevel(InputLevel.PauseMenu);
+
+			// do a cool thing with the camera
+			mCameraRef.transform.SetParent(null); // leave the camera here for a second
+			if (killer != null && !ReferenceEquals(killer, playerRoot))
+			{
+				StartCoroutine(Coroutines.LerpRotation(mCameraRef.transform,
+					Quaternion.LookRotation(killer.transform.position - mCameraRef.transform.position, Vector3.up), 0.75f));
+			}
+
+			playerRoot.transform.position = Vector3.one * -5000.0f;
+
+			Vignette temporaryVignette = SetupDeathVignette();
+			PostProcessVolume volume = PostProcessManager.instance.QuickVolume(LayerMask.NameToLayer("postprocessing"), 100, temporaryVignette);
+			volume.weight = 1.0f;
+
+			StartCoroutine(Coroutines.InvokeEveryTick(time =>
+			{
+				if (time < playerRoot.defaultData.respawnTime)
+				{
+					mRespawnTimer.value = Mathf.Ceil(playerRoot.defaultData.respawnTime - time);
+					return true; // signal to continue this coroutine
+				}
+
+				mRespawnTimer.value = 0.0f;
+
+				ServiceLocator.Get<IInput>()
+					.EnableInputLevel(InputLevel.Gameplay)
+					.EnableInputLevel(InputLevel.PauseMenu);
+
+				playerRoot.ResetPlayerValues(spawnPosition, spawnRotation);
+				mCameraRef.transform.SetParent(playerRoot.eye, false);
+				mCameraRef.transform.ResetLocalValues();
+
+				RuntimeUtilities.DestroyVolume(volume, false);
+				Destroy(temporaryVignette);
+
+				return false; // signal to end this coroutine
+			}));
+		}
+
+		private Vignette SetupDeathVignette()
+		{
+			Vignette temporaryVignette = ScriptableObject.CreateInstance<Vignette>();
+			temporaryVignette.enabled.Override(true);
+			temporaryVignette.intensity.Override(1.0f);
+			temporaryVignette.color.Override(Color.red);
+			temporaryVignette.smoothness.Override(1.0f);
+			temporaryVignette.roundness.Override(1.0f);
+
+			return temporaryVignette;
 		}
 	}
 }

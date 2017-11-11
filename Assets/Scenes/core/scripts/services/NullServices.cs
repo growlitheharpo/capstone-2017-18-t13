@@ -100,19 +100,34 @@ namespace FiringSquad.Core
 		{
 			private class NullAudioReference : IAudioReference
 			{
-				public void Start(){}
+				public IAudioReference Start()
+				{
+					return this;
+				}
 
-				public void Kill(bool allowFade = true) {}
+				public IAudioReference Kill(bool allowFade = true)
+				{
+					return this;
+				}
 
-				public void SetVolume(float vol){}
+				public IAudioReference SetVolume(float vol)
+				{
+					return this;
+				}
 
-				public void AttachToRigidbody(Rigidbody rb) {}
+				public IAudioReference AttachToRigidbody(Rigidbody rb)
+				{
+					return this;
+				}
 
 				public bool isPlaying { get { return false; } }
 				public float playerSpeed { get { return default(float); } set { } }
 				public float weaponType { get { return default(float); } set { } }
 
-				public void SetParameter(string name, float value) { }
+				public IAudioReference SetParameter(string name, float value)
+				{
+					return this;
+				}
 
 				public float GetParameter(string name)
 				{
@@ -206,24 +221,28 @@ namespace FiringSquad.Core
 				return this;
 			}
 
-			public void SetInputLevel(InputLevel level)
+			public IInput SetInputLevel(InputLevel level)
 			{
 				Logger.Info("NULL SERVICE: IInput.SetInputLevel()", Logger.System.Services);
+				return this;
 			}
 
-			public void SetInputLevelState(InputLevel level, bool state)
+			public IInput SetInputLevelState(InputLevel level, bool state)
 			{
 				Logger.Info("NULL SERVICE: IInput.SetInputLevelState()", Logger.System.Services);
+				return this;
 			}
 
-			public void EnableInputLevel(InputLevel level)
+			public IInput EnableInputLevel(InputLevel level)
 			{
 				Logger.Info("NULL SERVICE: IInput.EnableInputLevel()", Logger.System.Services);
+				return this;
 			}
 
-			public void DisableInputLevel(InputLevel level)
+			public IInput DisableInputLevel(InputLevel level)
 			{
 				Logger.Info("NULL SERVICE: IInput.DisableInputLevel()", Logger.System.Services);
+				return this;
 			}
 
 			public bool IsInputEnabled(InputLevel level)

@@ -31,7 +31,9 @@ namespace FiringSquad.Core.State
 
 			private void HandlePlayerCreated(CltPlayer obj)
 			{
-				ServiceLocator.Get<IInput>().SetInputLevelState(InputLevel.Gameplay | InputLevel.PauseMenu, true);
+				ServiceLocator.Get<IInput>()
+					.EnableInputLevel(InputLevel.Gameplay)
+					.EnableInputLevel(InputLevel.PauseMenu);
 				SetCursorState(true);
 
 				EventManager.Local.OnLocalPlayerSpawned -= HandlePlayerCreated;
@@ -50,7 +52,7 @@ namespace FiringSquad.Core.State
 
 			private void HandleInputChange(InputLevel input, bool state)
 			{
-				if (input != InputLevel.Gameplay)
+				if (input != InputLevel.HideCursor)
 					return;
 
 				SetCursorState(state);
@@ -91,29 +93,39 @@ namespace FiringSquad.Core.State
 
 				public override void OnEnter()
 				{
+					EventManager.Local.OnReceiveLobbyEndTime += OnReceiveLobbyEndTime;
 					EventManager.Local.OnReceiveStartEvent += OnReceiveStartEvent;
 					EventManager.Local.OnReceiveFinishEvent += OnReceiveFinishEvent;
 				}
 
 				public override void OnExit()
 				{
+					EventManager.Local.OnReceiveLobbyEndTime -= OnReceiveLobbyEndTime;
 					EventManager.Local.OnReceiveStartEvent -= OnReceiveStartEvent;
 					EventManager.Local.OnReceiveFinishEvent -= OnReceiveFinishEvent;
+				}
+
+				private void OnReceiveLobbyEndTime(long time)
+				{
+					OnReceiveStartEvent(time);
 				}
 
 				private void OnReceiveStartEvent(long time)
 				{
 					mRoundEndTime = time;
-					mRemainingTime = new BoundProperty<float>(CalculateRemainingTime(), GameplayUIManager.ARENA_ROUND_TIME);
+
+					if (mRemainingTime == null)
+						mRemainingTime = new BoundProperty<float>(CalculateRemainingTime(), GameplayUIManager.ARENA_ROUND_TIME);
+					else
+						mRemainingTime.value = CalculateRemainingTime();
 				}
 
 				private void OnReceiveFinishEvent(PlayerScore[] scores)
 				{
-					int myScore = ServiceLocator.Get<IGameplayUIManager>().GetProperty<int>(GameplayUIManager.PLAYER_KILLS).value;
-					int myDeaths = ServiceLocator.Get<IGameplayUIManager>().GetProperty<int>(GameplayUIManager.PLAYER_DEATHS).value;
-					
 					EventManager.Notify(() => EventManager.LocalGUI.ShowGameoverPanel(scores));
-					ServiceLocator.Get<IInput>().DisableInputLevel(InputLevel.Gameplay);
+					ServiceLocator.Get<IInput>()
+						.DisableInputLevel(InputLevel.Gameplay)
+						.DisableInputLevel(InputLevel.HideCursor);
 				}
 
 				public override void Update()
@@ -150,13 +162,16 @@ namespace FiringSquad.Core.State
 
 					IInput input = ServiceLocator.Get<IInput>();
 					mOriginalGameplayState = input.IsInputEnabled(InputLevel.Gameplay);
-					input.DisableInputLevel(InputLevel.Gameplay);
+					input.DisableInputLevel(InputLevel.Gameplay)
+						.DisableInputLevel(InputLevel.HideCursor);
 				}
 
 				public override void OnExit()
 				{
 					EventManager.Notify(() => EventManager.LocalGUI.TogglePauseMenu(false));
-					ServiceLocator.Get<IInput>().SetInputLevelState(InputLevel.Gameplay, mOriginalGameplayState);
+					ServiceLocator.Get<IInput>()
+						.SetInputLevelState(InputLevel.Gameplay, mOriginalGameplayState)
+						.SetInputLevelState(InputLevel.HideCursor, mOriginalGameplayState);
 				}
 
 				public override IState GetTransition()

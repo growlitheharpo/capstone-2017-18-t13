@@ -9,15 +9,23 @@ namespace FiringSquad.Core.Audio
 {
 	public enum AudioEvent
 	{
-		Reload = 15, //done
-		Shoot = 20, //done
-		LoopWalking = 30, // done
-		LoopGravGun = 40, // done
-		EquipItem = 50, // not yet!
+		EquipItem = 50,
+		LoopGravGun = 40,
+		LoopWalking = 30,
 
-		ImpactWall = 60, // done
-		ImpactOtherPlayer = 65, // done
-		ImpactCurrentPlayer = 70 // done
+		// Weapons
+		Reload = 15,
+		Shoot = 20,
+		ImpactWall = 60,
+		ImpactOtherPlayer = 65,
+		ImpactCurrentPlayer = 70,
+		EnterAimDownSights = 75,
+
+		// VO
+		AnnouncerMatchStarts = 80,
+		AnnouncerMatchEnds = 85,
+		AnnouncerStageAreaSpawns = 90,
+		AnnouncerStageAreaCaptured = 95,
 	}
 
 	/// <inheritdoc cref="IAudioManager"/>
@@ -47,28 +55,32 @@ namespace FiringSquad.Core.Audio
 			}
 
 			/// <inheritdoc />
-			public void Start()
+			public IAudioReference Start()
 			{
 				mEvent.start();
+				return this;
 			}
 
 			/// <inheritdoc />
-			public void Kill(bool allowFade = true)
+			public IAudioReference Kill(bool allowFade = true)
 			{
 				mEvent.stop(allowFade ? STOP_MODE.ALLOWFADEOUT : STOP_MODE.IMMEDIATE);
 				mEvent.release();
+				return this;
 			}
 
 			/// <inheritdoc />
-			public void SetVolume(float vol)
+			public IAudioReference SetVolume(float vol)
 			{
 				mEvent.setVolume(vol);
+				return this;
 			}
 
 			/// <inheritdoc />
-			public void AttachToRigidbody(Rigidbody rb)
+			public IAudioReference AttachToRigidbody(Rigidbody rb)
 			{
 				FMODUnity.RuntimeManager.AttachInstanceToGameObject(mEvent, rb.transform, rb);
+				return this;
 			}
 
 			/// <inheritdoc />
@@ -94,7 +106,7 @@ namespace FiringSquad.Core.Audio
 			public float weaponType { get { return GetParameter("WeaponType"); } set { SetParameter("WeaponType", value); } }
 
 			/// <inheritdoc />
-			public void SetParameter(string name, float value)
+			public IAudioReference SetParameter(string name, float value)
 			{
 				RESULT result = mEvent.setParameterValue(name, value);
 				if (result != RESULT.OK)
@@ -102,6 +114,8 @@ namespace FiringSquad.Core.Audio
 					throw new ArgumentException(
 						string.Format("Could not set parameter: {0} value {1:##.000}. Result was: {2}", name, value, result.ToString()));
 				}
+
+				return this;
 			}
 
 			/// <inheritdoc />
@@ -166,7 +180,17 @@ namespace FiringSquad.Core.Audio
 		/// <inheritdoc />
 		public IAudioReference CreateSound(AudioEvent e, Transform location, Vector3 offset, Space offsetType = Space.Self, bool autoPlay = true)
 		{
-			EventInstance fmodEvent = FMODUnity.RuntimeManager.CreateInstance(mEventDictionary[e]);
+			EventInstance fmodEvent;
+			try
+			{
+				fmodEvent = FMODUnity.RuntimeManager.CreateInstance(mEventDictionary[e]);
+			}
+			catch (FMODUnity.EventNotFoundException except)
+			{
+				UnityEngine.Debug.LogException(except);
+				return null;
+			}
+
 			AudioReference reference = new AudioReference(fmodEvent);
 
 			if (location != null)

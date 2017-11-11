@@ -10,6 +10,7 @@ namespace FiringSquad.Core.Input
 	{
 		None = 0,
 		Gameplay = 1,
+		HideCursor = 2,
 		InGameMenu = 32,
 		PauseMenu = 64,
 		DevConsole = 128,
@@ -176,7 +177,7 @@ namespace FiringSquad.Core.Input
 		}
 
 		/// <inheritdoc />
-		public void SetInputLevel(InputLevel level)
+		public IInput SetInputLevel(InputLevel level)
 		{
 			mEnabledInputs = level;
 			foreach (object value in Enum.GetValues(typeof(InputLevel)))
@@ -188,35 +189,38 @@ namespace FiringSquad.Core.Input
 				else
 					EventManager.Notify(() => EventManager.InputLevelChanged(v, false));
 			}
+
+			return this;
 		}
 
 		/// <inheritdoc />
-		public void SetInputLevelState(InputLevel flag, bool state)
+		public IInput SetInputLevelState(InputLevel flag, bool state)
 		{
-			if (state)
-				EnableInputLevel(flag);
-			else
-				DisableInputLevel(flag);
+			return state ? EnableInputLevel(flag) : DisableInputLevel(flag);
 		}
 
 		/// <inheritdoc />
-		public void DisableInputLevel(InputLevel level)
+		public IInput DisableInputLevel(InputLevel level)
 		{
 			if (!IsInputEnabled(level))
-				return;
+				return this;
 
 			mEnabledInputs &= ~level;
 			EventManager.Notify(() => EventManager.InputLevelChanged(level, false));
+
+			return this;
 		}
 
 		/// <inheritdoc />
-		public void EnableInputLevel(InputLevel level)
+		public IInput EnableInputLevel(InputLevel level)
 		{
 			if (IsInputEnabled(level))
-				return;
+				return this;
 
 			mEnabledInputs |= level;
 			EventManager.Notify(() => EventManager.InputLevelChanged(level, true));
+
+			return this;
 		}
 
 		/// <inheritdoc />
