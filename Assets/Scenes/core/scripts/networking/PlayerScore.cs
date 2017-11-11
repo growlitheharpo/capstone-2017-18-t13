@@ -10,6 +10,7 @@ namespace FiringSquad.Data
 	/// </summary>
 	public struct PlayerScore : INetworkable<PlayerScore>
 	{
+		/// Inspector variables
 		[SerializeField] private NetworkInstanceId mPlayerId;
 		[SerializeField] private int mKills;
 		[SerializeField] private int mDeaths;

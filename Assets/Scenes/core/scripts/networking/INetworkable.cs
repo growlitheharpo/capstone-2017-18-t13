@@ -7,7 +7,14 @@ namespace FiringSquad.Networking
 	/// </summary>
 	public interface INetworkable
 	{
+		/// <summary>
+		/// Write this object to the provided stream.
+		/// </summary>
 		void Serialize(NetworkWriter writer);
+
+		/// <summary>
+		/// Read an object from the provided stream and write it to the target.
+		/// </summary>
 		void Deserialize(NetworkReader reader, out object target);
 	}
 

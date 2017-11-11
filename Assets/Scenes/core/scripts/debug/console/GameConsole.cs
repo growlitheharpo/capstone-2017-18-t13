@@ -11,12 +11,15 @@ namespace FiringSquad.Debug
 	/// <inheritdoc cref="IGameConsole"/>
 	public class GameConsole : MonoSingleton<GameConsole>, IGameConsole
 	{
+		/// Inspector variables
+		[SerializeField] private BaseGameConsoleView mConsoleView;
+		[SerializeField] [EnumFlags] private Logger.System mEnabledLogSystems;
+
+		/// Private variables
+		private Dictionary<string, Action<string[]>> mCommandHandlers;
 		private bool mCheatsEnabled;
 
-		private Dictionary<string, Action<string[]>> mCommandHandlers;
-		[SerializeField] private BaseGameConsoleView mConsoleView;
-
-		[SerializeField] [EnumFlags] private Logger.System mEnabledLogSystems;
+		/// <inheritdoc />
 		public Logger.System enabledLogLevels { get { return mEnabledLogSystems; } }
 
 		/// <inheritdoc/>

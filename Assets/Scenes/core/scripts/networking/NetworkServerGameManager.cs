@@ -23,6 +23,7 @@ namespace FiringSquad.Networking
 	/// </summary>
 	public class NetworkServerGameManager : NetworkBehaviour
 	{
+		/// Inspector variables // TODO: This class's variables should be a struct
 		[SerializeField] private List<WeaponPartScript> mStageCaptureParts;
 		[SerializeField] private float mMinStageWaitTime;
 		[SerializeField] private float mMaxStageWaitTime;
@@ -30,6 +31,7 @@ namespace FiringSquad.Networking
 		[SerializeField] private int mLobbyTime;
 		[SerializeField] private int mGoalPlayerCount;
 
+		/// Private variables
 		private ServerStateMachine mStateMachine;
 
 		/// <summary>
@@ -216,6 +218,9 @@ namespace FiringSquad.Networking
 					EventManager.Server.OnPlayerHealthHitsZero += OnPlayerHealthHitsZero;
 				}
 
+				/// <summary>
+				/// EVENT HANDLER: Server.OnPlayerHealthHitsZero
+				/// </summary>
 				private void OnPlayerHealthHitsZero(CltPlayer deadPlayer, IDamageSource source)
 				{
 					NetworkStartPosition localSpawn = FindObjectsOfType<NetworkStartPosition>()
@@ -225,6 +230,7 @@ namespace FiringSquad.Networking
 					EventManager.Server.PlayerDied(deadPlayer, null, localSpawn != null ? localSpawn.transform : deadPlayer.transform);
 				}
 
+				/// <inheritdoc />
 				public override void OnExit()
 				{
 					EventManager.Server.OnPlayerHealthHitsZero -= OnPlayerHealthHitsZero;

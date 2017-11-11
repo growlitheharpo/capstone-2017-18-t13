@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.UI;
 using Object = UnityEngine.Object;
 
 namespace KeatsLib.Unity
@@ -219,6 +220,38 @@ namespace KeatsLib.Unity
 			}
 
 			light.intensity = newIntensity;
+
+			if (callback != null)
+				callback();
+		}
+
+		/// <summary>
+		/// Lerp the color of a UI element over time.
+		/// </summary>
+		/// <param name="targetGraphic">The target UI element to effect.</param>
+		/// <param name="color">The new color to lerp to.</param>
+		/// <param name="time">The amount of time to lerp over.</param>
+		/// <param name="tScale">The method used to evaluate T as the lerp occurs. Defaults to linear.</param>
+		/// <param name="callback">Function to call when this lerp has completed.</param>
+		/// <returns></returns>
+		public static IEnumerator LerpUIColor(
+			Graphic targetGraphic, Color color, float time, PercentageEvaluator tScale = null,
+			CallOnComplete callback = null)
+		{
+			if (tScale == null)
+				tScale = LINEAR_EVALUATOR;
+
+			float elapsedTime = 0.0f;
+			Color startingVal = targetGraphic.color;
+
+			while (elapsedTime < time)
+			{
+				yield return null;
+				targetGraphic.color = Color.Lerp(startingVal, color, tScale(elapsedTime, time));
+				elapsedTime += Time.deltaTime;
+			}
+
+			targetGraphic.color = color;
 
 			if (callback != null)
 				callback();

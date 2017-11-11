@@ -20,6 +20,7 @@ namespace FiringSquad.Debug
 			public LogType type { get; set; }
 		}
 
+		/// Private variables
 		private const KeyCode CONSOLE_TOGGLE = KeyCode.BackQuote;
 		private const int MAX_LOGS = 25;
 		private string mCurrentCommand = "";

@@ -13,14 +13,15 @@ namespace FiringSquad.Debug
 	/// </summary>
 	public class WeaponDebugVisualizer : MonoBehaviour
 	{
+		/// Inspector variables
 		[SerializeField] private Mesh mConeMesh;
 		[SerializeField] private Material mWireframe;
 
+		/// Private variables
+		private Material mMinMat, mCurMat, mMaxMat;
 		private LineRenderer[] mLineRenderers;
 		private BaseWeaponScript mCurrentScript;
 		private bool mEnabled;
-
-		private Material mMinMat, mCurMat, mMaxMat;
 
 		private void Start()
 		{

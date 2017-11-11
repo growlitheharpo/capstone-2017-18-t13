@@ -3,6 +3,9 @@ using UnityEngine;
 
 namespace FiringSquad.Data
 {
+	/// <summary>
+	/// The map that binds the string axes in Unity to code.
+	/// </summary>
 	[Serializable]
 	public class PlayerInputMap
 	{

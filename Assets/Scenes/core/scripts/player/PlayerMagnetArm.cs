@@ -5,14 +5,21 @@ using FiringSquad.Core;
 using FiringSquad.Core.Audio;
 using FiringSquad.Gameplay.UI;
 using FiringSquad.Gameplay.Weapons;
+using JetBrains.Annotations;
 using UnityEngine;
 using UnityEngine.Networking;
 using Logger = FiringSquad.Debug.Logger;
 
 namespace FiringSquad.Gameplay
 {
+	/// <summary>
+	/// The networked magnet arm of the player.
+	/// Used to draw weapon parts towards us and hold onto them until the player
+	/// decides to equip, drop, or throw them.
+	/// </summary>
 	public class PlayerMagnetArm : NetworkBehaviour
 	{
+		/// <summary> Enum used to mark network data that needs to be updated. </summary>
 		[Flags]
 		private enum DirtyBitFlags
 		{
@@ -20,6 +27,7 @@ namespace FiringSquad.Gameplay
 			HeldObject = 0x2,
 		}
 
+		/// <summary> The current input state of the magnet arm. </summary>
 		private enum State
 		{
 			Idle,
@@ -27,15 +35,29 @@ namespace FiringSquad.Gameplay
 			Locked
 		}
 
+		/// Inspector variables
 		[SerializeField] private float mPullForce;
-		public float pullForce { get { return mPullForce; } }
-
 		[SerializeField] private float mPullRadius;
 		[SerializeField] private LayerMask mGrabLayers;
 
+		/// Private variables
 		private WeaponPickupScript mHeldObject;
+		private IAudioReference mGrabSound;
+		private CltPlayer mBearer;
+		private WeaponPickupScript mGrabCandidate;
+		private float mHeldTimer;
+		private State mState;
 
-		public WeaponPickupScript heldWeaponPart
+		/// <summary> 
+		/// The pull force of this magnet arm. 
+		/// TODO: Does this need to be public or can it be passed as a parameter where it is used?
+		/// </summary>
+		public float pullForce { get { return mPullForce; } }
+
+		/// <summary>
+		/// The current held weapon part of this magnet arm, or null if we are not holding one.
+		/// </summary>
+		[CanBeNull] public WeaponPickupScript heldWeaponPart
 		{
 			get { return mHeldObject; }
 			set
@@ -48,9 +70,9 @@ namespace FiringSquad.Gameplay
 			}
 		}
 
-		private IAudioReference mGrabSound;
-
-		private CltPlayer mBearer;
+		/// <summary>
+		/// The current bearer of this magnet arm.
+		/// </summary>
 		public CltPlayer bearer
 		{
 			get { return mBearer; }
@@ -61,12 +83,11 @@ namespace FiringSquad.Gameplay
 			}
 		}
 
-		private WeaponPickupScript mGrabCandidate;
-		private float mHeldTimer;
-		private State mState;
-
 		#region Serialization
 
+		/// <summary>
+		/// Unity's OnSerialize function. Called when any dirty bits have been set.
+		/// </summary>
 		public override bool OnSerialize(NetworkWriter writer, bool forceAll)
 		{
 			if (forceAll)
@@ -104,6 +125,9 @@ namespace FiringSquad.Gameplay
 			return true;
 		}
 
+		/// <summary>
+		/// Unity's OnSerialize function. Called when an update to our state has been received.
+		/// </summary>
 		public override void OnDeserialize(NetworkReader reader, bool forceAll)
 		{
 			if (forceAll)
@@ -124,8 +148,12 @@ namespace FiringSquad.Gameplay
 			}
 		}
 
+		/// <summary>
+		/// Determine our held object from the network reader.
+		/// </summary>
 		private void DeserializeHeldObject(NetworkReader reader)
 		{
+			// Check if we have a part. If not, make sure to locally reflect that.
 			bool hasPart = reader.ReadBoolean();
 			if (!hasPart)
 			{
@@ -135,6 +163,7 @@ namespace FiringSquad.Gameplay
 			}
 			else
 			{
+				// We do have a part. Try to find it and grab it.
 				GameObject heldObject = ClientScene.FindLocalObject(reader.ReadNetworkId());
 				if (heldObject == null)
 				{
@@ -154,6 +183,9 @@ namespace FiringSquad.Gameplay
 			}
 		}
 
+		/// <summary>
+		/// Bind this magnet arm to the player with the provided ID.
+		/// </summary>
 		private IEnumerator BindToBearer(NetworkInstanceId bearerId)
 		{
 			while (bearer == null || bearer.netId != bearerId)
@@ -172,11 +204,15 @@ namespace FiringSquad.Gameplay
 			}
 		}
 
+		/// <summary>
+		/// Unity's Update function.
+		/// </summary>
 		private void Update()
 		{
 			if (bearer == null || !bearer.isCurrentPlayer)
 				return;
 
+			// TODO: This is *not* how these next few lines should work. We should only send the events when something has changed!
 			TryFindGrabCandidate();
 			EventManager.Notify(() => EventManager.LocalGUI.SetHintState(CrosshairHintText.Hint.MagnetArmGrab, mGrabCandidate != null));
 			EventManager.Notify(() => EventManager.LocalGUI.SetHintState(CrosshairHintText.Hint.ItemEquipOrDrop, heldWeaponPart != null));
@@ -253,7 +289,7 @@ namespace FiringSquad.Gameplay
 
 			foreach (RaycastHit hitInfo in hits)
 			{
-				WeaponPickupScript grabbable = hitInfo.collider.GetComponentUpwards<WeaponPickupScript>();
+				WeaponPickupScript grabbable = hitInfo.collider.GetComponentInParent<WeaponPickupScript>();
 				if (grabbable != null && !grabbable.currentlyHeld)
 				{
 					mGrabCandidate = grabbable;

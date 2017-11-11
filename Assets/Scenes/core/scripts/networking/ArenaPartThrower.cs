@@ -18,13 +18,14 @@ namespace FiringSquad.Gameplay
 	/// </summary>
 	public class ArenaPartThrower : NetworkBehaviour
 	{
+		/// Inspector variables
 		[SerializeField] private float mMinimumThrowTime;
 		[SerializeField] private float mMaximumThrowTime;
 		[SerializeField] private int mMaxExistingItems;
 
+		/// Private variables
 		private GameObject[] mWeaponPrefabs;
 		private Vector3[] mMeshPoints;
-
 		private List<GameObject> mSpawnedObjects;
 
 		/// <summary>

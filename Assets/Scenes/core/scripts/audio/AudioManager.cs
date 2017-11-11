@@ -34,8 +34,9 @@ namespace FiringSquad.Core.Audio
 	/// <inheritdoc cref="IAudioManager"/>
 	public class AudioManager : MonoSingleton<AudioManager>, IAudioManager
 	{
-		[SerializeField] private bool mShouldSelfInitialize;
-
+		/// <summary>
+		/// Utility class to bind an enum audio event to an FMOD value.
+		/// </summary>
 		[Serializable]
 		private struct EnumFmodBind
 		{
@@ -50,6 +51,17 @@ namespace FiringSquad.Core.Audio
 		private class AudioReference : IAudioReference
 		{
 			private EventInstance mEvent;
+
+			/// <inheritdoc />
+			public bool isPlaying
+			{
+				get
+				{
+					PLAYBACK_STATE state;
+					mEvent.getPlaybackState(out state);
+					return state == PLAYBACK_STATE.PLAYING || state == PLAYBACK_STATE.STARTING || state == PLAYBACK_STATE.SUSTAINING;
+				}
+			}
 
 			/// <inheritdoc />
 			public AudioReference(EventInstance e)
@@ -84,17 +96,6 @@ namespace FiringSquad.Core.Audio
 			{
 				FMODUnity.RuntimeManager.AttachInstanceToGameObject(mEvent, rb.transform, rb);
 				return this;
-			}
-
-			/// <inheritdoc />
-			public bool isPlaying
-			{
-				get
-				{
-					PLAYBACK_STATE state;
-					mEvent.getPlaybackState(out state);
-					return state == PLAYBACK_STATE.PLAYING || state == PLAYBACK_STATE.STARTING || state == PLAYBACK_STATE.SUSTAINING;
-				}
 			}
 
 			/// <summary>
@@ -141,7 +142,11 @@ namespace FiringSquad.Core.Audio
 			}
 		}
 
+		/// Inspector variables
+		[SerializeField] private bool mShouldSelfInitialize;
 		[SerializeField] private List<EnumFmodBind> mEventBindList;
+
+		/// Private variables
 		private Dictionary<AudioEvent, string> mEventDictionary;
 
 		/// <summary>
@@ -165,7 +170,7 @@ namespace FiringSquad.Core.Audio
 			foreach (EnumFmodBind e in mEventBindList)
 				mEventDictionary.Add(e.mEnumVal, e.mFmodVal);
 
-			EventManager.Notify(EventManager.InitialAudioLoadComplete);
+			EventManager.Notify(EventManager.Local.InitialAudioLoadComplete);
 		}
 
 		/// <inheritdoc />

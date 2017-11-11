@@ -7,6 +7,7 @@ namespace FiringSquad.Networking
 	/// </summary>
 	public class NetworkGameManager : NetworkManager
 	{
+		/// Private variables
 		private int mPlayerCount;
 
 		/// <summary>
