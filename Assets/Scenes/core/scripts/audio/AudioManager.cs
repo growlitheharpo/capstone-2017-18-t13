@@ -189,7 +189,17 @@ namespace FiringSquad.Core.Audio
 		/// <inheritdoc />
 		public IAudioReference CreateSound(AudioEvent e, Transform location, Vector3 offset, Space offsetType = Space.Self, bool autoPlay = true)
 		{
-			EventInstance fmodEvent = FMODUnity.RuntimeManager.CreateInstance(mEventDictionary[e]);
+			EventInstance fmodEvent;
+			try
+			{
+				fmodEvent = FMODUnity.RuntimeManager.CreateInstance(mEventDictionary[e]);
+			}
+			catch (FMODUnity.EventNotFoundException except)
+			{
+				UnityEngine.Debug.LogException(except);
+				return null;
+			}
+
 			AudioReference reference = new AudioReference(fmodEvent);
 
 			if (location != null)
