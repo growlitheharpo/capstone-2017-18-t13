@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Linq;
 using FiringSquad.Data;
 using FiringSquad.Gameplay.Weapons;
 using UnityEngine;
@@ -30,6 +32,8 @@ namespace FiringSquad.Gameplay.UI
 			EventManager.Local.OnLocalPlayerHoldingPart += OnLocalPlayerHoldingPart;
 			EventManager.Local.OnLocalPlayerReleasedPart += OnLocalPlayerReleasedPart;
 
+			StartCoroutine(GrabPlayerReference());
+
 			mTotalArea.SetActive(false);
 		}
 
@@ -38,6 +42,20 @@ namespace FiringSquad.Gameplay.UI
 			EventManager.Local.OnLocalPlayerAttachedPart -= OnLocalPlayerAttachedPart;
 			EventManager.Local.OnLocalPlayerHoldingPart -= OnLocalPlayerHoldingPart;
 			EventManager.Local.OnLocalPlayerReleasedPart -= OnLocalPlayerReleasedPart;
+		}
+
+		private IEnumerator GrabPlayerReference()
+		{
+			while (mPlayerWeaponRef == null)
+			{
+				yield return null;
+				CltPlayer script = FindObjectsOfType<CltPlayer>().FirstOrDefault(x => x.isCurrentPlayer);
+
+				if (script == null)
+					continue;
+
+				mPlayerWeaponRef = (BaseWeaponScript)script.weapon;
+			}
 		}
 
 		private void OnLocalPlayerHoldingPart(WeaponPartScript part)
@@ -72,7 +90,6 @@ namespace FiringSquad.Gameplay.UI
 		private void OnLocalPlayerAttachedPart(BaseWeaponScript weapon, WeaponPartScript part)
 		{
 			mCurrentPart = null;
-			mPlayerWeaponRef = weapon;
 		}
 		
 		private Sprite ChooseSprite(float oldValue, float newValue)
