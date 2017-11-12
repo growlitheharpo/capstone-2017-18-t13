@@ -35,6 +35,7 @@ namespace FiringSquad.Gameplay
 		public PlayerDefaultsData defaultData { get { return mInformation; } }
 		public WeaponPartCollection defaultParts { get { return mInformation.defaultWeaponParts; } }
 		public Transform eye { get { return mCameraOffset; } }
+		public Transform gunOffset { get { return mGun1Offset; } }
 
 		private PlayerMagnetArm mMagnetArm;
 		public PlayerMagnetArm magnetArm { get { return mMagnetArm; } }
