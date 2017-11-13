@@ -88,6 +88,8 @@ namespace FiringSquad.Core.State
 			{
 				public InGameState(GameSceneState machine) : base(machine) { }
 
+				private CltPlayer mLocalPlayerRef;
+				private bool mOpenNameMenu;
 				private long mRoundEndTime;
 				private BoundProperty<float> mRemainingTime;
 
@@ -105,9 +107,11 @@ namespace FiringSquad.Core.State
 					EventManager.Local.OnReceiveFinishEvent -= OnReceiveFinishEvent;
 				}
 
-				private void OnReceiveLobbyEndTime(long time)
+				private void OnReceiveLobbyEndTime(CltPlayer player, long time)
 				{
 					OnReceiveStartEvent(time);
+					mLocalPlayerRef = player;
+					mOpenNameMenu = true;
 				}
 
 				private void OnReceiveStartEvent(long time)
@@ -130,10 +134,23 @@ namespace FiringSquad.Core.State
 
 				public override void Update()
 				{
+					if (mOpenNameMenu)
+						OpenNameMenu();
+
 					if (mRemainingTime == null)
 						return;
 
 					mRemainingTime.value = Mathf.Clamp(CalculateRemainingTime(), 0.0f, float.MaxValue);
+				}
+
+				private void OpenNameMenu()
+				{
+					IInput input = ServiceLocator.Get<IInput>();
+					if (!input.IsInputEnabled(InputLevel.Gameplay))
+						return;
+
+					mOpenNameMenu = false;
+					EventManager.Notify(() => EventManager.LocalGUI.RequestNameChange(mLocalPlayerRef));
 				}
 
 				private float CalculateRemainingTime()

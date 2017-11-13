@@ -35,6 +35,7 @@ namespace FiringSquad.Gameplay
 		public PlayerDefaultsData defaultData { get { return mInformation; } }
 		public WeaponPartCollection defaultParts { get { return mInformation.defaultWeaponParts; } }
 		public Transform eye { get { return mCameraOffset; } }
+		public Transform gunOffset { get { return mGun1Offset; } }
 
 		private PlayerMagnetArm mMagnetArm;
 		public PlayerMagnetArm magnetArm { get { return mMagnetArm; } }
@@ -281,14 +282,16 @@ namespace FiringSquad.Gameplay
 		[TargetRpc]
 		public void TargetStartLobbyCountdown(NetworkConnection connection, long endTime)
 		{
-			EventManager.Notify(() => EventManager.LocalGUI.RequestNameChange(this));
-			EventManager.Notify(() => EventManager.Local.ReceiveLobbyEndTime(endTime));
+			EventManager.Notify(() => EventManager.Local.ReceiveLobbyEndTime(this, endTime));
 		}
 
 		[Server]
 		public void MoveToStartPosition(Vector3 position, Quaternion rotation)
 		{
 			RpcResetPlayerValues(position, rotation);
+
+			if (mMagnetArm != null)
+				mMagnetArm.ForceDropItem();
 		}
 
 		[Server]

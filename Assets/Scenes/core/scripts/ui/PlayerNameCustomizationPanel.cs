@@ -33,14 +33,16 @@ namespace FiringSquad.Gameplay.UI
 
 			ServiceLocator.Get<IInput>()
 				.DisableInputLevel(InputLevel.Gameplay)
-				.DisableInputLevel(InputLevel.HideCursor);
+				.DisableInputLevel(InputLevel.HideCursor)
+				.DisableInputLevel(InputLevel.PauseMenu);
 		}
 
 		private void ConfirmName()
 		{
 			ServiceLocator.Get<IInput>()
 				.EnableInputLevel(InputLevel.Gameplay)
-				.EnableInputLevel(InputLevel.HideCursor);
+				.EnableInputLevel(InputLevel.HideCursor)
+				.EnableInputLevel(InputLevel.PauseMenu);
 
 			UnityEngine.Debug.Log("Name: " + mInputField.text);
 			mPlayerRef.CmdSetPlayerName(mInputField.text);
