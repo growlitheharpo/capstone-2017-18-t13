@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Linq;
 using FiringSquad.Data;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -21,24 +22,31 @@ namespace FiringSquad.Gameplay.Weapons
 		{
 			base.PostSpawnInitialize(weapon, initialDirection, data);
 
-			Vector3 endPoint;
-			RaycastHit hitInfo;
-			if (Physics.Raycast(initialDirection, out hitInfo, 10000f, int.MaxValue, QueryTriggerInteraction.Ignore))
+			Vector3 endPoint = initialDirection.origin + initialDirection.direction * 2000.0f;
+			var hits = Physics.RaycastAll(initialDirection, 10000.0f, int.MaxValue, QueryTriggerInteraction.Ignore);
+			if (hits.Length > 0)
 			{
-				endPoint = hitInfo.point;
-
-				IDamageReceiver hitObject = hitInfo.GetDamageReceiver();
-				if (hitObject != null)
+				hits = hits.OrderBy(x => Vector3.Distance(x.point, initialDirection.origin)).ToArray();
+				foreach (RaycastHit hit in hits)
 				{
-					float damage = GetDamage(data, Vector3.Distance(weapon.transform.position, endPoint));
-					hitObject.ApplyDamage(damage, endPoint, hitInfo.normal, this);
-				}
+					if (hit.collider.gameObject == weapon.bearer.gameObject)
+						continue;
 
-				NetworkBehaviour netObject = hitObject as NetworkBehaviour;
-				RpcPlaySound(netObject == null ? NetworkInstanceId.Invalid : netObject.netId, endPoint);
+					endPoint = hit.point;
+
+					IDamageReceiver hitObject = hit.GetDamageReceiver();
+					if (hitObject != null)
+					{
+						float damage = GetDamage(data, Vector3.Distance(weapon.transform.position, endPoint));
+						hitObject.ApplyDamage(damage, endPoint, hit.normal, this);
+					}
+
+					NetworkBehaviour netObject = hitObject as NetworkBehaviour;
+					RpcPlaySound(netObject == null ? NetworkInstanceId.Invalid : netObject.netId, endPoint);
+					break;
+
+				}
 			}
-			else
-				endPoint = initialDirection.origin + initialDirection.direction * 5000.0f;
 
 			SetupShot(endPoint);
 			PositionAndVisualize(endPoint);
