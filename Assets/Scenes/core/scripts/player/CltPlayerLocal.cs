@@ -205,6 +205,8 @@ namespace FiringSquad.Gameplay
 				.DisableInputLevel(InputLevel.Gameplay)
 				.DisableInputLevel(InputLevel.PauseMenu);
 
+			INPUT_ExitAimDownSights(); // force an ADS exit
+
 			// do a cool thing with the camera
 			mCameraRef.transform.SetParent(null); // leave the camera here for a second
 			if (killer != null && !ReferenceEquals(killer, playerRoot))
