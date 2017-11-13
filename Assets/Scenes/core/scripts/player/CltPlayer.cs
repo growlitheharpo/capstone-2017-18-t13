@@ -282,8 +282,7 @@ namespace FiringSquad.Gameplay
 		[TargetRpc]
 		public void TargetStartLobbyCountdown(NetworkConnection connection, long endTime)
 		{
-			EventManager.Notify(() => EventManager.LocalGUI.RequestNameChange(this));
-			EventManager.Notify(() => EventManager.Local.ReceiveLobbyEndTime(endTime));
+			EventManager.Notify(() => EventManager.Local.ReceiveLobbyEndTime(this, endTime));
 		}
 
 		[Server]

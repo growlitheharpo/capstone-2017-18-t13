@@ -103,11 +103,11 @@ public partial class EventManager
 			OnLocalPlayerDied(spawnPos, spawnRot, killer);
 		}
 
-		public static event Action<long> OnReceiveLobbyEndTime = t => { LogEvent(); };
+		public static event Action<CltPlayer, long> OnReceiveLobbyEndTime = (p, t) => { LogEvent(); };
 
-		public static void ReceiveLobbyEndTime(long endTime)
+		public static void ReceiveLobbyEndTime(CltPlayer localPlayer, long endTime)
 		{
-			OnReceiveLobbyEndTime(endTime);
+			OnReceiveLobbyEndTime(localPlayer, endTime);
 		}
 	}
 
