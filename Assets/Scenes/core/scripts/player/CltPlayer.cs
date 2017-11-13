@@ -289,6 +289,9 @@ namespace FiringSquad.Gameplay
 		public void MoveToStartPosition(Vector3 position, Quaternion rotation)
 		{
 			RpcResetPlayerValues(position, rotation);
+
+			if (mMagnetArm != null)
+				mMagnetArm.ForceDropItem();
 		}
 
 		[Server]
