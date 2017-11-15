@@ -6,7 +6,7 @@ namespace FiringSquad.Core.State
 	/// Base interface for the Gamestate Manager service.
 	/// Handles the state of the game.
 	/// </summary>
-	public interface IGamestateManager
+	public interface IGamestateManager : IGlobalService
 	{
 		/// <summary>
 		/// Whether or not an instance of the GameState Manager exists.

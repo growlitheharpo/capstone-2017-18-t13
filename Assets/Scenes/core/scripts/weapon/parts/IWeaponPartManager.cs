@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace FiringSquad.Core.Weapons
 {
-	public interface IWeaponPartManager
+	public interface IWeaponPartManager : IGlobalService
 	{
 		WeaponPartScript GetPrefabScript(string id);
 		GameObject GetPartPrefab(string id);

@@ -1,6 +1,6 @@
 ﻿namespace FiringSquad.Core.UI
 {
-	public interface IGameplayUIManager
+	public interface IGameplayUIManager : IGlobalService
 	{
 		BoundProperty<T> GetProperty<T>(int hash);
 
