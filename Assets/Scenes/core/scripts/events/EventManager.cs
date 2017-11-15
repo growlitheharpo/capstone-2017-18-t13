@@ -213,17 +213,19 @@ public partial class EventManager
 
 		/// <summary>
 		/// Event called when the local player has received an "enter lobby" event from the server.
-		/// PARAMETER 1: The end time (in ticks) of the lobby.
+		/// PARAMETER 1: A reference to the local player.
+		/// PARAMETER 2: The end time (in ticks) of the lobby.
 		/// </summary>
-		public static event Action<long> OnReceiveLobbyEndTime = t => { LogEvent(); };
-
+		public static event Action<CltPlayer, long> OnReceiveLobbyEndTime = (p, t) => { LogEvent(); };
+		
 		/// <summary>
 		/// Event called when the local player has received an "enter lobby" event from the server.
 		/// </summary>
+		/// <param name="localPlayer">A reference to the local player.</param>
 		/// <param name="endTime">The end time (in ticks) of the lobby.</param>
-		public static void ReceiveLobbyEndTime(long endTime)
+		public static void ReceiveLobbyEndTime(CltPlayer localPlayer, long endTime)
 		{
-			OnReceiveLobbyEndTime(endTime);
+			OnReceiveLobbyEndTime(localPlayer, endTime);
 		}
 
 		/// <summary>

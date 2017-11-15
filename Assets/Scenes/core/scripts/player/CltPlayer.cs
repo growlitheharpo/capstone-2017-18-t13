@@ -76,6 +76,11 @@ namespace FiringSquad.Gameplay
 		/// The inspector balance data for this player.
 		/// </summary>
 		public PlayerDefaultsData defaultData { get { return mInformation; } }
+
+		/// <summary>
+		/// The transform offset to position the player's weapon.
+		/// </summary>
+		public Transform gunOffset { get { return mGun1Offset; } }
 		
 		/// <summary>
 		/// The magnet arm attached to this player.
@@ -376,8 +381,7 @@ namespace FiringSquad.Gameplay
 		[TargetRpc]
 		public void TargetStartLobbyCountdown(NetworkConnection connection, long endTime)
 		{
-			EventManager.Notify(() => EventManager.LocalGUI.RequestNameChange(this));
-			EventManager.Notify(() => EventManager.Local.ReceiveLobbyEndTime(endTime));
+			EventManager.Notify(() => EventManager.Local.ReceiveLobbyEndTime(this, endTime));
 		}
 
 		/// <summary>
@@ -389,6 +393,9 @@ namespace FiringSquad.Gameplay
 		public void MoveToStartPosition(Vector3 position, Quaternion rotation)
 		{
 			RpcResetPlayerValues(position, rotation);
+
+			if (mMagnetArm != null)
+				mMagnetArm.ForceDropItem();
 		}
 
 		/// <summary>

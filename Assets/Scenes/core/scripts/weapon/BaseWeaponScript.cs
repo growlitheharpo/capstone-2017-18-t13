@@ -34,7 +34,7 @@ namespace FiringSquad.Gameplay.Weapons
 			BarrelId = 0x4,
 			MechanismId = 0x8,
 			GripId = 0x10,
-			Durability = 0x11,
+			Durability = 0x20,
 		}
 
 		private IWeaponBearer mBearer;

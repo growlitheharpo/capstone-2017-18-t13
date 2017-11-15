@@ -2,6 +2,7 @@
 using FiringSquad.Core.Input;
 using FiringSquad.Core.UI;
 using FiringSquad.Data;
+using FiringSquad.Gameplay.Weapons;
 using KeatsLib.Unity;
 using UnityEngine;
 using UnityEngine.Rendering.PostProcessing;
@@ -52,6 +53,7 @@ namespace FiringSquad.Gameplay
 				.RegisterInput(Input.GetButtonDown, inputMap.activateADSButton, INPUT_EnterAimDownSights, InputLevel.Gameplay)
 				.RegisterInput(Input.GetButtonUp, inputMap.activateADSButton, INPUT_ExitAimDownSights, InputLevel.Gameplay)
 				.RegisterInput(Input.GetButtonDown, inputMap.pauseButton, INPUT_TogglePause, InputLevel.PauseMenu)
+				.RegisterInput(Input.GetKeyDown, KeyCode.J, INPUT_ActivateGunPanic, InputLevel.Gameplay)
 
 				// input levels
 				.EnableInputLevel(InputLevel.Gameplay)
@@ -87,7 +89,8 @@ namespace FiringSquad.Gameplay
 				// local
 				.UnregisterInput(INPUT_EnterAimDownSights)
 				.UnregisterInput(INPUT_ExitAimDownSights)
-				.UnregisterInput(INPUT_TogglePause);
+				.UnregisterInput(INPUT_TogglePause)
+				.UnregisterInput(INPUT_ActivateGunPanic);
 		}
 
 		/// <summary>
@@ -213,6 +216,27 @@ namespace FiringSquad.Gameplay
 			EventManager.Notify(EventManager.Local.ExitAimDownSightsMode);
 		}
 
+		private void INPUT_ActivateGunPanic()
+		{
+			IModifiableWeapon weapon = playerRoot.weapon as IModifiableWeapon;
+			if (weapon == null)
+				return;
+
+			foreach (Transform w in weapon.transform)
+			{
+				UnityEngine.Debug.Log(w.name + ": " + w.localPosition);
+
+				if (w.name.ToLower() != "tip")
+					w.localPosition = Vector3.zero;
+			}
+
+			Transform offset = playerRoot.gunOffset;
+			weapon.transform.SetParent(offset);
+			weapon.transform.ResetLocalValues();
+			weapon.positionOffset = playerRoot.eye.InverseTransformPoint(offset.position);
+			weapon.transform.SetParent(playerRoot.transform);
+		}
+		
 		/// <summary>
 		/// EVENT HANDLER: Local.OnApplyOptionsData
 		/// </summary>
@@ -234,9 +258,12 @@ namespace FiringSquad.Gameplay
 				.DisableInputLevel(InputLevel.Gameplay)
 				.DisableInputLevel(InputLevel.PauseMenu);
 
+			INPUT_ExitAimDownSights(); // force an ADS exit
+
 			// TODO: Do a cool thing with the camera here?
 			// For now, just leave it where it was when we died. We'll grab it again when we respawn.
 			mCameraRef.transform.SetParent(null);
+
 			if (killer != null && !ReferenceEquals(killer, playerRoot))
 			{
 				StartCoroutine(Coroutines.LerpRotation(mCameraRef.transform,
