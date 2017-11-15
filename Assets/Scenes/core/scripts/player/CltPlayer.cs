@@ -230,9 +230,7 @@ namespace FiringSquad.Gameplay
 			if (magnetArm != null)
 			{
 				interactable = magnetArm.heldWeaponPart;
-
-				if (interactable != null)
-					magnetArm.ForceDropItem();
+				magnetArm.ForceDropItem();
 			}
 
 			// If there's nothing that we're holding, look ahead of us.
@@ -394,8 +392,8 @@ namespace FiringSquad.Gameplay
 		{
 			RpcResetPlayerValues(position, rotation);
 
-			if (mMagnetArm != null)
-				mMagnetArm.ForceDropItem();
+			if (magnetArm != null)
+				magnetArm.ForceDropItem();
 		}
 
 		/// <summary>

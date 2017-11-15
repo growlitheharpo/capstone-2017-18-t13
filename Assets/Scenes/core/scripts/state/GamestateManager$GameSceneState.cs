@@ -22,7 +22,7 @@ namespace FiringSquad.Core.State
 			/// <inheritdoc />
 			public void OnEnter()
 			{
-				EventManager.OnInputLevelChanged += HandleInputChange;
+				EventManager.Local.OnInputLevelChanged += HandleInputChange;
 				EventManager.Local.OnTogglePause += HandlePauseToggle;
 
 				EventManager.Local.OnLocalPlayerSpawned += HandlePlayerCreated;
@@ -73,7 +73,7 @@ namespace FiringSquad.Core.State
 			{
 				TransitionStates(new NullState());
 
-				EventManager.OnInputLevelChanged -= HandleInputChange;
+				EventManager.Local.OnInputLevelChanged -= HandleInputChange;
 				EventManager.Local.OnTogglePause -= HandlePauseToggle;
 				EventManager.Local.OnLocalPlayerSpawned -= HandlePlayerCreated;
 				SetCursorState(false);

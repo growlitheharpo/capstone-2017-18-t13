@@ -1,9 +1,7 @@
-﻿using KeatsLib.Persistence;
-
-/// <summary>
+﻿/// <summary>
 /// Main game options.
 /// </summary>
-public interface IOptionsData : IBasePersisting
+public interface IOptionsData 
 {
 	float fieldOfView { get; set; }
 	float masterVolume { get; set; }

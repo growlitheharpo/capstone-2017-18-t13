@@ -3,7 +3,6 @@ using FiringSquad.Core;
 using FiringSquad.Core.Audio;
 using FiringSquad.Core.Input;
 using FiringSquad.Data;
-using FiringSquad.Gameplay.UI;
 using KeatsLib.Collections;
 using KeatsLib.Unity;
 using UnityEngine;

@@ -1,6 +1,6 @@
 ﻿using FiringSquad.Core;
-using FiringSquad.Core.SaveLoad;
 using FiringSquad.Core.State;
+using FiringSquad.Data;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -28,7 +28,6 @@ namespace FiringSquad.Gameplay.UI
 
 		private void Awake()
 		{
-			EventManager.OnInitialPersistenceLoadComplete += HandleInitialLoad;
 			EventManager.Local.OnApplyOptionsData += ReflectSettings;
 
 			mFirstQuitButton.OnClick += HandleFirstQuit;
@@ -41,13 +40,10 @@ namespace FiringSquad.Gameplay.UI
 			EventManager.LocalGUI.OnTogglePauseMenu += HandleToggle;
 			mConfirmationPanel.SetActive(false);
 			gameObject.SetActive(false);
-		}
 
-		private void Start()
-		{
-			HandleInitialLoad();
+			mData = OptionsData.GetInstance();
 		}
-
+		
 		private void OnDestroy()
 		{
 			mFirstQuitButton.OnClick -= HandleFirstQuit;
@@ -56,7 +52,6 @@ namespace FiringSquad.Gameplay.UI
 			mCancelQuitButton.OnClick -= HandleCancelQuit;
 			mFieldOfViewProvider.OnValueChange -= HandleValueChange;
 
-			EventManager.OnInitialPersistenceLoadComplete -= HandleInitialLoad;
 			EventManager.Local.OnApplyOptionsData -= ReflectSettings;
 			EventManager.LocalGUI.OnTogglePauseMenu -= HandleToggle;
 		}
@@ -69,26 +64,7 @@ namespace FiringSquad.Gameplay.UI
 			if (!show)
 				ApplySettings();
 		}
-
-		private void HandleInitialLoad()
-		{
-			if (mData != null)
-				return;
-
-			ISaveLoadManager service = ServiceLocator.Get<ISaveLoadManager>();
-			mData = service.persistentData.GetOptionsData(SETTINGS_ID);
-
-			if (mData == null)
-			{
-				mData = SaveLoadManager.instance.persistentData.CreateOptionsData(SETTINGS_ID);
-				mData.masterVolume = mDefaultVolume;
-				mData.fieldOfView = mDefaultFieldOfView;
-				mData.mouseSensitivity = mDefaultMouseSensitivity;
-			}
-
-			ReflectSettings(mData);
-		}
-
+		
 		private void HandleValueChange(float v)
 		{
 			ApplySettings();

@@ -60,7 +60,7 @@ namespace FiringSquad.Debug
 			GameObject target = UnityEditor.Selection.activeGameObject;
 
 			if (target != null)
-				mCurrentScript = target.GetComponentUpwards<BaseWeaponScript>();
+				mCurrentScript = target.GetComponentInParent<BaseWeaponScript>();
 
 			if (mCurrentScript == null)
 				mCurrentScript = FindObjectOfType<BaseWeaponScript>();

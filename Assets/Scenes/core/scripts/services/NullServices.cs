@@ -2,13 +2,11 @@
 using System.Collections.Generic;
 using FiringSquad.Core.Audio;
 using FiringSquad.Core.Input;
-using FiringSquad.Core.SaveLoad;
 using FiringSquad.Core.State;
 using FiringSquad.Core.UI;
 using FiringSquad.Core.Weapons;
 using FiringSquad.Debug;
 using FiringSquad.Gameplay.Weapons;
-using KeatsLib.Persistence;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Logger = FiringSquad.Debug.Logger;
@@ -30,8 +28,6 @@ namespace FiringSquad.Core
 				return new NullConsole() as T;
 			if (typeof(T) == typeof(IInput))
 				return new NullInput() as T;
-			if (typeof(T) == typeof(ISaveLoadManager))
-				return new NullSaveLoadManager() as T;
 			if (typeof(T) == typeof(IAudioManager))
 				return new NullAudioManager() as T;
 			if (typeof(T) == typeof(IGamestateManager))
@@ -292,27 +288,6 @@ namespace FiringSquad.Core
 			{
 				Logger.Info("NULL SERVICE: IInput.IsInputEnabled()", Logger.System.Services);
 				return false;
-			}
-		}
-
-		private class NullSaveLoadManager : ISaveLoadManager
-		{
-			private Persistence mFakePersistence;
-
-			public Persistence persistentData
-			{
-				get
-				{
-					Logger.Info("NULL SERVICE: ISaveLoadManager.persistentData", Logger.System.Services);
-					return mFakePersistence;
-				}
-			}
-
-			public void LoadData()
-			{
-				Logger.Info("NULL SERVICE: ISaveLoadManager.LoadData()", Logger.System.Services);
-				mFakePersistence = Persistence.Create("");
-				EventManager.Notify(EventManager.InitialPersistenceLoadComplete);
 			}
 		}
 

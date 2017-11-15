@@ -3,15 +3,17 @@
 using System;
 using UnityEngine;
 
-namespace KeatsLib.Persistence
+namespace FiringSquad.Data
 {
-	public partial class Persistence
+	public class OptionsData
 	{
 		/// <summary>
 		/// The background implementation for the IOptionsData package
+		/// TODO: Re-add the persistence saving and loading that allows saving
+		/// this data between play sessions.
 		/// </summary>
 		[Serializable]
-		private class OptionsDataImpl : BasePersisting, IOptionsData
+		private class OptionsDataImpl : IOptionsData
 		{
 			[SerializeField] private float mFieldOfView;
 			[SerializeField] private float mMasterVolume;
@@ -28,7 +30,6 @@ namespace KeatsLib.Persistence
 						return;
 
 					mFieldOfView = value;
-					SetDirty();
 				}
 			}
 
@@ -41,7 +42,6 @@ namespace KeatsLib.Persistence
 						return;
 
 					mMasterVolume = value;
-					SetDirty();
 				}
 			}
 
@@ -54,7 +54,6 @@ namespace KeatsLib.Persistence
 						return;
 
 					mSfxVolume = value;
-					SetDirty();
 				}
 			}
 
@@ -67,7 +66,6 @@ namespace KeatsLib.Persistence
 						return;
 
 					mMusicVolume = value;
-					SetDirty();
 				}
 			}
 
@@ -80,9 +78,13 @@ namespace KeatsLib.Persistence
 						return;
 
 					mMouseSensitivity = value;
-					SetDirty();
 				}
 			}
+		}
+
+		public static IOptionsData GetInstance()
+		{
+			return new OptionsDataImpl();
 		}
 	}
 }

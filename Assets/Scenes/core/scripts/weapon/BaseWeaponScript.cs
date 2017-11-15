@@ -483,7 +483,6 @@ namespace FiringSquad.Gameplay.Weapons
 		private void CmdOnShotFireComplete()
 		{
 			RpcReflectPlayerShotWeapon();
-			EventManager.Server.PlayerFiredWeapon(bearer, null);
 		}
 
 		[ClientRpc]

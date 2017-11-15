@@ -70,7 +70,7 @@ namespace FiringSquad.Gameplay.Weapons
 				if (col.transform == mDirectHit)
 					continue;
 
-				IDamageReceiver c = col.GetComponentUpwards<IDamageReceiver>();
+				IDamageReceiver c = col.GetComponentInParent<IDamageReceiver>();
 				if (c == null)
 					continue;
 
