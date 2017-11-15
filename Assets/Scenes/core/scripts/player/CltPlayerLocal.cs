@@ -216,6 +216,10 @@ namespace FiringSquad.Gameplay
 			EventManager.Notify(EventManager.Local.ExitAimDownSightsMode);
 		}
 
+		/// <summary>
+		/// INPUT HANDLER: Immediately reset the gun's position.
+		/// TODO: Remove this when this bug is actually fixed.
+		/// </summary>
 		private void INPUT_ActivateGunPanic()
 		{
 			IModifiableWeapon weapon = playerRoot.weapon as IModifiableWeapon;
