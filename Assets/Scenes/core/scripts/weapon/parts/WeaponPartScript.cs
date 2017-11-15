@@ -1,35 +1,59 @@
 ﻿using System;
 using FiringSquad.Core;
-using FiringSquad.Core.Weapons;
 using FiringSquad.Data;
 using UnityEngine;
 using UnityEngine.Networking;
 
 namespace FiringSquad.Gameplay.Weapons
 {
+	/// <summary>
+	/// The base script that handles all of the gameplay aspects of a weapon part.
+	/// Considered to primarily be the "On The Gun" script.
+	/// </summary>
 	public abstract class WeaponPartScript : MonoBehaviour
 	{
 		public const int INFINITE_DURABILITY = -1;
 		public const int USE_DEFAULT_DURABILITY = -2;
 
-		public abstract BaseWeaponScript.Attachment attachPoint { get; }
-
+		/// Inspector variables
 		[SerializeField] private Sprite mDurabilitySprite;
-		public Sprite durabilitySprite { get { return mDurabilitySprite; } }
-
 		[SerializeField] private WeaponPartData mData;
-		public WeaponPartData[] data { get { return new[] { mData }; } }
-
 		[SerializeField] private string mDescription;
-		public string description { get { return mDescription; } }
-
 		[SerializeField] private string mPrettyName;
-		public string prettyName { get { return mPrettyName; } }
-
 		[SerializeField] private int mDurability = INFINITE_DURABILITY;
+
+		/// Private variables
 		private BoundProperty<float> mDurabilityPercent = new BoundProperty<float>();
 		private int mBaseDurability;
 
+		/// <summary>
+		/// Which attachment point we connect to.
+		/// </summary>
+		public abstract BaseWeaponScript.Attachment attachPoint { get; }
+
+		/// <summary>
+		/// The collection of modifier data for this part.
+		/// </summary>
+		public WeaponPartData[] data { get { return new[] { mData }; } }
+
+		/// <summary>
+		/// The UI sprite used to represent this part in the durability HUD.
+		/// </summary>
+		public Sprite durabilitySprite { get { return mDurabilitySprite; } }
+
+		/// <summary>
+		/// A short text description of this part. Used for UI.
+		/// </summary>
+		public string description { get { return mDescription; } }
+
+		/// <summary>
+		/// A short name for this part. Used for UI.
+		/// </summary>
+		public string prettyName { get { return mPrettyName; } }
+
+		/// <summary>
+		/// The current durability of this weapon part.
+		/// </summary>
 		public int durability
 		{
 			get
@@ -47,6 +71,9 @@ namespace FiringSquad.Gameplay.Weapons
 			}
 		}
 
+		/// <summary>
+		/// The unique part ID of this weapon part.
+		/// </summary>
 		public string partId
 		{
 			get
@@ -57,6 +84,9 @@ namespace FiringSquad.Gameplay.Weapons
 			}
 		}
 
+		/// <summary>
+		/// Cleanup all listeners and event handlers
+		/// </summary>
 		private void OnDestroy()
 		{
 			mDurabilityPercent.Cleanup(); // force this so that the UI is unbound

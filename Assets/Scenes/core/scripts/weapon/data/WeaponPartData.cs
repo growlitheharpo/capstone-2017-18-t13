@@ -4,6 +4,9 @@ using UnityEngine.Serialization;
 
 namespace FiringSquad.Data
 {
+	/// <summary>
+	/// Data collection class used for weapon parts to track how they affect stats.
+	/// </summary>
 	[Serializable]
 	public class WeaponPartData
 	{
