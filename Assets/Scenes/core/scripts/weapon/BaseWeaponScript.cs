@@ -14,8 +14,16 @@ using Random = UnityEngine.Random;
 
 namespace FiringSquad.Gameplay.Weapons
 {
+	/// <summary>
+	/// The implementation of the basic modifiable weapon.
+	/// </summary>
+	/// <inheritdoc cref="IModifiableWeapon" />
 	public class BaseWeaponScript : NetworkBehaviour, IModifiableWeapon
 	{
+		/// <summary>
+		/// The four weapon attachment spots.
+		/// TODO: Move this to the IWeapon file and have it float in the namespace instead of in this class.
+		/// </summary>
 		[Flags]
 		public enum Attachment
 		{
@@ -25,6 +33,9 @@ namespace FiringSquad.Gameplay.Weapons
 			Grip = 0x8,
 		}
 
+		/// <summary>
+		/// The enum for masking what network updates must be sent.
+		/// </summary>
 		[Flags]
 		private enum DirtyBitFlags
 		{
@@ -37,7 +48,53 @@ namespace FiringSquad.Gameplay.Weapons
 			Durability = 0x20,
 		}
 
+		/// Inspector variables
+		[SerializeField] private Transform mBarrelAttach;
+		[SerializeField] private Transform mScopeAttach;
+		[SerializeField] private Transform mMechanismAttach;
+		[SerializeField] private Transform mGripAttach;
+		[SerializeField] private float mAimDownSightsDispersionMod;
+		[SerializeField] private WeaponData mDefaultData;
+
+		/// Private variables
 		private IWeaponBearer mBearer;
+		private WeaponPartCollection mCurrentParts;
+		private WeaponData mCurrentData, mAimDownSightsData;
+
+		private BoundProperty<int> mShotsInClip, mTotalClipSize;
+		private ParticleSystem mShotParticles, mPartBreakPrefab;
+		private Dictionary<Attachment, Transform> mAttachPoints;
+		private Animator mAnimator;
+
+		private List<float> mRecentShotTimes;
+		private int mShotsSinceRelease;
+		private bool mReloading, mAimDownSightsActive;
+
+		private const float CAMERA_FOLLOW_FACTOR = 10.0f;
+
+
+		/// <inheritdoc />
+		public Transform aimRoot { get; set; }
+
+		/// <inheritdoc />
+		public Vector3 positionOffset { get; set; }
+
+		/// <inheritdoc />
+		public WeaponData baseData { get { return mDefaultData; } }
+
+		/// <inheritdoc />
+		public WeaponPartCollection currentParts { get { return mCurrentParts; } }
+
+		/// <inheritdoc />
+		public WeaponData currentData
+		{
+			get
+			{
+				return mAimDownSightsActive ? mAimDownSightsData : mCurrentData;
+			}
+		}
+
+		/// <inheritdoc cref="IModifiableWeapon.bearer" />
 		public IWeaponBearer bearer
 		{
 			get { return mBearer; }
@@ -47,43 +104,15 @@ namespace FiringSquad.Gameplay.Weapons
 				SetDirtyBit(syncVarDirtyBits | (uint)DirtyBitFlags.Bearer);
 			}
 		}
-
-		public Transform aimRoot { get; set; }
-		public Vector3 positionOffset { get; set; }
-
-		[SerializeField] private Transform mBarrelAttach;
-		[SerializeField] private Transform mScopeAttach;
-		[SerializeField] private Transform mMechanismAttach;
-		[SerializeField] private Transform mGripAttach;
-		[SerializeField] private float mAimDownSightsDispersionMod;
-		[SerializeField] private WeaponData mDefaultData;
-		public WeaponData baseData { get { return mDefaultData; } }
-
-		private WeaponPartCollection mCurrentParts;
-		public WeaponPartCollection currentParts { get { return mCurrentParts; } }
-
-		private Dictionary<Attachment, Transform> mAttachPoints;
-		private WeaponData mCurrentData, mAimDownSightsData;
-
-		public WeaponData currentData
-		{
-			get
-			{
-				return mAimDownSightsActive ? mAimDownSightsData : mCurrentData;
-			}
-		}
-
+		
+		/// <summary>
+		/// The amount of time between each shot.
+		/// </summary>
 		private float timePerShot { get { return 1.0f / currentData.fireRate; } }
 
-		private bool mReloading;
-		private BoundProperty<int> mShotsInClip, mTotalClipSize;
-		private int mShotsSinceRelease;
-		private List<float> mRecentShotTimes;
-		private ParticleSystem mShotParticles, mPartBreakPrefab;
-		private Animator mAnimator;
-		private bool mAimDownSightsActive;
-
-		private const float CAMERA_FOLLOW_FACTOR = 10.0f;
+		/// <summary>
+		/// The current time of the game.
+		/// </summary>
 		private float currentTime { get { return Time.time; } }
 
 		private void Awake()

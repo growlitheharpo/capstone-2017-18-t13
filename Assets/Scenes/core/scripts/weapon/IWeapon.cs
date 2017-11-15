@@ -3,6 +3,9 @@ using UnityEngine;
 
 namespace FiringSquad.Gameplay.Weapons
 {
+	/// <summary>
+	/// The interface for a basic weapon in the game.
+	/// </summary>
 	public interface IWeapon
 	{
 		/// <summary>
@@ -64,9 +67,14 @@ namespace FiringSquad.Gameplay.Weapons
 		/// <returns></returns>
 		float GetCurrentDispersionFactor(bool forceNotZero);
 
+		/// <summary>
+		/// Input handler: Handle the trigger being held for this weapon.
+		/// </summary>
 		void FireWeaponHold();
-		void FireWeaponUp();
 
-		void PlayFireEffect();
+		/// <summary>
+		/// Input handler: Handle the trigger being released for this weapon.
+		/// </summary>
+		void FireWeaponUp();
 	}
 }

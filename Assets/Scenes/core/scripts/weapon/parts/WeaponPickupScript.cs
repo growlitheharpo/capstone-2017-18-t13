@@ -7,33 +7,51 @@ using UnityEngine.Networking;
 
 namespace FiringSquad.Gameplay.Weapons
 {
+	/// <summary>
+	/// The script to manage weapon parts when they exist with physics in the world.
+	/// </summary>
 	public class WeaponPickupScript : NetworkBehaviour, IInteractable, INetworkGrabbable
 	{
 		private const float PICKUP_LIFETIME = 30.0f; // in seconds
 
+		/// Inspector variables
 		[SerializeField] private GameObject mGunView;
 		[SerializeField] private GameObject mPickupView;
 		[SerializeField] private GameObject mParticleSystem;
 
-		public CltPlayer currentHolder { get; private set; }
-		public bool currentlyHeld { get { return currentHolder != null; } }
+		/// Sync variables
+		[SyncVar] private long mDeathTimeTicks;
 
+		/// Private variables
 		private int mOverrideDurability = WeaponPartScript.USE_DEFAULT_DURABILITY;
-		public int overrideDurability { get { return mOverrideDurability; } set { mOverrideDurability = value; } }
-
 		private WeaponPartWorldCanvas mCanvas;
 		private WeaponPartScript mPartScript;
 		private Rigidbody mRigidbody;
-
-		[SyncVar] private long mDeathTimeTicks;
 		private Coroutine mTimeoutRoutine;
 
+		/// <inheritdoc />
+		public CltPlayer currentHolder { get; private set; }
+
+		/// <inheritdoc />
+		public bool currentlyHeld { get { return currentHolder != null; } }
+
+		/// <summary>
+		/// The durability of this weapon part when it is picked up.
+		/// </summary>
+		public int overrideDurability { get { return mOverrideDurability; } set { mOverrideDurability = value; } }
+
+		/// <summary>
+		/// Unity's Awake function
+		/// </summary>
 		private void Awake()
 		{
 			mPartScript = GetComponent<WeaponPartScript>();
 			mRigidbody = GetComponent<Rigidbody>();
 		}
 
+		/// <summary>
+		/// Unity's Start function
+		/// </summary>
 		private void Start()
 		{
 			if (isServer)
@@ -42,6 +60,10 @@ namespace FiringSquad.Gameplay.Weapons
 				StartCoroutine(Coroutines.InvokeAfterFrames(5, InitializePickupView));
 		}
 
+		/// <summary>
+		/// Cleanup all listeners and event handlers
+		/// Prepare this part to exist on a weapon, if applicable.
+		/// </summary>
 		private void OnDestroy()
 		{
 			if (mTimeoutRoutine != null)
@@ -56,6 +78,9 @@ namespace FiringSquad.Gameplay.Weapons
 				Destroy(mRigidbody);
 		}
 
+		/// <summary>
+		/// Destroy the pickup view for this part and activate the gun view.
+		/// </summary>
 		private void DestroyPickupView()
 		{
 			mGunView.SetActive(true);
@@ -64,12 +89,18 @@ namespace FiringSquad.Gameplay.Weapons
 				Destroy(mPickupView);
 		}
 
+		/// <summary>
+		/// Reflect the pickup view state for this part across all clients.
+		/// </summary>
 		[ClientRpc]
 		public void RpcInitializePickupView()
 		{
 			InitializePickupView();
 		}
 
+		/// <summary>
+		/// Initialize this part to exist in the world by toggling the different views and setting a death time.
+		/// </summary>
 		private void InitializePickupView()
 		{
 			if (!mGunView.activeInHierarchy && mPickupView.activeInHierarchy)
@@ -107,6 +138,10 @@ namespace FiringSquad.Gameplay.Weapons
 			mTimeoutRoutine = StartCoroutine(Timeout(ps));
 		}
 
+		/// <summary>
+		/// Handle watching the lifetime of this part, and destroy it when it's over.
+		/// </summary>
+		/// <param name="vfxPack">The gameobject of our effect pack.</param>
 		private IEnumerator Timeout(GameObject vfxPack)
 		{
 			Light vfxLight = vfxPack.GetComponentInChildren<Light>();
@@ -132,6 +167,10 @@ namespace FiringSquad.Gameplay.Weapons
 				NetworkServer.Destroy(gameObject);
 		}
 
+		/// <summary>
+		/// Handle a character interacting with this part.
+		/// </summary>
+		/// <param name="source">The character that has called "interact".</param>
 		[Server]
 		public void Interact(ICharacter source)
 		{
@@ -139,7 +178,8 @@ namespace FiringSquad.Gameplay.Weapons
 			if (wepBearer == null)
 				return;
 
-			wepBearer.weapon.AttachNewPart(GetComponent<WeaponPartScript>().partId, overrideDurability);
+			if (wepBearer.weapon != null)
+				wepBearer.weapon.AttachNewPart(GetComponent<WeaponPartScript>().partId, overrideDurability);
 
 			try
 			{
@@ -151,6 +191,10 @@ namespace FiringSquad.Gameplay.Weapons
 			}
 		}
 
+		/// <summary>
+		/// Apply a physics force towards the provided pulling player.
+		/// </summary>
+		/// <param name="player">The player to pull towards. Must have a valid magnet arm.</param>
 		public void PullTowards(CltPlayer player)
 		{
 			if (currentlyHeld)
@@ -162,6 +206,10 @@ namespace FiringSquad.Gameplay.Weapons
 			mRigidbody.AddForce(direction, ForceMode.Force);
 		}
 
+		/// <summary>
+		/// Snap from being in physics mode to being locked/"grabbed" in the player's hand.
+		/// </summary>
+		/// <param name="player">The player that is grabbing this part.</param>
 		public void GrabNow(CltPlayer player)
 		{
 			currentHolder = player;
@@ -178,6 +226,9 @@ namespace FiringSquad.Gameplay.Weapons
 				EventManager.Notify(() => EventManager.Local.LocalPlayerHoldingPart(mPartScript));
 		}
 
+		/// <summary>
+		/// Throw this part with physics force based on where our current holder is looking.
+		/// </summary>
 		public void Throw()
 		{
 			if (currentHolder == null)
@@ -197,6 +248,9 @@ namespace FiringSquad.Gameplay.Weapons
 			currentHolder = null;
 		}
 
+		/// <summary>
+		/// Release this part and let it fall to the ground without any extra force.
+		/// </summary>
 		public void Release()
 		{
 			transform.SetParent(null);
