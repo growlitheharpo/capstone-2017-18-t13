@@ -22,7 +22,7 @@ namespace FiringSquad.Core.State
 					throw new ArgumentException("Cannot Initialize the game more than once! Manager is now in an invalid state.");
 
 				mAudioLoadComplete = false;
-				EventManager.Local.OnInitialAudioLoadComplete += AudioLoadComplete;
+				EventManager.Local.OnInitialAudioLoadComplete += OnInitialAudioLoadComplete;
 
 				ServiceLocator.Get<IAudioManager>()
 					.InitializeDatabase();
@@ -34,12 +34,13 @@ namespace FiringSquad.Core.State
 			/// <inheritdoc />
 			public override IState GetTransition()
 			{
-				if (mAudioLoadComplete)
-					return instance.ChooseStateByScene();
-				return null;
+				return mAudioLoadComplete ? instance.ChooseStateByScene() : null;
 			}
 
-			private void AudioLoadComplete()
+			/// <summary>
+			/// EVENT HANDLER: Local.OnInitialAudioLoadComplete
+			/// </summary>
+			private void OnInitialAudioLoadComplete()
 			{
 				mAudioLoadComplete = true;
 			}
@@ -48,8 +49,7 @@ namespace FiringSquad.Core.State
 			public override void OnExit()
 			{
 				kOccured = true;
-				//Cleanup handlers so we can be garbage collected
-				EventManager.Local.OnInitialAudioLoadComplete -= AudioLoadComplete;
+				EventManager.Local.OnInitialAudioLoadComplete -= OnInitialAudioLoadComplete;
 			}
 		}
 	}

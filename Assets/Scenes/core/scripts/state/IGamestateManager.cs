@@ -22,7 +22,7 @@ namespace FiringSquad.Core.State
 		void RequestShutdown();
 
 		/// <summary>
-		/// Make a request to change the current scene.
+		/// Make a request to change the current scene through the state system.
 		/// </summary>
 		/// <param name="sceneName"></param>
 		/// <param name="mode"></param>
