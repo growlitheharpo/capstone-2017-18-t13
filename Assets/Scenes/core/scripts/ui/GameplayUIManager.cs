@@ -4,6 +4,7 @@ using System.Linq;
 
 namespace FiringSquad.Core.UI
 {
+	/// <inheritdoc cref="IGameplayUIManager" />
 	public class GameplayUIManager : MonoSingleton<GameplayUIManager>, IGameplayUIManager
 	{
 		public static readonly int CLIP_CURRENT = "player_clip_current".GetHashCode();
@@ -15,14 +16,19 @@ namespace FiringSquad.Core.UI
 		public static readonly int PLAYER_DEATHS = "player_current_deaths".GetHashCode();
 		public static readonly int ARENA_ROUND_TIME = "arena_current_time".GetHashCode();
 
+		/// Private variables
 		private Dictionary<int, WeakReference> mPropertyMap;
 
+		/// <summary>
+		/// Unity's Awake function
+		/// </summary>
 		protected override void Awake()
 		{
 			base.Awake();
 			mPropertyMap = new Dictionary<int, WeakReference>();
 		}
 
+		/// <inheritdoc />
 		public BoundProperty<T> GetProperty<T>(int hash)
 		{
 			if (!mPropertyMap.ContainsKey(hash))
@@ -36,11 +42,13 @@ namespace FiringSquad.Core.UI
 			return null;
 		}
 
+		/// <inheritdoc />
 		public void BindProperty(int hash, BoundProperty prop)
 		{
 			mPropertyMap[hash] = new WeakReference(prop);
 		}
 
+		/// <inheritdoc />
 		public void UnbindProperty(BoundProperty obj)
 		{
 			var keys = mPropertyMap

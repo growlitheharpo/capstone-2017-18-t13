@@ -6,15 +6,23 @@ using UnityEngine.UI;
 
 namespace FiringSquad.Gameplay.UI
 {
+	/// <summary>
+	/// UI class that manages scaling the crosshair based on current dispersion.
+	/// </summary>
 	public class DynamicCrosshair : MonoBehaviour
 	{
+		/// Inspector variables
 		[SerializeField] private RectTransform mImageHolder;
 		[SerializeField] private float mFadeTime;
 
+		/// Private variables
 		private CltPlayer mPlayerRef;
 		private Color[] mOriginalColors;
 		private Image[] mImages;
 
+		/// <summary>
+		/// Unity's Awake function
+		/// </summary>
 		private void Awake()
 		{
 			mImages = mImageHolder.GetComponentsInChildren<Image>();
@@ -26,6 +34,9 @@ namespace FiringSquad.Gameplay.UI
 			EventManager.Local.OnLocalPlayerCausedDamage += OnLocalPlayerCausedDamage;
 		}
 
+		/// <summary>
+		/// Cleanup listeners and event handlers.
+		/// </summary>
 		private void OnDestroy()
 		{
 			EventManager.Local.OnEnterAimDownSightsMode -= OnEnterAimDownSightsMode;
@@ -34,24 +45,47 @@ namespace FiringSquad.Gameplay.UI
 			EventManager.Local.OnLocalPlayerCausedDamage -= OnLocalPlayerCausedDamage;
 		}
 
+		/// <summary>
+		/// EVENT HANDLER: Local.OnLocalPlayerSpawned
+		/// Saves a reference to the player.
+		/// </summary>
 		private void OnLocalPlayerSpawned(CltPlayer obj)
 		{
 			mPlayerRef = obj;
 			EventManager.Local.OnLocalPlayerSpawned -= OnLocalPlayerSpawned;
 		}
 
+		/// <summary>
+		/// EVENT HANDLER: Local.OnEnterAimDownSightsMode
+		/// </summary>
 		private void OnEnterAimDownSightsMode()
 		{
 			mImageHolder.gameObject.SetActive(false);
 		}
 
+		/// <summary>
+		/// EVENT HANDLER: Local.OnExitAimDownSightsMode
+		/// </summary>
 		private void OnExitAimDownSightsMode()
 		{
 			mImageHolder.gameObject.SetActive(true);
 		}
 
+		/// <summary>
+		/// EVENT HANDLER: Local.OnLocalPlayerCausedDamage
+		/// </summary>
+		private void OnLocalPlayerCausedDamage(float obj)
+		{
+			StopAllCoroutines();
+			StartCoroutine(FadeBackColors(mFadeTime));
+		}
+
+		/// <summary>
+		/// Unity's Update function
+		/// </summary>
 		private void Update()
 		{
+			// Ensure we have a player and a weapon.
 			if (mPlayerRef == null)
 				return;
 
@@ -59,6 +93,8 @@ namespace FiringSquad.Gameplay.UI
 			if (weapon == null)
 				return;
 
+			// TODO: There has to be a better way to do this.
+			// One per frame isn't the end of the world, but still...
 			float scaleVal3 = Mathf.Tan(Mathf.Asin(weapon.GetCurrentDispersionFactor(true)));
 
 			Vector3 cameraPos = mPlayerRef.eye.position;
@@ -77,12 +113,9 @@ namespace FiringSquad.Gameplay.UI
 			mImageHolder.anchorMin = new Vector2(0.5f - width, 0.5f - height);
 		}
 
-		private void OnLocalPlayerCausedDamage(float obj)
-		{
-			StopAllCoroutines();
-			StartCoroutine(FadeBackColors(mFadeTime));
-		}
-
+		/// <summary>
+		/// Fade from red to the original color of the crosshair.
+		/// </summary>
 		private IEnumerator FadeBackColors(float time)
 		{
 			float currentTime = 0.0f;

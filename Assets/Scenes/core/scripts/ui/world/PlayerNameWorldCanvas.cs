@@ -6,19 +6,30 @@ using UnityEngine.UI;
 
 namespace FiringSquad.Gameplay.UI
 {
+	/// <summary>
+	/// UI class to handle displaying a player's name in the world.
+	/// </summary>
 	public class PlayerNameWorldCanvas : MonoBehaviour
 	{
+		/// Inspector variables
 		[SerializeField] private Text mDisplayText;
 
+		/// Private variables
 		private Transform mLocalPlayerRef;
 		private float mMaxAlpha;
 
+		/// <summary>
+		/// Unity's Awake function
+		/// </summary>
 		private void Awake()
 		{
 			mMaxAlpha = 1.0f;
 			StartCoroutine(GrabPlayerReference());
 		}
 
+		/// <summary>
+		/// Grab a reference to the local player for handling rotations.
+		/// </summary>
 		private IEnumerator GrabPlayerReference()
 		{
 			while (mLocalPlayerRef == null)
@@ -33,6 +44,9 @@ namespace FiringSquad.Gameplay.UI
 			}
 		}
 
+		/// <summary>
+		/// Unity's Update function.
+		/// </summary>
 		private void Update()
 		{
 			if (mLocalPlayerRef == null)
@@ -42,6 +56,10 @@ namespace FiringSquad.Gameplay.UI
 			DoRotate();
 		}
 
+		/// <summary>
+		/// Lerp the color between transparent and visible based on if the player is looking at us.
+		/// TODO: Evaluate if we want this.
+		/// </summary>
 		private void DoAlpha()
 		{
 			// TODO: Reevaluate if we want this?
@@ -52,6 +70,9 @@ namespace FiringSquad.Gameplay.UI
 			mCanvasGroup.alpha = dot * mMaxAlpha;*/
 		}
 
+		/// <summary>
+		/// Rotate towards the player's view.
+		/// </summary>
 		private void DoRotate()
 		{
 			Vector3 direction = transform.position - mLocalPlayerRef.position;
@@ -60,6 +81,9 @@ namespace FiringSquad.Gameplay.UI
 			transform.rotation = rot;
 		}
 
+		/// <summary>
+		/// Set the name displayed on this canvas.
+		/// </summary>
 		public void SetPlayerName(string newName)
 		{
 			mDisplayText.text = CultureInfo.InvariantCulture.TextInfo.ToTitleCase(newName);

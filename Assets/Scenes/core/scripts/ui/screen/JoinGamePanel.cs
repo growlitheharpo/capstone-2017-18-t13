@@ -9,10 +9,12 @@ namespace FiringSquad.Gameplay.UI
 	/// </summary>
 	public class JoinGamePanel : MonoBehaviour
 	{
+		/// Inspector variables
 		[SerializeField] private ActionProvider mHostGameButton;
 		[SerializeField] private ActionProvider mFindGameButton;
 		[SerializeField] private UnityEngine.UI.Text mStatusText;
 
+		/// Private variables
 		private OverrideNetworkDiscovery mDiscoveryHandler;
 		private NetworkGameManager mNetworkManager;
 

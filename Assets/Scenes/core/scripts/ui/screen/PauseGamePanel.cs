@@ -6,11 +6,12 @@ using UnityEngine.Networking;
 
 namespace FiringSquad.Gameplay.UI
 {
+	/// <summary>
+	/// UI class to manage the pause panel.
+	/// </summary>
 	public class PauseGamePanel : MonoBehaviour
 	{
-		public const string SETTINGS_ID = "options_menu_options_id";
-
-		private IOptionsData mData;
+		/// Inspector variables
 		[SerializeField] private float mDefaultFieldOfView;
 		[SerializeField] private float mDefaultMouseSensitivity;
 
@@ -26,9 +27,15 @@ namespace FiringSquad.Gameplay.UI
 
 		[SerializeField] private GameObject mConfirmationPanel;
 
+		/// Private variables
+		private IOptionsData mData;
+
+		/// <summary>
+		/// Unity's Awake function
+		/// </summary>
 		private void Awake()
 		{
-			EventManager.Local.OnApplyOptionsData += ReflectSettings;
+			mData = OptionsData.GetInstance();
 
 			mFirstQuitButton.OnClick += HandleFirstQuit;
 			mResumeButton.OnClick += HandleResume;
@@ -36,14 +43,18 @@ namespace FiringSquad.Gameplay.UI
 			mCancelQuitButton.OnClick += HandleCancelQuit;
 
 			mFieldOfViewProvider.OnValueChange += HandleValueChange;
+			mVolumeProvider.OnValueChange += HandleValueChange;
 
-			EventManager.LocalGUI.OnTogglePauseMenu += HandleToggle;
+			EventManager.Local.OnApplyOptionsData += OnApplyOptionsData;
+			EventManager.LocalGUI.OnTogglePauseMenu += OnTogglePauseMenu;
+
 			mConfirmationPanel.SetActive(false);
 			gameObject.SetActive(false);
-
-			mData = OptionsData.GetInstance();
 		}
-		
+
+		/// <summary>
+		/// Cleanup listeners and event handlers.
+		/// </summary>
 		private void OnDestroy()
 		{
 			mFirstQuitButton.OnClick -= HandleFirstQuit;
@@ -52,11 +63,14 @@ namespace FiringSquad.Gameplay.UI
 			mCancelQuitButton.OnClick -= HandleCancelQuit;
 			mFieldOfViewProvider.OnValueChange -= HandleValueChange;
 
-			EventManager.Local.OnApplyOptionsData -= ReflectSettings;
-			EventManager.LocalGUI.OnTogglePauseMenu -= HandleToggle;
+			EventManager.Local.OnApplyOptionsData -= OnApplyOptionsData;
+			EventManager.LocalGUI.OnTogglePauseMenu -= OnTogglePauseMenu;
 		}
 
-		private void HandleToggle(bool show)
+		/// <summary>
+		/// EVENT HANDLER: Local.OnTogglePauseMenu
+		/// </summary>
+		private void OnTogglePauseMenu(bool show)
 		{
 			mConfirmationPanel.SetActive(false);
 			gameObject.SetActive(show);
@@ -64,13 +78,11 @@ namespace FiringSquad.Gameplay.UI
 			if (!show)
 				ApplySettings();
 		}
-		
-		private void HandleValueChange(float v)
-		{
-			ApplySettings();
-		}
 
-		public void ReflectSettings(IOptionsData data)
+		/// <summary>
+		/// EVENT HANDLER: Local.OnApplyOptionsData
+		/// </summary>
+		private void OnApplyOptionsData(IOptionsData data)
 		{
 			mData = data;
 			mVolumeProvider.SetValue(mData.masterVolume);
@@ -78,7 +90,19 @@ namespace FiringSquad.Gameplay.UI
 			mMouseSensitivityProvider.SetValue(mData.mouseSensitivity);
 		}
 
-		public void ApplySettings()
+		/// <summary>
+		/// Handles any of our values changing.
+		/// </summary>
+		/// <param name="v"></param>
+		private void HandleValueChange(float v)
+		{
+			ApplySettings();
+		}
+
+		/// <summary>
+		/// Grab all of our current values and notify the game to change them.
+		/// </summary>
+		private void ApplySettings()
 		{
 			mData.fieldOfView = mFieldOfViewProvider.GetValue();
 			mData.masterVolume = mVolumeProvider.GetValue();
@@ -87,6 +111,9 @@ namespace FiringSquad.Gameplay.UI
 			EventManager.Notify(() => EventManager.Local.ApplyOptionsData(mData));
 		}
 
+		/// <summary>
+		/// Handle the player clicking the "quit" button.
+		/// </summary>
 		private void HandleQuit()
 		{
 			NetworkManager.singleton.StopHost();
@@ -98,16 +125,25 @@ namespace FiringSquad.Gameplay.UI
 				.RequestSceneChange(GamestateManager.MENU_SCENE);
 		}
 
+		/// <summary>
+		/// Handle the player resuming the game.
+		/// </summary>
 		private void HandleResume()
 		{
 			EventManager.Notify(EventManager.Local.TogglePause);
 		}
 
+		/// <summary>
+		/// Handle the player clicking the first "quit" button and ask to confirm.
+		/// </summary>
 		private void HandleFirstQuit()
 		{
 			mConfirmationPanel.SetActive(true);
 		}
 
+		/// <summary>
+		/// Handle the player cancelling after clicking the first "quit" button.
+		/// </summary>
 		private void HandleCancelQuit()
 		{
 			mConfirmationPanel.SetActive(false);

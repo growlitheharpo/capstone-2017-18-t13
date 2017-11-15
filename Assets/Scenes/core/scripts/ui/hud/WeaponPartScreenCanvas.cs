@@ -9,8 +9,12 @@ using UIText = UnityEngine.UI.Text;
 
 namespace FiringSquad.Gameplay.UI
 {
+	/// <summary>
+	/// UI class that handles displaying a weapon part's stats on screen.
+	/// </summary>
 	public class WeaponPartScreenCanvas : MonoBehaviour
 	{
+		/// Inspector variables
 		[SerializeField] private GameObject mTotalArea;
 		[SerializeField] private UIText mPartName;
 		[SerializeField] private UIImage mDamageIcon;
@@ -23,9 +27,13 @@ namespace FiringSquad.Gameplay.UI
 		[SerializeField] private Sprite mPositiveSprite;
 		[SerializeField] private Sprite mNegativeSprite;
 
+		/// Private variables
 		private WeaponPartScript mCurrentPart;
 		private IWeapon mPlayerWeaponRef;
 
+		/// <summary>
+		/// Unity's Awake function
+		/// </summary>
 		private void Awake()
 		{
 			EventManager.Local.OnLocalPlayerAttachedPart += OnLocalPlayerAttachedPart;
@@ -37,6 +45,9 @@ namespace FiringSquad.Gameplay.UI
 			mTotalArea.SetActive(false);
 		}
 
+		/// <summary>
+		/// Cleanup all listeners and event handlers.
+		/// </summary>
 		private void OnDestroy()
 		{
 			EventManager.Local.OnLocalPlayerAttachedPart -= OnLocalPlayerAttachedPart;
@@ -44,6 +55,9 @@ namespace FiringSquad.Gameplay.UI
 			EventManager.Local.OnLocalPlayerReleasedPart -= OnLocalPlayerReleasedPart;
 		}
 
+		/// <summary>
+		/// Grab a reference to the local player's weapon.
+		/// </summary>
 		private IEnumerator GrabPlayerReference()
 		{
 			while (mPlayerWeaponRef == null)
@@ -58,6 +72,9 @@ namespace FiringSquad.Gameplay.UI
 			}
 		}
 
+		/// <summary>
+		/// EVENT HANDLER: Local.OnLocalPlayerHoldingPart
+		/// </summary>
 		private void OnLocalPlayerHoldingPart(WeaponPartScript part)
 		{
 			mTotalArea.SetActive(true);
@@ -65,6 +82,25 @@ namespace FiringSquad.Gameplay.UI
 			CalculateAndDisplayStats();
 		}
 
+		/// <summary>
+		/// EVENT HANDLER: Local.OnLocalPlayerReleasedPart
+		/// </summary>
+		private void OnLocalPlayerReleasedPart(WeaponPartScript obj)
+		{
+			mTotalArea.SetActive(false);
+		}
+
+		/// <summary>
+		/// EVENT HANDLER: Local.OnLocalPlayerAttachedPart
+		/// </summary>
+		private void OnLocalPlayerAttachedPart(BaseWeaponScript weapon, WeaponPartScript part)
+		{
+			mCurrentPart = null;
+		}
+
+		/// <summary>
+		/// Calculate the change in stats for each of the weapon categories then display them on the panel.
+		/// </summary>
 		private void CalculateAndDisplayStats()
 		{
 			WeaponPartCollection fakeCollection = new WeaponPartCollection(mPlayerWeaponRef.currentParts);
@@ -82,16 +118,13 @@ namespace FiringSquad.Gameplay.UI
 			mAccuracyIcon.sprite = ChooseSprite(newData.maximumDispersion, currentData.maximumDispersion);
 		}
 
-		private void OnLocalPlayerReleasedPart(WeaponPartScript obj)
-		{
-			mTotalArea.SetActive(false);
-		}
-
-		private void OnLocalPlayerAttachedPart(BaseWeaponScript weapon, WeaponPartScript part)
-		{
-			mCurrentPart = null;
-		}
-		
+		/// <summary>
+		/// Chooses which sprite to display based on the relation of newValue to oldValue.
+		/// </summary>
+		/// <param name="oldValue">The current value of the stat.</param>
+		/// <param name="newValue">The hypothetical value of the stat if this part were applied.</param>
+		/// <returns>The neutral sprite if they are roughly equal; the negativeSprite if 
+		/// oldValue is higher, the positiveSprite if newValue is higher.</returns>
 		private Sprite ChooseSprite(float oldValue, float newValue)
 		{
 			if (Math.Abs(oldValue - newValue) < 0.05f)
@@ -100,6 +133,9 @@ namespace FiringSquad.Gameplay.UI
 			return oldValue > newValue ? mNegativeSprite : mPositiveSprite;
 		}
 		
+		/// <summary>
+		/// Unity's Update function.
+		/// </summary>
 		private void Update()
 		{
 			if (!mTotalArea.activeInHierarchy)
