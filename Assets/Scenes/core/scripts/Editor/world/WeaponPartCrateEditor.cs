@@ -2,12 +2,19 @@
 
 namespace UnityEditor
 {
+	/// <summary>
+	/// Custom inspector for crates.
+	/// Auto-balances weights and draws a prettier list.
+	/// </summary>
 	[CustomEditor(typeof(FiringSquad.Gameplay.WeaponPartCrate))]
 	public class WeaponPartCrateEditor : Editor
 	{
 		private UnityEditorInternal.ReorderableList mList;
 		private SerializedProperty mPartsProperty;
 
+		/// <summary>
+		/// Called when the list is enabled. Connects a ReorderableList to the property
+		/// </summary>
 		private void OnEnable()
 		{
 			mPartsProperty = serializedObject.FindProperty("mParts");
@@ -30,6 +37,7 @@ namespace UnityEditor
 				};
 		}
 
+		/// <inheritdoc />
 		public override void OnInspectorGUI()
 		{
 			serializedObject.Update();
@@ -44,6 +52,9 @@ namespace UnityEditor
 			serializedObject.ApplyModifiedProperties();
 		}
 
+		/// <summary>
+		/// Balance all of our sliders.
+		/// </summary>
 		private void BalanceWeights()
 		{
 			float sum = 0.0f;
@@ -57,6 +68,10 @@ namespace UnityEditor
 				mPartsProperty.GetArrayElementAtIndex(i).FindPropertyRelative("mWeight").floatValue /= sum;
 		}
 
+		/// <summary>
+		/// Snap the crates to the floor.
+		/// </summary>
+		/// <param name="component"></param>
 		private void SnapToFloor(Component component)
 		{
 			Transform t = component.transform;

@@ -3,6 +3,9 @@ using UnityEngine;
 
 namespace UnityEditor
 {
+	/// <summary>
+	/// Draw a custom button for the debug menu.
+	/// </summary>
 	[CustomEditor(typeof(DebugMenu))]
 	public class DebugMenuEditor : Editor
 	{

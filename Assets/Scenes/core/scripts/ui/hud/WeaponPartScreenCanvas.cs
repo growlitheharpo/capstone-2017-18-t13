@@ -107,7 +107,7 @@ namespace FiringSquad.Gameplay.UI
 			fakeCollection[mCurrentPart.attachPoint] = mCurrentPart;
 
 			WeaponData currentData = mPlayerWeaponRef.currentData;
-			WeaponData newData = BaseWeaponScript.ActivatePartEffects(fakeCollection, mPlayerWeaponRef.baseData);
+			WeaponData newData = WeaponData.ActivatePartEffects(mPlayerWeaponRef.baseData, fakeCollection);
 
 			mPartName.text = mCurrentPart.prettyName;
 			mDamageIcon.sprite = ChooseSprite(currentData.damage, newData.damage);

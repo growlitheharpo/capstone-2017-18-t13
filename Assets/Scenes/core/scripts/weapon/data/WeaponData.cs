@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using FiringSquad.Gameplay.Weapons;
 using FiringSquad.Networking;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -206,6 +209,37 @@ namespace FiringSquad.Data
 		public void ForceModifyClipSize(Modifier.Int modification)
 		{
 			mClipSize = modification.Apply(mClipSize);
+		}
+
+		/// <summary>
+		/// Apply the effects of a collection of parts to a provided startnig data.
+		/// </summary>
+		/// <param name="parts">The weapon part collection to apply.</param>
+		/// <param name="startingData">The base data to apply the effects to.</param>
+		/// <param name="otherVars">Any other effects to apply in addition to the part collection's effects.</param>
+		/// <returns>The resulting weapon data after all effects are applied.</returns>
+		public static WeaponData ActivatePartEffects(WeaponData startingData, WeaponPartCollection parts, IEnumerable<WeaponPartData> otherVars = null)
+		{
+			WeaponData start = new WeaponData(startingData);
+
+			if (otherVars != null)
+				start = otherVars.Aggregate(start, (current, v) => new WeaponData(current, v));
+
+			Action<WeaponPartScript> apply = part =>
+			{
+				foreach (WeaponPartData data in part.data)
+					start = new WeaponData(start, data);
+			};
+
+			var partOrder = new[] { BaseWeaponScript.Attachment.Mechanism, BaseWeaponScript.Attachment.Barrel, BaseWeaponScript.Attachment.Scope, BaseWeaponScript.Attachment.Grip };
+
+			foreach (BaseWeaponScript.Attachment part in partOrder)
+			{
+				if (parts[part] != null)
+					apply(parts[part]);
+			}
+
+			return start;
 		}
 	}
 }

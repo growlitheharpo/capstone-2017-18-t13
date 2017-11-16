@@ -167,10 +167,7 @@ namespace FiringSquad.Gameplay.Weapons
 				NetworkServer.Destroy(gameObject);
 		}
 
-		/// <summary>
-		/// Handle a character interacting with this part.
-		/// </summary>
-		/// <param name="source">The character that has called "interact".</param>
+		/// <inheritdoc />
 		[Server]
 		public void Interact(ICharacter source)
 		{
@@ -191,10 +188,7 @@ namespace FiringSquad.Gameplay.Weapons
 			}
 		}
 
-		/// <summary>
-		/// Apply a physics force towards the provided pulling player.
-		/// </summary>
-		/// <param name="player">The player to pull towards. Must have a valid magnet arm.</param>
+		/// <inheritdoc />
 		public void PullTowards(CltPlayer player)
 		{
 			if (currentlyHeld)
@@ -206,10 +200,7 @@ namespace FiringSquad.Gameplay.Weapons
 			mRigidbody.AddForce(direction, ForceMode.Force);
 		}
 
-		/// <summary>
-		/// Snap from being in physics mode to being locked/"grabbed" in the player's hand.
-		/// </summary>
-		/// <param name="player">The player that is grabbing this part.</param>
+		/// <inheritdoc />
 		public void GrabNow(CltPlayer player)
 		{
 			currentHolder = player;
@@ -219,16 +210,14 @@ namespace FiringSquad.Gameplay.Weapons
 			mPickupView.transform.localScale = Vector3.one * 0.45f;
 			mRigidbody.isKinematic = true;
 
-			transform.SetParent(currentHolder.magnetArm.transform);
+			transform.SetParent(player.magnetArm.transform);
 			transform.ResetLocalValues();
 
 			if (player.isCurrentPlayer)
 				EventManager.Notify(() => EventManager.Local.LocalPlayerHoldingPart(mPartScript));
 		}
 
-		/// <summary>
-		/// Throw this part with physics force based on where our current holder is looking.
-		/// </summary>
+		/// <inheritdoc />
 		public void Throw()
 		{
 			if (currentHolder == null)
@@ -248,9 +237,7 @@ namespace FiringSquad.Gameplay.Weapons
 			currentHolder = null;
 		}
 
-		/// <summary>
-		/// Release this part and let it fall to the ground without any extra force.
-		/// </summary>
+		/// <inheritdoc />
 		public void Release()
 		{
 			transform.SetParent(null);

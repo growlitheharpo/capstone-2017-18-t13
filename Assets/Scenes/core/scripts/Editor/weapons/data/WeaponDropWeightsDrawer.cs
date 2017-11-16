@@ -4,16 +4,22 @@ using UnityEngine;
 
 namespace UnityEditor
 {
+	/// <summary>
+	/// Draw an auto-balancing slider for a collection of drop weights.
+	/// </summary>
 	[CustomPropertyDrawer(typeof(WeaponDropWeights))]
 	public class WeaponDropWeightsDrawer : PropertyDrawer
 	{
+		/// <inheritdoc />
 		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
 		{
 			if (property.isExpanded)
 				return base.GetPropertyHeight(property, label) * 5;
+
 			return base.GetPropertyHeight(property, label);
 		}
 
+		/// <inheritdoc />
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
 			Rect pos = new Rect(position.x, position.y, position.width, base.GetPropertyHeight(property, label));
