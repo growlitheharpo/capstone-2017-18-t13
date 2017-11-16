@@ -2,76 +2,38 @@
 using System.Collections;
 using System.Collections.Generic;
 using FiringSquad.Gameplay.Weapons;
+using JetBrains.Annotations;
 using UnityEngine;
 
 namespace FiringSquad.Data
 {
 	/// <summary>
 	/// Serializable utility class that stores a collection of weapon parts.
+	/// Extends IEnumerable for easier iteration.
 	/// </summary>
 	[Serializable]
 	public class WeaponPartCollection : IEnumerable<WeaponPartScript>
 	{
-		[SerializeField] private WeaponPartScriptScope mScope;
-		[SerializeField] private WeaponPartScriptBarrel mBarrel;
+		/// Inspector variables
 		[SerializeField] private WeaponPartScriptMechanism mMechanism;
+		[SerializeField] private WeaponPartScriptBarrel mBarrel;
+		[SerializeField] private WeaponPartScriptScope mScope;
 		[SerializeField] private WeaponPartScriptGrip mGrip;
 
-		public WeaponPartScriptScope scope { get { return mScope; } }
-		public WeaponPartScriptBarrel barrel { get { return mBarrel; } }
-		public WeaponPartScriptMechanism mechanism { get { return mMechanism; } }
-		public WeaponPartScriptGrip grip { get { return mGrip; } }
+		[CanBeNull] public WeaponPartScriptMechanism mechanism { get { return mMechanism; } }
+		[CanBeNull] public WeaponPartScriptBarrel barrel { get { return mBarrel; } }
+		[CanBeNull] public WeaponPartScriptScope scope { get { return mScope; } }
+		[CanBeNull] public WeaponPartScriptGrip grip { get { return mGrip; } }
 
-		public WeaponPartScript[] allParts { get { return new WeaponPartScript[] { scope, barrel, mechanism, grip }; } }
+		/// <summary>
+		/// Returns an array of all the weapon parts in the following order: mechanism, barrel, scope, grip
+		/// </summary>
+		public WeaponPartScript[] allParts { get { return new WeaponPartScript[] { mechanism, barrel, scope, grip }; } }
 
-		public struct GameObjects
-		{
-			private readonly WeaponPartCollection mCol;
-
-			public GameObjects(WeaponPartCollection c)
-			{
-				mCol = c;
-			}
-
-			public GameObject scope { get { return mCol.mScope.gameObject; } }
-			public GameObject barrel { get { return mCol.mBarrel.gameObject; } }
-			public GameObject mechanism { get { return mCol.mMechanism.gameObject; } }
-			public GameObject grip { get { return mCol.mGrip.gameObject; } }
-
-			public IEnumerator<GameObject> GetEnumerator()
-			{
-				yield return mCol.scope.gameObject;
-				yield return mCol.barrel.gameObject;
-				yield return mCol.mechanism.gameObject;
-				yield return mCol.grip.gameObject;
-			}
-
-			/// <summary>
-			/// Allows access to weapon parts by their attachment.
-			/// </summary>
-			public GameObject this[BaseWeaponScript.Attachment index]
-			{
-				get
-				{
-					switch (index)
-					{
-						case BaseWeaponScript.Attachment.Scope:
-							return mCol.mScope.gameObject;
-						case BaseWeaponScript.Attachment.Barrel:
-							return mCol.mBarrel.gameObject;
-						case BaseWeaponScript.Attachment.Mechanism:
-							return mCol.mMechanism.gameObject;
-						case BaseWeaponScript.Attachment.Grip:
-							return mCol.mGrip.gameObject;
-						default:
-							throw new ArgumentOutOfRangeException("index", index, null);
-					}
-				}
-			}
-		}
-
-		public GameObjects gameObjects { get { return new GameObjects(this); } }
-
+		/// <summary>
+		/// Serializable utility class that stores a collection of weapon parts.
+		/// Extends IEnumerable for easier iteration.
+		/// </summary>
 		public WeaponPartCollection()
 		{
 			mScope = null;
@@ -80,6 +42,11 @@ namespace FiringSquad.Data
 			mGrip = null;
 		}
 
+		/// <summary>
+		/// Serializable utility class that stores a collection of weapon parts.
+		/// Extends IEnumerable for easier iteration.
+		/// </summary>
+		/// <param name="copy">The collection to copy all references from.</param>
 		public WeaponPartCollection(WeaponPartCollection copy)
 		{
 			mScope = copy.mScope;
@@ -88,6 +55,14 @@ namespace FiringSquad.Data
 			mGrip = copy.mGrip;
 		}
 
+		/// <summary>
+		/// Serializable utility class that stores a collection of weapon parts.
+		/// Extends IEnumerable for easier iteration.
+		/// </summary>
+		/// <param name="mechanism1">The mechanism to store.</param>
+		/// <param name="barrel1">The barrel to store.</param>
+		/// <param name="scope1">The scope to store.</param>
+		/// <param name="grip1">The grip to store.</param>
 		public WeaponPartCollection(GameObject mechanism1, GameObject barrel1, GameObject scope1, GameObject grip1)
 		{
 			mMechanism = mechanism1.GetComponent<WeaponPartScriptMechanism>();
@@ -96,6 +71,14 @@ namespace FiringSquad.Data
 			mGrip = grip1.GetComponent<WeaponPartScriptGrip>();
 		}
 
+		/// <summary>
+		/// Serializable utility class that stores a collection of weapon parts.
+		/// Extends IEnumerable for easier iteration.
+		/// </summary>
+		/// <param name="m">The mechanism to store.</param>
+		/// <param name="b">The barrel to store.</param>
+		/// <param name="s">The scope to store.</param>
+		/// <param name="g">The grip to store.</param>
 		public WeaponPartCollection(WeaponPartScriptMechanism m, WeaponPartScriptBarrel b, WeaponPartScriptScope s, WeaponPartScriptGrip g)
 		{
 			mMechanism = m;
@@ -104,19 +87,29 @@ namespace FiringSquad.Data
 			mGrip = g;
 		}
 
+		/// <summary>
+		/// Allows this collection to be iterated over using a foreach loop.
+		/// </summary>
 		public IEnumerator<WeaponPartScript> GetEnumerator()
 		{
-			yield return scope;
-			yield return barrel;
 			yield return mechanism;
+			yield return barrel;
+			yield return scope;
 			yield return grip;
 		}
 
+		/// <summary>
+		/// Allows this collection to be iterated over using a foreach loop.
+		/// </summary>
 		IEnumerator IEnumerable.GetEnumerator()
 		{
 			return GetEnumerator();
 		}
 
+		/// <summary>
+		/// Access a particular attachment using its enum Attachment.
+		/// </summary>
+		/// <param name="index">Which attachment slot to access.</param>
 		public WeaponPartScript this[BaseWeaponScript.Attachment index]
 		{
 			get

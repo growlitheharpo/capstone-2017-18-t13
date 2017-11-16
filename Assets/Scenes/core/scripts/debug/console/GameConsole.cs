@@ -11,22 +11,29 @@ namespace FiringSquad.Debug
 	/// <inheritdoc cref="IGameConsole"/>
 	public class GameConsole : MonoSingleton<GameConsole>, IGameConsole
 	{
+		/// Inspector variables
+		[SerializeField] private BaseGameConsoleView mConsoleView;
+		[SerializeField] [EnumFlags] private Logger.System mEnabledLogSystems;
+
+		/// Private variables
+		private Dictionary<string, Action<string[]>> mCommandHandlers;
 		private bool mCheatsEnabled;
 
-		private Dictionary<string, Action<string[]>> mCommandHandlers;
-		[SerializeField] private BaseGameConsoleView mConsoleView;
-
-		[SerializeField] [EnumFlags] private Logger.System mEnabledLogSystems;
+		/// <inheritdoc />
 		public Logger.System enabledLogLevels { get { return mEnabledLogSystems; } }
 
+		/// <inheritdoc/>
 		protected override void Awake()
 		{
-			base.Awake();
-			Assert.raiseExceptions = true;
+			base.Awake(); // initialize the MonoSingleton.
 
+			Assert.raiseExceptions = true;
 			mCommandHandlers = new Dictionary<string, Action<string[]>>();
 		}
 
+		/// <summary>
+		/// Unity's Start function.
+		/// </summary>
 		private void Start()
 		{
 			Application.logMessageReceived += UnityLogToConsole;
@@ -50,12 +57,14 @@ namespace FiringSquad.Debug
 			return this;
 		}
 
+		/// <inheritdoc />
 		public IGameConsole UnregisterCommand(string command)
 		{
 			mCommandHandlers.Remove(command);
 			return this;
 		}
 
+		/// <inheritdoc />
 		public IGameConsole UnregisterCommand(Action<string[]> handle)
 		{
 			var keys = mCommandHandlers.Where(x => x.Value == handle).ToArray();

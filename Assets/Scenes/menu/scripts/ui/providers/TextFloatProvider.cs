@@ -2,30 +2,36 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-/// <summary>
-/// A UI helper class for providing a float value to a UI manager.
-/// Specialized for a UnityEngine.UI.Text.
-/// </summary>
-public class TextFloatProvider : BaseFloatProvider
+namespace FiringSquad.Gameplay.UI
 {
-	[SerializeField] private Text mInputfield;
-	private float mPreviousValidValue;
-
-	/// <inheritdoc />
-	public override float GetValue()
+	/// <summary>
+	/// A UI helper class for providing a float value to a UI manager.
+	/// Specialized for a UnityEngine.UI.Text.
+	/// </summary>
+	public class TextFloatProvider : BaseFloatProvider
 	{
-		float result;
-		if (!float.TryParse(mInputfield.text, NumberStyles.Any, new NumberFormatInfo(), out result))
-			return mPreviousValidValue;
+		/// Inspector variables
+		[SerializeField] private Text mInputfield;
 
-		mPreviousValidValue = result;
-		return result;
-	}
+		/// Private variables
+		private float mPreviousValidValue;
 
-	/// <inheritdoc />
-	public override void SetValue(float val)
-	{
-		mPreviousValidValue = val;
-		mInputfield.text = val.ToString(CultureInfo.InvariantCulture);
+		/// <inheritdoc />
+		public override float GetValue()
+		{
+			float result;
+			if (!float.TryParse(mInputfield.text, NumberStyles.Any, new NumberFormatInfo(), out result))
+				return mPreviousValidValue;
+
+			mPreviousValidValue = result;
+			return result;
+		}
+
+		/// <inheritdoc />
+		public override void SetValue(float val)
+		{
+			mPreviousValidValue = val;
+			mInputfield.text = val.ToString(CultureInfo.InvariantCulture);
+		}
 	}
 }

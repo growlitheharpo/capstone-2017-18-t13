@@ -9,16 +9,23 @@ using Input = UnityEngine.Input;
 
 namespace FiringSquad.Debug
 {
+	/// <summary>
+	/// The debug menu that displays all weapon parts.
+	/// </summary>
 	public class DebugMenu : MonoBehaviour
 	{
+		/// Inspector variables
 		[SerializeField] private WeaponPartScript[] mMechanisms;
 		[SerializeField] private WeaponPartScript[] mBarrels;
 		[SerializeField] private WeaponPartScript[] mScopes;
 		[SerializeField] private WeaponPartScript[] mGrips;
 
+		/// Private variables
 		private bool mActive;
-		public bool currentlyActive { get { return mActive; } }
 
+		/// <summary>
+		/// Update our WeaponList from the service.
+		/// </summary>
 		public void RefreshWeaponList()
 		{
 			var parts = ServiceLocator.Get<IWeaponPartManager>().GetAllPrefabScripts(true).Values;
@@ -29,6 +36,9 @@ namespace FiringSquad.Debug
 			mGrips = parts.Where(x => x.attachPoint == BaseWeaponScript.Attachment.Grip).ToArray();
 		}
 
+		/// <summary>
+		/// Unity's Start function.
+		/// </summary>
 		private void Start()
 		{
 			RefreshWeaponList();
@@ -36,12 +46,18 @@ namespace FiringSquad.Debug
 				.RegisterInput(Input.GetKeyDown, KeyCode.Tab, ToggleUI, InputLevel.None);
 		}
 
+		/// <summary>
+		/// Cleanup all listeners and event handlers.
+		/// </summary>
 		private void OnDestroy()
 		{
 			ServiceLocator.Get<IInput>()
 				.UnregisterInput(ToggleUI);
 		}
 
+		/// <summary>
+		/// Toggle whether or not the menu is visible.
+		/// </summary>
 		private void ToggleUI()
 		{
 			mActive = !mActive;
@@ -50,6 +66,9 @@ namespace FiringSquad.Debug
 				.SetInputLevelState(InputLevel.HideCursor, !mActive);
 		}
 
+		/// <summary>
+		/// Unity's ONGUI function. Draw the parts.
+		/// </summary>
 		private void OnGUI()
 		{
 			if (!mActive)
@@ -68,6 +87,11 @@ namespace FiringSquad.Debug
 			DrawPartList(gripRect, mGrips);
 		}
 
+		/// <summary>
+		/// Draw a list of parts.
+		/// </summary>
+		/// <param name="area">The overall rect of this list.</param>
+		/// <param name="parts">The collection of weapon parts in this list.</param>
 		private static void DrawPartList(Rect area, WeaponPartScript[] parts)
 		{
 			GUILayout.BeginArea(area);

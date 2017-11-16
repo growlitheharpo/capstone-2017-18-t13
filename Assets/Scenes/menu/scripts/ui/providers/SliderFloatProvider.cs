@@ -1,28 +1,35 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-/// <summary>
-/// A UI helper class for providing a float value to a UI manager.
-/// Specialized for a UnityEngine.UI.Slider.
-/// </summary>
-public class SliderFloatProvider : BaseFloatProvider
+namespace FiringSquad.Gameplay.UI
 {
-	[SerializeField] private Slider mSlider;
-
-	/// <inheritdoc />
-	public override float GetValue()
+	/// <summary>
+	/// A UI helper class for providing a float value to a UI manager.
+	/// Specialized for a UnityEngine.UI.Slider.
+	/// </summary>
+	public class SliderFloatProvider : BaseFloatProvider
 	{
-		return mSlider.value;
-	}
+		/// Inspector variables
+		[SerializeField] private Slider mSlider;
 
-	/// <inheritdoc />
-	public override void SetValue(float val)
-	{
-		mSlider.value = val;
-	}
+		/// <inheritdoc />
+		public override float GetValue()
+		{
+			return mSlider.value;
+		}
 
-	public new void ValueChanged()
-	{
-		base.ValueChanged();
+		/// <inheritdoc />
+		public override void SetValue(float val)
+		{
+			mSlider.value = val;
+		}
+
+		/// <summary>
+		/// Handle the value changing.
+		/// </summary>
+		public new void ValueChanged()
+		{
+			base.ValueChanged();
+		}
 	}
 }

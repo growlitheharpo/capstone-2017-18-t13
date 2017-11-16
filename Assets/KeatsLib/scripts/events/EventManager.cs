@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using FiringSquad.Core;
-using FiringSquad.Core.Input;
 using FiringSquad.Debug;
 using Debug = UnityEngine.Debug;
 
@@ -12,27 +11,6 @@ using Debug = UnityEngine.Debug;
 public partial class EventManager : MonoSingleton<EventManager>
 {
 	private static Queue<Action> kEventsFromLastFrame;
-
-	public static event Action OnInitiateXmlRefresh = () => { LogEvent(); };
-
-	public static void InitiateXmlRefresh()
-	{
-		OnInitiateXmlRefresh();
-	}
-
-	public static event Action OnXmlSuccesfullyRefreshed = () => { LogEvent(); };
-
-	public static void XmlSuccesfullyRefreshed()
-	{
-		OnXmlSuccesfullyRefreshed();
-	}
-
-	public static event Action<InputLevel, bool> OnInputLevelChanged = (a, b) => { LogEvent(); };
-
-	public static void InputLevelChanged(InputLevel level, bool state)
-	{
-		OnInputLevelChanged(level, state);
-	}
 
 	/// <summary>
 	/// Instantiate the EventManager.

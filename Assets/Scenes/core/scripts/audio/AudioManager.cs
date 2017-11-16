@@ -7,6 +7,9 @@ using UnityEngine;
 
 namespace FiringSquad.Core.Audio
 {
+	/// <summary>
+	/// The enum for the audio events. Mapped 1-1 to our FMOD events.
+	/// </summary>
 	public enum AudioEvent
 	{
 		EquipItem = 50,
@@ -31,8 +34,9 @@ namespace FiringSquad.Core.Audio
 	/// <inheritdoc cref="IAudioManager"/>
 	public class AudioManager : MonoSingleton<AudioManager>, IAudioManager
 	{
-		[SerializeField] private bool mShouldSelfInitialize;
-
+		/// <summary>
+		/// Utility class to bind an enum audio event to an FMOD value.
+		/// </summary>
 		[Serializable]
 		private struct EnumFmodBind
 		{
@@ -47,6 +51,17 @@ namespace FiringSquad.Core.Audio
 		private class AudioReference : IAudioReference
 		{
 			private EventInstance mEvent;
+
+			/// <inheritdoc />
+			public bool isPlaying
+			{
+				get
+				{
+					PLAYBACK_STATE state;
+					mEvent.getPlaybackState(out state);
+					return state == PLAYBACK_STATE.PLAYING || state == PLAYBACK_STATE.STARTING || state == PLAYBACK_STATE.SUSTAINING;
+				}
+			}
 
 			/// <inheritdoc />
 			public AudioReference(EventInstance e)
@@ -83,17 +98,9 @@ namespace FiringSquad.Core.Audio
 				return this;
 			}
 
-			/// <inheritdoc />
-			public bool isPlaying
-			{
-				get
-				{
-					PLAYBACK_STATE state;
-					mEvent.getPlaybackState(out state);
-					return state == PLAYBACK_STATE.PLAYING || state == PLAYBACK_STATE.STARTING || state == PLAYBACK_STATE.SUSTAINING;
-				}
-			}
-
+			/// <summary>
+			/// True if this reference is valid and currently playing.
+			/// </summary>
 			public bool isAlive
 			{
 				get { return mEvent.isValid() && mEvent.hasHandle() && isPlaying; }
@@ -135,9 +142,16 @@ namespace FiringSquad.Core.Audio
 			}
 		}
 
+		/// Inspector variables
+		[SerializeField] private bool mShouldSelfInitialize;
 		[SerializeField] private List<EnumFmodBind> mEventBindList;
+
+		/// Private variables
 		private Dictionary<AudioEvent, string> mEventDictionary;
 
+		/// <summary>
+		/// Unity's Start function.
+		/// </summary>
 		private void Start()
 		{
 			if (!ServiceLocator.Get<IGamestateManager>().isAlive && mShouldSelfInitialize)
@@ -156,7 +170,7 @@ namespace FiringSquad.Core.Audio
 			foreach (EnumFmodBind e in mEventBindList)
 				mEventDictionary.Add(e.mEnumVal, e.mFmodVal);
 
-			EventManager.Notify(EventManager.InitialAudioLoadComplete);
+			EventManager.Notify(EventManager.Local.InitialAudioLoadComplete);
 		}
 
 		/// <inheritdoc />

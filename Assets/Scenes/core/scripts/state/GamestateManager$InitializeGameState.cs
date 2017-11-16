@@ -1,6 +1,5 @@
 ﻿using System;
 using FiringSquad.Core.Audio;
-using FiringSquad.Core.SaveLoad;
 using KeatsLib.State;
 
 namespace FiringSquad.Core.State
@@ -14,7 +13,7 @@ namespace FiringSquad.Core.State
 		private class InitializeGameState : BaseGameState
 		{
 			private static bool kOccured;
-			private bool mSaveLoadComplete, mAudioLoadComplete;
+			private bool mAudioLoadComplete;
 
 			/// <inheritdoc />
 			public override void OnEnter()
@@ -22,13 +21,9 @@ namespace FiringSquad.Core.State
 				if (kOccured)
 					throw new ArgumentException("Cannot Initialize the game more than once! Manager is now in an invalid state.");
 
-				mSaveLoadComplete = false;
 				mAudioLoadComplete = false;
-				EventManager.OnInitialPersistenceLoadComplete += InitialLoadComplete;
-				EventManager.OnInitialAudioLoadComplete += AudioLoadComplete;
+				EventManager.Local.OnInitialAudioLoadComplete += OnInitialAudioLoadComplete;
 
-				ServiceLocator.Get<ISaveLoadManager>()
-					.LoadData();
 				ServiceLocator.Get<IAudioManager>()
 					.InitializeDatabase();
 			}
@@ -39,17 +34,13 @@ namespace FiringSquad.Core.State
 			/// <inheritdoc />
 			public override IState GetTransition()
 			{
-				if (mSaveLoadComplete && mAudioLoadComplete)
-					return instance.ChooseStateByScene();
-				return null;
+				return mAudioLoadComplete ? instance.ChooseStateByScene() : null;
 			}
 
-			private void InitialLoadComplete()
-			{
-				mSaveLoadComplete = true;
-			}
-
-			private void AudioLoadComplete()
+			/// <summary>
+			/// EVENT HANDLER: Local.OnInitialAudioLoadComplete
+			/// </summary>
+			private void OnInitialAudioLoadComplete()
 			{
 				mAudioLoadComplete = true;
 			}
@@ -58,9 +49,7 @@ namespace FiringSquad.Core.State
 			public override void OnExit()
 			{
 				kOccured = true;
-				//Cleanup handlers so we can be garbage collected
-				EventManager.OnInitialPersistenceLoadComplete -= InitialLoadComplete;
-				EventManager.OnInitialAudioLoadComplete -= AudioLoadComplete;
+				EventManager.Local.OnInitialAudioLoadComplete -= OnInitialAudioLoadComplete;
 			}
 		}
 	}

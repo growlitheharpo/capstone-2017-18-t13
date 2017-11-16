@@ -2,9 +2,7 @@
 using FiringSquad.Core;
 using FiringSquad.Core.Audio;
 using FiringSquad.Core.Input;
-using FiringSquad.Core.SaveLoad;
 using FiringSquad.Data;
-using FiringSquad.Gameplay.UI;
 using KeatsLib.Collections;
 using KeatsLib.Unity;
 using UnityEngine;
@@ -19,67 +17,78 @@ namespace FiringSquad.Gameplay
 	/// <inheritdoc />
 	public class CltPlayerMovementScript : MonoBehaviour
 	{
+		/// Inspector variables
 		[SerializeField] private CharacterMovementData mMovementData;
 
+		/// Private variables
 		private CapsuleCollider mCollider;
 		private CharacterController mController;
-		private new Transform transform { get { return mController.transform; } }
 
 		private CltPlayer mPlayer;
 		private CltPlayerLocal mLocalPlayer;
 		private IAudioReference mWalkingSound;
-
-		private PlayerInputMap mInputBindings;
-		private Vector2 mInput;
-		private Vector3 mMoveDirection;
-		private Vector2 mRotationAmount;
-		private float mMouseSensitivity;
-		private float mRotationY;
-		private bool mJump, mIsJumping, mIsRunning, mPreviouslyGrounded, mCrouching;
-
-		private float mSmoothedRecoil;
-		private float mStandingHeight;
-		private float mStandingRadius;
-
 		private Coroutine mZoomInRoutine;
 		private Camera mRealCameraRef;
 
+		private PlayerInputMap mInputBindings;
+		private Vector3 mMoveDirection;
+		private Vector2 mInput, mRotationAmount;
+		private float mMouseSensitivity;
+		private float mRotationY;
+		private float mSmoothedRecoil, mStandingHeight, mStandingRadius;
+		private bool mJump, mIsJumping, mIsRunning, mPreviouslyGrounded, mCrouching;
+		private float mCachedFieldOfView;
+
+		/// <summary> Cover up Unity's "transform" component with the one of our CltPlayer. </summary>
+		private new Transform transform { get { return mController.transform; } }
+
+		/// <summary>
+		/// Unity's Awake function.
+		/// </summary>
 		private void Awake()
 		{
 			mMoveDirection = Vector3.zero;
 			mMouseSensitivity = 1.0f;
 			mSmoothedRecoil = 0.0f;
+			mCachedFieldOfView = 60.0f; // the default field of view
 		}
 
+		/// <summary>
+		/// Unity's Start function.
+		/// </summary>
 		private void Start()
 		{
+			// Grab all the references we need to work.
 			mPlayer = GetComponentInParent<CltPlayer>();
 			mLocalPlayer = mPlayer.GetComponentInChildren<CltPlayerLocal>();
-			mCollider = mPlayer.GetComponent<CapsuleCollider>();
 			mController = mPlayer.GetComponent<CharacterController>();
+			mCollider = mPlayer.GetComponent<CapsuleCollider>();
 			mStandingHeight = mCollider.height;
 			mStandingRadius = mCollider.radius;
 
-			PlayerInputMap input = GetComponent<CltPlayerLocal>().inputMap;
-
+			// Register all of the movement input
+			mInputBindings = GetComponent<CltPlayerLocal>().inputMap;
 			ServiceLocator.Get<IInput>()
-				.RegisterAxis(Input.GetAxis, input.moveSidewaysAxis, INPUT_LeftRightMovement, InputLevel.Gameplay)
-				.RegisterAxis(Input.GetAxis, input.moveBackFrontAxis, INPUT_ForwardBackMovement, InputLevel.Gameplay)
-				.RegisterAxis(Input.GetAxis, input.lookLeftRightAxis, INPUT_LookHorizontal, InputLevel.Gameplay)
-				.RegisterAxis(Input.GetAxis, input.lookUpDownAxis, INPUT_LookVertical, InputLevel.Gameplay)
-				.RegisterInput(Input.GetButtonDown, input.jumpButton, INPUT_Jump, InputLevel.Gameplay)
-				.RegisterInput(Input.GetButtonDown, input.crouchButton, INPUT_CrouchStart, InputLevel.Gameplay)
-				.RegisterInput(Input.GetButtonUp, input.crouchButton, INPUT_CrouchStop, InputLevel.Gameplay)
-				.RegisterInput(Input.GetButtonDown, input.sprintButton, INPUT_SprintStart, InputLevel.Gameplay)
-				.RegisterInput(Input.GetButtonUp, input.sprintButton, INPUT_SprintStop, InputLevel.Gameplay);
+				.RegisterAxis(Input.GetAxis, mInputBindings.moveSidewaysAxis, INPUT_LeftRightMovement, InputLevel.Gameplay)
+				.RegisterAxis(Input.GetAxis, mInputBindings.moveBackFrontAxis, INPUT_ForwardBackMovement, InputLevel.Gameplay)
+				.RegisterAxis(Input.GetAxis, mInputBindings.lookLeftRightAxis, INPUT_LookHorizontal, InputLevel.Gameplay)
+				.RegisterAxis(Input.GetAxis, mInputBindings.lookUpDownAxis, INPUT_LookVertical, InputLevel.Gameplay)
+				.RegisterInput(Input.GetButtonDown, mInputBindings.jumpButton, INPUT_Jump, InputLevel.Gameplay)
+				.RegisterInput(Input.GetButtonDown, mInputBindings.crouchButton, INPUT_CrouchStart, InputLevel.Gameplay)
+				.RegisterInput(Input.GetButtonUp, mInputBindings.crouchButton, INPUT_CrouchStop, InputLevel.Gameplay)
+				.RegisterInput(Input.GetButtonDown, mInputBindings.sprintButton, INPUT_SprintStart, InputLevel.Gameplay)
+				.RegisterInput(Input.GetButtonUp, mInputBindings.sprintButton, INPUT_SprintStop, InputLevel.Gameplay);
 
+			// Register for local events.
 			EventManager.Local.OnApplyOptionsData += ApplyOptionsData;
 			EventManager.Local.OnEnterAimDownSightsMode += OnEnterAimDownSightsMode;
 			EventManager.Local.OnExitAimDownSightsMode += OnExitAimDownSightsMode;
 			EventManager.Local.OnLocalPlayerDied += OnLocalPlayerDied;
-			mInputBindings = input;
 		}
 
+		/// <summary>
+		/// Clean up all listeners and event handlers.
+		/// </summary>
 		private void OnDestroy()
 		{
 			ServiceLocator.Get<IInput>()
@@ -99,18 +108,27 @@ namespace FiringSquad.Gameplay
 
 		#region Input Delegates
 
+		/// <summary>
+		/// INPUT HANDLER: Handle back/forward movement.
+		/// </summary>
 		private void INPUT_ForwardBackMovement(float val)
 		{
 			mInput.y = val;
 			HandleMovementSound();
 		}
 
+		/// <summary>
+		/// INPUT HANDLER: Handle left/right movement.
+		/// </summary>
 		private void INPUT_LeftRightMovement(float val)
 		{
 			mInput.x = val;
 			HandleMovementSound();
 		}
 
+		/// <summary>
+		/// Update our movement sound based on the current input state.
+		/// </summary>
 		private void HandleMovementSound()
 		{
 			IAudioManager audioService = ServiceLocator.Get<IAudioManager>();
@@ -130,36 +148,59 @@ namespace FiringSquad.Gameplay
 				mWalkingSound.playerSpeed = mInput.magnitude;
 		}
 
+		/// <summary>
+		/// INPUT HANDLER: Handle mouse movement for looking horizontally.
+		/// </summary>
 		private void INPUT_LookHorizontal(float val)
 		{
 			mRotationAmount.x += val;
 		}
 
+		/// <summary>
+		/// INPUT HANDLER: Handle mouse movement for looking vertically.
+		/// </summary>
 		private void INPUT_LookVertical(float val)
 		{
 			mRotationAmount.y += val;
 		}
 
+		/// <summary>
+		/// INPUT HANDLER: Handle a jump command.
+		/// </summary>
 		private void INPUT_Jump()
 		{
 			mJump = true;
 		}
 
+		/// <summary>
+		/// INPUT HANDLER: Handle a start crouch command.
+		/// </summary>
 		private void INPUT_CrouchStart()
 		{
 			mCrouching = true;
 		}
 
+		/// <summary>
+		/// INPUT HANDLER: Handle a stop crouch command.
+		/// </summary>
 		private void INPUT_CrouchStop()
 		{
 			mCrouching = false;
 		}
 
+		/// <summary>
+		/// INPUT HANDLER: Handle a start sprint command.
+		/// #NotThisSprint
+		/// </summary>
 		private void INPUT_SprintStart()
 		{
 			mIsRunning = true;
 		}
 
+		/// <summary>
+		/// INPUT HANDLER: Handle a stop sprint command.
+		/// #NotThisSprint
+		/// </summary>
 		private void INPUT_SprintStop()
 		{
 			if (!mInputBindings.stickySprint)
@@ -168,6 +209,9 @@ namespace FiringSquad.Gameplay
 
 		#endregion
 
+		/// <summary>
+		/// Unity's Update function.
+		/// </summary>
 		private void Update()
 		{
 			HandleRotation();
@@ -192,6 +236,9 @@ namespace FiringSquad.Gameplay
 			UpdateAnimatorState();
 		}
 
+		/// <summary>
+		/// Unity's FixedUpdate function.
+		/// </summary>
 		private void FixedUpdate()
 		{
 			ApplyMovementForce();
@@ -211,7 +258,7 @@ namespace FiringSquad.Gameplay
 			Vector2 rotation = mRotationAmount * speed;
 			transform.RotateAround(transform.position, transform.up, rotation.x);
 
-			mRotationY += rotation.y; // + (mRecoilAmount * Time.deltaTime);
+			mRotationY += rotation.y;
 			mRotationY = GenericExt.ClampAngle(mRotationY, -85.0f, 85.0f);
 
 			float realRotation = mRotationY;
@@ -222,12 +269,12 @@ namespace FiringSquad.Gameplay
 			}
 
 			mPlayer.eye.localRotation = Quaternion.AngleAxis(realRotation, Vector3.left);
-
 			mRotationAmount = Vector2.zero;
 		}
 
 		/// <summary>
 		/// Squish or stretch our collider based on the crouch state.
+		/// TODO: This entire function needs to be re-written. It's *awful* and not networked!!
 		/// </summary>
 		private void UpdateCrouch()
 		{
@@ -242,6 +289,9 @@ namespace FiringSquad.Gameplay
 			mController.radius = newRadius;
 		}
 
+		/// <summary>
+		/// Update whether or not we are crouching on the local animator.
+		/// </summary>
 		private void UpdateAnimatorState()
 		{
 			AnimationUtility.SetVariable(mPlayer.localAnimator, "Crouch", mCrouching);
@@ -249,16 +299,19 @@ namespace FiringSquad.Gameplay
 
 		/// <summary>
 		/// Apply movement based on the input we received this frame.
+		/// Based on the controller in Unity's standard input, but modified (you might even say re-modded) to fit our needs.
 		/// </summary>
 		private void ApplyMovementForce()
 		{
 			Vector3 desiredMove = transform.forward * mInput.y + transform.right * mInput.x;
 
+			// Cast around us to check the plane we should move on.
 			RaycastHit hitInfo;
 			Physics.SphereCast(transform.position, mController.radius, Vector3.down, out hitInfo, mController.height / 2.0f, Physics.AllLayers, QueryTriggerInteraction.Ignore);
 			desiredMove = Vector3.ProjectOnPlane(desiredMove, hitInfo.normal).normalized;
 
 			float speed = mMovementData.speed;
+
 			if (mIsRunning)
 				speed *= mMovementData.sprintMultiplier;
 			if (mCrouching)
@@ -293,16 +346,26 @@ namespace FiringSquad.Gameplay
 			mController.Move(mMoveDirection * Time.fixedDeltaTime);
 		}
 
+		/// <summary>
+		/// EVENT HANDLER: Local.OnApplyOptionsData
+		/// </summary>
 		private void ApplyOptionsData(IOptionsData settings)
 		{
 			mMouseSensitivity = settings.mouseSensitivity;
+			mCachedFieldOfView = settings.fieldOfView;
 		}
 
+		/// <summary>
+		/// EVENT HANDLER: Local.OnLocalPlayerDied
+		/// </summary>
 		private void OnLocalPlayerDied(Vector3 spawnPos, Quaternion spawnRot, ICharacter killer)
 		{
 			mRotationY = 0.0f;
 		}
 
+		/// <summary>
+		/// EVENT HANDLER: Local.OnEnterAimDownSightsMode
+		/// </summary>
 		private void OnEnterAimDownSightsMode()
 		{
 			mRealCameraRef = mRealCameraRef ?? mPlayer.eye.GetComponentInChildren<Camera>();
@@ -315,11 +378,12 @@ namespace FiringSquad.Gameplay
 				.CreateSound(AudioEvent.EnterAimDownSights, transform).AttachToRigidbody(mPlayer.GetComponent<Rigidbody>());
 		}
 
+		/// <summary>
+		/// EVENT HANDLER: Local.OnExitAimDownSightsMode
+		/// </summary>
 		private void OnExitAimDownSightsMode()
 		{
-			IOptionsData settings = ServiceLocator.Get<ISaveLoadManager>()
-				.persistentData.GetOptionsData(PauseGamePanel.SETTINGS_ID);
-			float fov = settings == null ? 60 : settings.fieldOfView;
+			float fov = mCachedFieldOfView;
 
 			if (mZoomInRoutine != null)
 				StopCoroutine(mZoomInRoutine);
@@ -327,6 +391,11 @@ namespace FiringSquad.Gameplay
 			mZoomInRoutine = StartCoroutine(ZoomCameraFov(fov, 0.25f));
 		}
 
+		/// <summary>
+		/// Lerp the main camera's FOV
+		/// </summary>
+		/// <param name="newFov">The new target field of view.</param>
+		/// <param name="time">The length of time (in seconds) to lerp over.</param>
 		private IEnumerator ZoomCameraFov(float newFov, float time)
 		{
 			float currentTime = 0.0f;

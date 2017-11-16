@@ -7,14 +7,19 @@ namespace FiringSquad.Gameplay.UI
 {
 	/// <summary>
 	/// Main menu UI manager.
+	/// TODO: Rename this class.
 	/// </summary>
 	public class UIManager : MonoBehaviour
 	{
+		/// Inspector variables
 		[SerializeField] private GameObject mMainElementHolder;
 		[SerializeField] private ActionProvider mTwoPlayerButton;
 		[SerializeField] private ActionProvider mFourPlayerButton;
 		[SerializeField] private ActionProvider mQuitButton;
 
+		/// <summary>
+		/// Unity's Start function
+		/// </summary>
 		private void Start()
 		{
 			mTwoPlayerButton.OnClick += LaunchTwoPlayer;
@@ -22,6 +27,9 @@ namespace FiringSquad.Gameplay.UI
 			mQuitButton.OnClick += ClickQuit;
 		}
 
+		/// <summary>
+		/// Launch the two player game.
+		/// </summary>
 		private void LaunchTwoPlayer()
 		{
 			mMainElementHolder.SetActive(false);
@@ -31,6 +39,9 @@ namespace FiringSquad.Gameplay.UI
 				.RequestSceneChange(GamestateManager.TWOPLAYER_GAMEPLAY, LoadSceneMode.Additive);
 		}
 
+		/// <summary>
+		/// Launch the four/five/six/whatever player game.
+		/// </summary>
 		private void LaunchFourPlayer()
 		{
 			mMainElementHolder.SetActive(false);
@@ -39,6 +50,9 @@ namespace FiringSquad.Gameplay.UI
 				.RequestSceneChange(GamestateManager.FOURPLAYER_GAMEPLAY);
 		}
 
+		/// <summary>
+		/// Handle the player clicking the quit button.
+		/// </summary>
 		private void ClickQuit()
 		{
 			ServiceLocator.Get<IGamestateManager>()

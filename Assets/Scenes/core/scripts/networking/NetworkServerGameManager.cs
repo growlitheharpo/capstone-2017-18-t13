@@ -17,8 +17,13 @@ using Random = UnityEngine.Random;
 
 namespace FiringSquad.Networking
 {
+	/// <summary>
+	/// The main game manager on the server. Handles the current game state
+	/// and routes different signals that inform clients of the game state.
+	/// </summary>
 	public class NetworkServerGameManager : NetworkBehaviour
 	{
+		/// Inspector variables // TODO: This class's variables should be a struct
 		[SerializeField] private List<WeaponPartScript> mStageCaptureParts;
 		[SerializeField] private float mMinStageWaitTime;
 		[SerializeField] private float mMaxStageWaitTime;
@@ -26,25 +31,37 @@ namespace FiringSquad.Networking
 		[SerializeField] private int mLobbyTime;
 		[SerializeField] private int mGoalPlayerCount;
 
+		/// Private variables
 		private ServerStateMachine mStateMachine;
 
+		/// <summary>
+		/// Unity function. Called when this class begins on the server.
+		/// </summary>
 		public override void OnStartServer()
 		{
 			mStateMachine = new ServerStateMachine(this);
-
 			ServiceLocator.Get<IGameConsole>().RegisterCommand("force-start", CONSOLE_ForceStartGame);
 		}
 
+		/// <summary>
+		/// Cleanup listeners and handlers.
+		/// </summary>
 		private void OnDestroy()
 		{
 			ServiceLocator.Get<IGameConsole>().UnregisterCommand(CONSOLE_ForceStartGame);
 		}
 
+		/// <summary>
+		/// Server only. Unity's update function.
+		/// </summary>
 		private void Update()
 		{
 			mStateMachine.Update();
 		}
 
+		/// <summary>
+		/// CONSOLE HANDLER: Force start the game from the server console.
+		/// </summary>
 		private void CONSOLE_ForceStartGame(string[] obj)
 		{
 			if (obj.Length == 1 && obj[0] == "1")
@@ -55,6 +72,10 @@ namespace FiringSquad.Networking
 				throw new ArgumentException("force-start called with invalid parameters.\nUse \"force-start 1\" to start with lobby, or \"force-start 2\" to start the match directly.");
 		}
 
+		/// <summary>
+		/// Static method that finds the spawn point that is furthest away from all other players.
+		/// TODO: Also account for the player's death position.
+		/// </summary>
 		private static Transform ChooseSafestSpawnPosition(CltPlayer[] players, CltPlayer deadPlayer, IList<Transform> targets)
 		{
 			var scores = new float[targets.Count];
@@ -76,24 +97,14 @@ namespace FiringSquad.Networking
 		/// </summary>
 		private class ServerStateMachine : BaseStateMachine
 		{
+			/// <summary>
+			/// The state machine for the server's game manager
+			/// </summary>
 			public ServerStateMachine(NetworkServerGameManager script)
 			{
 				mScript = script;
 				mStartPositions = GameObject.FindGameObjectsWithTag("matchspawn").Select(x => x.transform).ToArray();
 				TransitionStates(new WaitingForConnectionState(this));
-			}
-
-			public void ForceStartGameNow(bool lobby)
-			{
-				if (lobby)
-					TransitionStates(new StartLobbyState(this));
-				else
-					TransitionStates(new StartGameState(this));
-			}
-
-			public new void Update()
-			{
-				base.Update();
 			}
 
 			// Private shared data
@@ -104,14 +115,38 @@ namespace FiringSquad.Networking
 			private Dictionary<NetworkInstanceId, PlayerScore> mPlayerScores;
 
 			/// <summary>
+			/// Force an immediate transition into a non-waiting state.
+			/// </summary>
+			/// <param name="lobby">True to enter the lobby, false to immediately enter the match.</param>
+			public void ForceStartGameNow(bool lobby)
+			{
+				if (lobby)
+					TransitionStates(new StartLobbyState(this));
+				else
+					TransitionStates(new StartGameState(this));
+			}
+
+			/// <summary>
+			/// Tick our state machine.
+			/// </summary>
+			public new void Update()
+			{
+				base.Update();
+			}
+
+			/// <summary>
 			/// The state we hold in until we have the required number of players
 			/// </summary>
 			private class WaitingForConnectionState : BaseState<ServerStateMachine>
 			{
+				/// <summary>
+				/// The state we hold in until we have the required number of players
+				/// </summary>
 				public WaitingForConnectionState(ServerStateMachine machine) : base(machine) { }
 
 				private bool mReady;
 
+				/// <inheritdoc />
 				public override void OnEnter()
 				{
 					mMachine.mCaptureAreas = FindObjectsOfType<StageCaptureArea>();
@@ -122,12 +157,16 @@ namespace FiringSquad.Networking
 					EventManager.Server.OnPlayerHealthHitsZero += OnPlayerHealthHitsZero;
 				}
 
+				/// <inheritdoc />
 				public override void OnExit()
 				{
 					EventManager.Server.OnPlayerJoined -= OnPlayerJoined;
 					EventManager.Server.OnPlayerHealthHitsZero -= OnPlayerHealthHitsZero;
 				}
 
+				/// <summary>
+				/// EVENT HANDLER: Server.OnPlayerJoined
+				/// </summary>
 				private void OnPlayerJoined(int newCount)
 				{
 					if (newCount > mMachine.mScript.mGoalPlayerCount)
@@ -136,6 +175,9 @@ namespace FiringSquad.Networking
 					mReady = newCount >= mMachine.mScript.mGoalPlayerCount;
 				}
 
+				/// <summary>
+				/// EVENT HANDLER: Server.OnPlayerHealthHitsZero
+				/// </summary>
 				private void OnPlayerHealthHitsZero(CltPlayer deadPlayer, IDamageSource source)
 				{
 					NetworkStartPosition localSpawn = FindObjectsOfType<NetworkStartPosition>()
@@ -145,18 +187,26 @@ namespace FiringSquad.Networking
 					EventManager.Server.PlayerDied(deadPlayer, null, localSpawn != null ? localSpawn.transform : deadPlayer.transform);
 				}
 
+				/// <inheritdoc />
 				public override IState GetTransition()
 				{
 					return !mReady ? this : (IState)new StartLobbyState(mMachine);
 				}
 			}
 
+			/// <summary>
+			/// The state we hold in while waiting for the lobby to begin.
+			/// </summary>
 			private class StartLobbyState : BaseState<ServerStateMachine>
 			{
+				/// <summary>
+				/// The state we hold in while waiting for the lobby to begin.
+				/// </summary>
 				public StartLobbyState(ServerStateMachine machine) : base(machine) { }
 
 				private long mEndTime;
 
+				/// <inheritdoc />
 				public override void OnEnter()
 				{
 					mMachine.mPlayerList = FindObjectsOfType<CltPlayer>();
@@ -168,6 +218,9 @@ namespace FiringSquad.Networking
 					EventManager.Server.OnPlayerHealthHitsZero += OnPlayerHealthHitsZero;
 				}
 
+				/// <summary>
+				/// EVENT HANDLER: Server.OnPlayerHealthHitsZero
+				/// </summary>
 				private void OnPlayerHealthHitsZero(CltPlayer deadPlayer, IDamageSource source)
 				{
 					NetworkStartPosition localSpawn = FindObjectsOfType<NetworkStartPosition>()
@@ -177,16 +230,21 @@ namespace FiringSquad.Networking
 					EventManager.Server.PlayerDied(deadPlayer, null, localSpawn != null ? localSpawn.transform : deadPlayer.transform);
 				}
 
+				/// <inheritdoc />
 				public override void OnExit()
 				{
 					EventManager.Server.OnPlayerHealthHitsZero -= OnPlayerHealthHitsZero;
 				}
 
+				/// <summary>
+				/// Returns true if the waiting period for the lobby is over.
+				/// </summary>
 				private bool IsWaitingTimeOver()
 				{
 					return DateTime.Now.Ticks >= mEndTime;
 				}
 
+				/// <inheritdoc />
 				public override IState GetTransition()
 				{
 					if (IsWaitingTimeOver())
@@ -202,8 +260,13 @@ namespace FiringSquad.Networking
 			/// </summary>
 			private class StartGameState : BaseState<ServerStateMachine>
 			{
+				/// <summary>
+				/// The single-frame state called to set up the players for the round to start.
+				/// Resets spawn points and ensures our shared data has an accurate list of players.
+				/// </summary>
 				public StartGameState(ServerStateMachine machine) : base(machine) { }
 
+				/// <inheritdoc />
 				public override void OnEnter()
 				{
 					mMachine.mPlayerList = FindObjectsOfType<CltPlayer>();
@@ -223,6 +286,7 @@ namespace FiringSquad.Networking
 					}
 				}
 
+				/// <inheritdoc />
 				public override IState GetTransition()
 				{
 					return new GameRunningState(mMachine);
@@ -238,12 +302,20 @@ namespace FiringSquad.Networking
 			/// </summary>
 			private class GameRunningState : BaseState<ServerStateMachine>
 			{
+				/// <summary>
+				/// State that runs the actual game. Ticks the timer for the game
+				/// and handles player deaths during the match by sending them to
+				/// a spawn point.
+				/// 
+				/// Also handles the StageCaptureArea enabling and disabling.
+				/// </summary>
 				public GameRunningState(ServerStateMachine machine) : base(machine) { }
 
 				private Coroutine mStageEnableRoutine;
 				private long mEndTime;
 				private bool mFinished;
 
+				/// <inheritdoc />
 				public override void OnEnter()
 				{
 					mEndTime = DateTime.Now.Ticks + mMachine.mScript.mRoundTime * TimeSpan.TicksPerSecond;
@@ -258,6 +330,9 @@ namespace FiringSquad.Networking
 					EventManager.Notify(() => EventManager.Server.StartGame(mEndTime));
 				}
 
+				/// <summary>
+				/// EVENT HANDLER: Server.OnPlayerCapturedStage
+				/// </summary>
 				private void OnPlayerCapturedStage(StageCaptureArea stage, CltPlayer player)
 				{
 					stage.Disable();
@@ -268,12 +343,21 @@ namespace FiringSquad.Networking
 					mStageEnableRoutine = mMachine.mScript.StartCoroutine(EnableStageArea(nextStage));
 				}
 
+				/// <summary>
+				/// Instantiate a legendary part because a stage has been captured.
+				/// </summary>
 				private void SpawnLegendaryPart(StageCaptureArea stage, CltPlayer player)
 				{
-					WeaponPartCollection currentParts = player.weapon.currentParts;
-					var allPossibilities = mMachine.mScript.mStageCaptureParts;
-					var possibilities = allPossibilities.Where(x => !currentParts.Contains(x));
-					WeaponPartScript choice = possibilities.ChooseRandom();
+					WeaponPartScript choice;
+					if (player.weapon != null)
+					{
+						WeaponPartCollection currentParts = player.weapon.currentParts;
+						var allPossibilities = mMachine.mScript.mStageCaptureParts;
+						var possibilities = allPossibilities.Where(x => !currentParts.Contains(x));
+						choice = possibilities.ChooseRandom();
+					}
+					else
+						choice = mMachine.mScript.mStageCaptureParts.ChooseRandom();
 
 					GameObject instance = choice.SpawnInWorld();
 					instance.transform.position = stage.transform.position + Vector3.up * 45.0f;
@@ -283,6 +367,9 @@ namespace FiringSquad.Networking
 					mMachine.mScript.StartCoroutine(Coroutines.InvokeAfterFrames(2, () => { instance.GetComponent<WeaponPickupScript>().RpcInitializePickupView(); }));
 				}
 
+				/// <summary>
+				/// EVENT HANDLER: Server.OnStageTimedOut
+				/// </summary>
 				private void OnStageTimedOut(StageCaptureArea stage)
 				{
 					stage.Disable();
@@ -291,28 +378,25 @@ namespace FiringSquad.Networking
 					mStageEnableRoutine = mMachine.mScript.StartCoroutine(EnableStageArea(nextStage));
 				}
 
+				/// <inheritdoc />
 				public override void Update()
 				{
 					if (!mFinished && DateTime.Now.Ticks >= mEndTime)
 						mFinished = true;
 				}
 
+				/// <summary>
+				/// Wait within a random range of seconds, then enable a stage.
+				/// </summary>
 				private IEnumerator EnableStageArea(StageCaptureArea stage)
 				{
 					yield return new WaitForSeconds(Random.Range(mMachine.mScript.mMinStageWaitTime, mMachine.mScript.mMaxStageWaitTime));
 					stage.Enable();
 				}
 
-				public override void OnExit()
-				{
-					EventManager.Server.OnPlayerHealthHitsZero -= OnPlayerHealthHitsZero;
-					EventManager.Server.OnPlayerCapturedStage -= OnPlayerCapturedStage;
-					EventManager.Server.OnStageTimedOut -= OnStageTimedOut;
-
-					if (mStageEnableRoutine != null)
-						mMachine.mScript.StopCoroutine(mStageEnableRoutine);
-				}
-
+				/// <summary>
+				/// EVENT HANDLER: Server.OnPlayerHealthHitsZero
+				/// </summary>
 				private void OnPlayerHealthHitsZero(CltPlayer dead, IDamageSource damage)
 				{
 					Transform newPosition = ChooseSafestSpawnPosition(mMachine.mPlayerList, dead, mMachine.mStartPositions);
@@ -329,6 +413,18 @@ namespace FiringSquad.Networking
 					EventManager.Notify(() => EventManager.Server.PlayerDied(dead, damage.source, newPosition));
 				}
 
+				/// <inheritdoc />
+				public override void OnExit()
+				{
+					EventManager.Server.OnPlayerHealthHitsZero -= OnPlayerHealthHitsZero;
+					EventManager.Server.OnPlayerCapturedStage -= OnPlayerCapturedStage;
+					EventManager.Server.OnStageTimedOut -= OnStageTimedOut;
+
+					if (mStageEnableRoutine != null)
+						mMachine.mScript.StopCoroutine(mStageEnableRoutine);
+				}
+
+				/// <inheritdoc />
 				public override IState GetTransition()
 				{
 					return mFinished ? (IState)new GameFinishedState(mMachine) : this;
@@ -341,13 +437,19 @@ namespace FiringSquad.Networking
 			/// </summary>
 			private class GameFinishedState : BaseState<ServerStateMachine>
 			{
+				/// <summary>
+				/// State to hold in after the game timer has completed and
+				/// everyone is able to disconnect.
+				/// </summary>
 				public GameFinishedState(ServerStateMachine machine) : base(machine) { }
 
+				/// <inheritdoc />
 				public override void OnEnter()
 				{
 					EventManager.Server.FinishGame(mMachine.mPlayerScores.Values.ToArray());
 				}
 
+				/// <inheritdoc />
 				public override IState GetTransition()
 				{
 					return this;

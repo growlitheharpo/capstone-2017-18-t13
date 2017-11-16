@@ -11,7 +11,7 @@
 		void OnEnter();
 
 		/// <summary>
-		/// Called every frame that state is active.
+		/// Called every time the holder State Machine's "Update" is called and we are active.
 		/// </summary>
 		void Update();
 
@@ -21,7 +21,7 @@
 		void OnExit();
 
 		/// <summary>
-		/// The state this state wants to transition to. Returns null if we should stay as we are.
+		/// The state this state wants to transition to. Returns null or this if we should stay as we are.
 		/// </summary>
 		IState GetTransition();
 	}

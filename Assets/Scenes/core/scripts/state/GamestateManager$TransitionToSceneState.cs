@@ -17,8 +17,13 @@ namespace FiringSquad.Core.State
 			private AsyncOperation mLoadingOperation;
 			private readonly LoadSceneMode mMode;
 
+			/// <inheritdoc />
 			public override bool safeToTransition { get { return false; } }
 
+			/// <summary>
+			/// State used during the transition to another scene.
+			/// Scene loading is done async to avoid freezing the game.
+			/// </summary>
 			public TransitionToSceneState(string sceneName, LoadSceneMode mode = LoadSceneMode.Single)
 			{
 				mSceneName = sceneName;
@@ -31,6 +36,10 @@ namespace FiringSquad.Core.State
 				instance.StartCoroutine(LoadScene());
 			}
 
+			/// <summary>
+			/// Start an operation to load a new scene.
+			/// TODO: We could add a "loading" display of some sort here.
+			/// </summary>
 			private IEnumerator LoadScene()
 			{
 				mLoadingOperation = SceneManager.LoadSceneAsync(mSceneName, mMode);
@@ -39,6 +48,7 @@ namespace FiringSquad.Core.State
 					yield return null;
 			}
 
+			/// <inheritdoc />
 			public override void OnExit()
 			{
 				Scene scene = SceneManager.GetSceneByName(mSceneName);

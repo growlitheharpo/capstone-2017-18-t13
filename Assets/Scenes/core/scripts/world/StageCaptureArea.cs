@@ -8,18 +8,36 @@ using UnityEngine.Networking;
 
 namespace FiringSquad.Gameplay
 {
+	/// <summary>
+	/// Represents a stage area in the game. Stages can be captured to win legendary parts.
+	/// Stages are captured while a player is alone in the area. If other players are in the area,
+	/// they block the capture.
+	/// Capture percentage resets when the player exits the zone.
+	/// Stage areas time out after a certan amount of time.
+	/// </summary>
 	public class StageCaptureArea : NetworkBehaviour
 	{
+		/// Inspector variables
 		[SerializeField] private float mTimeoutPeriod;
 		[SerializeField] private float mCaptureTime;
 		[SerializeField] private CollisionForwarder mTrigger;
 
+		/// Sync variables
+		/// TODO: Most of these do not NEED to be syncvar'd. There are other ways to do this.
 		[SyncVar(hook = "OnCapturableChanged")] private bool mCapturable;
 		[SyncVar(hook = "OnCapturePercentageChanged")] private float mCapturePercentageTimer;
 		[SyncVar(hook = "OnTimeoutTimerChanged")] private float mTimeoutTimer;
-
 		[SyncVar(hook = "OnCapturePlayerIdChanged")] private NetworkInstanceId mCapturingPlayerId;
+
+		/// Private variables
+		private static StageCaptureUI kUIManager;
 		private CltPlayer mCapturingPlayer;
+		private List<CltPlayer> mBlockingPlayers;
+		private List<GameObject> mChildren;
+
+		/// <summary>
+		/// The capturing player.
+		/// </summary>
 		private CltPlayer currentCapturingPlayer
 		{
 			get
@@ -37,10 +55,9 @@ namespace FiringSquad.Gameplay
 			}
 		}
 
-		private static StageCaptureUI kUIManager;
-		private List<CltPlayer> mBlockingPlayers;
-		private List<GameObject> mChildren;
-
+		/// <summary>
+		/// Unity's Awake function. Called on Server and Client.
+		/// </summary>
 		private void Awake()
 		{
 			if (kUIManager == null)
@@ -54,17 +71,27 @@ namespace FiringSquad.Gameplay
 				mChildren.Add(c.gameObject);
 		}
 
+		/// <summary>
+		/// On Start: Server-side.
+		/// </summary>
 		public override void OnStartServer()
 		{
 			Enable();
 			Disable();
 		}
 
+		/// <summary>
+		/// On Start: Client-side.
+		/// </summary>
 		public override void OnStartClient()
 		{
 			ReflectActiveState(mCapturable);
 		}
 
+		/// <summary>
+		/// Enable this stage immediately.
+		/// Makes the stage visible and capturable.
+		/// </summary>
 		[Server]
 		public void Enable()
 		{
@@ -75,12 +102,18 @@ namespace FiringSquad.Gameplay
 			mCapturable = true;
 		}
 
+		/// <summary>
+		/// Disable the stage. Hides its visual effect and makes it uncapturable.
+		/// </summary>
 		[Server]
 		public void Disable()
 		{
 			mCapturable = false;
 		}
 
+		/// <summary>
+		/// Unity's Update function. Called on Server only.
+		/// </summary>
 		[ServerCallback]
 		private void Update()
 		{
@@ -92,10 +125,12 @@ namespace FiringSquad.Gameplay
 			UpdateTimeout();
 		}
 
+		/// <summary>
+		/// Check if the previous capturer left or died. Update the capturing player appropriately.
+		/// </summary>
 		[Server]
 		private void UpdateCapturingPlayer()
 		{
-			// check if the previous capturer left or died
 			if (currentCapturingPlayer == null && mBlockingPlayers.Count > 0)
 			{
 				currentCapturingPlayer = mBlockingPlayers[0];
@@ -103,6 +138,9 @@ namespace FiringSquad.Gameplay
 			}
 		}
 
+		/// <summary>
+		/// Update our capture percent based on whether or not we have a capturing player.
+		/// </summary>
 		[Server]
 		private void UpdateCapturePercent()
 		{
@@ -118,22 +156,28 @@ namespace FiringSquad.Gameplay
 			}
 		}
 
+		/// <summary>
+		/// Update the timeout for this stage if there are no capturing players.
+		/// </summary>
 		[Server]
 		private void UpdateTimeout()
 		{
-			if (currentCapturingPlayer == null)
-			{
-				mTimeoutTimer += Time.deltaTime;
+			if (currentCapturingPlayer != null)
+				return;
 
-				if (mTimeoutTimer >= mTimeoutPeriod)
-				{
-					mCapturable = false;
-					EventManager.Notify(() => EventManager.Server.StageTimedOut(this));
-				}
+			mTimeoutTimer += Time.deltaTime;
+
+			if (mTimeoutTimer >= mTimeoutPeriod)
+			{
+				mCapturable = false;
+				EventManager.Notify(() => EventManager.Server.StageTimedOut(this));
 			}
 		}
 
-		// [Server] through return check
+		/// <summary>
+		/// Handle the trigger being entered.
+		/// Will only run on server.
+		/// </summary>
 		private void OnTriggerEnter(Collider other)
 		{
 			if (!isServer)
@@ -152,7 +196,10 @@ namespace FiringSquad.Gameplay
 				mBlockingPlayers.Add(player);
 		}
 
-		// [Server] through return check
+		/// <summary>
+		/// Handle the trigger being exited.
+		/// Will only run on server.
+		/// </summary>
 		private void OnTriggerExit(Collider other)
 		{
 			if (!isServer)
@@ -168,12 +215,21 @@ namespace FiringSquad.Gameplay
 				mBlockingPlayers.Remove(player);
 		}
 
+		/// <summary>
+		/// Handle our capturable state being changed.
+		/// </summary>
+		/// <param name="newValue">Whether or not we are capturable/visible.</param>
 		private void OnCapturableChanged(bool newValue)
 		{
 			mCapturable = newValue;
 			ReflectActiveState(mCapturable);
 		}
 
+		/// <summary>
+		/// Handle the capture ID changing.
+		/// TODO: We can use this to determine the capture percentage and timeout locally!
+		/// </summary>
+		/// <param name="id">The netid of the new capturing player.</param>
 		private void OnCapturePlayerIdChanged(NetworkInstanceId id)
 		{
 			mCapturingPlayerId = id;
@@ -187,6 +243,11 @@ namespace FiringSquad.Gameplay
 			kUIManager.SetMode(player.isCurrentPlayer ? StageCaptureUI.Mode.WereCapturing : StageCaptureUI.Mode.OtherCapturing, this);
 		}
 
+		/// <summary>
+		/// Handle the capture percentage changing.
+		/// TODO: This can be done locally based on the capture player ID changing.
+		/// </summary>
+		/// <param name="p">The new time that someone has been capturing for.</param>
 		private void OnCapturePercentageChanged(float p)
 		{
 			mCapturePercentageTimer = p;
@@ -196,12 +257,21 @@ namespace FiringSquad.Gameplay
 				ServiceLocator.Get<IAudioManager>().CreateSound(AudioEvent.AnnouncerStageAreaCaptured, transform);
 		}
 
+		/// <summary>
+		/// Handle the timeout timer changing.
+		/// TODO: This can be done locally based on the capture player ID changing.
+		/// </summary>
+		/// <param name="t">The new timeout time.</param>
 		private void OnTimeoutTimerChanged(float t)
 		{
 			mTimeoutTimer = t;
 			kUIManager.SetRemainingTime(mTimeoutPeriod - t);
 		}
 
+		/// <summary>
+		/// Reflect visibility and capturability. Update the UI.
+		/// </summary>
+		/// <param name="active">Whether or not the stage is capturable.</param>
 		private void ReflectActiveState(bool active)
 		{
 			foreach (GameObject child in mChildren)

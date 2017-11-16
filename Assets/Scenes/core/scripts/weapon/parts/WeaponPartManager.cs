@@ -5,10 +5,16 @@ using UnityEngine;
 
 namespace FiringSquad.Core.Weapons
 {
+	/// <inheritdoc cref="IWeaponPartManager" />
 	public class WeaponPartManager : MonoSingleton<WeaponPartManager>, IWeaponPartManager
 	{
+		/// Private variables
 		private Dictionary<string, GameObject> mPrefabs;
 		private Dictionary<string, WeaponPartScript> mScripts;
+
+		/// <summary>
+		/// The collection of prefabs. Will LazyInitialize the first time it is accessed.
+		/// </summary>
 		private Dictionary<string, GameObject> prefabs
 		{
 			get
@@ -18,6 +24,9 @@ namespace FiringSquad.Core.Weapons
 			}
 		}
 
+		/// <summary>
+		/// The collection of scripts. Will LazyInitialize the first time it is accessed.
+		/// </summary>
 		private Dictionary<string, WeaponPartScript> scripts
 		{
 			get
@@ -27,18 +36,22 @@ namespace FiringSquad.Core.Weapons
 			}
 		}
 
+		/// <inheritdoc />
 		public WeaponPartScript GetPrefabScript(string id)
 		{
 			return scripts[id];
 		}
 
+		/// <inheritdoc />
 		public GameObject GetPartPrefab(string id)
 		{
 			return prefabs[id];
 		}
 
+		/// <inheritdoc />
 		public GameObject this[string index] { get { return prefabs[index]; } }
 
+		/// <inheritdoc />
 		public Dictionary<string, GameObject> GetAllPrefabs(bool includeDebug)
 		{
 			LazyInitialize();
@@ -51,6 +64,7 @@ namespace FiringSquad.Core.Weapons
 				.ToDictionary(x => x.name);
 		}
 
+		/// <inheritdoc />
 		public Dictionary<string, WeaponPartScript> GetAllPrefabScripts(bool includeDebug)
 		{
 			if (includeDebug)
@@ -61,6 +75,10 @@ namespace FiringSquad.Core.Weapons
 				.ToDictionary(x => x.name);
 		}
 
+		/// <summary>
+		/// Initialize our collection of weapon parts by reading the Resources folder.
+		/// Should only be done once per game lifetime.
+		/// </summary>
 		private void LazyInitialize()
 		{
 			if (mPrefabs != null)

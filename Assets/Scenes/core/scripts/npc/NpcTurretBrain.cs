@@ -1,17 +1,25 @@
 ﻿using System.Linq;
 using UnityEngine;
-using Logger = FiringSquad.Debug.Logger;
 
 namespace FiringSquad.Gameplay.NPC
 {
+	/// <summary>
+	/// The class that handles the actual "thinking" for the NPC turrets and forwards
+	/// this on to the NpcTurret component.
+	/// </summary>
+	/// <seealso cref="NpcTurret"/>
 	public class NpcTurretBrain
 	{
+		/// Private variables
+		private readonly NpcTurret mTurret;
 		private ICharacter[] mPotentialTargets;
-		private NpcTurret mTurret;
-
 		private ICharacter mCurrentTarget;
 		private float mTriggerHoldTimer, mTriggerUpTimer;
 
+		/// <summary>
+		/// The class that handles the actual "thinking" for the NPC turrets and forwards
+		/// this on to the NpcTurret component.
+		/// </summary>
 		public NpcTurretBrain(NpcTurret turret)
 		{
 			mPotentialTargets = new ICharacter[0];
@@ -20,6 +28,11 @@ namespace FiringSquad.Gameplay.NPC
 			mTriggerUpTimer = 0.0f;
 		}
 
+		/// <summary>
+		/// Update the potential list of targets for this AI turret.
+		/// Resets our current target if they are no longer in the list.
+		/// </summary>
+		/// <param name="targets">The list of characters that we can target.</param>
 		public void UpdateTargetList(ICharacter[] targets)
 		{
 			mPotentialTargets = targets;
@@ -28,6 +41,9 @@ namespace FiringSquad.Gameplay.NPC
 				ClearTarget();
 		}
 
+		/// <summary>
+		/// NPC update/tick function. Once-per-frame when resources allow.
+		/// </summary>
 		public void Think()
 		{
 			ValidateCurrentTarget();
@@ -40,6 +56,9 @@ namespace FiringSquad.Gameplay.NPC
 				FindTarget();
 		}
 
+		/// <summary>
+		/// Ensure our current target is visible and within range, and clear it otherwise.
+		/// </summary>
 		private void ValidateCurrentTarget()
 		{
 			if (mCurrentTarget == null)
@@ -49,11 +68,17 @@ namespace FiringSquad.Gameplay.NPC
 				ClearTarget();
 		}
 
+		/// <summary>
+		/// Set the turret's target to null.
+		/// </summary>
 		private void ClearTarget()
 		{
 			mCurrentTarget = null;
 		}
 
+		/// <summary>
+		/// Rotate slowly towards our target.
+		/// </summary>
 		private void TrackTarget()
 		{
 			Vector3 dirToTarget = (mCurrentTarget.transform.position + Vector3.up - mTurret.transform.position).normalized;
@@ -62,8 +87,14 @@ namespace FiringSquad.Gameplay.NPC
 			mTurret.transform.rotation = Quaternion.Slerp(mTurret.transform.rotation, goalRot, Time.deltaTime * mTurret.data.targetingSpeed);
 		}
 		
+		/// <summary>
+		/// Handle "pulling the trigger" of the turret's weapon with a built-in cooldown to avoid aim-botting.
+		/// </summary>
 		private void ManageTrigger()
 		{
+			if (mTurret.weapon == null)
+				return;
+
 			if (mTriggerHoldTimer <= mTurret.data.weaponHoldTime)
 			{
 				mTriggerHoldTimer += Time.deltaTime;
@@ -82,8 +113,15 @@ namespace FiringSquad.Gameplay.NPC
 			}
 		}
 
+		/// <summary>
+		/// Locates a target. Prioritizes closer targets, and only selects targets that are visible.
+		/// </summary>
 		private void FindTarget()
 		{
+			// TODO: The square distance is cheaper than checking if the target is valid because of raycasting.
+			// It might be more efficient to sort the potential targets by position first, THEN eliminate
+			// based on whether or not they are valid.
+
 			ICharacter closesetTarget = null;
 			float sqrClosestDistance = float.MaxValue;
 
@@ -105,6 +143,17 @@ namespace FiringSquad.Gameplay.NPC
 			mTriggerUpTimer = 0.0f;
 		}
 
+		/// <summary>
+		/// Check if the provided target is valid and can be targeted.
+		/// </summary>
+		/// <para>
+		/// Requirements to be valid:
+		///		1. Must be within our targeting range defined by the turret's data.
+		///		2. Must be within our targeting cone defined by the turret's data.
+		///		3. Must be visible after a physics raycast.
+		/// </para>
+		/// <param name="target">The character to check.</param>
+		/// <returns>True if the target meets all criteria and is valid.</returns>
 		private bool IsTargetValid(ICharacter target)
 		{
 			if (target == null)

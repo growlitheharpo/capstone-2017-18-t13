@@ -1,35 +1,59 @@
 ﻿using System;
 using FiringSquad.Core;
-using FiringSquad.Core.Weapons;
 using FiringSquad.Data;
 using UnityEngine;
 using UnityEngine.Networking;
 
 namespace FiringSquad.Gameplay.Weapons
 {
+	/// <summary>
+	/// The base script that handles all of the gameplay aspects of a weapon part.
+	/// Considered to primarily be the "On The Gun" script.
+	/// </summary>
 	public abstract class WeaponPartScript : MonoBehaviour
 	{
 		public const int INFINITE_DURABILITY = -1;
 		public const int USE_DEFAULT_DURABILITY = -2;
 
-		public abstract BaseWeaponScript.Attachment attachPoint { get; }
-
+		/// Inspector variables
 		[SerializeField] private Sprite mDurabilitySprite;
-		public Sprite durabilitySprite { get { return mDurabilitySprite; } }
-
 		[SerializeField] private WeaponPartData mData;
-		public WeaponPartData[] data { get { return new[] { mData }; } }
-
 		[SerializeField] private string mDescription;
-		public string description { get { return mDescription; } }
-
 		[SerializeField] private string mPrettyName;
-		public string prettyName { get { return mPrettyName; } }
-
 		[SerializeField] private int mDurability = INFINITE_DURABILITY;
+
+		/// Private variables
 		private BoundProperty<float> mDurabilityPercent = new BoundProperty<float>();
 		private int mBaseDurability;
 
+		/// <summary>
+		/// Which attachment point we connect to.
+		/// </summary>
+		public abstract BaseWeaponScript.Attachment attachPoint { get; }
+
+		/// <summary>
+		/// The collection of modifier data for this part.
+		/// </summary>
+		public WeaponPartData[] data { get { return new[] { mData }; } }
+
+		/// <summary>
+		/// The UI sprite used to represent this part in the durability HUD.
+		/// </summary>
+		public Sprite durabilitySprite { get { return mDurabilitySprite; } }
+
+		/// <summary>
+		/// A short text description of this part. Used for UI.
+		/// </summary>
+		public string description { get { return mDescription; } }
+
+		/// <summary>
+		/// A short name for this part. Used for UI.
+		/// </summary>
+		public string prettyName { get { return mPrettyName; } }
+
+		/// <summary>
+		/// The current durability of this weapon part.
+		/// </summary>
 		public int durability
 		{
 			get
@@ -47,6 +71,9 @@ namespace FiringSquad.Gameplay.Weapons
 			}
 		}
 
+		/// <summary>
+		/// The unique part ID of this weapon part.
+		/// </summary>
 		public string partId
 		{
 			get
@@ -57,11 +84,18 @@ namespace FiringSquad.Gameplay.Weapons
 			}
 		}
 
+		/// <summary>
+		/// Cleanup all listeners and event handlers
+		/// </summary>
 		private void OnDestroy()
 		{
 			mDurabilityPercent.Cleanup(); // force this so that the UI is unbound
 		}
 
+		/// <summary>
+		/// Called on a prefab obtained from the IWeaponPartManager service.
+		/// Returns an instantiated copy of this part, intended to exist with physics in the game world.
+		/// </summary>
 		public GameObject SpawnInWorld()
 		{
 			GameObject copy = Instantiate(gameObject);
@@ -72,6 +106,11 @@ namespace FiringSquad.Gameplay.Weapons
 			return copy;
 		}
 
+		/// <summary>
+		/// Called on a prefab obtained from the IWeaponPartManager service.
+		/// Returns an instantiated copy of this part, intended to immediately be attached to a weapon.
+		/// </summary>
+		/// <param name="weapon">The weapon this part will be attached to.</param>
 		public WeaponPartScript SpawnForWeapon(BaseWeaponScript weapon)
 		{
 			GameObject copy = Instantiate(gameObject);
@@ -90,6 +129,9 @@ namespace FiringSquad.Gameplay.Weapons
 			return script;
 		}
 
+		/// <summary>
+		/// Bind the durability of an instantiated part to the durability HUD.
+		/// </summary>
 		private void BindDurabilityToUI()
 		{
 			mBaseDurability = durability;
@@ -98,16 +140,27 @@ namespace FiringSquad.Gameplay.Weapons
 
 		#region Serialization
 
+		/// <summary>
+		/// Write the unique ID of this weapon part.
+		/// TODO: Use something more space-efficient than a string!
+		/// </summary>
 		public void SerializeId(NetworkWriter writer)
 		{
 			writer.Write(partId);
 		}
 
+		/// <summary>
+		/// Read a unique ID of a part from the stream.
+		/// </summary>
 		public static string DeserializeId(NetworkReader reader)
 		{
 			return reader.ReadString();
 		}
 
+		/// <summary>
+		/// Write the durability of this weapon part.
+		/// Note: durability will be cast to a byte, and must be less than 255.
+		/// </summary>
 		public void SerializeDurability(NetworkWriter writer)
 		{
 			if (mDurability > byte.MaxValue)
@@ -116,6 +169,9 @@ namespace FiringSquad.Gameplay.Weapons
 			writer.Write((byte)mDurability);
 		}
 
+		/// <summary>
+		/// Read the durability of a weapon part from the stream.
+		/// </summary>
 		public static int DeserializeDurability(NetworkReader reader)
 		{
 			return reader.ReadByte();

@@ -2,9 +2,13 @@
 
 namespace UnityEditor
 {
+	/// <summary>
+	/// Custom inspector for the weapon barrel script.
+	/// </summary>
 	[CustomEditor(typeof(WeaponPartScriptBarrel))]
 	public class WeaponPartScriptBarrelEditor : Editor
 	{
+		/// <inheritdoc />
 		public override void OnInspectorGUI()
 		{
 			SerializedObject so = serializedObject;

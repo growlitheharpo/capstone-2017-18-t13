@@ -15,8 +15,17 @@ using Random = UnityEngine.Random;
 
 namespace FiringSquad.Gameplay
 {
+	/// <summary>
+	/// The primary class for the player GameObject.
+	/// Implements IWeaponBearer and IDamageReceiver.
+	/// Handles all network communication that directly affects a player.
+	/// Represents the "local player object" for all clients.
+	/// </summary>
+	/// <seealso cref="IDamageReceiver"/>
+	/// <seealso cref="IWeaponBearer"/>
 	public class CltPlayer : NetworkBehaviour, IWeaponBearer, IDamageReceiver
 	{
+		/// Inspector variables
 		[SerializeField] private PlayerAssetReferences mAssets;
 		[SerializeField] private PlayerDefaultsData mInformation;
 
@@ -26,24 +35,12 @@ namespace FiringSquad.Gameplay
 		[SerializeField] private Animator mAnimator;
 		[SerializeField] private NetworkAnimator mNetworkAnimator;
 
-		public Animator localAnimator { get { return mAnimator; } }
-		public NetworkAnimator networkAnimator { get { return mNetworkAnimator; } }
-
-		public bool isCurrentPlayer { get { return isLocalPlayer; } }
-
-		public IWeapon weapon { get; private set; }
-		public PlayerDefaultsData defaultData { get { return mInformation; } }
-		public WeaponPartCollection defaultParts { get { return mInformation.defaultWeaponParts; } }
-		public Transform eye { get { return mCameraOffset; } }
-		public Transform gunOffset { get { return mGun1Offset; } }
-
-		private PlayerMagnetArm mMagnetArm;
-		public PlayerMagnetArm magnetArm { get { return mMagnetArm; } }
-
+		/// Private variables
 		private IPlayerHitIndicator mHitIndicator;
 		private CharacterController mCharacterController;
 		private CltPlayerLocal mLocalPlayerScript;
 
+		/// Private syncvars
 		[SyncVar(hook = "OnHealthUpdate")] private float mHealth;
 		private BoundProperty<float> mLocalHealthVar;
 
@@ -53,20 +50,63 @@ namespace FiringSquad.Gameplay
 		[SyncVar(hook = "OnDeathsUpdate")] private int mDeaths;
 		private BoundProperty<int> mLocalDeathsVar;
 
+		/// <inheritdoc />
+		public bool isCurrentPlayer { get { return isLocalPlayer; } }
+
+		/// <inheritdoc />
+		public IWeapon weapon { get; private set; }
+
+		/// <inheritdoc />
+		public WeaponPartCollection defaultParts { get { return mInformation.defaultWeaponParts; } }
+
+		/// <inheritdoc />
+		public Transform eye { get { return mCameraOffset; } }
+
+		/// <summary>
+		/// The local animator for this player.
+		/// </summary>
+		public Animator localAnimator { get { return mAnimator; } }
+
+		/// <summary>
+		/// The animator for this player that sends events over network.
+		/// </summary>
+		public NetworkAnimator networkAnimator { get { return mNetworkAnimator; } }
+
+		/// <summary>
+		/// The inspector balance data for this player.
+		/// </summary>
+		public PlayerDefaultsData defaultData { get { return mInformation; } }
+
+		/// <summary>
+		/// The transform offset to position the player's weapon.
+		/// </summary>
+		public Transform gunOffset { get { return mGun1Offset; } }
+		
+		/// <summary>
+		/// The magnet arm attached to this player.
+		/// </summary>
+		public PlayerMagnetArm magnetArm { get; private set; }
+
+		/// <summary>
+		/// The custom player name entered by this player.
+		/// </summary>
 		public string playerName { get; private set; }
 
 		#region Unity Callbacks
 
+		/// <summary>
+		/// Unity's server-side start event.
+		/// </summary>
 		public override void OnStartServer()
 		{
 			base.OnStartServer();
 
 			// register for server events
 			EventManager.Server.OnPlayerDied += OnPlayerDied;
-
 			EventManager.Server.OnStartGame += OnStartGame;
 			EventManager.Server.OnFinishGame += OnFinishGame;
 
+			// register information
 			mHitIndicator = new NullHitIndicator();
 			mHealth = mInformation.defaultHealth;
 
@@ -77,17 +117,18 @@ namespace FiringSquad.Gameplay
 			NetworkServer.SpawnWithClientAuthority(wep.gameObject, gameObject);
 
 			// create our magnet arm & bind
-			PlayerMagnetArm arm = Instantiate(mAssets.gravityGunPrefab).GetComponent<PlayerMagnetArm>();
+			PlayerMagnetArm arm = Instantiate(mAssets.magnetArmPrefab).GetComponent<PlayerMagnetArm>();
 			BindMagnetArmToPlayer(arm);
 			NetworkServer.SpawnWithClientAuthority(arm.gameObject, gameObject);
 		}
 
+		/// <summary>
+		/// Unity's client-side start event.
+		/// </summary>
 		public override void OnStartClient()
 		{
-			// force the lazy initialization of the part list
-			ServiceLocator.Get<IWeaponPartManager>().GetAllPrefabs(false);
-
 			base.OnStartClient();
+
 			mCharacterController = GetComponent<CharacterController>();
 
 			GameObject hitObject = new GameObject("HitIndicator");
@@ -97,17 +138,26 @@ namespace FiringSquad.Gameplay
 			mLocalHealthVar = new BoundProperty<float>(mInformation.defaultHealth);
 		}
 
+		/// <summary>
+		/// Unity's client-side start event that is ONLY called when this is the local player.
+		/// </summary>
 		public override void OnStartLocalPlayer()
 		{
+			// force the lazy initialization of the part list
+			ServiceLocator.Get<IWeaponPartManager>().GetAllPrefabs(false);
+
+			// Instantiate the local player controllers.
 			mLocalPlayerScript = Instantiate(mAssets.localPlayerPrefab).GetComponent<CltPlayerLocal>();
 			mLocalPlayerScript.transform.SetParent(transform);
 			mLocalPlayerScript.playerRoot = this;
 
+			// Bind the UI properties that we need.
 			mLocalHealthVar = new BoundProperty<float>(mInformation.defaultHealth, GameplayUIManager.PLAYER_HEALTH);
 			mLocalKillsVar = new BoundProperty<int>(0, GameplayUIManager.PLAYER_KILLS);
 			mLocalDeathsVar = new BoundProperty<int>(0, GameplayUIManager.PLAYER_DEATHS);
 			StartCoroutine(GrabLocalHitIndicator());
 
+			// Disable the renderers for the local player.
 			var renderers = mAnimator.transform.GetComponentsInChildren<Renderer>();
 			foreach (Renderer r in renderers)
 				Destroy(r);
@@ -115,6 +165,9 @@ namespace FiringSquad.Gameplay
 			EventManager.Notify(() => EventManager.Local.LocalPlayerSpawned(this));
 		}
 
+		/// <summary>
+		/// Grab a reference to the UI-based local player hit indicator once it exists.
+		/// </summary>
 		private IEnumerator GrabLocalHitIndicator()
 		{
 			mHitIndicator = new NullHitIndicator(); // a placeholder to avoid errors
@@ -129,6 +182,9 @@ namespace FiringSquad.Gameplay
 			mHitIndicator = realIndicator;
 		}
 
+		/// <summary>
+		/// Cleanup all listeners and event handlers, and spawned items.
+		/// </summary>
 		private void OnDestroy()
 		{
 			EventManager.Server.OnPlayerDied -= OnPlayerDied;
@@ -149,6 +205,9 @@ namespace FiringSquad.Gameplay
 				mLocalDeathsVar.Cleanup();
 		}
 
+		/// <summary>
+		/// Client-only Unity Update function.
+		/// </summary>
 		[ClientCallback]
 		private void Update()
 		{
@@ -157,19 +216,24 @@ namespace FiringSquad.Gameplay
 
 		#endregion
 
+		/// <summary>
+		/// Activate the "interact" input command on the server.
+		/// </summary>
+		/// <param name="eyePosition">The local eye position of the player.</param>
+		/// <param name="eyeForward">The local eye forward of the player.</param>
 		[Command]
 		public void CmdActivateInteract(Vector3 eyePosition, Vector3 eyeForward)
 		{
 			IInteractable interactable = null;
 
+			// Prioritize anything held by the magnet arm.
 			if (magnetArm != null)
 			{
 				interactable = magnetArm.heldWeaponPart;
-
-				if (interactable != null)
-					magnetArm.ForceDropItem();
+				magnetArm.ForceDropItem();
 			}
 
+			// If there's nothing that we're holding, look ahead of us.
 			if (interactable == null)
 			{
 				RaycastHit hit;
@@ -187,10 +251,14 @@ namespace FiringSquad.Gameplay
 
 		#region Animations
 
+		/// <summary>
+		/// Update our velocity-based animation parameters based on local variables.
+		/// </summary>
 		[Client]
 		private void UpdateAnimations()
 		{
-			Vector3 relativeVel = mCharacterController.velocity / 6; // 6 is the MOVEMENTDATA SPEED
+			// TODO: spread this calculation out over multiple frames.
+			Vector3 relativeVel = mCharacterController.velocity / 6; // 6 is the MOVEMENTDATA SPEED. THIS SHOULD NOT BE HARDCODED
 			relativeVel = transform.InverseTransformDirection(relativeVel);
 			Vector2 vel = new Vector2(relativeVel.x, relativeVel.z);
 
@@ -201,6 +269,7 @@ namespace FiringSquad.Gameplay
 			AnimationUtility.SetVariable(mAnimator, "VelocityY", velY);
 		}
 
+		/// <inheritdoc />
 		public void PlayFireAnimation()
 		{
 			localAnimator.SetTrigger("Fire");
@@ -211,6 +280,7 @@ namespace FiringSquad.Gameplay
 
 		#region Weapons
 
+		/// <inheritdoc />
 		public void BindWeaponToBearer(IModifiableWeapon wep, bool bindUI = false)
 		{
 			if (weapon != null)
@@ -230,6 +300,10 @@ namespace FiringSquad.Gameplay
 			weapon = wep;
 		}
 
+		/// <summary>
+		/// Two-way bind a magnet arm to this player.
+		/// </summary>
+		/// <param name="arm">The magnet arm to be bound.</param>
 		public void BindMagnetArmToPlayer(PlayerMagnetArm arm)
 		{
 			arm.transform.SetParent(mGun2Offset);
@@ -237,37 +311,57 @@ namespace FiringSquad.Gameplay
 			arm.transform.SetParent(transform);
 			arm.bearer = this;
 
-			mMagnetArm = arm;
+			magnetArm = arm;
 		}
 
+		/// <summary>
+		/// Attach parts to the provided weapon script.
+		/// </summary>
 		private void AddDefaultPartsToWeapon(BaseWeaponScript wep)
 		{
 			foreach (WeaponPartScript part in defaultParts)
 				wep.AttachNewPart(part.partId, WeaponPartScript.INFINITE_DURABILITY);
 		}
 
+		/// <summary>
+		/// Immediately equip the weapon with the provided part ID.
+		/// </summary>
+		/// <param name="partId">The unique ID of the part to attach.</param>
 		[Command]
-		public void CmdDebugEquipWeaponPart(string part)
+		public void CmdDebugEquipWeaponPart(string partId)
 		{
-			weapon.AttachNewPart(part);
+			if (weapon == null)
+				return;
+
+			weapon.AttachNewPart(partId);
 		}
 		
+		/// <summary>
+		/// Instantiate the non-default weapons this player was holding and drop them where they died.
+		/// </summary>
 		[Server]
 		private void SpawnDeathWeaponParts()
 		{
+			if (weapon == null)
+				return;
+
 			IWeaponPartManager partService = ServiceLocator.Get<IWeaponPartManager>();
+			Vector3 weaponPos = weapon.transform.position;
+
 			foreach (WeaponPartScript part in weapon.currentParts)
 			{
+				// skip default weapon parts
 				if (defaultParts.Any(defaultPart => part.partId == defaultPart.partId))
 					continue;
 
 				WeaponPartScript prefab = partService.GetPrefabScript(part.partId);
 				GameObject instance = prefab.SpawnInWorld();
 
-				instance.transform.position = weapon.transform.position + Random.insideUnitSphere;
-
-				instance.GetComponent<WeaponPickupScript>().overrideDurability = part.durability;
+				instance.transform.position = weaponPos + Random.insideUnitSphere;
 				instance.GetComponent<Rigidbody>().AddExplosionForce(40.0f, transform.position, 2.0f);
+
+				// give the part its current durability.
+				instance.GetComponent<WeaponPickupScript>().overrideDurability = part.durability;
 
 				NetworkServer.Spawn(instance);
 
@@ -279,21 +373,32 @@ namespace FiringSquad.Gameplay
 
 		#region GameState
 
+		/// <summary>
+		/// Transition into lobby mode and start ticking down until it is over.
+		/// </summary>
 		[TargetRpc]
 		public void TargetStartLobbyCountdown(NetworkConnection connection, long endTime)
 		{
 			EventManager.Notify(() => EventManager.Local.ReceiveLobbyEndTime(this, endTime));
 		}
 
+		/// <summary>
+		/// Move the player to the provided position and rotation immediately and reset all values.
+		/// </summary>
+		/// <param name="position">The target spawn position of the player.</param>
+		/// <param name="rotation">The target spawn rotation of the player.</param>
 		[Server]
 		public void MoveToStartPosition(Vector3 position, Quaternion rotation)
 		{
 			RpcResetPlayerValues(position, rotation);
 
-			if (mMagnetArm != null)
-				mMagnetArm.ForceDropItem();
+			if (magnetArm != null)
+				magnetArm.ForceDropItem();
 		}
 
+		/// <summary>
+		/// EVENT HANDLER: Server.OnStartGame
+		/// </summary>
 		[Server]
 		[EventHandler]
 		private void OnStartGame(long gameEndTime)
@@ -301,13 +406,9 @@ namespace FiringSquad.Gameplay
 			TargetHandleStartGame(connectionToClient, gameEndTime);
 		}
 
-		[Server]
-		[EventHandler]
-		private void OnFinishGame(PlayerScore[] scores)
-		{
-			TargetHandleFinishGame(connectionToClient, PlayerScore.SerializeArray(scores));
-		}
-
+		/// <summary>
+		/// Locally handle the match starting on the server by playing a sound and updating our UI.
+		/// </summary>
 		[TargetRpc]
 		private void TargetHandleStartGame(NetworkConnection connection, long gameEndTime)
 		{
@@ -316,6 +417,19 @@ namespace FiringSquad.Gameplay
 				.CreateSound(AudioEvent.AnnouncerMatchStarts, transform);
 		}
 
+		/// <summary>
+		/// EVENT HANDLER: Server.OnFinishGame
+		/// </summary>
+		[Server]
+		[EventHandler]
+		private void OnFinishGame(PlayerScore[] scores)
+		{
+			TargetHandleFinishGame(connectionToClient, PlayerScore.SerializeArray(scores));
+		}
+
+		/// <summary>
+		/// Locally handle the match ending on the server.
+		/// </summary>
 		[TargetRpc]
 		private void TargetHandleFinishGame(NetworkConnection connection, byte[] serializedArray)
 		{
@@ -332,6 +446,7 @@ namespace FiringSquad.Gameplay
 
 		#region Player Health/Death
 
+		/// <inheritdoc />
 		[Server]
 		public void ApplyDamage(float amount, Vector3 point, Vector3 normal, IDamageSource cause)
 		{
@@ -349,6 +464,9 @@ namespace FiringSquad.Gameplay
 				EventManager.Notify(() => EventManager.Server.PlayerHealthHitZero(this, cause));
 		}
 
+		/// <summary>
+		/// EVENT HANDLER: Server.OnPlayerDied
+		/// </summary>
 		[Server]
 		[EventHandler]
 		private void OnPlayerDied(CltPlayer deadPlayer, ICharacter killer, Transform spawnPos)
@@ -371,13 +489,18 @@ namespace FiringSquad.Gameplay
 					magnetArm.ForceDropItem();
 
 				mHealth = mInformation.defaultHealth;
-				weapon.ResetToDefaultParts();
+				if (weapon != null)
+					weapon.ResetToDefaultParts();
+
 				RpcHandleDeath(transform.position, spawnPos.position, spawnPos.rotation, killerId);
 			}
 			else if (ReferenceEquals(killer, this))
 				mKills++;
 		}
 
+		/// <summary>
+		/// Reflect damage taken on the server locally.
+		/// </summary>
 		[ClientRpc]
 		private void RpcReflectDamageLocally(Vector3 point, Vector3 normal, Vector3 origin, float amount, NetworkInstanceId source)
 		{
@@ -388,6 +511,13 @@ namespace FiringSquad.Gameplay
 			mHitIndicator.NotifyHit(this, origin, point, normal, amount);
 		}
 
+		/// <summary>
+		/// Reflect the death of a player locally.
+		/// </summary>
+		/// <param name="deathPosition">The position where the player died.</param>
+		/// <param name="spawnPos">The new target spawn position of the player.</param>
+		/// <param name="spawnRot">The new target spawn rotation of the player.</param>
+		/// <param name="killer">The network id of the character that killed the player.</param>
 		[ClientRpc]
 		private void RpcHandleDeath(Vector3 deathPosition, Vector3 spawnPos, Quaternion spawnRot, NetworkInstanceId killer)
 		{
@@ -397,19 +527,29 @@ namespace FiringSquad.Gameplay
 
 			ICharacter killerObj = killer == NetworkInstanceId.Invalid ? null : ClientScene.FindLocalObject(killer).GetComponent<ICharacter>();
 
-			if (isLocalPlayer)
-			{
-				mLocalHealthVar.value = 0.0f;
-				EventManager.Local.LocalPlayerDied(spawnPos, spawnRot, killerObj);
-			}
+			if (!isLocalPlayer)
+				return;
+
+			mLocalHealthVar.value = 0.0f;
+			EventManager.Local.LocalPlayerDied(spawnPos, spawnRot, killerObj);
 		}
 
+		/// <summary>
+		/// Reset all the values of this player (position, rotation, health, weapon parts).
+		/// </summary>
+		/// <param name="position">The new target spawn position of the player.</param>
+		/// <param name="rotation">The new target spawn rotation of the player.</param>
 		[ClientRpc]
 		private void RpcResetPlayerValues(Vector3 position, Quaternion rotation)
 		{
 			ResetPlayerValues(position, rotation);
 		}
 
+		/// <summary>
+		/// Reset all the values of this player (position, rotation, health, weapon parts).
+		/// </summary>
+		/// <param name="position">The new target spawn position of the player.</param>
+		/// <param name="rotation">The new target spawn rotation of the player.</param>
 		[Client]
 		public void ResetPlayerValues(Vector3 position, Quaternion rotation)
 		{
@@ -426,6 +566,9 @@ namespace FiringSquad.Gameplay
 
 		#region SyncVars
 
+		/// <summary>
+		/// Sync the player's health across the network (and UI).
+		/// </summary>
 		[Client]
 		private void OnHealthUpdate(float value)
 		{
@@ -434,6 +577,9 @@ namespace FiringSquad.Gameplay
 				mLocalHealthVar.value = value;
 		}
 
+		/// <summary>
+		/// Sync the player's kill count across the network (and UI).
+		/// </summary>
 		[Client]
 		private void OnKillsUpdate(int value)
 		{
@@ -442,6 +588,9 @@ namespace FiringSquad.Gameplay
 				mLocalKillsVar.value = value;
 		}
 
+		/// <summary>
+		/// Sync the player's death count across the network (and UI).
+		/// </summary>
 		[Client]
 		private void OnDeathsUpdate(int value)
 		{
@@ -450,12 +599,18 @@ namespace FiringSquad.Gameplay
 				mLocalDeathsVar.value = value;
 		}
 
+		/// <summary>
+		/// Set the player's customized name across the network.
+		/// </summary>
 		[Command]
 		public void CmdSetPlayerName(string newName)
 		{
 			RpcSetPlayerName(newName);
 		}
 
+		/// <summary>
+		/// Set the player's customized name from the server locally.
+		/// </summary>
 		[ClientRpc]
 		private void RpcSetPlayerName(string value)
 		{

@@ -6,7 +6,7 @@ namespace FiringSquad.Core.State
 	/// Base interface for the Gamestate Manager service.
 	/// Handles the state of the game.
 	/// </summary>
-	public interface IGamestateManager
+	public interface IGamestateManager : IGlobalService
 	{
 		/// <summary>
 		/// Whether or not an instance of the GameState Manager exists.
@@ -22,7 +22,7 @@ namespace FiringSquad.Core.State
 		void RequestShutdown();
 
 		/// <summary>
-		/// Make a request to change the current scene.
+		/// Make a request to change the current scene through the state system.
 		/// </summary>
 		/// <param name="sceneName"></param>
 		/// <param name="mode"></param>

@@ -7,27 +7,37 @@ using KeatsLib.Unity;
 using UnityEngine;
 using UnityEngine.Rendering.PostProcessing;
 using Input = UnityEngine.Input;
-using Logger = FiringSquad.Debug.Logger;
 
 namespace FiringSquad.Gameplay
 {
+	/// <summary>
+	/// The local class that handles non-movement input for the local player.
+	/// Handles some local effects, such as the respawn time.
+	/// </summary>
 	public class CltPlayerLocal : MonoBehaviour
 	{
+		/// Inspector variables
 		[SerializeField] private PlayerInputMap mInputMap;
-		public PlayerInputMap inputMap { get { return mInputMap; } }
-
 		[SerializeField] private GameObject mCameraPrefab;
 
-		public CltPlayer playerRoot { get; set; }
-
+		/// Private variables
 		private Camera mCameraRef;
 		private Vector3 mCameraOriginalPos;
 		private Quaternion mCameraOriginalRot;
 		private BoundProperty<float> mRespawnTimer;
 
+		/// <summary> The input map for this player. </summary>
+		public PlayerInputMap inputMap { get { return mInputMap; } }
+
+		/// <summary> The CltPlayer that this local player is linked to. </summary>
+		public CltPlayer playerRoot { get; set; }
+
+		/// <summary> Whether or not this player is currently in AimDownSights mode. </summary>
 		public bool inAimDownSightsMode { get; private set; }
 
-		// Use this for initialization
+		/// <summary>
+		/// Unity's Start function.
+		/// </summary>
 		private void Start()
 		{
 			ServiceLocator.Get<IInput>()
@@ -51,19 +61,20 @@ namespace FiringSquad.Gameplay
 				.EnableInputLevel(InputLevel.PauseMenu);
 
 			SetupCamera();
-			SetupUI();
 
 			mRespawnTimer = new BoundProperty<float>(0, GameplayUIManager.PLAYER_RESPAWN_TIME);
 
-			EventManager.Local.OnApplyOptionsData += ApplyOptionsData;
+			EventManager.Local.OnApplyOptionsData += OnApplyOptionsData;
 			EventManager.Local.OnLocalPlayerDied += OnLocalPlayerDied;
 		}
 
+		/// <summary>
+		/// Cleanup all listeners and event handlers.
+		/// </summary>
 		private void OnDestroy()
 		{
 			EventManager.Local.OnLocalPlayerDied -= OnLocalPlayerDied;
-			EventManager.Local.OnApplyOptionsData -= ApplyOptionsData;
-			CleanupUI();
+			EventManager.Local.OnApplyOptionsData -= OnApplyOptionsData;
 			CleanupCamera();
 
 			ServiceLocator.Get<IInput>()
@@ -82,6 +93,10 @@ namespace FiringSquad.Gameplay
 				.UnregisterInput(INPUT_ActivateGunPanic);
 		}
 
+		/// <summary>
+		/// Instantiate a camera or steal the one that already exists in the scene
+		/// and attach it to our face.
+		/// </summary>
 		private void SetupCamera()
 		{
 			mCameraRef = Camera.main ?? FindObjectOfType<Camera>();
@@ -100,8 +115,9 @@ namespace FiringSquad.Gameplay
 			mCameraRef.transform.ResetLocalValues();
 		}
 
-		private void SetupUI() { }
-
+		/// <summary>
+		/// Attempt to release our camera from our control while we are being destroyed.
+		/// </summary>
 		public void CleanupCamera()
 		{
 			if (mCameraRef == null)
@@ -117,23 +133,36 @@ namespace FiringSquad.Gameplay
 			mCameraRef = null;
 		}
 
-		private void CleanupUI() { }
-
+		/// <summary>
+		/// INPUT HANDLER: Hold down the trigger of our weapon.
+		/// </summary>
 		private void INPUT_WeaponFireHold()
 		{
-			playerRoot.weapon.FireWeaponHold();
+			if (playerRoot.weapon != null)
+				playerRoot.weapon.FireWeaponHold();
 		}
 
+		/// <summary>
+		/// INPUT HANDLER: Release the trigger of our weapon.
+		/// </summary>
 		private void INPUT_WeaponFireUp()
 		{
-			playerRoot.weapon.FireWeaponUp();
+			if (playerRoot.weapon != null)
+				playerRoot.weapon.FireWeaponUp();
 		}
 
+		/// <summary>
+		/// INPUT HANDLER: Reload our current weapon.
+		/// </summary>
 		private void INPUT_WeaponReload()
 		{
-			playerRoot.weapon.Reload();
+			if (playerRoot.weapon != null)
+				playerRoot.weapon.Reload();
 		}
 
+		/// <summary>
+		/// INPUT HANDLER: Hold down the trigger of our magnet arm.
+		/// </summary>
 		private void INPUT_MagnetArmHeld()
 		{
 			if (inAimDownSightsMode)
@@ -142,16 +171,25 @@ namespace FiringSquad.Gameplay
 			playerRoot.magnetArm.FireHeld();
 		}
 
+		/// <summary>
+		/// INPUT HANDLER: Release the trigger of our magnet arm.
+		/// </summary>
 		private void INPUT_MagnetArmUp()
 		{
 			playerRoot.magnetArm.FireUp();
 		}
 
+		/// <summary>
+		/// INPUT HANDLER: Immediately call "interact" on the server.
+		/// </summary>
 		private void INPUT_ActivateInteract()
 		{
 			playerRoot.CmdActivateInteract(playerRoot.eye.position, playerRoot.eye.forward);
 		}
 
+		/// <summary>
+		/// INPUT HANDLER: Toggle the game's pause menu.
+		/// </summary>
 		private void INPUT_TogglePause()
 		{
 			if (inAimDownSightsMode)
@@ -160,18 +198,28 @@ namespace FiringSquad.Gameplay
 			EventManager.Local.TogglePause();
 		}
 
+		/// <summary>
+		/// INPUT HANDLER: Enter aim down sights mode.
+		/// </summary>
 		private void INPUT_EnterAimDownSights()
 		{
 			inAimDownSightsMode = true;
 			EventManager.Notify(EventManager.Local.EnterAimDownSightsMode);
 		}
 
+		/// <summary>
+		/// INPUT HANDLER: End aim down sights mode.
+		/// </summary>
 		private void INPUT_ExitAimDownSights()
 		{
 			inAimDownSightsMode = false;
 			EventManager.Notify(EventManager.Local.ExitAimDownSightsMode);
 		}
 
+		/// <summary>
+		/// INPUT HANDLER: Immediately reset the gun's position.
+		/// TODO: Remove this when this bug is actually fixed.
+		/// </summary>
 		private void INPUT_ActivateGunPanic()
 		{
 			IModifiableWeapon weapon = playerRoot.weapon as IModifiableWeapon;
@@ -192,53 +240,72 @@ namespace FiringSquad.Gameplay
 			weapon.positionOffset = playerRoot.eye.InverseTransformPoint(offset.position);
 			weapon.transform.SetParent(playerRoot.transform);
 		}
-
-		private void ApplyOptionsData(IOptionsData data)
+		
+		/// <summary>
+		/// EVENT HANDLER: Local.OnApplyOptionsData
+		/// </summary>
+		private void OnApplyOptionsData(IOptionsData data)
 		{
+			// set the volume on FMOD's master mixer bus.
 			FMODUnity.RuntimeManager.GetBus("bus:/").setVolume(data.masterVolume);
 			mCameraRef.fieldOfView = data.fieldOfView;
 		}
 
+		/// <summary>
+		/// EVENT HANDLER: Local.OnLocalPlayerDied
+		/// Starts the respawn timer and then sends this player back to their start position when time is up.
+		/// </summary>
 		private void OnLocalPlayerDied(Vector3 spawnPosition, Quaternion spawnRotation, ICharacter killer)
 		{
+			// Disable input (because we're dead).
 			ServiceLocator.Get<IInput>()
 				.DisableInputLevel(InputLevel.Gameplay)
 				.DisableInputLevel(InputLevel.PauseMenu);
 
 			INPUT_ExitAimDownSights(); // force an ADS exit
 
-			// do a cool thing with the camera
-			mCameraRef.transform.SetParent(null); // leave the camera here for a second
+			// TODO: Do a cool thing with the camera here?
+			// For now, just leave it where it was when we died. We'll grab it again when we respawn.
+			mCameraRef.transform.SetParent(null);
+
 			if (killer != null && !ReferenceEquals(killer, playerRoot))
 			{
 				StartCoroutine(Coroutines.LerpRotation(mCameraRef.transform,
 					Quaternion.LookRotation(killer.transform.position - mCameraRef.transform.position, Vector3.up), 0.75f));
 			}
 
+			// Move us way out of the level.
 			playerRoot.transform.position = Vector3.one * -5000.0f;
 
+			// Make the screen red.
 			Vignette temporaryVignette = SetupDeathVignette();
 			PostProcessVolume volume = PostProcessManager.instance.QuickVolume(LayerMask.NameToLayer("postprocessing"), 100, temporaryVignette);
 			volume.weight = 1.0f;
 
+			// InvokeEveryTick: A "temporary" update function:
 			StartCoroutine(Coroutines.InvokeEveryTick(time =>
 			{
 				if (time < playerRoot.defaultData.respawnTime)
 				{
+					// Update the respawn UI timer.
 					mRespawnTimer.value = Mathf.Ceil(playerRoot.defaultData.respawnTime - time);
 					return true; // signal to continue this coroutine
 				}
 
+				// Time is up!
 				mRespawnTimer.value = 0.0f;
 
+				// Re-enable our input
 				ServiceLocator.Get<IInput>()
 					.EnableInputLevel(InputLevel.Gameplay)
 					.EnableInputLevel(InputLevel.PauseMenu);
 
+				// Send is back to the spawn position the server chose for us.
 				playerRoot.ResetPlayerValues(spawnPosition, spawnRotation);
 				mCameraRef.transform.SetParent(playerRoot.eye, false);
 				mCameraRef.transform.ResetLocalValues();
 
+				// Destroy the red "death" effect.
 				RuntimeUtilities.DestroyVolume(volume, false);
 				Destroy(temporaryVignette);
 
@@ -246,6 +313,9 @@ namespace FiringSquad.Gameplay
 			}));
 		}
 
+		/// <summary>
+		/// Create a Vignette to indicate on-screen that we are dead.
+		/// </summary>
 		private Vignette SetupDeathVignette()
 		{
 			Vignette temporaryVignette = ScriptableObject.CreateInstance<Vignette>();

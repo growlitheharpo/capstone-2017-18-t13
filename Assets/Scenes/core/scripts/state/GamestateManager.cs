@@ -35,6 +35,7 @@ namespace FiringSquad.Core.State
 			/// <inheritdoc />
 			public virtual bool safeToTransition { get { return true; } }
 
+			/// <inheritdoc />
 			public virtual IState GetTransition()
 			{
 				return this;
@@ -44,30 +45,28 @@ namespace FiringSquad.Core.State
 			public virtual void OnExit() { }
 		}
 
+		/// <summary>
+		/// Empty state used to hold the state machine in place for a frame.
+		/// Transitions away based on scene name rules immediately the next frame.
+		/// </summary>
 		private class NullState : BaseGameState
 		{
+			/// <inheritdoc />
 			public override IState GetTransition()
 			{
 				return instance.ChooseStateByScene();
 			}
 		}
 
+		private Dictionary<string, IGameState> mBaseStates;
+		private IGameState mCurrentState;
+
 		public const string MAIN_SCENE = "main";
 		public const string MENU_SCENE = "menu";
 		public const string ART_PROTOTYPE_SCENE = "artproto";
-		public const string FOURPLAYER_WORLD = "game4player_world";
 		public const string FOURPLAYER_GAMEPLAY = "game4player_gameplay";
 		public const string TWOPLAYER_WORLD = "game2player_world";
 		public const string TWOPLAYER_GAMEPLAY = "game2player_gameplay";
-
-		public enum Feature
-		{
-			WeaponDrops,
-			WeaponDurability
-		}
-
-		private Dictionary<string, IGameState> mBaseStates;
-		private IGameState mCurrentState;
 
 		/// <inheritdoc />
 		public bool isAlive { get { return true; } }
@@ -80,6 +79,9 @@ namespace FiringSquad.Core.State
 			Application.Quit();
 		}
 
+		/// <summary>
+		/// Unity's Awake function.
+		/// </summary>
 		protected override void Awake()
 		{
 			base.Awake();
@@ -91,11 +93,13 @@ namespace FiringSquad.Core.State
 				{ TWOPLAYER_GAMEPLAY, new GameSceneState() },
 				{ FOURPLAYER_GAMEPLAY, new GameSceneState() },
 				{ "sandbox_networked", new GameSceneState() },
-				{ FOURPLAYER_WORLD, new NullState() },
 				{ TWOPLAYER_WORLD, new NullState() }
 			};
 		}
 
+		/// <summary>
+		/// Unity's Start function.
+		/// </summary>
 		private void Start()
 		{
 			mCurrentState = new InitializeGameState();
@@ -106,6 +110,9 @@ namespace FiringSquad.Core.State
 				.RegisterCommand("close", s => RequestSceneChange(MENU_SCENE));
 		}
 
+		/// <summary>
+		/// Unity's Update function.
+		/// </summary>
 		private void Update()
 		{
 			if (mCurrentState == null)
@@ -131,6 +138,10 @@ namespace FiringSquad.Core.State
 			mCurrentState.OnEnter();
 		}
 
+		/// <summary>
+		/// Attempt to resolve a new state based on the name of the current scene.
+		/// </summary>
+		/// <returns>A new state if possible, or null if none are found to match the current scene.</returns>
 		private IGameState ChooseStateByScene()
 		{
 			string currentScene = SceneManager.GetActiveScene().name;
@@ -139,12 +150,18 @@ namespace FiringSquad.Core.State
 			return mBaseStates.TryGetValue(currentScene, out result) ? result : null;
 		}
 
+		/// <inheritdoc />
 		public IGamestateManager RequestSceneChange(string sceneName, LoadSceneMode mode = LoadSceneMode.Single)
 		{
 			StartCoroutine(AttemptSceneChange(sceneName, mode));
 			return this;
 		}
 
+		/// <summary>
+		/// Attempt a scene change once the current state signals that it is safe to do so.
+		/// </summary>
+		/// <param name="sceneName">The name of the new scene.</param>
+		/// <param name="mode">Which Unity scene load mode to use.</param>
 		private IEnumerator AttemptSceneChange(string sceneName, LoadSceneMode mode)
 		{
 			while (!mCurrentState.safeToTransition)

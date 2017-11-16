@@ -6,51 +6,13 @@ using Random = UnityEngine.Random;
 
 namespace KeatsLib.Collections
 {
+	/// <summary>
+	/// A collection of extensions and static classes for general purposes.
+	/// </summary>
 	public static class SystemExtensions
 	{
 		public static class Types
 		{
-			/// <summary>
-			/// Utility struct used for forward-iterating over a fixed-size container.
-			/// Wraps around to index 0 when you attempt to increment past the end.
-			/// </summary>
-			public struct IteratorIndex
-			{
-				private int mValue;
-				private int mSize;
-
-				public IteratorIndex(int size, int initialValue = 0)
-				{
-					mSize = size;
-
-					mValue = initialValue >= size ? size - 1 : initialValue;
-				}
-
-				public void SetSize(int newSize)
-				{
-					mSize = newSize;
-				}
-
-				public void ResetValue()
-				{
-					mValue = 0;
-				}
-
-				public static implicit operator int(IteratorIndex i)
-				{
-					return i.mValue;
-				}
-
-				public static IteratorIndex operator ++(IteratorIndex i)
-				{
-					i.mValue++;
-					if (i.mValue >= i.mSize)
-						i.mValue = 0;
-
-					return i;
-				}
-			}
-
 			/// <summary>
 			/// Utility class similar in function to C++'s std::pair class.
 			/// </summary>
@@ -109,12 +71,16 @@ namespace KeatsLib.Collections
 			return (T)Enum.Parse(typeof(T), value, true);
 		}
 
-		public static T RandomEnum<T>()
+		/// <summary>
+		/// Returns a random value within the provided enum.
+		/// </summary>
+		/// <typeparam name="T">The type of enum to choose from.</typeparam>
+		public static T RandomEnum<T>() 
 		{
 			Type type = typeof(T);
 			object val = Enum.GetValues(type).ChooseRandom();
 
-			return (T)Convert.ChangeType(val, type);
+			return (T)val;
 		}
 
 		/// <summary>
@@ -215,11 +181,25 @@ namespace KeatsLib.Collections
 			list[j] = tmp;
 		}
 
+		/// <summary>
+		/// Chooses a key from a dictionary which has the highest value paired to it.
+		/// </summary>
+		/// <param name="list">The dictionary from which to choose.</param>
+		/// <returns>Returns the T1 Key with the highest T2 value.</returns>
 		public static T1 GetHighestValueKey<T1, T2>(this IDictionary<T1, T2> list) where T2 : IComparable
 		{
 			return list.Aggregate((l, r) => l.Value.CompareTo(r.Value) >= 0 ? l : r).Key;
 		}
 
+		/// <summary>
+		/// Rescales a value that was previously in range [oldMin, oldMax] to range [newMin, newMax].
+		/// </summary>
+		/// <param name="val">The value to transform.</param>
+		/// <param name="oldMin">The lowest possible value in the previous scale.</param>
+		/// <param name="oldMax">The highest possible value in the previous scale.</param>
+		/// <param name="newMin">The lowest possible value in the new scale. Defaults to 0.</param>
+		/// <param name="newMax">The highest possible value in the new scale. Defaults to 1.</param>
+		/// <returns></returns>
 		public static float Rescale(this float val, float oldMin, float oldMax, float newMin = 0.0f, float newMax = 1.0f)
 		{
 			float oldRange = oldMax - oldMin;

@@ -3,48 +3,41 @@ using UnityEngine;
 
 namespace FiringSquad
 {
+	/// <summary>
+	/// Useful static extensions for common interfaces.
+	/// </summary>
 	public static class StaticGameExtensions
 	{
+		/// <summary>
+		/// Get the damage receiver on the collision object.
+		/// </summary>
 		public static IDamageReceiver GetDamageReceiver(this Collision col)
 		{
-			return GetComponentUpwards<IDamageReceiver>(col.transform);
+			return col.transform.GetComponentInParent<IDamageReceiver>();
 		}
 
+		/// <summary>
+		/// Get the damage receiver on the RaycastHit object.
+		/// </summary>
 		public static IDamageReceiver GetDamageReceiver(this RaycastHit col)
 		{
-			return GetComponentUpwards<IDamageReceiver>(col.transform);
+			return col.transform.GetComponentInParent<IDamageReceiver>();
 		}
 
+		/// <summary>
+		/// Get the interactable interface on the collision object.
+		/// </summary>
 		public static IInteractable GetInteractableComponent(this Collision col)
 		{
-			return GetComponentUpwards<IInteractable>(col.transform);
+			return col.transform.GetComponentInParent<IInteractable>();
 		}
 
+		/// <summary>
+		/// Get the interactable interface on the RaycastHit object.
+		/// </summary>
 		public static IInteractable GetInteractableComponent(this RaycastHit col)
 		{
-			return GetComponentUpwards<IInteractable>(col.transform);
-		}
-
-		public static T GetComponentUpwards<T>(this GameObject g) where T : class
-		{
-			return GetComponentUpwards<T>(g.transform);
-		}
-
-		public static T GetComponentUpwards<T>(this Component g) where T : class
-		{
-			return GetComponentUpwards<T>(g.transform);
-		}
-
-		public static T GetComponentUpwards<T>(Transform t) where T : class
-		{
-			T c = null;
-			while (c == null && t != null)
-			{
-				c = t.GetComponent<T>();
-				t = t.parent;
-			}
-
-			return c;
+			return col.transform.GetComponentInParent<IInteractable>();
 		}
 	}
 }
