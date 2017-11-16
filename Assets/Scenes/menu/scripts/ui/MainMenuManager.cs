@@ -7,9 +7,8 @@ namespace FiringSquad.Gameplay.UI
 {
 	/// <summary>
 	/// Main menu UI manager.
-	/// TODO: Rename this class.
 	/// </summary>
-	public class UIManager : MonoBehaviour
+	public class MainMenuManager : MonoBehaviour
 	{
 		/// Inspector variables
 		[SerializeField] private GameObject mMainElementHolder;
