@@ -3,6 +3,7 @@ using FiringSquad.Core.Input;
 using FiringSquad.Core.UI;
 using FiringSquad.Data;
 using FiringSquad.Gameplay;
+using FiringSquad.Gameplay.UI;
 using KeatsLib.State;
 using UnityEngine;
 
@@ -117,7 +118,6 @@ namespace FiringSquad.Core.State
 
 				/// Private variables
 				private CltPlayer mLocalPlayerRef;
-				private bool mOpenNameMenu;
 				private long mRoundEndTime;
 				private BoundProperty<float> mRemainingTime;
 
@@ -145,7 +145,10 @@ namespace FiringSquad.Core.State
 				{
 					OnReceiveStartEvent(time);
 					mLocalPlayerRef = player;
-					mOpenNameMenu = true;
+
+					IScreenPanel panel = ServiceLocator.Get<IUIManager>()
+						.PushNewPanel(ScreenPanelTypes.PlayerNameEntry);
+					((PlayerNameCustomizationPanel)panel).SetPlayer(player);
 				}
 
 				/// <summary>
@@ -157,7 +160,7 @@ namespace FiringSquad.Core.State
 					mRoundEndTime = time;
 
 					if (mRemainingTime == null)
-						mRemainingTime = new BoundProperty<float>(CalculateRemainingTime(), GameplayUIManager.ARENA_ROUND_TIME);
+						mRemainingTime = new BoundProperty<float>(CalculateRemainingTime(), UIManager.ARENA_ROUND_TIME);
 					else
 						mRemainingTime.value = CalculateRemainingTime();
 				}
@@ -168,35 +171,23 @@ namespace FiringSquad.Core.State
 				/// </summary>
 				private void OnReceiveFinishEvent(PlayerScore[] scores)
 				{
-					EventManager.Notify(() => EventManager.LocalGUI.ShowGameoverPanel(scores));
+					/*EventManager.Notify(() => EventManager.LocalGUI.ShowGameoverPanel(scores));
 					ServiceLocator.Get<IInput>()
 						.DisableInputLevel(InputLevel.Gameplay)
-						.DisableInputLevel(InputLevel.HideCursor);
+						.DisableInputLevel(InputLevel.HideCursor);*/
+
+					IScreenPanel panel = ServiceLocator.Get<IUIManager>()
+						.PushNewPanel(ScreenPanelTypes.GameOver);
+					((GameOverPanel)panel).SetDisplayScores(scores);
 				}
 
 				/// <inheritdoc />
 				public override void Update()
 				{
-					if (mOpenNameMenu)
-						OpenNameMenu();
-
 					if (mRemainingTime == null)
 						return;
 
 					mRemainingTime.value = Mathf.Clamp(CalculateRemainingTime(), 0.0f, float.MaxValue);
-				}
-
-				/// <summary>
-				/// Open the "Enter Name" panel as soon as gameplay input is enabled (i.e., another window isn't open).
-				/// </summary>
-				private void OpenNameMenu()
-				{
-					IInput input = ServiceLocator.Get<IInput>();
-					if (!input.IsInputEnabled(InputLevel.Gameplay))
-						return;
-
-					mOpenNameMenu = false;
-					EventManager.Notify(() => EventManager.LocalGUI.RequestNameChange(mLocalPlayerRef));
 				}
 
 				/// <summary>
@@ -235,21 +226,22 @@ namespace FiringSquad.Core.State
 				/// <inheritdoc />
 				public override void OnEnter()
 				{
-					EventManager.Notify(() => EventManager.LocalGUI.TogglePauseMenu(true));
+					ServiceLocator.Get<IUIManager>().PushNewPanel(ScreenPanelTypes.Pause);
 
-					IInput input = ServiceLocator.Get<IInput>();
+					/*IInput input = ServiceLocator.Get<IInput>();
 					mOriginalGameplayState = input.IsInputEnabled(InputLevel.Gameplay);
 					input.DisableInputLevel(InputLevel.Gameplay)
-						.DisableInputLevel(InputLevel.HideCursor);
+						.DisableInputLevel(InputLevel.HideCursor);*/
 				}
 
 				/// <inheritdoc />
 				public override void OnExit()
 				{
-					EventManager.Notify(() => EventManager.LocalGUI.TogglePauseMenu(false));
+					/*EventManager.Notify(() => EventManager.LocalGUI.TogglePauseMenu(false));
 					ServiceLocator.Get<IInput>()
 						.SetInputLevelState(InputLevel.Gameplay, mOriginalGameplayState)
-						.SetInputLevelState(InputLevel.HideCursor, mOriginalGameplayState);
+						.SetInputLevelState(InputLevel.HideCursor, mOriginalGameplayState);*/
+					ServiceLocator.Get<IUIManager>().PopPanel(ScreenPanelTypes.Pause);
 				}
 
 				/// <inheritdoc />

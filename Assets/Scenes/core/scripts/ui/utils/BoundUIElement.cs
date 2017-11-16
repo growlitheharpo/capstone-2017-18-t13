@@ -16,7 +16,7 @@ namespace FiringSquad.Gameplay.UI
 		[SerializeField] private string mBoundProperty;
 
 		/// Private variables
-		private IGameplayUIManager mUIManagerRef;
+		private IUIManager mUIManagerRef;
 		private BoundProperty<T> mProperty;
 		private int mPropertyHash;
 		private bool mSearching;
@@ -42,7 +42,7 @@ namespace FiringSquad.Gameplay.UI
 		/// </summary>
 		protected virtual void Start()
 		{
-			mUIManagerRef = ServiceLocator.Get<IGameplayUIManager>();
+			mUIManagerRef = ServiceLocator.Get<IUIManager>();
 			StartCoroutine(CheckForProperty());
 		}
 

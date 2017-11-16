@@ -32,8 +32,8 @@ namespace FiringSquad.Core
 				return new NullAudioManager() as T;
 			if (typeof(T) == typeof(IGamestateManager))
 				return new NullGamestateManager() as T;
-			if (typeof(T) == typeof(IGameplayUIManager))
-				return new NullGameplayUIManager() as T;
+			if (typeof(T) == typeof(IUIManager))
+				return new NullUIManager() as T;
 			if (typeof(T) == typeof(IWeaponPartManager))
 				return new NullWeaponPartManager() as T;
 
@@ -292,7 +292,7 @@ namespace FiringSquad.Core
 		}
 
 		/// <inheritdoc />
-		private class NullGameplayUIManager : IGameplayUIManager
+		private class NullUIManager : IUIManager
 		{
 			/// <inheritdoc />
 			public BoundProperty<T> GetProperty<T>(int hash)
@@ -311,6 +311,36 @@ namespace FiringSquad.Core
 			public void UnbindProperty(BoundProperty prop)
 			{
 				Logger.Info("NULL SERVICE: NullGameplayUIManager.UnbindProperty()", Logger.System.Services);
+			}
+
+			/// <inheritdoc />
+			public IScreenPanel PushNewPanel(ScreenPanelTypes type)
+			{
+				return null;
+			}
+
+			/// <inheritdoc />
+			public IUIManager PopPanel(ScreenPanelTypes type)
+			{
+				return this;
+			}
+
+			/// <inheritdoc />
+			public IScreenPanel TogglePanel(ScreenPanelTypes type)
+			{
+				return null;
+			}
+
+			/// <inheritdoc />
+			public IUIManager RegisterPanel(IScreenPanel panelObject, ScreenPanelTypes type)
+			{
+				return this;
+			}
+
+			/// <inheritdoc />
+			public IUIManager UnregisterPanel(IScreenPanel panelObject)
+			{
+				return this;
 			}
 		}
 	}

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using FiringSquad.Core;
 using FiringSquad.Core.Audio;
 using FiringSquad.Core.UI;
@@ -165,8 +164,8 @@ namespace FiringSquad.Gameplay.Weapons
 		/// <inheritdoc />
 		public void BindPropertiesToUI()
 		{
-			mShotsInClip = new BoundProperty<int>(mShotsInClip == null ? 0 : mShotsInClip.value, GameplayUIManager.CLIP_CURRENT);
-			mTotalClipSize = new BoundProperty<int>(mTotalClipSize == null ? 0 : mTotalClipSize.value, GameplayUIManager.CLIP_TOTAL);
+			mShotsInClip = new BoundProperty<int>(mShotsInClip == null ? 0 : mShotsInClip.value, UIManager.CLIP_CURRENT);
+			mTotalClipSize = new BoundProperty<int>(mTotalClipSize == null ? 0 : mTotalClipSize.value, UIManager.CLIP_TOTAL);
 		}
 
 		/// <summary>

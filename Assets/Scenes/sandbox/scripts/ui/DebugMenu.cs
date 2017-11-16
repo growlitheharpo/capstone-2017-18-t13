@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using FiringSquad.Core;
 using FiringSquad.Core.Input;
+using FiringSquad.Core.UI;
 using FiringSquad.Core.Weapons;
 using FiringSquad.Gameplay;
 using FiringSquad.Gameplay.Weapons;
@@ -12,16 +13,13 @@ namespace FiringSquad.Debug
 	/// <summary>
 	/// The debug menu that displays all weapon parts.
 	/// </summary>
-	public class DebugMenu : MonoBehaviour
+	public class DebugMenu : MonoBehaviour, IScreenPanel
 	{
 		/// Inspector variables
 		[SerializeField] private WeaponPartScript[] mMechanisms;
 		[SerializeField] private WeaponPartScript[] mBarrels;
 		[SerializeField] private WeaponPartScript[] mScopes;
 		[SerializeField] private WeaponPartScript[] mGrips;
-
-		/// Private variables
-		private bool mActive;
 
 		/// <summary>
 		/// Update our WeaponList from the service.
@@ -44,6 +42,9 @@ namespace FiringSquad.Debug
 			RefreshWeaponList();
 			ServiceLocator.Get<IInput>()
 				.RegisterInput(Input.GetKeyDown, KeyCode.Tab, ToggleUI, InputLevel.None);
+
+			ServiceLocator.Get<IUIManager>()
+				.RegisterPanel(this, ScreenPanelTypes.DebugMenu);
 		}
 
 		/// <summary>
@@ -53,6 +54,9 @@ namespace FiringSquad.Debug
 		{
 			ServiceLocator.Get<IInput>()
 				.UnregisterInput(ToggleUI);
+
+			ServiceLocator.Get<IUIManager>()
+				.UnregisterPanel(this);
 		}
 
 		/// <summary>
@@ -60,10 +64,8 @@ namespace FiringSquad.Debug
 		/// </summary>
 		private void ToggleUI()
 		{
-			mActive = !mActive;
-			ServiceLocator.Get<IInput>()
-				.SetInputLevelState(InputLevel.Gameplay, !mActive)
-				.SetInputLevelState(InputLevel.HideCursor, !mActive);
+			ServiceLocator.Get<IUIManager>()
+				.TogglePanel(ScreenPanelTypes.DebugMenu);
 		}
 
 		/// <summary>
@@ -71,9 +73,6 @@ namespace FiringSquad.Debug
 		/// </summary>
 		private void OnGUI()
 		{
-			if (!mActive)
-				return;
-
 			float columnWidth = Screen.width / 4.0f;
 
 			Rect mechRect = new Rect(0.0f, 0.0f, columnWidth, Screen.height);
