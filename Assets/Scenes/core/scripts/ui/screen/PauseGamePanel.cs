@@ -1,5 +1,6 @@
 ﻿using FiringSquad.Core;
 using FiringSquad.Core.State;
+using FiringSquad.Core.UI;
 using FiringSquad.Data;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -9,7 +10,7 @@ namespace FiringSquad.Gameplay.UI
 	/// <summary>
 	/// UI class to manage the pause panel.
 	/// </summary>
-	public class PauseGamePanel : MonoBehaviour
+	public class PauseGamePanel : MonoBehaviour, IScreenPanel
 	{
 		/// Inspector variables
 		[SerializeField] private float mDefaultFieldOfView;
@@ -33,7 +34,7 @@ namespace FiringSquad.Gameplay.UI
 		/// <summary>
 		/// Unity's Awake function
 		/// </summary>
-		private void Awake()
+		private void Start()
 		{
 			mData = OptionsData.GetInstance();
 
@@ -46,10 +47,10 @@ namespace FiringSquad.Gameplay.UI
 			mVolumeProvider.OnValueChange += HandleValueChange;
 
 			EventManager.Local.OnApplyOptionsData += OnApplyOptionsData;
-			EventManager.LocalGUI.OnTogglePauseMenu += OnTogglePauseMenu;
 
 			mConfirmationPanel.SetActive(false);
-			gameObject.SetActive(false);
+			ServiceLocator.Get<IUIManager>()
+				.RegisterPanel(this, ScreenPanelTypes.Pause);
 		}
 
 		/// <summary>
@@ -64,19 +65,17 @@ namespace FiringSquad.Gameplay.UI
 			mFieldOfViewProvider.OnValueChange -= HandleValueChange;
 
 			EventManager.Local.OnApplyOptionsData -= OnApplyOptionsData;
-			EventManager.LocalGUI.OnTogglePauseMenu -= OnTogglePauseMenu;
+
+			ServiceLocator.Get<IUIManager>()
+				.UnregisterPanel(this);
 		}
 
 		/// <summary>
-		/// EVENT HANDLER: Local.OnTogglePauseMenu
+		/// Unity's OnDisable function.
 		/// </summary>
-		private void OnTogglePauseMenu(bool show)
+		private void OnDisable()
 		{
-			mConfirmationPanel.SetActive(false);
-			gameObject.SetActive(show);
-
-			if (!show)
-				ApplySettings();
+			ApplySettings();
 		}
 
 		/// <summary>

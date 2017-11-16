@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using FiringSquad.Core;
 using FiringSquad.Core.Input;
+using FiringSquad.Core.UI;
 using UnityEngine;
 using Input = UnityEngine.Input;
 
@@ -27,7 +28,6 @@ namespace FiringSquad.Debug
 		private Queue<LogEntryHolder> mEntries;
 
 		private Action<string[]> mEntryHandler;
-		private bool mViewEnabled;
 		private Vector2 mViewScrollPosition;
 
 		/// <summary>
@@ -46,6 +46,9 @@ namespace FiringSquad.Debug
 		{
 			ServiceLocator.Get<IInput>()
 				.RegisterInput(Input.GetKeyDown, CONSOLE_TOGGLE, INPUT_ToggleConsole, InputLevel.None);
+
+			ServiceLocator.Get<IUIManager>()
+				.RegisterPanel(this, ScreenPanelTypes.Console);
 		}
 
 		/// <summary>
@@ -53,7 +56,7 @@ namespace FiringSquad.Debug
 		/// </summary>
 		private void INPUT_ToggleConsole()
 		{
-			ToggleConsole();
+			ServiceLocator.Get<IUIManager>().TogglePanel(ScreenPanelTypes.Console);
 		}
 
 		/// <inheritdoc />
@@ -87,16 +90,12 @@ namespace FiringSquad.Debug
 		{
 			mEntryHandler = handler;
 		}
-
-		/// <inheritdoc />
-		public override void ToggleConsole()
+		
+		/// <summary>
+		/// Unity's OnEnable function.
+		/// </summary>
+		private void OnEnable()
 		{
-			mViewEnabled = !mViewEnabled;
-			IInput input = ServiceLocator.Get<IInput>();
-			input.SetInputLevelState(InputLevel.DevConsole, mViewEnabled);
-			input.SetInputLevelState(InputLevel.Gameplay, !mViewEnabled);
-			input.SetInputLevelState(InputLevel.HideCursor, !mViewEnabled);
-
 			ForceScrollToBottom();
 		}
 
@@ -123,9 +122,6 @@ namespace FiringSquad.Debug
 		/// </summary>
 		private void OnGUI()
 		{
-			if (!mViewEnabled)
-				return;
-
 			float baseX = Screen.width, baseY = Screen.height;
 			lock (mEntries)
 				DrawLogs(baseX, baseY);
@@ -187,7 +183,7 @@ namespace FiringSquad.Debug
 				if (Event.current.keyCode == KeyCode.Return)
 					SendCommand();
 				else if (Event.current.keyCode == CONSOLE_TOGGLE)
-					ToggleConsole();
+					ServiceLocator.Get<IUIManager>().PopPanel(ScreenPanelTypes.Console);
 			}
 
 			Rect entryRect = new Rect(10.0f, baseY * 0.95f, baseX - 20.0f, baseY * 0.045f);

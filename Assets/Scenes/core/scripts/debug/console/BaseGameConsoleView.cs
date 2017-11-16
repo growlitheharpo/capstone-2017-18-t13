@@ -1,4 +1,5 @@
 ﻿using System;
+using FiringSquad.Core.UI;
 using UnityEngine;
 
 namespace FiringSquad.Debug
@@ -7,7 +8,7 @@ namespace FiringSquad.Debug
 	/// A base class for a console view. Allows switching the console between
 	/// modern Unity UI and immediate mode UI for instance.
 	/// </summary>
-	public abstract class BaseGameConsoleView : MonoBehaviour
+	public abstract class BaseGameConsoleView : MonoBehaviour, IScreenPanel
 	{
 		/// <summary>
 		/// Clear all of the saved logs.
@@ -25,10 +26,5 @@ namespace FiringSquad.Debug
 		/// Register a handler for commands being entered into this console.
 		/// </summary>
 		public abstract void RegisterCommandHandler(Action<string[]> handler);
-
-		/// <summary>
-		/// Enable/disable this console.
-		/// </summary>
-		public abstract void ToggleConsole();
 	}
 }

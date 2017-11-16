@@ -1,5 +1,5 @@
 ﻿using FiringSquad.Core;
-using FiringSquad.Core.Input;
+using FiringSquad.Core.UI;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -8,7 +8,7 @@ namespace FiringSquad.Gameplay.UI
 	/// <summary>
 	/// UI class to manage the player's name customization panel.
 	/// </summary>
-	public class PlayerNameCustomizationPanel : MonoBehaviour
+	public class PlayerNameCustomizationPanel : MonoBehaviour, IScreenPanel
 	{
 		/// Inspector variables
 		[SerializeField] private InputField mInputField;
@@ -18,14 +18,14 @@ namespace FiringSquad.Gameplay.UI
 		private CltPlayer mPlayerRef;
 
 		/// <summary>
-		/// Unity's Awake function.
+		/// Unity's Start function.
 		/// </summary>
-		private void Awake()
+		private void Start()
 		{
 			mConfirmButton.OnClick += ConfirmName;
-			EventManager.LocalGUI.OnRequestNameChange += OnRequestNameChange;
-
-			gameObject.SetActive(false);
+			
+			ServiceLocator.Get<IUIManager>()
+				.RegisterPanel(this, ScreenPanelTypes.PlayerNameEntry);
 		}
 
 		/// <summary>
@@ -34,22 +34,18 @@ namespace FiringSquad.Gameplay.UI
 		private void OnDestroy()
 		{
 			mConfirmButton.OnClick -= ConfirmName;
-			EventManager.LocalGUI.OnRequestNameChange -= OnRequestNameChange;
+
+			ServiceLocator.Get<IUIManager>()
+				.UnregisterPanel(this);
 		}
 
 		/// <summary>
-		/// EVENT HANDLER: LocalGUI.OnRequestNameChange
-		/// Show the panel and disable input.
+		/// Set the player that this panel will change.
 		/// </summary>
-		private void OnRequestNameChange(CltPlayer obj)
+		/// <param name="obj"></param>
+		public void SetPlayer(CltPlayer obj)
 		{
 			mPlayerRef = obj;
-			gameObject.SetActive(true);
-
-			ServiceLocator.Get<IInput>()
-				.DisableInputLevel(InputLevel.Gameplay)
-				.DisableInputLevel(InputLevel.HideCursor)
-				.DisableInputLevel(InputLevel.PauseMenu);
 		}
 
 		/// <summary>
@@ -58,13 +54,8 @@ namespace FiringSquad.Gameplay.UI
 		/// </summary>
 		private void ConfirmName()
 		{
-			ServiceLocator.Get<IInput>()
-				.EnableInputLevel(InputLevel.Gameplay)
-				.EnableInputLevel(InputLevel.HideCursor)
-				.EnableInputLevel(InputLevel.PauseMenu);
-
-			UnityEngine.Debug.Log("Name: " + mInputField.text);
 			mPlayerRef.CmdSetPlayerName(mInputField.text);
+			ServiceLocator.Get<IUIManager>().PopPanel(ScreenPanelTypes.PlayerNameEntry);
 			Destroy(gameObject);
 		}
 	}

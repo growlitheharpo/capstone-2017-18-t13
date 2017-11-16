@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using FiringSquad.Core;
 using FiringSquad.Core.State;
+using FiringSquad.Core.UI;
 using FiringSquad.Data;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -11,7 +12,7 @@ namespace FiringSquad.Gameplay.UI
 	/// <summary>
 	/// UI class to manage the gameover panel.
 	/// </summary>
-	public class GameOverPanel : MonoBehaviour
+	public class GameOverPanel : MonoBehaviour, IScreenPanel
 	{
 		/// Inspector variables
 		[SerializeField] private GameObject mScorePrefab;
@@ -23,10 +24,10 @@ namespace FiringSquad.Gameplay.UI
 		/// </summary>
 		private void Start()
 		{
-			EventManager.LocalGUI.OnShowGameoverPanel += OnShowGameoverPanel;
 			mQuitButton.OnClick += HandleQuit;
 
-			gameObject.SetActive(false);
+			ServiceLocator.Get<IUIManager>()
+				.RegisterPanel(this, ScreenPanelTypes.GameOver);
 		}
 
 		/// <summary>
@@ -34,14 +35,17 @@ namespace FiringSquad.Gameplay.UI
 		/// </summary>
 		private void OnDestroy()
 		{
-			EventManager.LocalGUI.OnShowGameoverPanel -= OnShowGameoverPanel;
 			mQuitButton.OnClick -= HandleQuit;
+
+			ServiceLocator.Get<IUIManager>()
+				.UnregisterPanel(this);
 		}
 
 		/// <summary>
-		/// EVENT HANDLER: LocalGUI.OnShowGameoverPanel
+		/// Set the scores displayed on the UI panel.
 		/// </summary>
-		private void OnShowGameoverPanel(PlayerScore[] scores)
+		/// <param name="scores">The array of scores that will be displayed.</param>
+		public void SetDisplayScores(PlayerScore[] scores)
 		{
 			NetworkInstanceId localPlayerId = FindObjectsOfType<CltPlayer>().First(x => x.isCurrentPlayer).netId;
 
