@@ -252,36 +252,6 @@ public partial class EventManager
 	public static class LocalGUI
 	{
 		/// <summary>
-		/// Event called to toggle the GUI pause menu element.
-		/// PARAMETER 1: Whether to enable (true) or disable (false) the panel.
-		/// </summary>
-		public static event Action<bool> OnTogglePauseMenu = b => { LogEvent(); };
-
-		/// <summary>
-		/// Event called to toggle the GUI pause menu element.
-		/// </summary>
-		/// <param name="visible">Whether to enable (true) or disable (false) the panel.</param>
-		public static void TogglePauseMenu(bool visible)
-		{
-			OnTogglePauseMenu(visible);
-		}
-
-		/// <summary>
-		/// Event called to toggle the GUI gameover element.
-		/// PARAMETER 1: The array of player scores provided by the server.
-		/// </summary>
-		public static event Action<PlayerScore[]> OnShowGameoverPanel = s => { LogEvent(); };
-
-		/// <summary>
-		/// Event called to toggle the GUI gameover element.
-		/// </summary>
-		/// <param name="scores">The array of player scores provided by the server.</param>
-		public static void ShowGameoverPanel(PlayerScore[] scores)
-		{
-			OnShowGameoverPanel(scores);
-		}
-
-		/// <summary>
 		/// Event called to push a UI hint onto the hint stack.
 		/// PARAMETER 1: Which hint to push.
 		/// PARAMETER 2: Whether to push or pop the given state.
@@ -296,21 +266,6 @@ public partial class EventManager
 		public static void SetHintState(CrosshairHintText.Hint hint, bool state)
 		{
 			OnSetHintState(hint, state);
-		}
-
-		/// <summary>
-		/// Event called to toggle the GUI name change element.
-		/// PARAMETER 1: The player whose name will be changed.
-		/// </summary>
-		public static event Action<CltPlayer> OnRequestNameChange = p => { LogEvent(); };
-
-		/// <summary>
-		/// Event called to toggle the GUI name change element.
-		/// </summary>
-		/// <param name="localPlayer">The player whose name will be changed.</param>
-		public static void RequestNameChange(CltPlayer localPlayer)
-		{
-			OnRequestNameChange(localPlayer);
 		}
 	}
 
