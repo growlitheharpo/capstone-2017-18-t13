@@ -312,6 +312,36 @@ namespace FiringSquad.Core
 			{
 				Logger.Info("NULL SERVICE: NullGameplayUIManager.UnbindProperty()", Logger.System.Services);
 			}
+
+			/// <inheritdoc />
+			public IScreenPanel PushNewPanel(ScreenPanelTypes type)
+			{
+				return null;
+			}
+
+			/// <inheritdoc />
+			public IUIManager PopPanel(ScreenPanelTypes type)
+			{
+				return this;
+			}
+
+			/// <inheritdoc />
+			public IScreenPanel TogglePanel(ScreenPanelTypes type)
+			{
+				return null;
+			}
+
+			/// <inheritdoc />
+			public IUIManager RegisterPanel(IScreenPanel panelObject, ScreenPanelTypes type)
+			{
+				return this;
+			}
+
+			/// <inheritdoc />
+			public IUIManager UnregisterPanel(IScreenPanel panelObject)
+			{
+				return this;
+			}
 		}
 	}
 }

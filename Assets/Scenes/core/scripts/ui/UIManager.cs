@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using FiringSquad.Core.Input;
+using KeatsLib.Collections;
+using UnityEngine;
 
 namespace FiringSquad.Core.UI
 {
@@ -18,6 +21,9 @@ namespace FiringSquad.Core.UI
 
 		/// Private variables
 		private Dictionary<int, WeakReference> mPropertyMap;
+		private Dictionary<ScreenPanelTypes, IScreenPanel> mPanelTypeToObjectMap;
+		private Dictionary<IScreenPanel, ScreenPanelTypes> mPanelObjectToTypeMap;
+		private UniqueStack<GameObject> mActivePanels;
 
 		/// <summary>
 		/// Unity's Awake function
@@ -26,7 +32,12 @@ namespace FiringSquad.Core.UI
 		{
 			base.Awake();
 			mPropertyMap = new Dictionary<int, WeakReference>();
+			mPanelObjectToTypeMap = new Dictionary<IScreenPanel, ScreenPanelTypes>();
+			mPanelTypeToObjectMap = new Dictionary<ScreenPanelTypes, IScreenPanel>();
+			mActivePanels = new UniqueStack<GameObject>();
 		}
+
+		#region Bound Properties
 
 		/// <inheritdoc />
 		public BoundProperty<T> GetProperty<T>(int hash)
@@ -59,5 +70,93 @@ namespace FiringSquad.Core.UI
 			foreach (int key in keys)
 				mPropertyMap.Remove(key);
 		}
+
+		#endregion
+
+		#region Panel Stack Management
+
+		/// <inheritdoc />
+		public IScreenPanel PushNewPanel(ScreenPanelTypes type)
+		{
+			if (!mPanelTypeToObjectMap.ContainsKey(type))
+				return null;
+
+			IScreenPanel panel = mPanelTypeToObjectMap[type];
+			GameObject go = panel.gameObject;
+			go.SetActive(true);
+
+			ServiceLocator.Get<IInput>()
+				.DisableInputLevel(InputLevel.Gameplay)
+				.DisableInputLevel(InputLevel.HideCursor);
+			
+			mActivePanels.Push(go);
+			go.transform.SetAsLastSibling();
+
+			return panel;
+		}
+
+		/// <inheritdoc />
+		public IUIManager PopPanel(ScreenPanelTypes type)
+		{
+			if (!mPanelTypeToObjectMap.ContainsKey(type))
+				return this;
+
+			IScreenPanel panel = mPanelTypeToObjectMap[type];
+			GameObject go = panel.gameObject;
+			go.SetActive(false);
+			mActivePanels.Remove(go);
+
+			if (mActivePanels.Count == 0)
+			{
+				ServiceLocator.Get<IInput>()
+					.EnableInputLevel(InputLevel.Gameplay)
+					.EnableInputLevel(InputLevel.HideCursor);
+			}
+
+			return this;
+		}
+
+		public IScreenPanel TogglePanel(ScreenPanelTypes type)
+		{
+			if (!mPanelTypeToObjectMap.ContainsKey(type))
+				return null;
+
+			IScreenPanel panel = mPanelTypeToObjectMap[type];
+			if (!mActivePanels.Contains(panel.gameObject))
+				return PushNewPanel(type);
+
+			PopPanel(type);
+			return panel;
+		}
+
+		/// <inheritdoc />
+		public IUIManager RegisterPanel(IScreenPanel panelObject, ScreenPanelTypes type)
+		{
+			if (mPanelTypeToObjectMap.ContainsKey(type) || mPanelObjectToTypeMap.ContainsKey(panelObject))
+				throw new ArgumentException("Registering a panel for more than one type, or more than one panel for a type!");
+
+			mPanelObjectToTypeMap[panelObject] = type;
+			mPanelTypeToObjectMap[type] = panelObject;
+
+			panelObject.gameObject.SetActive(false);
+
+			return this;
+		}
+
+		/// <inheritdoc />
+		public IUIManager UnregisterPanel(IScreenPanel panelObject)
+		{
+			if (!mPanelObjectToTypeMap.ContainsKey(panelObject))
+				return this;
+
+			ScreenPanelTypes type = mPanelObjectToTypeMap[panelObject];
+
+			mPanelObjectToTypeMap.Remove(panelObject);
+			mPanelTypeToObjectMap.Remove(type);
+
+			return this;
+		}
+
+		#endregion
 	}
 }

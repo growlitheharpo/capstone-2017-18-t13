@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
 
 // ReSharper disable InconsistentNaming
 // Disabled because this class is meant to match the Stack interface 1-to-1
@@ -95,6 +96,16 @@ namespace KeatsLib.Collections
 			T obj = Peek();
 			mItems.RemoveAt(Count - 1);
 			return obj;
+		}
+
+		/// <summary>
+		/// Remove an arbitrary item from the stack.
+		/// </summary>
+		/// <param name="item">The item to be removed.</param>
+		/// <returns>True if the item existed, false if not.</returns>
+		public bool Remove(T item)
+		{
+			return mItems.Remove(item);
 		}
 
 		/// <summary>
