@@ -57,7 +57,7 @@ namespace FiringSquad.Core
 			foreach (Delegate d in delegates)
 				ValueChanged -= (Action)d;
 
-			ServiceLocator.Get<IGameplayUIManager>()
+			ServiceLocator.Get<IUIManager>()
 				.UnbindProperty(this);
 		}
 	}
@@ -113,7 +113,7 @@ namespace FiringSquad.Core
 		public BoundProperty(T value, int property)
 		{
 			this.value = value;
-			ServiceLocator.Get<IGameplayUIManager>()
+			ServiceLocator.Get<IUIManager>()
 				.BindProperty(property, this);
 		}
 	}

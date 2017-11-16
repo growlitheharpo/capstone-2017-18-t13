@@ -157,7 +157,7 @@ namespace FiringSquad.Core.State
 					mRoundEndTime = time;
 
 					if (mRemainingTime == null)
-						mRemainingTime = new BoundProperty<float>(CalculateRemainingTime(), GameplayUIManager.ARENA_ROUND_TIME);
+						mRemainingTime = new BoundProperty<float>(CalculateRemainingTime(), UIManager.ARENA_ROUND_TIME);
 					else
 						mRemainingTime.value = CalculateRemainingTime();
 				}

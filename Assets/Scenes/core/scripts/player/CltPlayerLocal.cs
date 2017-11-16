@@ -62,7 +62,7 @@ namespace FiringSquad.Gameplay
 
 			SetupCamera();
 
-			mRespawnTimer = new BoundProperty<float>(0, GameplayUIManager.PLAYER_RESPAWN_TIME);
+			mRespawnTimer = new BoundProperty<float>(0, UIManager.PLAYER_RESPAWN_TIME);
 
 			EventManager.Local.OnApplyOptionsData += OnApplyOptionsData;
 			EventManager.Local.OnLocalPlayerDied += OnLocalPlayerDied;

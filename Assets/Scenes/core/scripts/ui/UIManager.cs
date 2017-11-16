@@ -4,8 +4,8 @@ using System.Linq;
 
 namespace FiringSquad.Core.UI
 {
-	/// <inheritdoc cref="IGameplayUIManager" />
-	public class GameplayUIManager : MonoSingleton<GameplayUIManager>, IGameplayUIManager
+	/// <inheritdoc cref="IUIManager" />
+	public class UIManager : MonoSingleton<UIManager>, IUIManager
 	{
 		public static readonly int CLIP_CURRENT = "player_clip_current".GetHashCode();
 		public static readonly int CLIP_TOTAL = "player_clip_total".GetHashCode();

@@ -6,7 +6,7 @@ namespace FiringSquad.Core.UI
 	/// The public interface for the gameplay UI manager.
 	/// Utilized for binding properties to UI elements.
 	/// </summary>
-	public interface IGameplayUIManager : IGlobalService
+	public interface IUIManager : IGlobalService
 	{
 		/// <summary>
 		/// Get the property associated with a particular hash.

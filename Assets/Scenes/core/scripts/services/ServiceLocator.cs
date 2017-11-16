@@ -33,7 +33,7 @@ namespace FiringSquad.Core
 				{ typeof(IGameConsole), TryFind<IGameConsole>(GameConsole.instance) },
 				{ typeof(IAudioManager), TryFind<IAudioManager>(AudioManager.instance) },
 				{ typeof(IGamestateManager), TryFind<IGamestateManager>(GamestateManager.instance) },
-				{ typeof(IGameplayUIManager), TryFind<IGameplayUIManager>(GameplayUIManager.instance) },
+				{ typeof(IUIManager), TryFind<IUIManager>(UIManager.instance) },
 				{ typeof(IWeaponPartManager), TryFind<IWeaponPartManager>(WeaponPartManager.instance) },
 			};
 		}

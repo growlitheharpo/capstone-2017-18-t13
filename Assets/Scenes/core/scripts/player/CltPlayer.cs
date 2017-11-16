@@ -152,9 +152,9 @@ namespace FiringSquad.Gameplay
 			mLocalPlayerScript.playerRoot = this;
 
 			// Bind the UI properties that we need.
-			mLocalHealthVar = new BoundProperty<float>(mInformation.defaultHealth, GameplayUIManager.PLAYER_HEALTH);
-			mLocalKillsVar = new BoundProperty<int>(0, GameplayUIManager.PLAYER_KILLS);
-			mLocalDeathsVar = new BoundProperty<int>(0, GameplayUIManager.PLAYER_DEATHS);
+			mLocalHealthVar = new BoundProperty<float>(mInformation.defaultHealth, UIManager.PLAYER_HEALTH);
+			mLocalKillsVar = new BoundProperty<int>(0, UIManager.PLAYER_KILLS);
+			mLocalDeathsVar = new BoundProperty<int>(0, UIManager.PLAYER_DEATHS);
 			StartCoroutine(GrabLocalHitIndicator());
 
 			// Disable the renderers for the local player.

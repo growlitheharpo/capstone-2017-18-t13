@@ -32,8 +32,8 @@ namespace FiringSquad.Core
 				return new NullAudioManager() as T;
 			if (typeof(T) == typeof(IGamestateManager))
 				return new NullGamestateManager() as T;
-			if (typeof(T) == typeof(IGameplayUIManager))
-				return new NullGameplayUIManager() as T;
+			if (typeof(T) == typeof(IUIManager))
+				return new NullUIManager() as T;
 			if (typeof(T) == typeof(IWeaponPartManager))
 				return new NullWeaponPartManager() as T;
 
@@ -292,7 +292,7 @@ namespace FiringSquad.Core
 		}
 
 		/// <inheritdoc />
-		private class NullGameplayUIManager : IGameplayUIManager
+		private class NullUIManager : IUIManager
 		{
 			/// <inheritdoc />
 			public BoundProperty<T> GetProperty<T>(int hash)
