@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using KeatsLib.Collections;
+using UnityEngine;
 using UIImage = UnityEngine.UI.Image;
 
 namespace FiringSquad.Gameplay.UI
@@ -67,7 +68,7 @@ namespace FiringSquad.Gameplay.UI
 		/// </summary>
 		private void MoveAndFaceTarget()
 		{
-			Vector3 targetPos = mTarget.transform.position;
+			Vector3 targetPos = mTarget.transform.position + Vector3.up * 3.0f;
 			Vector3 cameraForward = Camera.main.transform.forward;
 			Vector2 viewportPos = Camera.main.WorldToViewportPoint(targetPos);
 
@@ -109,6 +110,8 @@ namespace FiringSquad.Gameplay.UI
 		/// <param name="worldPos">The position of the target in world space.</param>
 		private void UpdateOnScreen(Vector2 viewportPos, Vector3 worldPos)
 		{
+			viewportPos.x = viewportPos.x.Rescale(0.1f, 0.9f);
+			viewportPos.y = viewportPos.y.Rescale(0.1f, 0.9f);
 			mRealTransform.anchorMin = new Vector2(viewportPos.x, viewportPos.y);
 			mRealTransform.anchorMax = new Vector2(viewportPos.x, viewportPos.y);
 			mRealTransform.localRotation = Quaternion.identity;
