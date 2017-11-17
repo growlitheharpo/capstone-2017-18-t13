@@ -16,14 +16,12 @@ namespace FiringSquad.Gameplay.UI
 
 		/// Private variables
 		private Transform mLocalPlayerRef;
-		private float mMaxAlpha;
 
 		/// <summary>
 		/// Unity's Awake function
 		/// </summary>
 		private void Awake()
 		{
-			mMaxAlpha = 1.0f;
 			StartCoroutine(GrabPlayerReference());
 		}
 
@@ -67,7 +65,7 @@ namespace FiringSquad.Gameplay.UI
 			float dot = Vector3.Dot(direction.normalized, mLocalPlayerRef.forward);
 			dot = (Mathf.Pow(dot, 10.0f) - 0.6f) * 2.5f;
 
-			mCanvasGroup.alpha = dot * mMaxAlpha;*/
+			mCanvasGroup.alpha = dot;*/
 		}
 
 		/// <summary>

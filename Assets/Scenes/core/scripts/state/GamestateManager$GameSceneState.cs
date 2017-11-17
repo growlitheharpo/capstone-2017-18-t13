@@ -117,7 +117,6 @@ namespace FiringSquad.Core.State
 				public InGameState(GameSceneState machine) : base(machine) { }
 
 				/// Private variables
-				private CltPlayer mLocalPlayerRef;
 				private long mRoundEndTime;
 				private BoundProperty<float> mRemainingTime;
 
@@ -144,7 +143,6 @@ namespace FiringSquad.Core.State
 				private void OnReceiveLobbyEndTime(CltPlayer player, long time)
 				{
 					OnReceiveStartEvent(time);
-					mLocalPlayerRef = player;
 
 					IScreenPanel panel = ServiceLocator.Get<IUIManager>()
 						.PushNewPanel(ScreenPanelTypes.PlayerNameEntry);
