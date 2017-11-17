@@ -227,5 +227,16 @@ namespace UnityEditor
 			GUILayout.Space(size);
 			GUILayout.EndVertical();
 		}
+
+		/// <summary>
+		/// Get the string value of an enum in a serialized property.
+		/// </summary>
+		/// <param name="property">The property (an enum) to get the string value of.</param>
+		public static string GetEnumPropertyString(SerializedProperty property)
+		{
+			int index = property.enumValueIndex;
+			var names = property.enumNames;
+			return names[index];
+		}
 	}
 }
