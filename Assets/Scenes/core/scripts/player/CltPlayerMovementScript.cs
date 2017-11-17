@@ -398,6 +398,8 @@ namespace FiringSquad.Gameplay
 		/// <param name="time">The length of time (in seconds) to lerp over.</param>
 		private IEnumerator ZoomCameraFov(float newFov, float time)
 		{
+			mRealCameraRef = mRealCameraRef ?? Camera.main; //TODO: Find a solution to this, don't hardcode the main camera. mPlayer.eye.GetComponentInChildren<Camera>();
+
 			float currentTime = 0.0f;
 			float startFov = mRealCameraRef.fieldOfView;
 

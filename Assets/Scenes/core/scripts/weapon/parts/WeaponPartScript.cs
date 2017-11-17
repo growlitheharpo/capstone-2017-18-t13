@@ -16,10 +16,11 @@ namespace FiringSquad.Gameplay.Weapons
 		public const int USE_DEFAULT_DURABILITY = -2;
 
 		/// Inspector variables
-		[SerializeField] private Sprite mDurabilitySprite;
-		[SerializeField] private WeaponPartData mData;
-		[SerializeField] private string mDescription;
+		[SerializeField] private byte mUniqueId;
 		[SerializeField] private string mPrettyName;
+		[SerializeField] private string mDescription;
+		[SerializeField] private WeaponPartData mData;
+		[SerializeField] private Sprite mDurabilitySprite;
 		[SerializeField] private int mDurability = INFINITE_DURABILITY;
 
 		/// Private variables
@@ -40,6 +41,11 @@ namespace FiringSquad.Gameplay.Weapons
 		/// The UI sprite used to represent this part in the durability HUD.
 		/// </summary>
 		public Sprite durabilitySprite { get { return mDurabilitySprite; } }
+
+		/// <summary>
+		/// The unique part ID of this weapon part.
+		/// </summary>
+		public byte partId { get { return mUniqueId; } }
 
 		/// <summary>
 		/// A short text description of this part. Used for UI.
@@ -71,18 +77,6 @@ namespace FiringSquad.Gameplay.Weapons
 			}
 		}
 
-		/// <summary>
-		/// The unique part ID of this weapon part.
-		/// </summary>
-		public string partId
-		{
-			get
-			{
-				if (gameObject.name.Contains("(Clone)"))
-					return gameObject.name.Replace("(Clone)", "");
-				return gameObject.name;
-			}
-		}
 
 		/// <summary>
 		/// Cleanup all listeners and event handlers
@@ -152,9 +146,9 @@ namespace FiringSquad.Gameplay.Weapons
 		/// <summary>
 		/// Read a unique ID of a part from the stream.
 		/// </summary>
-		public static string DeserializeId(NetworkReader reader)
+		public static byte DeserializeId(NetworkReader reader)
 		{
-			return reader.ReadString();
+			return reader.ReadByte();
 		}
 
 		/// <summary>

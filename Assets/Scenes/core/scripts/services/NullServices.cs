@@ -44,21 +44,21 @@ namespace FiringSquad.Core
 		public class NullWeaponPartManager : IWeaponPartManager
 		{
 			/// <inheritdoc />
-			public WeaponPartScript GetPrefabScript(string id)
+			public WeaponPartScript GetPrefabScript(byte id)
 			{
 				Logger.Info("NULL SERVICE: NullWeaponPartManager.GetPrefabScript()", Logger.System.Services);
 				return null;
 			}
 
 			/// <inheritdoc />
-			public GameObject GetPartPrefab(string id)
+			public GameObject GetPartPrefab(byte id)
 			{
 				Logger.Info("NULL SERVICE: NullWeaponPartManager.GetPartPrefab()", Logger.System.Services);
 				return null;
 			}
 
 			/// <inheritdoc />
-			public GameObject this[string index]
+			public GameObject this[byte index]
 			{
 				get
 				{
@@ -68,17 +68,17 @@ namespace FiringSquad.Core
 			}
 
 			/// <inheritdoc />
-			public Dictionary<string, GameObject> GetAllPrefabs(bool includeDebug)
+			public Dictionary<byte, GameObject> GetAllPrefabs(bool includeDebug)
 			{
 				Logger.Info("NULL SERVICE: NullWeaponPartManager.GetAllPrefabs()", Logger.System.Services);
-				return new Dictionary<string, GameObject>();
+				return new Dictionary<byte, GameObject>();
 			}
 
 			/// <inheritdoc />
-			public Dictionary<string, WeaponPartScript> GetAllPrefabScripts(bool includeDebug)
+			public Dictionary<byte, WeaponPartScript> GetAllPrefabScripts(bool includeDebug)
 			{
 				Logger.Info("NULL SERVICE: NullWeaponPartManager.GetAllPrefabScripts()", Logger.System.Services);
-				return new Dictionary<string, WeaponPartScript>();
+				return new Dictionary<byte, WeaponPartScript>();
 			}
 		}
 

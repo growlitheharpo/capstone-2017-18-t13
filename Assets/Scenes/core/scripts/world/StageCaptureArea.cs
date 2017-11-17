@@ -239,7 +239,7 @@ namespace FiringSquad.Gameplay
 				return;
 			}
 
-			CltPlayer player = ClientScene.FindLocalObject(id).GetComponent<CltPlayer>();
+			CltPlayer player = ClientScene.FindLocalObject(mCapturingPlayerId).GetComponent<CltPlayer>();
 			kUIManager.SetMode(player.isCurrentPlayer ? StageCaptureUI.Mode.WereCapturing : StageCaptureUI.Mode.OtherCapturing, this);
 		}
 

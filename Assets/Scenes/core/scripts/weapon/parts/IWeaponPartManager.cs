@@ -13,28 +13,28 @@ namespace FiringSquad.Core.Weapons
 		/// <summary>
 		/// Get the (script) prefab based for a particular ID.
 		/// </summary>
-		WeaponPartScript GetPrefabScript(string id);
+		WeaponPartScript GetPrefabScript(byte id);
 
 		/// <summary>
 		/// Get the (gameobject) prefab for a particular ID.
 		/// </summary>
-		GameObject GetPartPrefab(string id);
+		GameObject GetPartPrefab(byte id);
 
 		/// <summary>
 		/// Access the (gameobject) prefab for a particular ID.
 		/// </summary>
-		GameObject this[string index] { get; }
+		GameObject this[byte index] { get; }
 
 		/// <summary>
 		/// Access the entire dictionary of (gameobject) part prefabs.
 		/// </summary>
 		/// <param name="includeDebug">Whether or not to include parts flagged as debug parts.</param>
-		Dictionary<string, GameObject> GetAllPrefabs(bool includeDebug);
+		Dictionary<byte, GameObject> GetAllPrefabs(bool includeDebug);
 
 		/// <summary>
 		/// Access the entire dictionary of (script) part prefabs.
 		/// </summary>
 		/// <param name="includeDebug">Whether or not to include parts flagged as debug parts.</param>
-		Dictionary<string, WeaponPartScript> GetAllPrefabScripts(bool includeDebug);
+		Dictionary<byte, WeaponPartScript> GetAllPrefabScripts(bool includeDebug);
 	}
 }

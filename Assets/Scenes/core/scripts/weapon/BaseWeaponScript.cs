@@ -258,7 +258,7 @@ namespace FiringSquad.Gameplay.Weapons
 
 				for (int i = 0; i < 4; i++)
 				{
-					string id = WeaponPartScript.DeserializeId(reader);
+					byte id = WeaponPartScript.DeserializeId(reader);
 					int durability = WeaponPartScript.DeserializeDurability(reader);
 
 					AttachNewPart(id, durability);
@@ -276,28 +276,28 @@ namespace FiringSquad.Gameplay.Weapons
 
 				if ((flags & DirtyBitFlags.ScopeId) != 0)
 				{
-					string id = WeaponPartScript.DeserializeId(reader);
+					byte id = WeaponPartScript.DeserializeId(reader);
 					int durability = WeaponPartScript.DeserializeDurability(reader);
 
 					AttachNewPart(id, durability);
 				}
 				if ((flags & DirtyBitFlags.BarrelId) != 0)
 				{
-					string id = WeaponPartScript.DeserializeId(reader);
+					byte id = WeaponPartScript.DeserializeId(reader);
 					int durability = WeaponPartScript.DeserializeDurability(reader);
 
 					AttachNewPart(id, durability);
 				}
 				if ((flags & DirtyBitFlags.MechanismId) != 0)
 				{
-					string id = WeaponPartScript.DeserializeId(reader);
+					byte id = WeaponPartScript.DeserializeId(reader);
 					int durability = WeaponPartScript.DeserializeDurability(reader);
 
 					AttachNewPart(id, durability);
 				}
 				if ((flags & DirtyBitFlags.GripId) != 0)
 				{
-					string id = WeaponPartScript.DeserializeId(reader);
+					byte id = WeaponPartScript.DeserializeId(reader);
 					int durability = WeaponPartScript.DeserializeDurability(reader);
 
 					AttachNewPart(id, durability);
@@ -367,9 +367,9 @@ namespace FiringSquad.Gameplay.Weapons
 		}
 
 		/// <inheritdoc />
-		public void AttachNewPart(string partId, int durability = WeaponPartScript.USE_DEFAULT_DURABILITY)
+		public void AttachNewPart(byte partId, int durability = WeaponPartScript.USE_DEFAULT_DURABILITY)
 		{
-			if (string.IsNullOrEmpty(partId))
+			if (partId == 0)
 				return;
 
 			WeaponPartScript prefab = ServiceLocator.Get<IWeaponPartManager>().GetPrefabScript(partId);

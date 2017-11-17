@@ -103,13 +103,14 @@ namespace FiringSquad.Networking
 			public ServerStateMachine(NetworkServerGameManager script)
 			{
 				mScript = script;
-				mStartPositions = GameObject.FindGameObjectsWithTag("matchspawn").Select(x => x.transform).ToArray();
+				mInGameStartPositions = GameObject.FindGameObjectsWithTag("matchspawn").Select(x => x.transform).ToArray();
+				mLobbyStartPositions = FindObjectsOfType<NetworkStartPosition>().Select(x => x.transform).ToArray();
 				TransitionStates(new WaitingForConnectionState(this));
 			}
 
 			// Private shared data
 			private readonly NetworkServerGameManager mScript;
-			private readonly Transform[] mStartPositions;
+			private readonly Transform[] mInGameStartPositions, mLobbyStartPositions;
 			private StageCaptureArea[] mCaptureAreas;
 			private CltPlayer[] mPlayerList;
 			private Dictionary<NetworkInstanceId, PlayerScore> mPlayerScores;
@@ -180,8 +181,8 @@ namespace FiringSquad.Networking
 				/// </summary>
 				private void OnPlayerHealthHitsZero(CltPlayer deadPlayer, IDamageSource source)
 				{
-					NetworkStartPosition localSpawn = FindObjectsOfType<NetworkStartPosition>()
-						.OrderByDescending(x => Vector3.Distance(x.transform.position.normalized, deadPlayer.transform.position))
+					Transform localSpawn = mMachine.mLobbyStartPositions
+						.OrderBy(x => Vector3.Distance(x.transform.position, deadPlayer.transform.position))
 						.FirstOrDefault();
 
 					EventManager.Server.PlayerDied(deadPlayer, null, localSpawn != null ? localSpawn.transform : deadPlayer.transform);
@@ -223,8 +224,8 @@ namespace FiringSquad.Networking
 				/// </summary>
 				private void OnPlayerHealthHitsZero(CltPlayer deadPlayer, IDamageSource source)
 				{
-					NetworkStartPosition localSpawn = FindObjectsOfType<NetworkStartPosition>()
-						.OrderByDescending(x => Vector3.Distance(x.transform.position.normalized, deadPlayer.transform.position))
+					Transform localSpawn = mMachine.mLobbyStartPositions
+						.OrderBy(x => Vector3.Distance(x.transform.position, deadPlayer.transform.position))
 						.FirstOrDefault();
 
 					EventManager.Server.PlayerDied(deadPlayer, null, localSpawn != null ? localSpawn.transform : deadPlayer.transform);
@@ -271,10 +272,10 @@ namespace FiringSquad.Networking
 				{
 					mMachine.mPlayerList = FindObjectsOfType<CltPlayer>();
 
-					if (mMachine.mPlayerList.Length > mMachine.mStartPositions.Length)
+					if (mMachine.mPlayerList.Length > mMachine.mInGameStartPositions.Length)
 						Logger.Warn("We have too many players for the number of spawn positions!", Logger.System.Network);
 
-					var spawnCopy = mMachine.mStartPositions.Select(x => x.transform).ToList();
+					var spawnCopy = mMachine.mInGameStartPositions.Select(x => x.transform).ToList();
 					spawnCopy.Shuffle();
 
 					foreach (CltPlayer player in mMachine.mPlayerList)
@@ -361,7 +362,7 @@ namespace FiringSquad.Networking
 
 					GameObject instance = choice.SpawnInWorld();
 					instance.transform.position = stage.transform.position + Vector3.up * 45.0f;
-					instance.name = choice.partId;
+					instance.name = choice.name;
 
 					NetworkServer.Spawn(instance);
 					mMachine.mScript.StartCoroutine(Coroutines.InvokeAfterFrames(2, () => { instance.GetComponent<WeaponPickupScript>().RpcInitializePickupView(); }));
@@ -399,7 +400,7 @@ namespace FiringSquad.Networking
 				/// </summary>
 				private void OnPlayerHealthHitsZero(CltPlayer dead, IDamageSource damage)
 				{
-					Transform newPosition = ChooseSafestSpawnPosition(mMachine.mPlayerList, dead, mMachine.mStartPositions);
+					Transform newPosition = ChooseSafestSpawnPosition(mMachine.mPlayerList, dead, mMachine.mInGameStartPositions);
 
 					if (damage.source is CltPlayer)
 					{
