@@ -328,7 +328,7 @@ namespace FiringSquad.Gameplay
 		/// </summary>
 		/// <param name="partId">The unique ID of the part to attach.</param>
 		[Command]
-		public void CmdDebugEquipWeaponPart(string partId)
+		public void CmdDebugEquipWeaponPart(byte partId)
 		{
 			if (weapon == null)
 				return;

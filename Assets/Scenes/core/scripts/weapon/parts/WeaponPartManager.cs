@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using FiringSquad.Gameplay.Weapons;
 using UnityEngine;
 
@@ -9,13 +8,13 @@ namespace FiringSquad.Core.Weapons
 	public class WeaponPartManager : MonoSingleton<WeaponPartManager>, IWeaponPartManager
 	{
 		/// Private variables
-		private Dictionary<string, GameObject> mPrefabs;
-		private Dictionary<string, WeaponPartScript> mScripts;
+		private Dictionary<byte, GameObject> mPrefabs;
+		private Dictionary<byte, WeaponPartScript> mScripts;
 
 		/// <summary>
 		/// The collection of prefabs. Will LazyInitialize the first time it is accessed.
 		/// </summary>
-		private Dictionary<string, GameObject> prefabs
+		private Dictionary<byte, GameObject> prefabs
 		{
 			get
 			{
@@ -27,7 +26,7 @@ namespace FiringSquad.Core.Weapons
 		/// <summary>
 		/// The collection of scripts. Will LazyInitialize the first time it is accessed.
 		/// </summary>
-		private Dictionary<string, WeaponPartScript> scripts
+		private Dictionary<byte, WeaponPartScript> scripts
 		{
 			get
 			{
@@ -37,42 +36,52 @@ namespace FiringSquad.Core.Weapons
 		}
 
 		/// <inheritdoc />
-		public WeaponPartScript GetPrefabScript(string id)
+		public WeaponPartScript GetPrefabScript(byte id)
 		{
 			return scripts[id];
 		}
 
 		/// <inheritdoc />
-		public GameObject GetPartPrefab(string id)
+		public GameObject GetPartPrefab(byte id)
 		{
 			return prefabs[id];
 		}
 
 		/// <inheritdoc />
-		public GameObject this[string index] { get { return prefabs[index]; } }
+		public GameObject this[byte index] { get { return prefabs[index]; } }
 
 		/// <inheritdoc />
-		public Dictionary<string, GameObject> GetAllPrefabs(bool includeDebug)
+		public Dictionary<byte, GameObject> GetAllPrefabs(bool includeDebug)
 		{
 			LazyInitialize();
 
 			if (includeDebug)
 				return prefabs;
+			
+			var result = new Dictionary<byte, GameObject>(prefabs.Count);
+			foreach (var x in prefabs)
+			{
+				if (!x.Value.name.ToLower().Contains("debug"))
+					result.Add(x.Key, x.Value);
+			}
 
-			return prefabs.Values
-				.Where(x => !x.name.ToLower().Contains("debug"))
-				.ToDictionary(x => x.name);
+			return result;
 		}
 
 		/// <inheritdoc />
-		public Dictionary<string, WeaponPartScript> GetAllPrefabScripts(bool includeDebug)
+		public Dictionary<byte, WeaponPartScript> GetAllPrefabScripts(bool includeDebug)
 		{
 			if (includeDebug)
 				return scripts;
 
-			return scripts.Values
-				.Where(x => !x.name.ToLower().Contains("debug"))
-				.ToDictionary(x => x.name);
+			var result = new Dictionary<byte, WeaponPartScript>(scripts.Count);
+			foreach (var x in scripts)
+			{
+				if (!x.Value.name.ToLower().Contains("debug"))
+					result.Add(x.Key, x.Value);
+			}
+
+			return result;
 		}
 
 		/// <summary>
@@ -84,13 +93,19 @@ namespace FiringSquad.Core.Weapons
 			if (mPrefabs != null)
 				return;
 
+			mPrefabs = new Dictionary<byte, GameObject>();
+			mScripts = new Dictionary<byte, WeaponPartScript>();
+
 			var allObjects = Resources.LoadAll<GameObject>("prefabs/weapons");
-			mPrefabs = allObjects
-				.Where(x => x.GetComponent<WeaponPartScript>() != null)
-				.ToDictionary(x => x.name);
-			mScripts = mPrefabs
-				.Select(x => x.Value.GetComponent<WeaponPartScript>())
-				.ToDictionary(x => x.name);
+			foreach (GameObject go in allObjects)
+			{
+				WeaponPartScript script = go.GetComponent<WeaponPartScript>();
+				if (script == null)
+					continue;
+
+				mPrefabs[script.partId] = go;
+				mScripts[script.partId] = script;
+			}
 		}
 	}
 }

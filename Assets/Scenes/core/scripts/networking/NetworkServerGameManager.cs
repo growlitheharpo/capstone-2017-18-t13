@@ -361,7 +361,7 @@ namespace FiringSquad.Networking
 
 					GameObject instance = choice.SpawnInWorld();
 					instance.transform.position = stage.transform.position + Vector3.up * 45.0f;
-					instance.name = choice.partId;
+					instance.name = choice.name;
 
 					NetworkServer.Spawn(instance);
 					mMachine.mScript.StartCoroutine(Coroutines.InvokeAfterFrames(2, () => { instance.GetComponent<WeaponPickupScript>().RpcInitializePickupView(); }));

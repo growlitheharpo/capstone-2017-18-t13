@@ -105,7 +105,7 @@ namespace FiringSquad.Debug
 					CltPlayer player = FindObjectsOfType<CltPlayer>()
 						.FirstOrDefault(x => x.isCurrentPlayer);
 					if (player != null)
-						player.CmdDebugEquipWeaponPart(part.name);
+						player.CmdDebugEquipWeaponPart(part.partId);
 				}
 			}
 			GUILayout.EndArea();
