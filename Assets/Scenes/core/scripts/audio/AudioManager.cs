@@ -13,8 +13,9 @@ namespace FiringSquad.Core.Audio
 	public enum AudioEvent
 	{
 		EquipItem = 50,
-		LoopGravGun = 40,
 		LoopWalking = 30,
+		LoopGravGun = 40,
+		MagnetArmGrab = 45,
 
 		// Weapons
 		Reload = 15,
@@ -41,6 +42,8 @@ namespace FiringSquad.Core.Audio
 		private struct EnumFmodBind
 		{
 			public AudioEvent mEnumVal;
+
+			[FMODUnity.EventRef]
 			public string mFmodVal;
 		}
 
@@ -144,7 +147,7 @@ namespace FiringSquad.Core.Audio
 
 		/// Inspector variables
 		[SerializeField] private bool mShouldSelfInitialize;
-		[SerializeField] private List<EnumFmodBind> mEventBindList;
+		[HideInInspector] [SerializeField] private List<EnumFmodBind> mEventBindList;
 
 		/// Private variables
 		private Dictionary<AudioEvent, string> mEventDictionary;

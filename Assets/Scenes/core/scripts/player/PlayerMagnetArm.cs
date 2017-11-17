@@ -339,6 +339,11 @@ namespace FiringSquad.Gameplay
 				EventManager.Notify(() => EventManager.LocalGUI.SetHintState(CrosshairHintText.Hint.MagnetArmGrab, false));
 				EventManager.Notify(() => EventManager.LocalGUI.SetHintState(CrosshairHintText.Hint.ItemEquipOrDrop, true));
 				CmdGrabItem(mGrabCandidate.netId);
+
+				ServiceLocator.Get<IAudioManager>()
+					.CreateSound(AudioEvent.MagnetArmGrab, transform)
+					.AttachToRigidbody(mBearer.GetComponent<Rigidbody>());
+
 				return;
 			}
 
