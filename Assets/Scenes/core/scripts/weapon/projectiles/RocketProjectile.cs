@@ -19,6 +19,7 @@ namespace FiringSquad.Gameplay.Weapons
 		private Rigidbody mRigidbody;
 		private GameObject mView;
 		private WeaponData mData; // server-only
+		private bool mExploded;
 
 		/// <summary>
 		/// Unity's Awake function
@@ -48,8 +49,13 @@ namespace FiringSquad.Gameplay.Weapons
 		[ServerCallback]
 		private void OnCollisionEnter(Collision hit)
 		{
+			if (mExploded)
+				return;
+
 			if (hit.transform == source.gameObject.transform)
 				return;
+
+			mExploded = true;
 
 			IDamageReceiver component = hit.GetDamageReceiver();
 			if (component != null)
@@ -59,7 +65,7 @@ namespace FiringSquad.Gameplay.Weapons
 			}
 
 			NetworkBehaviour netObject = component as NetworkBehaviour;
-			RpcPlaySound(netObject == null ? NetworkInstanceId.Invalid : netId, hit.contacts[0].point);
+			RpcPlaySound(netObject == null ? NetworkInstanceId.Invalid : netObject.netId, hit.contacts[0].point);
 
 			ApplySplashDamage();
 			RpcActivateExplodeEffect();
