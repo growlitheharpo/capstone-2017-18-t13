@@ -1079,7 +1079,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: deb306b1da0393747b5e50edb29851f6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mDurabilitySprite: {fileID: 21300000, guid: 6cd2d021fe250304fa291c190a203bd1, type: 3}
+  mUniqueId: 121
+  mPrettyName: Grenades
+  mDescription: 'Fires impact grenades: 100 damage.'
   mData:
     mMinDispersionModifier:
       mAmount: 0
@@ -1111,8 +1113,7 @@ MonoBehaviour:
     mClipSizeModifier:
       mAmount: 0
       mType: 0
-  mDescription: 'Fires impact grenades: 100 damage.'
-  mPrettyName: Grenades
+  mDurabilitySprite: {fileID: 21300000, guid: 6cd2d021fe250304fa291c190a203bd1, type: 3}
   mDurability: 25
   mAudioOverrideWeaponType: 1
   mProjectilePrefab: {fileID: 1122678007204700, guid: 153ed538bd19d5646851811f1589f10f,

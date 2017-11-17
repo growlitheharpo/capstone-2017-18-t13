@@ -361,7 +361,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7024d1c3bbf87e0498ff935403a3540e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mDurabilitySprite: {fileID: 21300000, guid: 380286c874978504a83bb8cc8d72dd83, type: 3}
+  mUniqueId: 4
+  mPrettyName: Shotgun Barrel
+  mDescription: A buckshot shotgun.
   mData:
     mMinDispersionModifier:
       mAmount: 2
@@ -393,8 +395,7 @@ MonoBehaviour:
     mClipSizeModifier:
       mAmount: -4
       mType: 0
-  mDescription: A buckshot shotgun.
-  mPrettyName: Shotgun Barrel
+  mDurabilitySprite: {fileID: 21300000, guid: 380286c874978504a83bb8cc8d72dd83, type: 3}
   mDurability: 12
   mTip: {fileID: 4467395475359334}
   mProjectileCount: 5
