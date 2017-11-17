@@ -35,9 +35,9 @@ namespace FiringSquad.Gameplay.Weapons
 
 			Transform barrelTip = weapon.currentParts.barrel != null ? weapon.currentParts.barrel.barrelTip : weapon.transform;
 			transform.position = barrelTip.position + barrelTip.forward;
-			transform.forward = barrelTip.forward;
 
 			mRigidbody.AddForce(ray.direction * mSpeed, ForceMode.Impulse);
+			transform.right = ray.direction;
 			mData = data;
 		}
 
