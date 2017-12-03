@@ -5,7 +5,7 @@ namespace precommit
 {
 	internal static class GitAsyncUtil
 	{
-		public static async Task<string> Git(string args, int bufferSize = 2048)
+		public static async Task<string> Git(string args, int bufferSize = 1024 * 64)
 		{
 			using (Process p = new Process())
 			{
