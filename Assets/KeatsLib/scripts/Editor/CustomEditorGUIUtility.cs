@@ -10,23 +10,6 @@ namespace UnityEditor
 	public static class CustomEditorGUIUtility
 	{
 		public const float LINE_HEIGHT_MODIFIER = 1.05f;
-		private static float kOneLineHeight;
-
-		/// <summary>
-		/// Set the global "one-line height" variable.
-		/// </summary>
-		public static void SetLineHeight(float h)
-		{
-			kOneLineHeight = h;
-		}
-
-		/// <summary>
-		/// Get the global "one-line height" variable.
-		/// </summary>
-		public static float GetLineHeight()
-		{
-			return kOneLineHeight;
-		}
 
 		/// <summary>
 		/// Draws the "script" field at the top of a fully custom inspector.
@@ -91,8 +74,8 @@ namespace UnityEditor
 
 			float startY = label != "" ? DrawLabel(pos, label) : pos.y;
 
-			Rect propRect = new Rect(pos.x, startY, propW, kOneLineHeight);
-			Rect delRect = propRect.ShiftAlongX(delW, kOneLineHeight);
+			Rect propRect = new Rect(pos.x, startY, propW, EditorGUIUtility.singleLineHeight);
+			Rect delRect = propRect.ShiftAlongX(delW, EditorGUIUtility.singleLineHeight);
 
 			EditorGUI.indentLevel++;
 			propRect = itemLabel == null
@@ -106,7 +89,7 @@ namespace UnityEditor
 			}
 
 			float indentSize = EditorGUI.indentLevel * 15; //let's say that's roughly right for now.
-			Rect addRect = new Rect(pos.x + indentSize, propRect.y, pos.width - indentSize, kOneLineHeight);
+			Rect addRect = new Rect(pos.x + indentSize, propRect.y, pos.width - indentSize, EditorGUIUtility.singleLineHeight);
 
 			if (GUI.Button(addRect, addLabel))
 				prop.InsertArrayElementAtIndex(prop.arraySize);
@@ -120,7 +103,7 @@ namespace UnityEditor
 		/// <returns>The y position of the next line after the label.</returns>
 		private static float DrawLabel(Rect pos, string label)
 		{
-			Rect labelRect = new Rect(pos.x, pos.y, pos.width, kOneLineHeight);
+			Rect labelRect = new Rect(pos.x, pos.y, pos.width, EditorGUIUtility.singleLineHeight);
 			EditorGUI.LabelField(labelRect, label);
 
 			return labelRect.y + labelRect.height;
@@ -176,6 +159,7 @@ namespace UnityEditor
 				labelRect.y += labelRect.height;
 				propRect.y += propRect.height;
 				delRect.y += delRect.height;
+
 			}
 
 			return propRect;
