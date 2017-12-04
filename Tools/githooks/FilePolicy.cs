@@ -29,12 +29,13 @@ namespace precommit
 		private const string LC_WORD = "([a-z]+)";
 		private const string UC_WORD = "([A-Z][a-z]+)";
 		private const string OPT_NUM_TWO = "(\\d{0}|\\d{2})";
+		private const string OPT_DIMENSION = "((\\d{1,3}(\\.\\d)?)(x(\\d{1,3}(\\.\\d)?)){1,2})";
 		private const string ANIM = "(@[a-z]+)";
 		private const string OPT_ANIM = ANIM + "?";
 		private const string AUD_TYPE = "((sfx)|(mus))_";
 		private const string TEX_TYPE = "((color_)|(rmao_)|(norm_)|(emiss_))";
 
-		private const string REGULAR_NAME = LC_WORD + UC_WORD + "*" + OPT_NUM_TWO;
+		private const string REGULAR_NAME = LC_WORD + UC_WORD + "*" + "(" + OPT_NUM_TWO + ")|(" + OPT_DIMENSION + ")";
 		private const string SUFFIX = "(_" + REGULAR_NAME + ")?";
 
 		private static readonly Dictionary<string, Regex> FILETYPE_CONVENTIONS = new Dictionary<string, Regex>
