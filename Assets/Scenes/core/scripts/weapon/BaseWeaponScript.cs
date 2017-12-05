@@ -136,7 +136,7 @@ namespace FiringSquad.Gameplay.Weapons
 			mShotParticles = transform.Find("shot_particles").GetComponent<ParticleSystem>();
 			mAnimator = GetComponent<Animator>();
 
-			mPartBreakPrefab = Resources.Load<GameObject>("prefabs/weapons/effects/p_vfxPartBreak").GetComponent<ParticleSystem>();
+			mPartBreakPrefab = Resources.Load<GameObject>("prefabs/weapons/effects/p_vfx_partBreak").GetComponent<ParticleSystem>();
 		}
 
 		/// <inheritdoc />
