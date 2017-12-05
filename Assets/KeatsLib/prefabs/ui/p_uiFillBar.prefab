@@ -38,7 +38,7 @@ GameObject:
   - component: {fileID: 224298552553659474}
   - component: {fileID: 114474120622685694}
   m_Layer: 5
-  m_Name: UIFillBar
+  m_Name: p_uiFillBar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -118,9 +118,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mBackground: {fileID: 114623190897062556}
   mDelayBar: {fileID: 114418427825783012}
+  mDelayTime: 0.4
   mFillBar: {fileID: 114739557415318764}
   mFillDirection: 0
-  mDelayTime: 0.4
 --- !u!114 &114623190897062556
 MonoBehaviour:
   m_ObjectHideFlags: 1
