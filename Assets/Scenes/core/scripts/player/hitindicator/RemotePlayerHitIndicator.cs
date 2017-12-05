@@ -17,7 +17,7 @@ namespace FiringSquad.Gameplay.UI
 		private void Awake()
 		{
 			if (kHitParticlesPrefab == null)
-				kHitParticlesPrefab = Resources.Load<GameObject>("prefabs/player/p_hitParticles");
+				kHitParticlesPrefab = Resources.Load<GameObject>("prefabs/player/p_vfx_playerHit");
 		}
 
 		/// <inheritdoc />

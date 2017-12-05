@@ -129,7 +129,7 @@ namespace FiringSquad.Gameplay.Weapons
 			}
 
 			// Spawn and setup the UI name canvas
-			GameObject cvPrefab = Resources.Load<GameObject>("prefabs/weapons/effects/p_partWorldCanvas");
+			GameObject cvPrefab = Resources.Load<GameObject>("prefabs/weapons/effects/p_ui_partWorldCanvas");
 			GameObject cv = Instantiate(cvPrefab, transform);
 			mCanvas = cv.GetComponent<WeaponPartWorldCanvas>();
 			mCanvas.LinkToObject(mPartScript);
