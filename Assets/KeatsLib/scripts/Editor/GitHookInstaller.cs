@@ -26,7 +26,11 @@ namespace UnityEditor
 				"Charles Carucci",
 				"James Keats",
 				"Max Sanel",
-				"Tyler Bolster"
+				"Tyler Bolster",
+				"Justin Mulkin",
+				"Natalie Frost",
+				"Timothy Eccleston",
+				"Michael Manfredi",
 			};
 
 			public static readonly string[] POSSIBLE_EMAILS =
@@ -34,7 +38,11 @@ namespace UnityEditor
 				"charles.carucci@mymail.champlain.edu",
 				"james.keats@mymail.champlain.edu",
 				"max.sanel@mymail.champlain.edu",
-				"tyler.bolster@mymail.champlain.edu"
+				"tyler.bolster@mymail.champlain.edu",
+				"justin.mulkin@mymail.champlain.edu",
+				"natalie.frost@mymail.champlain.edu",
+				"timothy.eccleston@mymail.champlain.edu",
+				"michael.manfredi@mymail.champlain.edu",
 			};
 		}
 
@@ -43,7 +51,7 @@ namespace UnityEditor
 		private GUIState mCurrentState;
 
 		private GUIStyle mHeaderStyle;
-		private int mNameIndex, mEmailIndex;
+		private int mNameEmailIndex;
 
 		/// <summary>
 		/// Static constructor. Ensures we only perform the check once.
@@ -54,6 +62,15 @@ namespace UnityEditor
 				return;
 
 			DO_ONCE = true;
+			EditorApplication.update += DoCheck;
+		}
+
+		/// <summary>
+		/// Forces the git information to update now.
+		/// </summary>
+		[MenuItem("Pipeline/Update Git Information")]
+		public static void ForceInitialize()
+		{
 			EditorApplication.update += DoCheck;
 		}
 
@@ -88,17 +105,24 @@ namespace UnityEditor
 			}
 			else
 			{
-				string currentName = GitProcess.Launch("config --get user.name");
-				int nameIndex = Array.IndexOf(FiringSquad.POSSIBLE_NAMES, currentName);
-				string currentEmail = GitProcess.Launch("config --get user.email");
-				int emailIndex = Array.IndexOf(FiringSquad.POSSIBLE_EMAILS, currentEmail);
-
-				if (nameIndex < 0 || emailIndex < 0)
+				try
 				{
-					GitHookInstaller window = GetWindow<GitHookInstaller>();
-					window.mNameIndex = nameIndex;
-					window.mEmailIndex = emailIndex;
-					window.mCurrentState = window.EnsureProperName;
+					string currentName = GitProcess.Launch("config --get user.name");
+					int nameIndex = Array.IndexOf(FiringSquad.POSSIBLE_NAMES, currentName);
+					string currentEmail = GitProcess.Launch("config --get user.email");
+					int emailIndex = Array.IndexOf(FiringSquad.POSSIBLE_EMAILS, currentEmail);
+
+					if (nameIndex < 0 || emailIndex < 0)
+					{
+						GitHookInstaller window = GetWindow<GitHookInstaller>();
+						window.mNameEmailIndex = nameIndex;
+						window.mCurrentState = window.EnsureProperName;
+					}
+				}
+				catch (Exception)
+				{
+					Debug.LogWarning("Unable to automatically set user's name and email because command-line git is not installed.");
+					Debug.LogWarning("Please make sure your name and email are set properly before committing.");
 				}
 			}
 
@@ -136,9 +160,11 @@ namespace UnityEditor
 			CustomEditorGUIUtility.HorizontalLayout(() => { GUILayout.Label("Git Setup", mHeaderStyle); });
 			CustomEditorGUIUtility.HorizontalLayout(() =>
 			{
+				GUIStyle style = new GUIStyle(GUI.skin.box) { normal = { textColor = GUI.skin.label.normal.textColor } };
+
 				GUILayout.Box(
 					"It appears you do not have the latest version of the git utilities active " +
-					"on this copy of the repository. Would you like to set them up now?", GUILayout.MaxWidth(350.0f));
+					"on this copy of the repository. Would you like to set them up now?", style, GUILayout.MaxWidth(350.0f));
 			});
 
 			CustomEditorGUIUtility.VerticalSpacer(50.0f);
@@ -164,11 +190,11 @@ namespace UnityEditor
 			CustomEditorGUIUtility.HorizontalLayout(() => { GUILayout.Label("Git Setup", mHeaderStyle); });
 			CustomEditorGUIUtility.HorizontalLayout(() =>
 			{
-				mNameIndex = EditorGUILayout.Popup(mNameIndex, FiringSquad.POSSIBLE_NAMES, GUILayout.MaxWidth(200.0f));
+				mNameEmailIndex = EditorGUILayout.Popup(mNameEmailIndex, FiringSquad.POSSIBLE_NAMES, GUILayout.MaxWidth(200.0f));
 			});
 			CustomEditorGUIUtility.HorizontalLayout(() =>
 			{
-				mEmailIndex = EditorGUILayout.Popup(mEmailIndex, FiringSquad.POSSIBLE_EMAILS, GUILayout.MaxWidth(200.0f));
+				mNameEmailIndex = EditorGUILayout.Popup(mNameEmailIndex, FiringSquad.POSSIBLE_EMAILS, GUILayout.MaxWidth(200.0f));
 			});
 
 			CustomEditorGUIUtility.VerticalSpacer(50);
@@ -179,8 +205,8 @@ namespace UnityEditor
 				{
 					if (GUILayout.Button("Confirm", GUILayout.MaxWidth(150.0f)))
 					{
-						GitProcess.Launch(string.Format("config --local user.name \"{0}\"", FiringSquad.POSSIBLE_NAMES[mNameIndex]));
-						GitProcess.Launch(string.Format("config --local user.email {0}", FiringSquad.POSSIBLE_EMAILS[mEmailIndex]));
+						GitProcess.Launch(string.Format("config --local user.name \"{0}\"", FiringSquad.POSSIBLE_NAMES[mNameEmailIndex]));
+						GitProcess.Launch(string.Format("config --local user.email {0}", FiringSquad.POSSIBLE_EMAILS[mNameEmailIndex]));
 						Close();
 					}
 				});
