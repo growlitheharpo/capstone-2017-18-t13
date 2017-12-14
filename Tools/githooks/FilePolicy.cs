@@ -86,9 +86,9 @@ namespace precommit
 					switch (f)
 					{
 						case Folder.Assets:
-							return x.StartsWith("Assets/");
+							return x.StartsWith("Assets/") || x.StartsWith("\"Assets/");
 						case Folder.AssetsScenes:
-							return x.StartsWith("Assets/Scenes/");
+							return x.StartsWith("Assets/Scenes/") || x.StartsWith("\"Assets/Scenes/");
 						default:
 							return true;
 					}
