@@ -20,6 +20,9 @@ namespace FiringSquad.Networking
 		/// </summary>
 		private void OnDestroy()
 		{
+			if (running)
+				StopBroadcast();
+
 			EventManager.Local.OnReceiveStartEvent -= OnReceiveStartEvent;
 		}
 
@@ -28,6 +31,9 @@ namespace FiringSquad.Networking
 		/// </summary>
 		private void OnReceiveStartEvent(long time)
 		{
+			if (running)
+				StopBroadcast();
+
 			Destroy(gameObject);
 		}
 
