@@ -90,6 +90,21 @@ public partial class EventManager
 		}
 
 		/// <summary>
+		/// Event called when the player has confirmed they want to quit a game
+		/// in-progress, either through the pause menu or through the "game over" panel.
+		/// </summary>
+		public static event Action OnConfirmQuitGame = () => { LogEvent(); };
+
+		/// <summary>
+		/// Event called when the player has confirmed they want to quit a game
+		/// in-progress, either through the pause menu or through the "game over" panel.
+		/// </summary>
+		public static void ConfirmQuitGame()
+		{
+			OnConfirmQuitGame();
+		}
+
+		/// <summary>
 		/// Event called when the local player has spawned and is ready to play.
 		/// PARAMETER 1: A reference to the local player.
 		/// </summary>
