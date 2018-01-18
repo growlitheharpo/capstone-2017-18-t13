@@ -72,8 +72,7 @@ namespace FiringSquad.Gameplay.UI
 		/// </summary>
 		private void HandleQuit()
 		{
-			ServiceLocator.Get<IGamestateManager>()
-				.RequestSceneChange(GamestateManager.MENU_SCENE);
+			EventManager.Notify(EventManager.Local.ConfirmQuitGame);
 		}
 	}
 }
