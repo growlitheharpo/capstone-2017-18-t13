@@ -6,6 +6,7 @@ using FiringSquad.Gameplay;
 using FiringSquad.Gameplay.UI;
 using KeatsLib.State;
 using UnityEngine;
+using UnityEngine.Networking;
 
 namespace FiringSquad.Core.State
 {
@@ -126,6 +127,7 @@ namespace FiringSquad.Core.State
 					EventManager.Local.OnReceiveLobbyEndTime += OnReceiveLobbyEndTime;
 					EventManager.Local.OnReceiveStartEvent += OnReceiveStartEvent;
 					EventManager.Local.OnReceiveFinishEvent += OnReceiveFinishEvent;
+					EventManager.Local.OnConfirmQuitGame += OnConfirmQuitGame;
 				}
 
 				/// <inheritdoc />
@@ -134,6 +136,7 @@ namespace FiringSquad.Core.State
 					EventManager.Local.OnReceiveLobbyEndTime -= OnReceiveLobbyEndTime;
 					EventManager.Local.OnReceiveStartEvent -= OnReceiveStartEvent;
 					EventManager.Local.OnReceiveFinishEvent -= OnReceiveFinishEvent;
+					EventManager.Local.OnConfirmQuitGame -= OnConfirmQuitGame;
 				}
 
 				/// <summary>
@@ -169,14 +172,22 @@ namespace FiringSquad.Core.State
 				/// </summary>
 				private void OnReceiveFinishEvent(PlayerScore[] scores)
 				{
-					/*EventManager.Notify(() => EventManager.LocalGUI.ShowGameoverPanel(scores));
-					ServiceLocator.Get<IInput>()
-						.DisableInputLevel(InputLevel.Gameplay)
-						.DisableInputLevel(InputLevel.HideCursor);*/
-
 					IScreenPanel panel = ServiceLocator.Get<IUIManager>()
 						.PushNewPanel(ScreenPanelTypes.GameOver);
 					((GameOverPanel)panel).SetDisplayScores(scores);
+				}
+
+				/// <summary>
+				/// EVENT HANDLER: Local.OnConfirmQuitGame
+				/// Shutdown any network processes and go back to the menu.
+				/// </summary>
+				private void OnConfirmQuitGame()
+				{
+					NetworkManager.singleton.StopHost();
+					NetworkManager.Shutdown();
+
+					ServiceLocator.Get<IGamestateManager>()
+						.RequestSceneChange(MENU_SCENE);
 				}
 
 				/// <inheritdoc />
@@ -219,26 +230,15 @@ namespace FiringSquad.Core.State
 				/// </summary>
 				public PausedGameState(GameSceneState m) : base(m) { }
 
-				private bool mOriginalGameplayState;
-
 				/// <inheritdoc />
 				public override void OnEnter()
 				{
 					ServiceLocator.Get<IUIManager>().PushNewPanel(ScreenPanelTypes.Pause);
-
-					/*IInput input = ServiceLocator.Get<IInput>();
-					mOriginalGameplayState = input.IsInputEnabled(InputLevel.Gameplay);
-					input.DisableInputLevel(InputLevel.Gameplay)
-						.DisableInputLevel(InputLevel.HideCursor);*/
 				}
 
 				/// <inheritdoc />
 				public override void OnExit()
 				{
-					/*EventManager.Notify(() => EventManager.LocalGUI.TogglePauseMenu(false));
-					ServiceLocator.Get<IInput>()
-						.SetInputLevelState(InputLevel.Gameplay, mOriginalGameplayState)
-						.SetInputLevelState(InputLevel.HideCursor, mOriginalGameplayState);*/
 					ServiceLocator.Get<IUIManager>().PopPanel(ScreenPanelTypes.Pause);
 				}
 
