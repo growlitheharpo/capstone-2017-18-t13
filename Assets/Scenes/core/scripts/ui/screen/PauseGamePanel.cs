@@ -115,13 +115,10 @@ namespace FiringSquad.Gameplay.UI
 		/// </summary>
 		private void HandleQuit()
 		{
-			NetworkManager.singleton.StopHost();
-
 			// Call event directly so that it is handled immediately.
 			EventManager.Local.TogglePause();
 
-			ServiceLocator.Get<IGamestateManager>()
-				.RequestSceneChange(GamestateManager.MENU_SCENE);
+			EventManager.Notify(EventManager.Local.ConfirmQuitGame);
 		}
 
 		/// <summary>
