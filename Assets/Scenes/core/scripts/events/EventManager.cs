@@ -269,6 +269,23 @@ public partial class EventManager
 		{
 			OnSetCrosshairVisible(visible);
 		}
+		
+		/// <summary>
+		/// Event called to lerp the camera's field of view to a new value.
+		/// PARAMETER 1: The new target field of view. A value less than 0 means the default.
+		/// PARAMETER 2: The time to lerp over. A value less than or equal to 0 means instant.
+		/// </summary>
+		public static event Action<float, float> OnRequestNewFieldOfView = (f, t) => { LogEvent(); };
+
+		/// <summary>
+		/// Event called to lerp the camera's field of view to a new value.
+		/// </summary>
+		/// <param name="fov">The new target field of view. A value less than 0 means the default.</param>
+		/// <param name="time">The time to lerp over. A value less than or equal to 0 means instant.</param>
+		public static void RequestNewFieldOfView(float fov, float time)
+		{
+			OnRequestNewFieldOfView(fov, time);
+		}
 	}
 
 	/// <summary>

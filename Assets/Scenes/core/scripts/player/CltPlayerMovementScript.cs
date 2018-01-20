@@ -78,9 +78,8 @@ namespace FiringSquad.Gameplay
 
 			// Register for local events.
 			EventManager.Local.OnApplyOptionsData += ApplyOptionsData;
-			//EventManager.Local.OnEnterAimDownSightsMode += OnEnterAimDownSightsMode;
-			//EventManager.Local.OnExitAimDownSightsMode += OnExitAimDownSightsMode;
 			EventManager.Local.OnLocalPlayerDied += OnLocalPlayerDied;
+			EventManager.LocalGUI.OnRequestNewFieldOfView += OnRequestNewFieldOfView;
 		}
 
 		/// <summary>
@@ -98,9 +97,8 @@ namespace FiringSquad.Gameplay
 				.UnregisterAxis(INPUT_LookVertical);
 
 			EventManager.Local.OnApplyOptionsData -= ApplyOptionsData;
-			//EventManager.Local.OnEnterAimDownSightsMode -= OnEnterAimDownSightsMode;
-			//EventManager.Local.OnExitAimDownSightsMode -= OnExitAimDownSightsMode;
 			EventManager.Local.OnLocalPlayerDied -= OnLocalPlayerDied;
+			EventManager.LocalGUI.OnRequestNewFieldOfView -= OnRequestNewFieldOfView;
 		}
 
 		#region Input Delegates
@@ -359,29 +357,24 @@ namespace FiringSquad.Gameplay
 		{
 			mRotationY = 0.0f;
 		}
-
+		
 		/// <summary>
-		/// EVENT HANDLER: Local.OnEnterAimDownSightsMode
+		/// EVENT HANDLER: Local.OnRequestNewFieldOfView
 		/// </summary>
-		private void OnEnterAimDownSightsMode()
+		private void OnRequestNewFieldOfView(float fov, float time)
 		{
 			mRealCameraRef = mRealCameraRef ?? mPlayer.eye.GetComponentInChildren<Camera>();
-
+			
 			if (mZoomInRoutine != null)
 				StopCoroutine(mZoomInRoutine);
 
-			mZoomInRoutine = StartCoroutine(ZoomCameraFov(25.0f, 0.25f));
-		}
+			if (fov < 0.0f)
+				fov = mPlayerOptions.fieldOfView;
 
-		/// <summary>
-		/// EVENT HANDLER: Local.OnExitAimDownSightsMode
-		/// </summary>
-		private void OnExitAimDownSightsMode()
-		{
-			if (mZoomInRoutine != null)
-				StopCoroutine(mZoomInRoutine);
-
-			mZoomInRoutine = StartCoroutine(ZoomCameraFov(mPlayerOptions.fieldOfView, 0.25f));
+			if (time > 0.0f)
+				mZoomInRoutine = StartCoroutine(ZoomCameraFov(fov, 0.25f));
+			else
+				mRealCameraRef.fieldOfView = fov;
 		}
 
 		/// <summary>

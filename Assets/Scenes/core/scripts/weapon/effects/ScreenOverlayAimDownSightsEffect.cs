@@ -16,6 +16,8 @@ namespace FiringSquad.Gameplay.Weapons
 		{
 			base.ActivateEffect(weapon, part);
 
+			EventManager.Notify(() => EventManager.LocalGUI.RequestNewFieldOfView(15.0f, -1.0f));
+
 			// Create a temporary effect with all of its necessary settings
 			mVignette = CreateInstance<Vignette>();
 			mVignette.enabled.Override(true);
@@ -31,6 +33,8 @@ namespace FiringSquad.Gameplay.Weapons
 		/// <inheritdoc />
 		public override void DeactivateEffect(IWeapon weapon, WeaponPartScript part, bool immediate)
 		{
+			EventManager.Notify(() => EventManager.LocalGUI.RequestNewFieldOfView(-1.0f, -1.0f));
+
 			RuntimeUtilities.DestroyVolume(mTemporaryVolume, false);
 			Destroy(mVignette);
 		}

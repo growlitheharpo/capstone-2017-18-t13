@@ -19,6 +19,7 @@ namespace FiringSquad.Gameplay.Weapons
 			base.ActivateEffect(weapon, part);
 
 			EventManager.Notify(() => EventManager.LocalGUI.SetCrosshairVisible(false));
+			EventManager.Notify(() => EventManager.LocalGUI.RequestNewFieldOfView(25.0f, 0.25f));
 
 			Transform subView = weapon.transform.Find("View").GetChild(0);
 			if (mMoveRoutine != null)
@@ -31,6 +32,7 @@ namespace FiringSquad.Gameplay.Weapons
 		public override void DeactivateEffect(IWeapon weapon, WeaponPartScript part, bool immediate)
 		{
 			EventManager.Notify(() => EventManager.LocalGUI.SetCrosshairVisible(true));
+			EventManager.Notify(() => EventManager.LocalGUI.RequestNewFieldOfView(-1.0f, 0.25f));
 
 			Transform subView = weapon.transform.Find("View").GetChild(0);
 			if (mMoveRoutine != null)
