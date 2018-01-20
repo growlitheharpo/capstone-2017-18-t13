@@ -138,18 +138,7 @@ namespace FiringSquad.Gameplay.Weapons
 
 			mPartBreakPrefab = Resources.Load<GameObject>("prefabs/weapons/effects/p_vfx_partBreak").GetComponent<ParticleSystem>();
 		}
-
-		/// <inheritdoc />
-		/// <summary>
-		/// On Start for local instances.
-		/// TODO: Why are we registring ALL weapons for this event? It should only affect the local player's.
-		/// </summary>
-		public override void OnStartClient()
-		{
-			EventManager.Local.OnEnterAimDownSightsMode += OnEnterAimDownSightsMode;
-			EventManager.Local.OnExitAimDownSightsMode += OnExitAimDownSightsMode;
-		}
-
+		
 		/// <summary>
 		/// Cleanup all listeners and event handlers.
 		/// </summary>
@@ -157,8 +146,6 @@ namespace FiringSquad.Gameplay.Weapons
 		{
 			mShotsInClip.Cleanup();
 			mTotalClipSize.Cleanup();
-			EventManager.Local.OnEnterAimDownSightsMode -= OnEnterAimDownSightsMode;
-			EventManager.Local.OnExitAimDownSightsMode -= OnExitAimDownSightsMode;
 		}
 
 		/// <inheritdoc />
@@ -689,10 +676,10 @@ namespace FiringSquad.Gameplay.Weapons
 		#region Aim Down Sights
 
 		/// <summary>
-		/// EVENT HANDLER: Local.OnEnterAimDownSightsMode
+		/// Activate Aim Down Sights mode based on whatever scope is currently attached to this weapon.
 		/// </summary>
 		[Client]
-		private void OnEnterAimDownSightsMode()
+		public void EnterAimDownSightsMode()
 		{
 			if (!bearer.isCurrentPlayer)
 				return;
@@ -703,10 +690,10 @@ namespace FiringSquad.Gameplay.Weapons
 		}
 
 		/// <summary>
-		/// EVENT HANDLER: Local.OnExitAimDownSightsMode
+		/// Deactivate aim down sights mode.
 		/// </summary>
 		[Client]
-		private void OnExitAimDownSightsMode()
+		public void ExitAimDownSightsMode()
 		{
 			if (!bearer.isCurrentPlayer)
 				return;

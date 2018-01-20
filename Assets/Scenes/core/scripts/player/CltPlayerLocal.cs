@@ -204,7 +204,9 @@ namespace FiringSquad.Gameplay
 		private void INPUT_EnterAimDownSights()
 		{
 			inAimDownSightsMode = true;
-			EventManager.Notify(EventManager.Local.EnterAimDownSightsMode);
+
+			if (playerRoot.weapon != null)
+				playerRoot.weapon.EnterAimDownSightsMode();
 		}
 
 		/// <summary>
@@ -213,7 +215,9 @@ namespace FiringSquad.Gameplay
 		private void INPUT_ExitAimDownSights()
 		{
 			inAimDownSightsMode = false;
-			EventManager.Notify(EventManager.Local.ExitAimDownSightsMode);
+
+			if (playerRoot.weapon != null)
+				playerRoot.weapon.ExitAimDownSightsMode();
 		}
 
 		/// <summary>

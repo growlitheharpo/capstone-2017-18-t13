@@ -167,32 +167,6 @@ public partial class EventManager
 		}
 
 		/// <summary>
-		/// Event called when the local player has entered Aim Down Sights mode.
-		/// </summary>
-		public static event Action OnEnterAimDownSightsMode = () => { LogEvent(); };
-
-		/// <summary>
-		/// Event called when the local player has entered Aim Down Sights mode.
-		/// </summary>
-		public static void EnterAimDownSightsMode()
-		{
-			OnEnterAimDownSightsMode();
-		}
-
-		/// <summary>
-		/// Event called when the local player has exited Aim Down Sights mode.
-		/// </summary>
-		public static event Action OnExitAimDownSightsMode = () => { LogEvent(); };
-
-		/// <summary>
-		/// Event called when the local player has exited Aim Down Sights mode.
-		/// </summary>
-		public static void ExitAimDownSightsMode()
-		{
-			OnExitAimDownSightsMode();
-		}
-
-		/// <summary>
 		/// Event called when the local player has caused any amount of damage confirmed by the server.
 		/// PARAMETER 1: The amount of damage that was caused.
 		/// </summary>
