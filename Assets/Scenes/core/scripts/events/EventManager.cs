@@ -282,6 +282,19 @@ public partial class EventManager
 		{
 			OnSetHintState(hint, state);
 		}
+
+		/// <summary>
+		/// Event called when the player's dynamic crosshair should change state based on a game event.
+		/// </summary>
+		public static event Action<bool> OnSetCrosshairVisible = (b) => { LogEvent(); };
+		
+		/// <summary>
+		/// Event called when the player's dynamic crosshair should change state based on a game event.
+		/// </summary>
+		public static void SetCrosshairVisible(bool visible)
+		{
+			OnSetCrosshairVisible(visible);
+		}
 	}
 
 	/// <summary>

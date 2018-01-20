@@ -28,8 +28,7 @@ namespace FiringSquad.Gameplay.UI
 			mImages = mImageHolder.GetComponentsInChildren<Image>();
 			mOriginalColors = mImages.Select(x => x.color).ToArray();
 
-			EventManager.Local.OnEnterAimDownSightsMode += OnEnterAimDownSightsMode;
-			EventManager.Local.OnExitAimDownSightsMode += OnExitAimDownSightsMode;
+			EventManager.LocalGUI.OnSetCrosshairVisible += OnSetCrosshairVisible;
 			EventManager.Local.OnLocalPlayerSpawned += OnLocalPlayerSpawned;
 			EventManager.Local.OnLocalPlayerCausedDamage += OnLocalPlayerCausedDamage;
 		}
@@ -39,8 +38,7 @@ namespace FiringSquad.Gameplay.UI
 		/// </summary>
 		private void OnDestroy()
 		{
-			EventManager.Local.OnEnterAimDownSightsMode -= OnEnterAimDownSightsMode;
-			EventManager.Local.OnExitAimDownSightsMode -= OnExitAimDownSightsMode;
+			EventManager.LocalGUI.OnSetCrosshairVisible -= OnSetCrosshairVisible;
 			EventManager.Local.OnLocalPlayerSpawned -= OnLocalPlayerSpawned;
 			EventManager.Local.OnLocalPlayerCausedDamage -= OnLocalPlayerCausedDamage;
 		}
@@ -56,19 +54,11 @@ namespace FiringSquad.Gameplay.UI
 		}
 
 		/// <summary>
-		/// EVENT HANDLER: Local.OnEnterAimDownSightsMode
+		/// EVENT HANDLER: LocalGUI.OnSetCrosshairVisible
 		/// </summary>
-		private void OnEnterAimDownSightsMode()
+		private void OnSetCrosshairVisible(bool visible)
 		{
-			mImageHolder.gameObject.SetActive(false);
-		}
-
-		/// <summary>
-		/// EVENT HANDLER: Local.OnExitAimDownSightsMode
-		/// </summary>
-		private void OnExitAimDownSightsMode()
-		{
-			mImageHolder.gameObject.SetActive(true);
+			mImageHolder.gameObject.SetActive(visible);
 		}
 
 		/// <summary>
