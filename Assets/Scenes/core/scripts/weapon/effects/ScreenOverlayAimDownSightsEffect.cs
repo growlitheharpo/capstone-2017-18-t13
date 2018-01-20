@@ -14,6 +14,8 @@ namespace FiringSquad.Gameplay.Weapons
 		/// <inheritdoc />
 		public override void ActivateEffect(IWeapon weapon, WeaponPartScript part)
 		{
+			base.ActivateEffect(weapon, part);
+
 			// Create a temporary effect with all of its necessary settings
 			mVignette = CreateInstance<Vignette>();
 			mVignette.enabled.Override(true);

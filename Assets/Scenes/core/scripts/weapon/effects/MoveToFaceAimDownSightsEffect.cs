@@ -16,6 +16,8 @@ namespace FiringSquad.Gameplay.Weapons
 		/// <inheritdoc />
 		public override void ActivateEffect(IWeapon weapon, WeaponPartScript part)
 		{
+			base.ActivateEffect(weapon, part);
+
 			Transform subView = weapon.transform.Find("View").GetChild(0);
 			if (mMoveRoutine != null)
 				part.StopCoroutine(mMoveRoutine);

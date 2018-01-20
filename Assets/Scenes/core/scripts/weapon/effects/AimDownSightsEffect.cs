@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using FiringSquad.Core;
+using FiringSquad.Core.Audio;
+using UnityEngine;
 
 namespace FiringSquad.Gameplay.Weapons
 {
@@ -8,11 +10,16 @@ namespace FiringSquad.Gameplay.Weapons
 	public abstract class AimDownSightsEffect : ScriptableObject
 	{
 		/// <summary>
-		/// Immediately activate the effect for this type of Aim Down Sights
+		/// Immediately activate the effect for this type of Aim Down Sights.
 		/// </summary>
 		/// <param name="weapon">Which weapon this effect is running on.</param>
 		/// <param name="part">The weapon part that this effect is attached to.</param>
-		public abstract void ActivateEffect(IWeapon weapon, WeaponPartScript part);
+		public virtual void ActivateEffect(IWeapon weapon, WeaponPartScript part)
+		{
+			ServiceLocator.Get<IAudioManager>()
+				.CreateSound(AudioEvent.EnterAimDownSights, part.transform)
+				.AttachToRigidbody(weapon.bearer.gameObject.GetComponent<Rigidbody>());
+		}
 
 		/// <summary>
 		/// Deactivate the effect for this type of Aim Down Sights
