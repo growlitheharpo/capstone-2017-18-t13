@@ -4,6 +4,7 @@ using UnityEngine;
 namespace FiringSquad.Gameplay.Weapons
 {
 	/// <inheritdoc />
+	[CreateAssetMenu(menuName = "reMod Data/ADS Effect - Move Weapon")]
 	public class MoveToFaceAimDownSightsEffect : AimDownSightsEffect
 	{
 		/// Inspector variables

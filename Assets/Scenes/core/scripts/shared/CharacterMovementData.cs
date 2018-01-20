@@ -5,7 +5,7 @@ namespace FiringSquad.Data
 	/// <summary>
 	/// Data utility to describe the motion of a character.
 	/// </summary>
-	[CreateAssetMenu(menuName = "Characters/Movement Data")]
+	[CreateAssetMenu(menuName = "reMod Data/Character Movement")]
 	public class CharacterMovementData : ScriptableObject
 	{
 		[SerializeField] private float mSpeed;

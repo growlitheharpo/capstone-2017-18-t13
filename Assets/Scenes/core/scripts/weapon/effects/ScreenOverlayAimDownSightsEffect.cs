@@ -4,6 +4,7 @@ using UnityEngine.Rendering.PostProcessing;
 namespace FiringSquad.Gameplay.Weapons
 {
 	/// <inheritdoc />
+	[CreateAssetMenu(menuName = "reMod Data/ADS Effect - Overlay")]
 	public class ScreenOverlayAimDownSightsEffect : AimDownSightsEffect
 	{
 		/// Private variables
