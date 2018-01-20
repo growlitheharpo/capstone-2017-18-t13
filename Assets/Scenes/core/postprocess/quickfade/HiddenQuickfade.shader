@@ -5,11 +5,12 @@
 		#include "../../../../PostProcessing/Shaders/StdLib.hlsl"
 		TEXTURE2D_SAMPLER2D(_MainTex, sampler_MainTex);
 		float _Blend;
+		float4 _ScreenColor;
 
 		float4 Frag(VaryingsDefault i) : SV_Target
 		{
 			float4 color = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.texcoord);
-			color.rgb = lerp(color.rgb, luminance.xxx, _Blend.xxx);
+			color.rgb = lerp(color.rgb, _ScreenColor.rgb, _Blend.xxx);
 			return color;
 		}
 

@@ -12,7 +12,7 @@ public sealed class Quickfade : PostProcessEffectSettings
 
 	public FloatParameter blend = new FloatParameter { value = 0.0f };
 
-	public void Activate(MonoBehaviour runner, bool autoReverse = true)
+	public void Activate(MonoBehaviour runner, bool autoReverse = true, Action onCompleteCallback = null)
 	{
 		runner.StartCoroutine(Coroutines.InvokeEveryTick((currentTime) =>
 		{
@@ -22,6 +22,9 @@ public sealed class Quickfade : PostProcessEffectSettings
 				return true;
 			}
 
+			if (onCompleteCallback != null)
+				onCompleteCallback.Invoke();
+
 			if (autoReverse)
 				Deactivate(runner);
 
@@ -29,7 +32,7 @@ public sealed class Quickfade : PostProcessEffectSettings
 		}));
 	}
 
-	public void Deactivate(MonoBehaviour runner)
+	public void Deactivate(MonoBehaviour runner, Action onCompleteCallback = null)
 	{
 		runner.StartCoroutine(Coroutines.InvokeEveryTick((currentTime) =>
 		{
@@ -38,6 +41,9 @@ public sealed class Quickfade : PostProcessEffectSettings
 				blend.Override(1.0f - (currentTime / time));
 				return true;
 			}
+
+			if (onCompleteCallback != null)
+				onCompleteCallback.Invoke();
 
 			return false;
 		}));
@@ -50,6 +56,7 @@ public sealed class QuickfadeRenderer : PostProcessEffectRenderer<Quickfade>
 	{
 		PropertySheet sheet = context.propertySheets.Get(Shader.Find("Hidden/Custom/Quickfade"));
 		sheet.properties.SetFloat("_Blend", settings.blend);
+		sheet.properties.SetColor("_ScreenColor", settings.color);
 		context.command.BlitFullscreenTriangle(context.source, context.destination, sheet, 0);
 	}
 }

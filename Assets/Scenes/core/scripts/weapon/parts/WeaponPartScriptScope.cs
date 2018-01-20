@@ -29,5 +29,14 @@ namespace FiringSquad.Gameplay.Weapons
 		{
 			mAimDownSightsEffect.DeactivateEffect(weapon, this, immediate);
 		}
+
+		/// <summary>
+		/// Unity Event Handler. Called when scope is destroyed.
+		/// </summary>
+		public void OnDestroy()
+		{
+			if (mAimDownSightsEffect != null)
+				mAimDownSightsEffect.DeactivateEffect(null, this, true);
+		}
 	}
 }
