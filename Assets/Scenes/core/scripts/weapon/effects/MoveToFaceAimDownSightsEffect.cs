@@ -12,10 +12,15 @@ namespace FiringSquad.Gameplay.Weapons
 
 		/// Private variables
 		private Coroutine mMoveRoutine;
+		private bool mActive;
 
 		/// <inheritdoc />
 		public override void ActivateEffect(IWeapon weapon, WeaponPartScript part)
 		{
+			if (mActive)
+				return;
+
+			mActive = true;
 			base.ActivateEffect(weapon, part);
 
 			EventManager.Notify(() => EventManager.LocalGUI.SetCrosshairVisible(false));
@@ -31,6 +36,10 @@ namespace FiringSquad.Gameplay.Weapons
 		/// <inheritdoc />
 		public override void DeactivateEffect(IWeapon weapon, WeaponPartScript part, bool immediate)
 		{
+			if (!mActive)
+				return;
+
+			mActive = false;
 			EventManager.Notify(() => EventManager.LocalGUI.SetCrosshairVisible(true));
 			EventManager.Notify(() => EventManager.LocalGUI.RequestNewFieldOfView(-1.0f, 0.25f));
 

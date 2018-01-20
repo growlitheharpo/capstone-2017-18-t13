@@ -59,7 +59,8 @@ namespace FiringSquad.Gameplay.Weapons
 
 			if (immediate)
 			{
-				EventManager.Notify(() => EventManager.LocalGUI.RequestNewFieldOfView(-1.0f, -1.0f));
+				// Do this immediately so the new scope can do its effect if necessary
+				EventManager.LocalGUI.RequestNewFieldOfView(-1.0f, -1.0f);
 				RuntimeUtilities.DestroyVolume(mTemporaryVolume, false);
 				Destroy(mQuickfade);
 				Destroy(mVignette);
@@ -74,7 +75,8 @@ namespace FiringSquad.Gameplay.Weapons
 				mVignette.enabled.Override(false);
 				Destroy(mVignette);
 
-				EventManager.Notify(() => EventManager.LocalGUI.RequestNewFieldOfView(-1.0f, -1.0f));
+				// Do this immediately so the new scope can do its effect if necessary
+				EventManager.LocalGUI.RequestNewFieldOfView(-1.0f, -1.0f);
 
 				mQuickfade.Deactivate(part, () =>
 				{
