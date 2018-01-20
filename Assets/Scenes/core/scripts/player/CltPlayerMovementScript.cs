@@ -38,6 +38,8 @@ namespace FiringSquad.Gameplay
 		private float mSmoothedRecoil, mStandingHeight, mStandingRadius;
 		private bool mJump, mIsJumping, mIsRunning, mPreviouslyGrounded, mCrouching;
 
+		private const float DEFAULT_FIELD_OF_VIEW = 60.0f;
+
 		/// <summary> Cover up Unity's "transform" component with the one of our CltPlayer. </summary>
 		private new Transform transform { get { return mController.transform; } }
 
@@ -369,7 +371,7 @@ namespace FiringSquad.Gameplay
 				StopCoroutine(mZoomInRoutine);
 
 			if (fov < 0.0f)
-				fov = mPlayerOptions.fieldOfView;
+				fov = mPlayerOptions != null ? mPlayerOptions.fieldOfView : DEFAULT_FIELD_OF_VIEW;
 
 			if (time > 0.0f)
 				mZoomInRoutine = StartCoroutine(ZoomCameraFov(fov, 0.25f));
