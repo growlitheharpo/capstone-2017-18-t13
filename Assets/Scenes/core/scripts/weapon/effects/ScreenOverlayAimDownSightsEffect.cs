@@ -50,7 +50,7 @@ namespace FiringSquad.Gameplay.Weapons
 		}
 
 		/// <inheritdoc />
-		public override void DeactivateEffect(IWeapon weapon, WeaponPartScript part, bool immediate)
+		public override void DeactivateEffect(WeaponPartScript part, bool immediate)
 		{
 			if (!mActive)
 				return;

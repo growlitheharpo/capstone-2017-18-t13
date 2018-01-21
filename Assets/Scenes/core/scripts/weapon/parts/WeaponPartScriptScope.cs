@@ -27,7 +27,7 @@ namespace FiringSquad.Gameplay.Weapons
 		/// <param name="immediate">Whether or not to jump immediately to the "exit" state instead of lerping.</param>
 		public void DeactivateAimDownSightsEffect(IWeapon weapon, bool immediate = false)
 		{
-			mAimDownSightsEffect.DeactivateEffect(weapon, this, immediate);
+			mAimDownSightsEffect.DeactivateEffect(this, immediate);
 		}
 
 		/// <summary>
@@ -36,7 +36,7 @@ namespace FiringSquad.Gameplay.Weapons
 		public void OnDestroy()
 		{
 			if (mAimDownSightsEffect != null)
-				mAimDownSightsEffect.DeactivateEffect(null, this, true);
+				mAimDownSightsEffect.DeactivateEffect(this, true);
 		}
 	}
 }

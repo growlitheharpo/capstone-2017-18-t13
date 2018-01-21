@@ -24,9 +24,8 @@ namespace FiringSquad.Gameplay.Weapons
 		/// <summary>
 		/// Deactivate the effect for this type of Aim Down Sights
 		/// </summary>
-		/// <param name="weapon">Which weapon this effect is running on.</param>
 		/// <param name="part">The weapon part that this effect is attached to.</param>
 		/// <param name="immediate">Whether or not to jump immediately to the "exit" state instead of lerping.</param>
-		public abstract void DeactivateEffect(IWeapon weapon, WeaponPartScript part, bool immediate);
+		public abstract void DeactivateEffect(WeaponPartScript part, bool immediate);
 	}
 }

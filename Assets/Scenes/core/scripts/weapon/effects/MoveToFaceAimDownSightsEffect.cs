@@ -12,6 +12,7 @@ namespace FiringSquad.Gameplay.Weapons
 
 		/// Private variables
 		private Coroutine mMoveRoutine;
+		private IWeapon mCurrentWeapon;
 		private bool mActive;
 
 		/// <inheritdoc />
@@ -20,6 +21,7 @@ namespace FiringSquad.Gameplay.Weapons
 			if (mActive)
 				return;
 
+			mCurrentWeapon = weapon;
 			mActive = true;
 			base.ActivateEffect(weapon, part);
 
@@ -34,7 +36,7 @@ namespace FiringSquad.Gameplay.Weapons
 		}
 
 		/// <inheritdoc />
-		public override void DeactivateEffect(IWeapon weapon, WeaponPartScript part, bool immediate)
+		public override void DeactivateEffect(WeaponPartScript part, bool immediate)
 		{
 			if (!mActive)
 				return;
@@ -43,7 +45,7 @@ namespace FiringSquad.Gameplay.Weapons
 			EventManager.Notify(() => EventManager.LocalGUI.SetCrosshairVisible(true));
 			EventManager.Notify(() => EventManager.LocalGUI.RequestNewFieldOfView(-1.0f, 0.25f));
 
-			Transform subView = weapon.transform.Find("View").GetChild(0);
+			Transform subView = mCurrentWeapon.transform.Find("View").GetChild(0);
 			if (mMoveRoutine != null)
 				part.StopCoroutine(mMoveRoutine);
 
