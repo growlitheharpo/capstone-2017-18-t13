@@ -6,7 +6,7 @@ namespace FiringSquad.Gameplay.Weapons
 	public class WeaponPartScriptScope : WeaponPartScript
 	{
 		/// Inspector variables
-		[SerializeField] private AimDownSightsEffect mAimDownSightsEffect;
+		[HideInInspector] [SerializeField] private AimDownSightsEffect mAimDownSightsEffect;
 
 		/// <inheritdoc />
 		public override BaseWeaponScript.Attachment attachPoint { get { return BaseWeaponScript.Attachment.Scope; } }
