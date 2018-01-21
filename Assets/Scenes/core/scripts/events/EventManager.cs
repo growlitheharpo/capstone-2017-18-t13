@@ -167,32 +167,6 @@ public partial class EventManager
 		}
 
 		/// <summary>
-		/// Event called when the local player has entered Aim Down Sights mode.
-		/// </summary>
-		public static event Action OnEnterAimDownSightsMode = () => { LogEvent(); };
-
-		/// <summary>
-		/// Event called when the local player has entered Aim Down Sights mode.
-		/// </summary>
-		public static void EnterAimDownSightsMode()
-		{
-			OnEnterAimDownSightsMode();
-		}
-
-		/// <summary>
-		/// Event called when the local player has exited Aim Down Sights mode.
-		/// </summary>
-		public static event Action OnExitAimDownSightsMode = () => { LogEvent(); };
-
-		/// <summary>
-		/// Event called when the local player has exited Aim Down Sights mode.
-		/// </summary>
-		public static void ExitAimDownSightsMode()
-		{
-			OnExitAimDownSightsMode();
-		}
-
-		/// <summary>
 		/// Event called when the local player has caused any amount of damage confirmed by the server.
 		/// PARAMETER 1: The amount of damage that was caused.
 		/// </summary>
@@ -281,6 +255,36 @@ public partial class EventManager
 		public static void SetHintState(CrosshairHintText.Hint hint, bool state)
 		{
 			OnSetHintState(hint, state);
+		}
+
+		/// <summary>
+		/// Event called when the player's dynamic crosshair should change state based on a game event.
+		/// </summary>
+		public static event Action<bool> OnSetCrosshairVisible = (b) => { LogEvent(); };
+		
+		/// <summary>
+		/// Event called when the player's dynamic crosshair should change state based on a game event.
+		/// </summary>
+		public static void SetCrosshairVisible(bool visible)
+		{
+			OnSetCrosshairVisible(visible);
+		}
+		
+		/// <summary>
+		/// Event called to lerp the camera's field of view to a new value.
+		/// PARAMETER 1: The new target field of view. A value less than 0 means the default.
+		/// PARAMETER 2: The time to lerp over. A value less than or equal to 0 means instant.
+		/// </summary>
+		public static event Action<float, float> OnRequestNewFieldOfView = (f, t) => { LogEvent(); };
+
+		/// <summary>
+		/// Event called to lerp the camera's field of view to a new value.
+		/// </summary>
+		/// <param name="fov">The new target field of view. A value less than 0 means the default.</param>
+		/// <param name="time">The time to lerp over. A value less than or equal to 0 means instant.</param>
+		public static void RequestNewFieldOfView(float fov, float time)
+		{
+			OnRequestNewFieldOfView(fov, time);
 		}
 	}
 

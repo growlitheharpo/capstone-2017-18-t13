@@ -76,5 +76,17 @@ namespace FiringSquad.Gameplay.Weapons
 		/// Input handler: Handle the trigger being released for this weapon.
 		/// </summary>
 		void FireWeaponUp();
+
+		/// <summary>
+		/// Input handler: Handle the player entering AimDownSights for this weapon.
+		/// Generally should only be run on the local player's weapon.
+		/// </summary>
+		void EnterAimDownSightsMode();
+
+		/// <summary>
+		/// Input handler: Handle the player exiting AimDownSights for this weapon.
+		/// Generally should only be run on the local player's weapon.
+		/// </summary>
+		void ExitAimDownSightsMode();
 	}
 }

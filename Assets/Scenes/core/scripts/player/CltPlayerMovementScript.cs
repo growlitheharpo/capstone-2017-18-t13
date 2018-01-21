@@ -30,14 +30,15 @@ namespace FiringSquad.Gameplay
 		private Coroutine mZoomInRoutine;
 		private Camera mRealCameraRef;
 
+		private IOptionsData mPlayerOptions;
 		private PlayerInputMap mInputBindings;
 		private Vector3 mMoveDirection;
 		private Vector2 mInput, mRotationAmount;
-		private float mMouseSensitivity;
 		private float mRotationY;
 		private float mSmoothedRecoil, mStandingHeight, mStandingRadius;
 		private bool mJump, mIsJumping, mIsRunning, mPreviouslyGrounded, mCrouching;
-		private float mCachedFieldOfView;
+
+		private const float DEFAULT_FIELD_OF_VIEW = 60.0f;
 
 		/// <summary> Cover up Unity's "transform" component with the one of our CltPlayer. </summary>
 		private new Transform transform { get { return mController.transform; } }
@@ -48,9 +49,7 @@ namespace FiringSquad.Gameplay
 		private void Awake()
 		{
 			mMoveDirection = Vector3.zero;
-			mMouseSensitivity = 1.0f;
 			mSmoothedRecoil = 0.0f;
-			mCachedFieldOfView = 60.0f; // the default field of view
 		}
 
 		/// <summary>
@@ -81,9 +80,8 @@ namespace FiringSquad.Gameplay
 
 			// Register for local events.
 			EventManager.Local.OnApplyOptionsData += ApplyOptionsData;
-			EventManager.Local.OnEnterAimDownSightsMode += OnEnterAimDownSightsMode;
-			EventManager.Local.OnExitAimDownSightsMode += OnExitAimDownSightsMode;
 			EventManager.Local.OnLocalPlayerDied += OnLocalPlayerDied;
+			EventManager.LocalGUI.OnRequestNewFieldOfView += OnRequestNewFieldOfView;
 		}
 
 		/// <summary>
@@ -101,9 +99,8 @@ namespace FiringSquad.Gameplay
 				.UnregisterAxis(INPUT_LookVertical);
 
 			EventManager.Local.OnApplyOptionsData -= ApplyOptionsData;
-			EventManager.Local.OnEnterAimDownSightsMode -= OnEnterAimDownSightsMode;
-			EventManager.Local.OnExitAimDownSightsMode -= OnExitAimDownSightsMode;
 			EventManager.Local.OnLocalPlayerDied -= OnLocalPlayerDied;
+			EventManager.LocalGUI.OnRequestNewFieldOfView -= OnRequestNewFieldOfView;
 		}
 
 		#region Input Delegates
@@ -251,7 +248,8 @@ namespace FiringSquad.Gameplay
 		/// </summary>
 		private void HandleRotation()
 		{
-			float speed = mMovementData.lookSpeed * mMouseSensitivity;
+			float sensitivity = mPlayerOptions != null ? mPlayerOptions.mouseSensitivity : 1.0f;
+			float speed = mMovementData.lookSpeed * sensitivity;
 			if (mLocalPlayer.inAimDownSightsMode)
 				speed *= mMovementData.aimDownSightsLookMultiplier;
 
@@ -351,8 +349,7 @@ namespace FiringSquad.Gameplay
 		/// </summary>
 		private void ApplyOptionsData(IOptionsData settings)
 		{
-			mMouseSensitivity = settings.mouseSensitivity;
-			mCachedFieldOfView = settings.fieldOfView;
+			mPlayerOptions = settings;
 		}
 
 		/// <summary>
@@ -362,33 +359,24 @@ namespace FiringSquad.Gameplay
 		{
 			mRotationY = 0.0f;
 		}
-
+		
 		/// <summary>
-		/// EVENT HANDLER: Local.OnEnterAimDownSightsMode
+		/// EVENT HANDLER: Local.OnRequestNewFieldOfView
 		/// </summary>
-		private void OnEnterAimDownSightsMode()
+		private void OnRequestNewFieldOfView(float fov, float time)
 		{
 			mRealCameraRef = mRealCameraRef ?? mPlayer.eye.GetComponentInChildren<Camera>();
-
+			
 			if (mZoomInRoutine != null)
 				StopCoroutine(mZoomInRoutine);
 
-			mZoomInRoutine = StartCoroutine(ZoomCameraFov(25.0f, 0.25f));
-			ServiceLocator.Get<IAudioManager>()
-				.CreateSound(AudioEvent.EnterAimDownSights, transform).AttachToRigidbody(mPlayer.GetComponent<Rigidbody>());
-		}
+			if (fov < 0.0f)
+				fov = mPlayerOptions != null ? mPlayerOptions.fieldOfView : DEFAULT_FIELD_OF_VIEW;
 
-		/// <summary>
-		/// EVENT HANDLER: Local.OnExitAimDownSightsMode
-		/// </summary>
-		private void OnExitAimDownSightsMode()
-		{
-			float fov = mCachedFieldOfView;
-
-			if (mZoomInRoutine != null)
-				StopCoroutine(mZoomInRoutine);
-
-			mZoomInRoutine = StartCoroutine(ZoomCameraFov(fov, 0.25f));
+			if (time > 0.0f)
+				mZoomInRoutine = StartCoroutine(ZoomCameraFov(fov, 0.25f));
+			else
+				mRealCameraRef.fieldOfView = fov;
 		}
 
 		/// <summary>
@@ -398,7 +386,7 @@ namespace FiringSquad.Gameplay
 		/// <param name="time">The length of time (in seconds) to lerp over.</param>
 		private IEnumerator ZoomCameraFov(float newFov, float time)
 		{
-			mRealCameraRef = mRealCameraRef ?? Camera.main; //TODO: Find a solution to this, don't hardcode the main camera. mPlayer.eye.GetComponentInChildren<Camera>();
+			mRealCameraRef = mRealCameraRef ?? mPlayer.eye.GetComponentInChildren<Camera>();
 
 			float currentTime = 0.0f;
 			float startFov = mRealCameraRef.fieldOfView;
