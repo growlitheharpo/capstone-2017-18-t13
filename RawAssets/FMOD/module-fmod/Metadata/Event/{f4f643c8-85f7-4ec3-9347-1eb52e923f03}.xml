@@ -5,7 +5,7 @@
             <value>MatchStarts</value>
         </property>
         <property name="outputFormat">
-            <value>1</value>
+            <value>0</value>
         </property>
         <relationship name="folder">
             <destination>{4e6b01b3-a2fe-498a-9e5d-bf232af53109}</destination>
@@ -59,18 +59,11 @@
     <object class="EventAutomatableProperties" id="{11494c69-8b3e-428b-a924-8ca80d50d66b}"/>
     <object class="MarkerTrack" id="{d5701b51-8dff-4666-8567-c85e8f258f4f}"/>
     <object class="GroupTrack" id="{f35ac752-72de-4c0e-a565-e4ff1ff88346}">
-        <relationship name="modules">
-            <destination>{ddc0ff56-0537-4605-8e7a-133fb65ffd6a}</destination>
-        </relationship>
         <relationship name="mixerGroup">
             <destination>{d664914e-3ac4-4ac6-a0cf-e2511a667044}</destination>
         </relationship>
     </object>
-    <object class="Timeline" id="{db9fea53-4307-47aa-9710-a2aade2b4f66}">
-        <relationship name="modules">
-            <destination>{ddc0ff56-0537-4605-8e7a-133fb65ffd6a}</destination>
-        </relationship>
-    </object>
+    <object class="Timeline" id="{db9fea53-4307-47aa-9710-a2aade2b4f66}"/>
     <object class="EventMixerMaster" id="{91f7d1b5-6531-4d28-9d6f-a0a57f23e838}">
         <relationship name="effectChain">
             <destination>{38c9e8bb-623d-43ea-bbe6-7210cb87913c}</destination>
@@ -88,20 +81,6 @@
         </relationship>
     </object>
     <object class="MixerBusPanner" id="{b860acfa-ca51-4ed4-8dc0-e342fcf978b3}"/>
-    <object class="SingleSound" id="{ddc0ff56-0537-4605-8e7a-133fb65ffd6a}">
-        <property name="length">
-            <value>4.5</value>
-        </property>
-        <property name="timelockedOffset">
-            <value>63</value>
-        </property>
-        <property name="volume">
-            <value>7.5</value>
-        </property>
-        <relationship name="audioFile">
-            <destination>{26d274c2-f6f9-4065-bc86-9c8221b3f500}</destination>
-        </relationship>
-    </object>
     <object class="EventMixerGroup" id="{d664914e-3ac4-4ac6-a0cf-e2511a667044}">
         <property name="name">
             <value>Audio 1</value>
