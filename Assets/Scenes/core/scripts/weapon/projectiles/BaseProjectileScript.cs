@@ -54,7 +54,7 @@ namespace FiringSquad.Gameplay.Weapons
 		/// </summary>
 		/// <param name="hitObject">The network instance ID of the object that was hit.</param>
 		[Client]
-		private AudioEvent GetHitAudioEvent(NetworkInstanceId hitObject)
+		public static AudioEvent GetHitAudioEvent(NetworkInstanceId hitObject)
 		{
 			if (hitObject == NetworkInstanceId.Invalid)
 				return AudioEvent.ImpactWall;
