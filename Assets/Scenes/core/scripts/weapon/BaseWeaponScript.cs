@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using FiringSquad.Core;
 using FiringSquad.Core.Audio;
 using FiringSquad.Core.UI;
@@ -496,20 +497,33 @@ namespace FiringSquad.Gameplay.Weapons
 				return;
 
 			int count = mCurrentParts.barrel != null ? mCurrentParts.barrel.projectileCount : 1;
-			var shots = new List<Ray>(count);
+			List<Vector3> origins = new List<Vector3>(), directions = new List<Vector3>();;
 			for (int i = 0; i < count; i++)
-				shots.Add(CalculateShotDirection(i == 0));
+			{
+				Ray shot = CalculateShotDirection(i == 0);
+				origins.Add(shot.origin);
+				directions.Add(shot.direction);
+			}
 
 			mRecentShotTimes.Add(currentTime);
 			mShotsSinceRelease++;
 			mShotsInClip.value--;
 
-			foreach (Ray shot in shots)
-				CmdInstantiateShot(shot.origin, shot.direction);
-
-			CmdOnShotFireComplete();
+			CmdOnShotFireComplete(origins.ToArray(), directions.ToArray());
 			PlayFireEffect();
 			CmdDegradeDurability();
+		}
+
+		/// <summary>
+		/// Notify the server that the weapon has finished a "shot" after instantiating all of its projectiles.
+		/// </summary>
+		[Command]
+		private void CmdOnShotFireComplete(Vector3[] origins, Vector3[] directions)
+		{
+			for (int i = 0; i < origins.Length; ++i)
+				InstantiateShot(origins[i], directions[i]);
+
+			RpcReflectPlayerShotWeapon();
 		}
 
 		/// <summary>
@@ -517,9 +531,8 @@ namespace FiringSquad.Gameplay.Weapons
 		/// </summary>
 		/// <param name="origin">The origin of the shot. The local position of the aimRoot on fire.</param>
 		/// <param name="direction">The direction of the shot. The forward of the aimRoot on fire.</param>
-		/// TODO: Investigate the performance of this with CmdOnShotFireComplete
-		[Command]
-		private void CmdInstantiateShot(Vector3 origin, Vector3 direction)
+		[Server]
+		private void InstantiateShot(Vector3 origin, Vector3 direction)
 		{
 			Ray shot = new Ray(origin, direction);
 
@@ -529,19 +542,9 @@ namespace FiringSquad.Gameplay.Weapons
 			GameObject instance = Instantiate(mCurrentParts.mechanism.projectilePrefab, mCurrentParts.barrel.barrelTip.position, Quaternion.identity);
 			IProjectile projectile = instance.GetComponent<IProjectile>();
 
-			projectile.PreSpawnInitialize(this, shot, currentData);
-			NetworkServer.Spawn(instance);
+			if (projectile.PreSpawnInitialize(this, shot, currentData))
+				NetworkServer.Spawn(instance);
 			projectile.PostSpawnInitialize(this, shot, currentData);
-		}
-
-		/// <summary>
-		/// Notify the server that the weapon has finished a "shot" after instantiating all of its projectiles.
-		/// TODO: Investigate the performance of this with CmdInstantiateShot
-		/// </summary>
-		[Command]
-		private void CmdOnShotFireComplete()
-		{
-			RpcReflectPlayerShotWeapon();
 		}
 
 		/// <summary>
