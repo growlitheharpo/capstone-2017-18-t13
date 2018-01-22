@@ -311,7 +311,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: deb306b1da0393747b5e50edb29851f6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mDurabilitySprite: {fileID: 21300000, guid: a89531be722ca3849bcffa918b2da758, type: 3}
+  mUniqueId: 120
+  mPrettyName: Bullets
+  mDescription: 'Fires bullets: 50 damage.'
   mData:
     mMinDispersionModifier:
       mAmount: 0
@@ -343,8 +345,7 @@ MonoBehaviour:
     mClipSizeModifier:
       mAmount: 0
       mType: 0
-  mDescription: 'Fires bullets: 50 damage.'
-  mPrettyName: Bullets
+  mDurabilitySprite: {fileID: 21300000, guid: a89531be722ca3849bcffa918b2da758, type: 3}
   mDurability: -1
   mAudioOverrideWeaponType: 0
   mProjectilePrefab: {fileID: 1546697341052326, guid: 37046d5bb3731fa488c846503629ad6f,

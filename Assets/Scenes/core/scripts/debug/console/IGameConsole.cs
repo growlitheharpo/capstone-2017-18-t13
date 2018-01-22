@@ -1,11 +1,12 @@
 ﻿using System;
+using FiringSquad.Core;
 
 namespace FiringSquad.Debug
 {
 	/// <summary>
 	/// The base interface for the Game Console service.
 	/// </summary>
-	public interface IGameConsole
+	public interface IGameConsole : IGlobalService
 	{
 		/// <summary>
 		/// Immediately throws an error if cheats are not enabled.

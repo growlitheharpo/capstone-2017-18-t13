@@ -3,6 +3,9 @@ using UnityEngine;
 
 namespace FiringSquad.Gameplay.Weapons
 {
+	/// <summary>
+	/// The interface for a basic weapon in the game.
+	/// </summary>
 	public interface IWeapon
 	{
 		/// <summary>
@@ -25,7 +28,7 @@ namespace FiringSquad.Gameplay.Weapons
 		/// </summary>
 		/// <param name="partId">The part to be attached.</param>
 		/// <param name="durability">The durability to assign to the new part, or -2 to use the default.</param>
-		void AttachNewPart(string partId, int durability = WeaponPartScript.USE_DEFAULT_DURABILITY);
+		void AttachNewPart(byte partId, int durability = WeaponPartScript.USE_DEFAULT_DURABILITY);
 
 		/// <summary>
 		/// Reset all the parts on this weapon to the default parts of the bearer.
@@ -64,9 +67,26 @@ namespace FiringSquad.Gameplay.Weapons
 		/// <returns></returns>
 		float GetCurrentDispersionFactor(bool forceNotZero);
 
+		/// <summary>
+		/// Input handler: Handle the trigger being held for this weapon.
+		/// </summary>
 		void FireWeaponHold();
+
+		/// <summary>
+		/// Input handler: Handle the trigger being released for this weapon.
+		/// </summary>
 		void FireWeaponUp();
 
-		void PlayFireEffect();
+		/// <summary>
+		/// Input handler: Handle the player entering AimDownSights for this weapon.
+		/// Generally should only be run on the local player's weapon.
+		/// </summary>
+		void EnterAimDownSightsMode();
+
+		/// <summary>
+		/// Input handler: Handle the player exiting AimDownSights for this weapon.
+		/// Generally should only be run on the local player's weapon.
+		/// </summary>
+		void ExitAimDownSightsMode();
 	}
 }

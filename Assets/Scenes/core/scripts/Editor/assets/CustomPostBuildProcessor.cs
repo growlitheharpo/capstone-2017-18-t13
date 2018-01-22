@@ -9,6 +9,7 @@ namespace UnityEditor
 	/// <summary>
 	/// Create a build and auto-upload it to SVN.
 	/// Basically a giant state machine that tries to wait for each step.
+	/// TODO: This needs to be really, really refined. It kind of sucks right now. The SVN commands lock up the process.
 	/// </summary>
 	public class CustomPostBuildProcessor
 	{

@@ -1,8 +1,6 @@
 ﻿using UnityEngine;
 using System.IO;
 using System.Text.RegularExpressions;
-using FiringSquad.Data;
-using UnityEngine.Audio;
 
 namespace UnityEditor
 {
@@ -50,6 +48,12 @@ namespace UnityEditor
 			return mat;
 		}
 
+		/// <summary>
+		/// Fill the texture maps for an imported material based on found files.
+		/// </summary>
+		/// <param name="mat">The material to update.</param>
+		/// <param name="folder">The folder we're located in.</param>
+		/// <param name="filename">The filename of the model we're importing.</param>
 		private static void FillTextureMaps(Material mat, string folder, string filename)
 		{
 			Texture color = GetTexture(folder, filename, "color");
@@ -61,6 +65,13 @@ namespace UnityEditor
 			mat.SetTexture("_BumpMap", normal);
 		}
 
+		/// <summary>
+		/// Find the texture file based on the file name and folder.
+		/// </summary>
+		/// <param name="folder">The folder where we're located.</param>
+		/// <param name="file">The name of the file that we're importing.</param>
+		/// <param name="type">The type of the texture map to search fori.</param>
+		/// <returns></returns>
 		private static Texture GetTexture(string folder, string file, string type)
 		{
 			string pathTarga = folder + "/tex_" + type + "_" + file + ".tga";

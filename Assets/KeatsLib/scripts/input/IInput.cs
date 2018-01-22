@@ -5,7 +5,7 @@ namespace FiringSquad.Core.Input
 	/// <summary>
 	/// Interface for the Input Manager service.
 	/// </summary>
-	public interface IInput
+	public interface IInput : IGlobalService
 	{
 		/// <summary>
 		/// Register a new input function to be fired when its conditions are met.

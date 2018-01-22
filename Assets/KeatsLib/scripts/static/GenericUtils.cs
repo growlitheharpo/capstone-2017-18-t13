@@ -60,34 +60,4 @@ namespace KeatsLib.Collections
 			return Mathf.Clamp(angle, min, max);
 		}
 	}
-
-	public static class UnityUtils
-	{
-		public static GameObject InstantiateIntoHolder(GameObject prefab, Transform holder, bool dontParent = false, bool destroyParent = false)
-		{
-			if (!dontParent && destroyParent)
-				throw new ArgumentException("Invalid combination of arguments!");
-
-			GameObject newItem = Object.Instantiate(prefab);
-			newItem.name = prefab.name;
-
-			if (dontParent)
-			{
-				newItem.transform.position = holder.transform.position;
-				newItem.transform.rotation = holder.transform.rotation;
-				newItem.transform.SetParent(holder.parent);
-
-				if (destroyParent)
-					Object.Destroy(holder.gameObject);
-			}
-			else
-			{
-				newItem.transform.SetParent(holder);
-				newItem.transform.localPosition = Vector3.zero;
-				newItem.transform.localRotation = Quaternion.identity;
-			}
-
-			return newItem;
-		}
-	}
 }

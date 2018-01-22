@@ -9,8 +9,15 @@ using UnityEngine;
 
 namespace FiringSquad.Gameplay
 {
+	/// <summary>
+	/// Component for crates that contain weapon parts.
+	/// Explodes and spawns a part upon receiving damage.
+	/// </summary>
 	public class WeaponPartCrate : NetworkBehaviour, IDamageReceiver
 	{
+		/// <summary>
+		/// Struct to bind a prefab to a weight (0 - 1).
+		/// </summary>
 		[Serializable]
 		public struct PartWeightSet
 		{
@@ -21,16 +28,22 @@ namespace FiringSquad.Gameplay
 			public float weight { get { return mWeight; } }
 		}
 
-		[HideInInspector] [SerializeField] private List<PartWeightSet> mParts;
+		/// Inspector variables
+		[HideInInspector] [SerializeField] private List<PartWeightSet> mParts; // [HideInInspector] because this is drawn with custom editor
 		[SerializeField] private GameObject mBreakVFX;
-		public float mRespawnTime;
+		[SerializeField] private float mRespawnTime;
 
+		/// Syncvars
+		[SyncVar(hook = "OnChangeVisible")] private bool mVisible = true;
+
+		/// Private variables
 		private Vector3 mColliderExtents;
 		private Collider mCollider;
 		private GameObject mView;
 
-		[SyncVar(hook = "OnChangeVisible")] private bool mVisible = true;
-
+		/// <summary>
+		/// Unity's Awake function.
+		/// </summary>
 		private void Awake()
 		{
 			mCollider = GetComponent<Collider>();
@@ -38,17 +51,22 @@ namespace FiringSquad.Gameplay
 			mView = transform.Find("EnabledView").gameObject;
 		}
 
+		/// <summary>
+		/// Handle starting on the client.
+		/// </summary>
+		/// <inheritdoc />
 		public override void OnStartClient()
 		{
 			base.OnStartClient();
 
-			if (!mVisible)
-			{
-				mCollider.enabled = false;
-				mView.SetActive(false);
-			}
+			if (mVisible)
+				return;
+
+			mCollider.enabled = false;
+			mView.SetActive(false);
 		}
 
+		/// <inheritdoc />
 		[Server]
 		public void ApplyDamage(float amount, Vector3 point, Vector3 normal, IDamageSource cause)
 		{
@@ -58,6 +76,9 @@ namespace FiringSquad.Gameplay
 			CmdSpawnPart();
 		}
 
+		/// <summary>
+		/// Spawn a part after the crate has taken damage.
+		/// </summary>
 		[Command]
 		private void CmdSpawnPart()
 		{
@@ -75,6 +96,9 @@ namespace FiringSquad.Gameplay
 			StartCoroutine(Coroutines.InvokeAfterFrames(2, () => { instance.GetComponent<WeaponPickupScript>().RpcInitializePickupView(); }));
 		}
 
+		/// <summary>
+		/// Reappear after a certain amount of time has passed and our collider space is clear.
+		/// </summary>
 		[Server]
 		private IEnumerator WaitAndReappear()
 		{
@@ -91,6 +115,10 @@ namespace FiringSquad.Gameplay
 			mVisible = true;
 		}
 
+		/// <summary>
+		/// Handle our visibility changing by toggling our collider and view.
+		/// </summary>
+		/// <param name="visible">Whether to enable or disable the crate.</param>
 		private void OnChangeVisible(bool visible)
 		{
 			mVisible = visible;
@@ -101,6 +129,9 @@ namespace FiringSquad.Gameplay
 				CreateBreakParticles();
 		}
 
+		/// <summary>
+		/// Spawn particles to demonstrate the crate was broken.
+		/// </summary>
 		private void CreateBreakParticles()
 		{
 			ParticleSystem ps = Instantiate(mBreakVFX, transform.position + Vector3.up * 0.25f, Quaternion.identity).GetComponent<ParticleSystem>();

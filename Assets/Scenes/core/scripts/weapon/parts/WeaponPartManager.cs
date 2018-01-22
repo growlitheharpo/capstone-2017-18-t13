@@ -1,15 +1,20 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using FiringSquad.Gameplay.Weapons;
 using UnityEngine;
 
 namespace FiringSquad.Core.Weapons
 {
+	/// <inheritdoc cref="IWeaponPartManager" />
 	public class WeaponPartManager : MonoSingleton<WeaponPartManager>, IWeaponPartManager
 	{
-		private Dictionary<string, GameObject> mPrefabs;
-		private Dictionary<string, WeaponPartScript> mScripts;
-		private Dictionary<string, GameObject> prefabs
+		/// Private variables
+		private Dictionary<byte, GameObject> mPrefabs;
+		private Dictionary<byte, WeaponPartScript> mScripts;
+
+		/// <summary>
+		/// The collection of prefabs. Will LazyInitialize the first time it is accessed.
+		/// </summary>
+		private Dictionary<byte, GameObject> prefabs
 		{
 			get
 			{
@@ -18,7 +23,10 @@ namespace FiringSquad.Core.Weapons
 			}
 		}
 
-		private Dictionary<string, WeaponPartScript> scripts
+		/// <summary>
+		/// The collection of scripts. Will LazyInitialize the first time it is accessed.
+		/// </summary>
+		private Dictionary<byte, WeaponPartScript> scripts
 		{
 			get
 			{
@@ -27,52 +35,77 @@ namespace FiringSquad.Core.Weapons
 			}
 		}
 
-		public WeaponPartScript GetPrefabScript(string id)
+		/// <inheritdoc />
+		public WeaponPartScript GetPrefabScript(byte id)
 		{
 			return scripts[id];
 		}
 
-		public GameObject GetPartPrefab(string id)
+		/// <inheritdoc />
+		public GameObject GetPartPrefab(byte id)
 		{
 			return prefabs[id];
 		}
 
-		public GameObject this[string index] { get { return prefabs[index]; } }
+		/// <inheritdoc />
+		public GameObject this[byte index] { get { return prefabs[index]; } }
 
-		public Dictionary<string, GameObject> GetAllPrefabs(bool includeDebug)
+		/// <inheritdoc />
+		public Dictionary<byte, GameObject> GetAllPrefabs(bool includeDebug)
 		{
 			LazyInitialize();
 
 			if (includeDebug)
 				return prefabs;
+			
+			var result = new Dictionary<byte, GameObject>(prefabs.Count);
+			foreach (var x in prefabs)
+			{
+				if (!x.Value.name.ToLower().Contains("debug"))
+					result.Add(x.Key, x.Value);
+			}
 
-			return prefabs.Values
-				.Where(x => !x.name.ToLower().Contains("debug"))
-				.ToDictionary(x => x.name);
+			return result;
 		}
 
-		public Dictionary<string, WeaponPartScript> GetAllPrefabScripts(bool includeDebug)
+		/// <inheritdoc />
+		public Dictionary<byte, WeaponPartScript> GetAllPrefabScripts(bool includeDebug)
 		{
 			if (includeDebug)
 				return scripts;
 
-			return scripts.Values
-				.Where(x => !x.name.ToLower().Contains("debug"))
-				.ToDictionary(x => x.name);
+			var result = new Dictionary<byte, WeaponPartScript>(scripts.Count);
+			foreach (var x in scripts)
+			{
+				if (!x.Value.name.ToLower().Contains("debug"))
+					result.Add(x.Key, x.Value);
+			}
+
+			return result;
 		}
 
+		/// <summary>
+		/// Initialize our collection of weapon parts by reading the Resources folder.
+		/// Should only be done once per game lifetime.
+		/// </summary>
 		private void LazyInitialize()
 		{
 			if (mPrefabs != null)
 				return;
 
+			mPrefabs = new Dictionary<byte, GameObject>();
+			mScripts = new Dictionary<byte, WeaponPartScript>();
+
 			var allObjects = Resources.LoadAll<GameObject>("prefabs/weapons");
-			mPrefabs = allObjects
-				.Where(x => x.GetComponent<WeaponPartScript>() != null)
-				.ToDictionary(x => x.name);
-			mScripts = mPrefabs
-				.Select(x => x.Value.GetComponent<WeaponPartScript>())
-				.ToDictionary(x => x.name);
+			foreach (GameObject go in allObjects)
+			{
+				WeaponPartScript script = go.GetComponent<WeaponPartScript>();
+				if (script == null)
+					continue;
+
+				mPrefabs[script.partId] = go;
+				mScripts[script.partId] = script;
+			}
 		}
 	}
 }

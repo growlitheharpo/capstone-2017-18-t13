@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using FiringSquad.Core;
 using FiringSquad.Core.Input;
+using FiringSquad.Core.UI;
 using UnityEngine;
 using Input = UnityEngine.Input;
 
@@ -20,30 +21,42 @@ namespace FiringSquad.Debug
 			public LogType type { get; set; }
 		}
 
+		/// Private variables
 		private const KeyCode CONSOLE_TOGGLE = KeyCode.BackQuote;
 		private const int MAX_LOGS = 25;
 		private string mCurrentCommand = "";
 		private Queue<LogEntryHolder> mEntries;
 
 		private Action<string[]> mEntryHandler;
-		private bool mViewEnabled;
 		private Vector2 mViewScrollPosition;
 
+		/// <summary>
+		/// Unity's Awake function.
+		/// </summary>
 		private void Awake()
 		{
 			// ReSharper disable once InconsistentlySynchronizedField  (null object cannot be locked)
 			mEntries = new Queue<LogEntryHolder>(MAX_LOGS);
 		}
 
+		/// <summary>
+		/// Unity's Start function.
+		/// </summary>
 		private void Start()
 		{
 			ServiceLocator.Get<IInput>()
 				.RegisterInput(Input.GetKeyDown, CONSOLE_TOGGLE, INPUT_ToggleConsole, InputLevel.None);
+
+			ServiceLocator.Get<IUIManager>()
+				.RegisterPanel(this, ScreenPanelTypes.Console);
 		}
 
+		/// <summary>
+		/// INPUT HANDLER: Toggle the debug game console.
+		/// </summary>
 		private void INPUT_ToggleConsole()
 		{
-			ToggleConsole();
+			ServiceLocator.Get<IUIManager>().TogglePanel(ScreenPanelTypes.Console);
 		}
 
 		/// <inheritdoc />
@@ -77,16 +90,12 @@ namespace FiringSquad.Debug
 		{
 			mEntryHandler = handler;
 		}
-
-		/// <inheritdoc />
-		public override void ToggleConsole()
+		
+		/// <summary>
+		/// Unity's OnEnable function.
+		/// </summary>
+		private void OnEnable()
 		{
-			mViewEnabled = !mViewEnabled;
-			IInput input = ServiceLocator.Get<IInput>();
-			input.SetInputLevelState(InputLevel.DevConsole, mViewEnabled);
-			input.SetInputLevelState(InputLevel.Gameplay, !mViewEnabled);
-			input.SetInputLevelState(InputLevel.HideCursor, !mViewEnabled);
-
 			ForceScrollToBottom();
 		}
 
@@ -113,9 +122,6 @@ namespace FiringSquad.Debug
 		/// </summary>
 		private void OnGUI()
 		{
-			if (!mViewEnabled)
-				return;
-
 			float baseX = Screen.width, baseY = Screen.height;
 			lock (mEntries)
 				DrawLogs(baseX, baseY);
@@ -123,6 +129,9 @@ namespace FiringSquad.Debug
 			DrawEntryBox(baseX, baseY);
 		}
 
+		/// <summary>
+		/// Called from immediate mode OnGUI. Draws the debug console logs.
+		/// </summary>
 		private void DrawLogs(float baseX, float baseY)
 		{
 			Rect consoleRect = new Rect(10.0f, baseY * 0.5f, baseX - 20.0f, baseY * 0.45f);
@@ -164,6 +173,9 @@ namespace FiringSquad.Debug
 			GUILayout.EndArea();
 		}
 
+		/// <summary>
+		/// Called from immediate mode OnGUI. Draws the text entry box.
+		/// </summary>
 		private void DrawEntryBox(float baseX, float baseY)
 		{
 			if (Event.current.type == EventType.keyDown)
@@ -171,7 +183,7 @@ namespace FiringSquad.Debug
 				if (Event.current.keyCode == KeyCode.Return)
 					SendCommand();
 				else if (Event.current.keyCode == CONSOLE_TOGGLE)
-					ToggleConsole();
+					ServiceLocator.Get<IUIManager>().PopPanel(ScreenPanelTypes.Console);
 			}
 
 			Rect entryRect = new Rect(10.0f, baseY * 0.95f, baseX - 20.0f, baseY * 0.045f);

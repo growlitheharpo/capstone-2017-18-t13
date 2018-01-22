@@ -210,7 +210,8 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_Materials:
-  - {fileID: 2100000, guid: 12a8965948e8c564b8ef36f3142841e5, type: 2}
+  - {fileID: 2100000, guid: dfd36be2471c15a409a952ab5a4630fe, type: 2}
+  - {fileID: 2100000, guid: fc41b173231458043b132767c62f204e, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -242,7 +243,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_Materials:
-  - {fileID: 2100000, guid: 12a8965948e8c564b8ef36f3142841e5, type: 2}
+  - {fileID: 2100000, guid: dfd36be2471c15a409a952ab5a4630fe, type: 2}
   - {fileID: 2100000, guid: fc41b173231458043b132767c62f204e, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
@@ -396,7 +397,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1f72922dda36b554ba8f1e37d8e306fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mDurabilitySprite: {fileID: 21300000, guid: 30c734bf7b64c3b4d8fdc80d18ba4f0c, type: 3}
+  mUniqueId: 180
+  mPrettyName: Iron Sights
+  mDescription: Iron Sights
   mData:
     mMinDispersionModifier:
       mAmount: 0
@@ -428,10 +431,10 @@ MonoBehaviour:
     mClipSizeModifier:
       mAmount: 0
       mType: 0
-  mDescription: Iron Sights
-  mPrettyName: Iron Sights
+  mDurabilitySprite: {fileID: 21300000, guid: 30c734bf7b64c3b4d8fdc80d18ba4f0c, type: 3}
   mDurability: -1
-  mAimDownSightsPosition: {x: -0.199, y: 0.037, z: 0}
+  mAimDownSightsEffect: {fileID: 11400000, guid: 6fe81614cb3258040bbfdd67fe7a5885,
+    type: 2}
 --- !u!114 &114797771502676396
 MonoBehaviour:
   m_ObjectHideFlags: 1

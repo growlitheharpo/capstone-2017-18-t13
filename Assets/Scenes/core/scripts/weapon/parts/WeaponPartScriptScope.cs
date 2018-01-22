@@ -1,34 +1,42 @@
-﻿using KeatsLib.Unity;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace FiringSquad.Gameplay.Weapons
 {
+	/// <inheritdoc />
 	public class WeaponPartScriptScope : WeaponPartScript
 	{
+		/// Inspector variables
+		[HideInInspector] [SerializeField] private AimDownSightsEffect mAimDownSightsEffect;
+
+		/// <inheritdoc />
 		public override BaseWeaponScript.Attachment attachPoint { get { return BaseWeaponScript.Attachment.Scope; } }
 
-		[SerializeField] private Vector3 mAimDownSightsPosition;
-		private Coroutine mMoveRoutine;
-
+		/// <summary>
+		/// Activate the Aim Down Sights effect for this script.
+		/// </summary>
+		/// <param name="weapon">The weapon we are attached to.</param>
 		public void ActivateAimDownSightsEffect(IWeapon weapon)
 		{
-			Transform subView = weapon.transform.Find("View").GetChild(0);
-			if (mMoveRoutine != null)
-				StopCoroutine(mMoveRoutine);
-
-			mMoveRoutine = StartCoroutine(Coroutines.LerpPosition(subView, mAimDownSightsPosition, 0.2f, Space.Self, Coroutines.MATHF_SMOOTHSTEP));
+			mAimDownSightsEffect.ActivateEffect(weapon, this);
 		}
 
+		/// <summary>
+		/// Deativate the Aim Down Sights effect for this script.
+		/// </summary>
+		/// <param name="weapon">The weapon we are attached to.</param>
+		/// <param name="immediate">Whether or not to jump immediately to the "exit" state instead of lerping.</param>
 		public void DeactivateAimDownSightsEffect(IWeapon weapon, bool immediate = false)
 		{
-			Transform subView = weapon.transform.Find("View").GetChild(0);
-			if (mMoveRoutine != null)
-				StopCoroutine(mMoveRoutine);
+			mAimDownSightsEffect.DeactivateEffect(this, immediate);
+		}
 
-			if (!immediate)
-				mMoveRoutine = StartCoroutine(Coroutines.LerpPosition(subView, Vector3.zero, 0.2f, Space.Self, Coroutines.MATHF_SMOOTHSTEP));
-			else
-				subView.transform.localPosition = Vector3.zero;
+		/// <summary>
+		/// Unity Event Handler. Called when scope is destroyed.
+		/// </summary>
+		public void OnDestroy()
+		{
+			if (mAimDownSightsEffect != null)
+				mAimDownSightsEffect.DeactivateEffect(this, true);
 		}
 	}
 }

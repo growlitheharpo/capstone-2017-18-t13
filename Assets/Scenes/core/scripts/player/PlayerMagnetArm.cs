@@ -5,14 +5,21 @@ using FiringSquad.Core;
 using FiringSquad.Core.Audio;
 using FiringSquad.Gameplay.UI;
 using FiringSquad.Gameplay.Weapons;
+using JetBrains.Annotations;
 using UnityEngine;
 using UnityEngine.Networking;
 using Logger = FiringSquad.Debug.Logger;
 
 namespace FiringSquad.Gameplay
 {
+	/// <summary>
+	/// The networked magnet arm of the player.
+	/// Used to draw weapon parts towards us and hold onto them until the player
+	/// decides to equip, drop, or throw them.
+	/// </summary>
 	public class PlayerMagnetArm : NetworkBehaviour
 	{
+		/// <summary> Enum used to mark network data that needs to be updated. </summary>
 		[Flags]
 		private enum DirtyBitFlags
 		{
@@ -20,6 +27,7 @@ namespace FiringSquad.Gameplay
 			HeldObject = 0x2,
 		}
 
+		/// <summary> The current input state of the magnet arm. </summary>
 		private enum State
 		{
 			Idle,
@@ -27,15 +35,32 @@ namespace FiringSquad.Gameplay
 			Locked
 		}
 
+		/// Inspector variables
 		[SerializeField] private float mPullForce;
-		public float pullForce { get { return mPullForce; } }
-
 		[SerializeField] private float mPullRadius;
 		[SerializeField] private LayerMask mGrabLayers;
 
+		/// Private variables
 		private WeaponPickupScript mHeldObject;
+		private IAudioReference mGrabSound;
+		private CltPlayer mBearer;
+		private WeaponPickupScript mGrabCandidate;
+		private float mHeldTimer;
+		private State mState;
 
-		public WeaponPickupScript heldWeaponPart
+		private const float SNAP_THRESHOLD_DISTANCE = 2.5f;
+		private const float THROW_HOLD_SECONDS = 1.0f;
+
+		/// <summary> 
+		/// The pull force of this magnet arm. 
+		/// TODO: Does this need to be public or can it be passed as a parameter where it is used?
+		/// </summary>
+		public float pullForce { get { return mPullForce; } }
+
+		/// <summary>
+		/// The current held weapon part of this magnet arm, or null if we are not holding one.
+		/// </summary>
+		[CanBeNull] public WeaponPickupScript heldWeaponPart
 		{
 			get { return mHeldObject; }
 			set
@@ -48,9 +73,9 @@ namespace FiringSquad.Gameplay
 			}
 		}
 
-		private IAudioReference mGrabSound;
-
-		private CltPlayer mBearer;
+		/// <summary>
+		/// The current bearer of this magnet arm.
+		/// </summary>
 		public CltPlayer bearer
 		{
 			get { return mBearer; }
@@ -61,12 +86,11 @@ namespace FiringSquad.Gameplay
 			}
 		}
 
-		private WeaponPickupScript mGrabCandidate;
-		private float mHeldTimer;
-		private State mState;
-
 		#region Serialization
 
+		/// <summary>
+		/// Unity's OnSerialize function. Called when any dirty bits have been set.
+		/// </summary>
 		public override bool OnSerialize(NetworkWriter writer, bool forceAll)
 		{
 			if (forceAll)
@@ -104,6 +128,9 @@ namespace FiringSquad.Gameplay
 			return true;
 		}
 
+		/// <summary>
+		/// Unity's OnSerialize function. Called when an update to our state has been received.
+		/// </summary>
 		public override void OnDeserialize(NetworkReader reader, bool forceAll)
 		{
 			if (forceAll)
@@ -124,8 +151,12 @@ namespace FiringSquad.Gameplay
 			}
 		}
 
+		/// <summary>
+		/// Determine our held object from the network reader.
+		/// </summary>
 		private void DeserializeHeldObject(NetworkReader reader)
 		{
+			// Check if we have a part. If not, make sure to locally reflect that.
 			bool hasPart = reader.ReadBoolean();
 			if (!hasPart)
 			{
@@ -135,6 +166,7 @@ namespace FiringSquad.Gameplay
 			}
 			else
 			{
+				// We do have a part. Try to find it and grab it.
 				GameObject heldObject = ClientScene.FindLocalObject(reader.ReadNetworkId());
 				if (heldObject == null)
 				{
@@ -154,6 +186,9 @@ namespace FiringSquad.Gameplay
 			}
 		}
 
+		/// <summary>
+		/// Bind this magnet arm to the player with the provided ID.
+		/// </summary>
 		private IEnumerator BindToBearer(NetworkInstanceId bearerId)
 		{
 			while (bearer == null || bearer.netId != bearerId)
@@ -172,11 +207,15 @@ namespace FiringSquad.Gameplay
 			}
 		}
 
+		/// <summary>
+		/// Unity's Update function.
+		/// </summary>
 		private void Update()
 		{
 			if (bearer == null || !bearer.isCurrentPlayer)
 				return;
 
+			// TODO: This is *not* how these next few lines should work. We should only send the events when something has changed!
 			TryFindGrabCandidate();
 			EventManager.Notify(() => EventManager.LocalGUI.SetHintState(CrosshairHintText.Hint.MagnetArmGrab, mGrabCandidate != null));
 			EventManager.Notify(() => EventManager.LocalGUI.SetHintState(CrosshairHintText.Hint.ItemEquipOrDrop, heldWeaponPart != null));
@@ -184,6 +223,10 @@ namespace FiringSquad.Gameplay
 
 		#endregion
 
+		/// <summary>
+		/// INPUT_HANDLER: Handle the player's "magnet arm fire" button being held down.
+		/// Result depends on our internal state.
+		/// </summary>
 		[Client]
 		public void FireHeld()
 		{
@@ -205,6 +248,10 @@ namespace FiringSquad.Gameplay
 			}
 		}
 
+		/// <summary>
+		/// INPUT_HANDLER: Handle the player's "magnet arm fire" button being released.
+		/// Result depends on our internal state.
+		/// </summary>
 		[Client]
 		public void FireUp()
 		{
@@ -223,6 +270,10 @@ namespace FiringSquad.Gameplay
 			}
 		}
 
+		/// <summary>
+		/// Send an update to FMOD on whether or not to play the magnet arm "grab" sound.
+		/// </summary>
+		/// <param name="shouldPlay">Whether or not the sound should be playing.</param>
 		[Client]
 		private void UpdateSound(bool shouldPlay)
 		{
@@ -238,6 +289,10 @@ namespace FiringSquad.Gameplay
 			}
 		}
 
+		/// <summary>
+		/// Fire out a spherecast and check the objects it hit. Sets mGrabCandidate to null if
+		/// no objects are found, or to the closeset hit object.
+		/// </summary>
 		[Client]
 		private void TryFindGrabCandidate()
 		{
@@ -249,11 +304,12 @@ namespace FiringSquad.Gameplay
 			if (hits.Length == 0)
 				return;
 
-			hits = hits.OrderBy(x => x.distance).ToArray(); // could also sort by dot product
+			// could also sort by dot product instead of distance to get the "most accurate" pull instead of the closest.
+			hits = hits.OrderBy(x => x.distance).ToArray(); 
 
 			foreach (RaycastHit hitInfo in hits)
 			{
-				WeaponPickupScript grabbable = hitInfo.collider.GetComponentUpwards<WeaponPickupScript>();
+				WeaponPickupScript grabbable = hitInfo.collider.GetComponentInParent<WeaponPickupScript>();
 				if (grabbable != null && !grabbable.currentlyHeld)
 				{
 					mGrabCandidate = grabbable;
@@ -264,6 +320,10 @@ namespace FiringSquad.Gameplay
 			mGrabCandidate = null;
 		}
 
+		/// <summary>
+		/// Pull our current grab candidate towards us if we have one. Will abort if we are holding a part.
+		/// When the object is closer than SNAP_THRESHOLD_DISTANCE, snaps the object into the hand.
+		/// </summary>
 		[Client]
 		private void ReelGrabCandidate()
 		{
@@ -272,16 +332,22 @@ namespace FiringSquad.Gameplay
 
 			mState = State.Reeling;
 
+			// Check if it's close enough to grab.
 			Vector3 direction = mGrabCandidate.transform.position - bearer.eye.position;
-
-			if (direction.magnitude < 2.5f)
+			if (direction.magnitude < SNAP_THRESHOLD_DISTANCE)
 			{
 				EventManager.Notify(() => EventManager.LocalGUI.SetHintState(CrosshairHintText.Hint.MagnetArmGrab, false));
 				EventManager.Notify(() => EventManager.LocalGUI.SetHintState(CrosshairHintText.Hint.ItemEquipOrDrop, true));
 				CmdGrabItem(mGrabCandidate.netId);
+
+				ServiceLocator.Get<IAudioManager>()
+					.CreateSound(AudioEvent.MagnetArmGrab, transform)
+					.AttachToRigidbody(mBearer.GetComponent<Rigidbody>());
+
 				return;
 			}
 
+			// Check if we're still more or less looking at the object.
 			Vector3 looking = bearer.eye.forward;
 			float dot = Vector3.Dot(direction.normalized, looking.normalized);
 			if (dot < 0.9f)
@@ -290,22 +356,28 @@ namespace FiringSquad.Gameplay
 				return;
 			}
 
+			// Pull it towards us locally and on the server.
 			mGrabCandidate.PullTowards(bearer);
 			CmdReelObject(mGrabCandidate.netId);
 		}
 
+		/// <summary>
+		/// Releases our currently held item. Throws or drops depending on the current hold time.
+		/// </summary>
 		[Client]
 		private void ThrowOrDropItem()
 		{
 			EventManager.Notify(() => EventManager.LocalGUI.SetHintState(CrosshairHintText.Hint.ItemEquipOrDrop, false));
 			if (heldWeaponPart != null && heldWeaponPart.currentHolder == bearer)
 			{
-				if (mHeldTimer >= 1.0f)
+				bool throwObj = mHeldTimer >= THROW_HOLD_SECONDS;
+
+				if (throwObj)
 					heldWeaponPart.Throw();
 				else
 					heldWeaponPart.Release();
 
-				CmdReleaseItem(heldWeaponPart.netId, mHeldTimer < 1.0f);
+				CmdReleaseItem(heldWeaponPart.netId, !throwObj);
 			}
 
 			heldWeaponPart = null;
@@ -314,6 +386,9 @@ namespace FiringSquad.Gameplay
 			mState = State.Idle;
 		}
 
+		/// <summary>
+		/// Force the magnet arm to immediately drop a held item. Will not throw if there is no held item.
+		/// </summary>
 		[Server]
 		public void ForceDropItem()
 		{
@@ -324,6 +399,9 @@ namespace FiringSquad.Gameplay
 			RpcForceReleaseItem();
 		}
 
+		/// <summary>
+		/// Reflect a "ForceDropItem" call on the server on each local instance.
+		/// </summary>
 		[ClientRpc]
 		private void RpcForceReleaseItem()
 		{
@@ -331,6 +409,10 @@ namespace FiringSquad.Gameplay
 			ThrowOrDropItem();
 		}
 
+		/// <summary>
+		/// Reflect an item reel on the server so that all clients can sync it.
+		/// </summary>
+		/// <param name="id">The id of the object to reel in.</param>
 		[Command]
 		private void CmdReelObject(NetworkInstanceId id)
 		{
@@ -338,6 +420,10 @@ namespace FiringSquad.Gameplay
 			go.GetComponent<INetworkGrabbable>().PullTowards(bearer);
 		}
 
+		/// <summary>
+		/// Reflect an immediate grab/snap command from the client on the server so that all clients can sync it.
+		/// </summary>
+		/// <param name="id">The id of the object to snap.</param>
 		[Command]
 		private void CmdGrabItem(NetworkInstanceId id)
 		{
@@ -352,6 +438,11 @@ namespace FiringSquad.Gameplay
 			mGrabCandidate = null;
 		}
 
+		/// <summary>
+		/// Reflect a "release" command on the server so that all clients can sync it.
+		/// </summary>
+		/// <param name="itemId">The id of the object to release. Should be our held weapon.</param>
+		/// <param name="drop">True to simply drop the object to the ground, false to throw it with force.</param>
 		[Command]
 		private void CmdReleaseItem(NetworkInstanceId itemId, bool drop)
 		{

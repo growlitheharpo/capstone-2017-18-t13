@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
@@ -29,19 +28,21 @@ namespace precommit
 
 		private const string LC_WORD = "([a-z]+)";
 		private const string UC_WORD = "([A-Z][a-z]+)";
-		private const string NUM_TWO = "(\\d{2})";
+		private const string OPT_NUM_TWO = "(\\d{0}|\\d{2})";
+		private const string OPT_DIMENSION = "((\\d{1,3}(\\.\\d)?)(x(\\d{1,3}(\\.\\d)?)){1,2})";
 		private const string ANIM = "(@[a-z]+)";
 		private const string OPT_ANIM = ANIM + "?";
 		private const string AUD_TYPE = "((sfx)|(mus))_";
-		private const string TEX_TYPE = "((color_)|(rmao_)|(norm_)|(emiss_))";
+		private const string PREFAB_TYPE = "((vfx_)|(ui_))?";
+		private const string TEX_TYPE = "((color_)|(rmao_)|(norm_)|(emiss_)|(aorm_)|(ui_)|(vfx_))";
 
-		private const string REGULAR_NAME = LC_WORD + UC_WORD + "*" + NUM_TWO + "?";
-		private const string SUFFIX = "(_[a-z]+\\d{2}?)?";
+		private const string REGULAR_NAME = LC_WORD + UC_WORD + "*" + "(" + OPT_NUM_TWO + ")|(" + OPT_DIMENSION + ")";
+		private const string SUFFIX = "(_" + REGULAR_NAME + ")?";
 
 		private static readonly Dictionary<string, Regex> FILETYPE_CONVENTIONS = new Dictionary<string, Regex>
 		{
-			{ ".prefab",	new Regex(START + "(p_)" + REGULAR_NAME + SUFFIX + "(.prefab)(.meta)?" + END) },
-			{ ".mat",		new Regex(START + "(mat_)" + REGULAR_NAME + SUFFIX + "(.mat)(.meta)?" + END) },
+			{ ".prefab",	new Regex(START + "(p_)" + PREFAB_TYPE + REGULAR_NAME + SUFFIX + "(.prefab)(.meta)?" + END) },
+			{ ".mat",		new Regex(START + "(mat_)" + PREFAB_TYPE + REGULAR_NAME + SUFFIX + "(.mat)(.meta)?" + END) },
 			{ ".png",		new Regex(START + "(tex_)" + TEX_TYPE + "?" + REGULAR_NAME + SUFFIX + "(.png)(.meta)?" + END) },
 			{ ".jpg",		new Regex(START + "(tex_)" + TEX_TYPE + "?" + REGULAR_NAME + SUFFIX + "(.jpg)(.meta)?" + END) },
 			{ ".jpeg",		new Regex(START + "(tex_)" + TEX_TYPE + "?" + REGULAR_NAME + SUFFIX + "(.jpeg)(.meta)?" + END) },
@@ -85,9 +86,9 @@ namespace precommit
 					switch (f)
 					{
 						case Folder.Assets:
-							return x.StartsWith("Assets/");
+							return x.StartsWith("Assets/") || x.StartsWith("\"Assets/");
 						case Folder.AssetsScenes:
-							return x.StartsWith("Assets/Scenes/");
+							return x.StartsWith("Assets/Scenes/") || x.StartsWith("\"Assets/Scenes/");
 						default:
 							return true;
 					}

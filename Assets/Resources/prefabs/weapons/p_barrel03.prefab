@@ -1753,7 +1753,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7024d1c3bbf87e0498ff935403a3540e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mDurabilitySprite: {fileID: 21300000, guid: 7b92c0e9d26208746b38fc49bcb442bf, type: 3}
+  mUniqueId: 3
+  mPrettyName: Sniper Barrel
+  mDescription: A single shot, sniper rifle barrel
   mData:
     mMinDispersionModifier:
       mAmount: 0.65
@@ -1785,8 +1787,7 @@ MonoBehaviour:
     mClipSizeModifier:
       mAmount: -6
       mType: 0
-  mDescription: A single shot, sniper rifle barrel
-  mPrettyName: Sniper Barrel
+  mDurabilitySprite: {fileID: 21300000, guid: 7b92c0e9d26208746b38fc49bcb442bf, type: 3}
   mDurability: 8
   mTip: {fileID: 4467395475359334}
   mProjectileCount: 1

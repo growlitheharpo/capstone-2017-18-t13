@@ -1,12 +1,19 @@
 ﻿using System;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.UI;
 using Object = UnityEngine.Object;
 
 namespace KeatsLib.Unity
 {
+	/// <summary>
+	/// A collection of useful coroutines.
+	/// </summary>
 	public static class Coroutines
 	{
+		/// <summary>
+		/// The delegate type for Actions to call after a Coroutine has completed.
+		/// </summary>
 		public delegate void CallOnComplete();
 
 		public delegate float PercentageEvaluator(float current, float total);
@@ -48,6 +55,9 @@ namespace KeatsLib.Unity
 				callback();
 		}
 
+		/// <summary>
+		/// Private function for lerping a local position.
+		/// </summary>
 		private static IEnumerator LerpLocalPos(Transform obj, Vector3 p, float t, PercentageEvaluator tScale)
 		{
 			float currentTime = 0.0f;
@@ -64,6 +74,9 @@ namespace KeatsLib.Unity
 			obj.transform.localPosition = p;
 		}
 
+		/// <summary>
+		/// Private function for lerping a world position.
+		/// </summary>
 		private static IEnumerator LerpWorldPos(Transform obj, Vector3 p, float t, PercentageEvaluator tScale)
 		{
 			float currentTime = 0.0f;
@@ -105,22 +118,9 @@ namespace KeatsLib.Unity
 				callback();
 		}
 
-		private static IEnumerator LerpWorldRot(Transform t, Quaternion rot, float time, PercentageEvaluator tScale)
-		{
-			float currentTime = 0.0f;
-			Quaternion startRot = t.rotation;
-
-			while (currentTime < time)
-			{
-				t.rotation = Quaternion.Slerp(startRot, rot, tScale(currentTime, time));
-
-				currentTime += Time.deltaTime;
-				yield return new WaitForEndOfFrame();
-			}
-
-			t.rotation = rot;
-		}
-
+		/// <summary>
+		/// Private function for lerping a local rotation.
+		/// </summary>
 		private static IEnumerator LerpLocalRot(Transform t, Quaternion rot, float time, PercentageEvaluator tScale)
 		{
 			float currentTime = 0.0f;
@@ -135,6 +135,25 @@ namespace KeatsLib.Unity
 			}
 
 			t.localRotation = rot;
+		}
+
+		/// <summary>
+		/// Private function for lerping a world rotation.
+		/// </summary>
+		private static IEnumerator LerpWorldRot(Transform t, Quaternion rot, float time, PercentageEvaluator tScale)
+		{
+			float currentTime = 0.0f;
+			Quaternion startRot = t.rotation;
+
+			while (currentTime < time)
+			{
+				t.rotation = Quaternion.Slerp(startRot, rot, tScale(currentTime, time));
+
+				currentTime += Time.deltaTime;
+				yield return new WaitForEndOfFrame();
+			}
+
+			t.rotation = rot;
 		}
 
 		/// <summary>
@@ -157,6 +176,9 @@ namespace KeatsLib.Unity
 				callback();
 		}
 
+		/// <summary>
+		/// Private fucntion for lerping a local rotation.
+		/// </summary>
 		private static IEnumerator LerpLocalScale(Transform obj, Vector3 scale, float t, PercentageEvaluator tScale)
 		{
 			float currentTime = 0.0f;
@@ -204,6 +226,38 @@ namespace KeatsLib.Unity
 		}
 
 		/// <summary>
+		/// Lerp the color of a UI element over time.
+		/// </summary>
+		/// <param name="targetGraphic">The target UI element to effect.</param>
+		/// <param name="color">The new color to lerp to.</param>
+		/// <param name="time">The amount of time to lerp over.</param>
+		/// <param name="tScale">The method used to evaluate T as the lerp occurs. Defaults to linear.</param>
+		/// <param name="callback">Function to call when this lerp has completed.</param>
+		/// <returns></returns>
+		public static IEnumerator LerpUIColor(
+			Graphic targetGraphic, Color color, float time, PercentageEvaluator tScale = null,
+			CallOnComplete callback = null)
+		{
+			if (tScale == null)
+				tScale = LINEAR_EVALUATOR;
+
+			float elapsedTime = 0.0f;
+			Color startingVal = targetGraphic.color;
+
+			while (elapsedTime < time)
+			{
+				yield return null;
+				targetGraphic.color = Color.Lerp(startingVal, color, tScale(elapsedTime, time));
+				elapsedTime += Time.deltaTime;
+			}
+
+			targetGraphic.color = color;
+
+			if (callback != null)
+				callback();
+		}
+
+		/// <summary>
 		/// Wait a certain number of frames, than activate the given callback.
 		/// </summary>
 		/// <param name="numberFrames">Number of frames to wait for.</param>
@@ -235,7 +289,6 @@ namespace KeatsLib.Unity
 		/// The first parameter is the amount of time (in seconds) since the coroutine began.
 		/// The function returns true if it should continue, and returns false if it should end.
 		/// </param>
-		/// <returns></returns>
 		public static IEnumerator InvokeEveryTick(Func<float, bool> callback)
 		{
 			float currentTime = 0.0f;
@@ -248,6 +301,7 @@ namespace KeatsLib.Unity
 
 		/// <summary>
 		/// Destroys a particle system after it has finished playing.
+		/// TODO: If we update to Unity 2017.2, we won't need this!!!
 		/// </summary>
 		public static IEnumerator WaitAndDestroyParticleSystem(ParticleSystem ps, bool destroyGameObject = true)
 		{

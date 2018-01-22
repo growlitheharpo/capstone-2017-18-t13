@@ -12,7 +12,13 @@ namespace precommit
 			"Charles Carucci",
 			"James Keats",
 			"Max Sanel",
-			"Tyler Bolster"
+			"Tyler Bolster",
+			"Justin Mulkin",
+			"Natalie Frost",
+			"Tim Eccleston",
+			"Timothy Eccleston",
+			"Michael Manfredi",
+			"Mike Manfredi",
 		};
 
 		private static readonly string[] POSSIBLE_EMAILS =
@@ -20,7 +26,11 @@ namespace precommit
 			"charles.carucci@mymail.champlain.edu",
 			"james.keats@mymail.champlain.edu",
 			"max.sanel@mymail.champlain.edu",
-			"tyler.bolster@mymail.champlain.edu"
+			"tyler.bolster@mymail.champlain.edu",
+			"justin.mulkin@mymail.champlain.edu",
+			"natalie.frost@mymail.champlain.edu",
+			"timothy.eccleston@mymail.champlain.edu",
+			"michael.manfredi@mymail.champlain.edu",
 		};
 
 		public static async Task<PrehookResult> DoCheckUser()

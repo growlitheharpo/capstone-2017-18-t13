@@ -5,7 +5,7 @@ namespace FiringSquad.Core.Audio
 	/// <summary>
 	/// The public interface for the Audio Manager service.
 	/// </summary>
-	public interface IAudioManager
+	public interface IAudioManager : IGlobalService
 	{
 		/// <summary>
 		/// Used to instantiate all of the sounds at startup.

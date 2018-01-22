@@ -6,40 +6,59 @@ using UnityEngine.Networking;
 
 namespace FiringSquad.Gameplay.Weapons
 {
+	/// <inheritdoc />
 	public class RocketProjectile : BaseProjectileScript
 	{
+		/// Inspector variables
 		[SerializeField] private ParticleSystem mHitParticles;
 		[SerializeField] private float mSpeed;
 		[SerializeField] private float mSplashDamageRadius;
 
+		/// Private variables
 		private Transform mDirectHit;
 		private Rigidbody mRigidbody;
 		private GameObject mView;
 		private WeaponData mData; // server-only
+		private bool mExploded;
 
+		/// <summary>
+		/// Unity's Awake function
+		/// </summary>
 		private void Awake()
 		{
 			mRigidbody = GetComponent<Rigidbody>();
 			mView = transform.Find("View").gameObject;
 		}
 
-		public override void PreSpawnInitialize(IWeapon weapon, Ray ray, WeaponData data)
+		/// <inheritdoc />
+		public override bool PreSpawnInitialize(IWeapon weapon, Ray ray, WeaponData data)
 		{
 			base.PreSpawnInitialize(weapon, ray, data);
 
-			Transform barrelTip = weapon.currentParts.barrel.barrelTip;
+			Transform barrelTip = weapon.currentParts.barrel != null ? weapon.currentParts.barrel.barrelTip : weapon.transform;
 			transform.position = barrelTip.position + barrelTip.forward;
-			transform.forward = barrelTip.forward;
 
 			mRigidbody.AddForce(ray.direction * mSpeed, ForceMode.Impulse);
+			transform.right = ray.direction;
 			mData = data;
+
+			return true;
 		}
 
+		/// <summary>
+		/// Unity's OnCollisionEnter callback.
+		/// Set to only trigger on the server for hit detection.
+		/// </summary>
 		[ServerCallback]
 		private void OnCollisionEnter(Collision hit)
 		{
+			if (mExploded)
+				return;
+
 			if (hit.transform == source.gameObject.transform)
 				return;
+
+			mExploded = true;
 
 			IDamageReceiver component = hit.GetDamageReceiver();
 			if (component != null)
@@ -49,18 +68,25 @@ namespace FiringSquad.Gameplay.Weapons
 			}
 
 			NetworkBehaviour netObject = component as NetworkBehaviour;
-			RpcPlaySound(netObject == null ? NetworkInstanceId.Invalid : netId, hit.contacts[0].point);
+			RpcPlaySound(netObject == null ? NetworkInstanceId.Invalid : netObject.netId, hit.contacts[0].point);
 
 			ApplySplashDamage();
 			RpcActivateExplodeEffect();
 			StartCoroutine(DisplayExplodeParticles());
 		}
 
+		/// <summary>
+		/// Unity's Update function.
+		/// Rotate our projectile to face towards our velocity
+		/// </summary>
 		private void Update()
 		{
 			transform.right = mRigidbody.velocity;
 		}
 
+		/// <summary>
+		/// Apply the splash damage for this projectile.
+		/// </summary>
 		[Server]
 		private void ApplySplashDamage()
 		{
@@ -70,7 +96,7 @@ namespace FiringSquad.Gameplay.Weapons
 				if (col.transform == mDirectHit)
 					continue;
 
-				IDamageReceiver c = col.GetComponentUpwards<IDamageReceiver>();
+				IDamageReceiver c = col.GetComponentInParent<IDamageReceiver>();
 				if (c == null)
 					continue;
 
@@ -85,12 +111,20 @@ namespace FiringSquad.Gameplay.Weapons
 			}
 		}
 
+		/// <summary>
+		/// Activate the explode effect across all clients.
+		/// TODO: This probably shouldn't be an RPC!!
+		/// </summary>
 		[ClientRpc]
 		private void RpcActivateExplodeEffect() // TODO: Does this really need to be an RPC?
 		{
 			StartCoroutine(DisplayExplodeParticles());
 		}
 
+		/// <summary>
+		/// Show the particles and destroy our normal view.
+		/// </summary>
+		/// <returns></returns>
 		private IEnumerator DisplayExplodeParticles()
 		{
 			mView.SetActive(false);
@@ -112,6 +146,9 @@ namespace FiringSquad.Gameplay.Weapons
 			OnEffectComplete();
 		}
 
+		/// <summary>
+		/// Cleanup this projectile after the explode has finished.
+		/// </summary>
 		[Server]
 		private void OnEffectComplete()
 		{

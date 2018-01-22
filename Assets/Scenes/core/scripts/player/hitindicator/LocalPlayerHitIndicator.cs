@@ -1,12 +1,14 @@
 ﻿using System.Collections;
 using KeatsLib.Unity;
 using UnityEngine;
+using UnityEngine.UI;
 using UIImage = UnityEngine.UI.Image;
 
 namespace FiringSquad.Gameplay.UI
 {
 	public class LocalPlayerHitIndicator : MonoBehaviour, IPlayerHitIndicator
 	{
+		/// Private variables
 		private UIImage mVignetteImage;
 		private GameObjectPool mIndicatorPool;
 		private Color mVisibleRadColor, mHiddenRadColor, mVisibleVinColor, mHiddenVinColor;
@@ -14,6 +16,9 @@ namespace FiringSquad.Gameplay.UI
 
 		private const float FADE_OUT_TIME = 0.25f;
 
+		/// <summary>
+		/// Unity's Awake function.
+		/// </summary>
 		private void Awake()
 		{
 			mVignetteImage = transform.Find("Vignette").GetComponent<UIImage>();
@@ -29,6 +34,9 @@ namespace FiringSquad.Gameplay.UI
 			mVignetteImage.color = mHiddenVinColor;
 		}
 
+		/// <summary>
+		/// Unity's Start function.
+		/// </summary>
 		private void Start()
 		{
 			GameObject prefab = Instantiate(gameObject);
@@ -44,27 +52,37 @@ namespace FiringSquad.Gameplay.UI
 			t.offsetMin = Vector2.zero;
 		}
 
+		/// <inheritdoc />
 		public void NotifyHit(ICharacter receiver, Vector3 sourcePosition, Vector3 hitPosition, Vector3 hitNormal, float amount)
 		{
 			if (mIndicatorPool.usePercentage >= 1.0f)
 				return;
 
-			SpawnHitIndicator(receiver, sourcePosition, amount);
+			SpawnHitIndicator(receiver.transform, sourcePosition, amount);
 			FlashScreenVignette();
 		}
 
-		private void SpawnHitIndicator(ICharacter receiver, Vector3 sourcePosition, float amount)
+		/// <summary>
+		/// Display our hit indicator on the canvas.
+		/// </summary>
+		/// <param name="receiver">The transform of the damage receiver.</param>
+		/// <param name="sourcePosition">The world position of the damage source.</param>
+		/// <param name="amount">How much damage was caused.</param>
+		private void SpawnHitIndicator(Transform receiver, Vector3 sourcePosition, float amount)
 		{
+			// "Instantiate" a new hit indicator.
 			GameObject newObj = mIndicatorPool.ReleaseNewItem();
 			RectTransform t = newObj.GetComponent<RectTransform>();
 			t.SetParent(transform);
 			t.ResetEverything(new Vector2(0.4f, 0.4f), new Vector2(0.6f, 0.6f));
 
-			Vector3 cam = receiver.gameObject.transform.forward;
-			Vector3 a = receiver.gameObject.transform.position;
+			// Determine where the hit came from relative to us.
+			Vector3 cam = receiver.forward;
+			Vector3 a = receiver.position;
 			Vector3 b = sourcePosition;
 			Vector3 dir = b - a;
 
+			// "Flatten" the direction along the vertical axis.
 			cam = new Vector3(cam.x, 0.0f, cam.z);
 			dir = new Vector3(dir.x, 0.0f, dir.z);
 
@@ -74,6 +92,10 @@ namespace FiringSquad.Gameplay.UI
 			StartCoroutine(FadeOutColor(newObj.GetComponent<UIImage>(), mVisibleRadColor, mHiddenRadColor, FADE_OUT_TIME * 1.75f, true));
 		}
 
+		/// <summary>
+		/// Flash a red vignette on the screen.
+		/// TODO: This can be done using a PostProcessing QuickVolume instead of a UI Image.
+		/// </summary>
 		private void FlashScreenVignette()
 		{
 			if (mFadeVignetteRoutine != null)
@@ -83,23 +105,25 @@ namespace FiringSquad.Gameplay.UI
 			mFadeVignetteRoutine = StartCoroutine(FadeOutColor(mVignetteImage, mVisibleVinColor, mHiddenVinColor, FADE_OUT_TIME, false));
 		}
 
-		private IEnumerator FadeOutColor(UIImage image, Color a, Color b, float time, bool returnToPool)
+		/// <summary>
+		/// Fade out the color of a UI element.
+		/// </summary>
+		/// <param name="image">The </param>
+		/// <param name="a"></param>
+		/// <param name="b"></param>
+		/// <param name="time"></param>
+		/// <param name="returnToPool"></param>
+		/// <returns></returns>
+		private IEnumerator FadeOutColor(Graphic image, Color a, Color b, float time, bool returnToPool)
 		{
-			float currentTime = 0.0f;
-			while (currentTime < time)
-			{
-				image.color = Color.Lerp(a, b, currentTime / time);
-				currentTime += Time.deltaTime;
-				yield return null;
-			}
+			image.color = a;
+			yield return Coroutines.LerpUIColor(image, b, time);
 
-			image.color = b;
+			if (!returnToPool)
+				yield break;
 
-			if (returnToPool)
-			{
-				mIndicatorPool.ReturnItem(image.gameObject);
-				image.color = a;
-			}
+			mIndicatorPool.ReturnItem(image.gameObject);
+			image.color = a;
 		}
 	}
 }
