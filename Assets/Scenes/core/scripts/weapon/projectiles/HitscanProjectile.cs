@@ -7,13 +7,20 @@ using UnityEngine.Networking;
 namespace FiringSquad.Gameplay.Weapons
 {
 	/// <inheritdoc />
-	public class HitscanProjectile : BaseProjectileScript
+	public class HitscanProjectile : MonoBehaviour, IProjectile
 	{
 		/// Inspector variables
+		[SerializeField] private float mAudioWeaponType;
 		[SerializeField] private AnimationCurve mFalloffCurve;
 
 		/// Private variables
 		private HitscanShootEffect mEffect;
+
+		/// <inheritdoc />
+		public ICharacter source { get { return sourceWeapon.bearer; } }
+
+		/// <inheritdoc />
+		public IWeapon sourceWeapon { get; private set; }
 
 		/// <summary>
 		/// Unity's Awake function
@@ -24,16 +31,27 @@ namespace FiringSquad.Gameplay.Weapons
 		}
 
 		/// <inheritdoc />
-		[Server]
-		public override void PostSpawnInitialize(IWeapon weapon, Ray initialDirection, WeaponData data)
+		public bool PreSpawnInitialize(IWeapon weapon, Ray initialDirection, WeaponData data)
 		{
-			base.PostSpawnInitialize(weapon, initialDirection, data);
+			sourceWeapon = weapon;
+			return false;
+		}
 
+		/// <inheritdoc />
+		public void PostSpawnInitialize(IWeapon weapon, Ray initialDirection, WeaponData data)
+		{
+			sourceWeapon = weapon;
+
+			// Check for whatever object we hit
+			IDamageReceiver hitObject = null;
 			Vector3 endPoint = initialDirection.origin + initialDirection.direction * 2000.0f;
 			var hits = Physics.RaycastAll(initialDirection, 10000.0f, int.MaxValue, QueryTriggerInteraction.Ignore);
 			if (hits.Length > 0)
 			{
+				// Ensure that the hits are sorted by distance
 				hits = hits.OrderBy(x => Vector3.Distance(x.point, initialDirection.origin)).ToArray();
+
+				// Check if each hit has hit a damage receiver and break if so.
 				foreach (RaycastHit hit in hits)
 				{
 					if (hit.collider.gameObject == weapon.bearer.gameObject)
@@ -41,17 +59,14 @@ namespace FiringSquad.Gameplay.Weapons
 
 					endPoint = hit.point;
 
-					IDamageReceiver hitObject = hit.GetDamageReceiver();
+					hitObject = hit.GetDamageReceiver();
 					if (hitObject != null)
 					{
 						float damage = GetDamage(data, Vector3.Distance(weapon.transform.position, endPoint));
 						hitObject.ApplyDamage(damage, endPoint, hit.normal, this);
 					}
 
-					NetworkBehaviour netObject = hitObject as NetworkBehaviour;
-					RpcPlaySound(netObject == null ? NetworkInstanceId.Invalid : netObject.netId, endPoint);
 					break;
-
 				}
 			}
 
