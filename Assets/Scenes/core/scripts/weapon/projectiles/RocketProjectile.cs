@@ -30,7 +30,8 @@ namespace FiringSquad.Gameplay.Weapons
 			mView = transform.Find("View").gameObject;
 		}
 
-		public override void PreSpawnInitialize(IWeapon weapon, Ray ray, WeaponData data)
+		/// <inheritdoc />
+		public override bool PreSpawnInitialize(IWeapon weapon, Ray ray, WeaponData data)
 		{
 			base.PreSpawnInitialize(weapon, ray, data);
 
@@ -40,6 +41,8 @@ namespace FiringSquad.Gameplay.Weapons
 			mRigidbody.AddForce(ray.direction * mSpeed, ForceMode.Impulse);
 			transform.right = ray.direction;
 			mData = data;
+
+			return true;
 		}
 
 		/// <summary>

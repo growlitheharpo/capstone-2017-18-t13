@@ -542,8 +542,8 @@ namespace FiringSquad.Gameplay.Weapons
 			GameObject instance = Instantiate(mCurrentParts.mechanism.projectilePrefab, mCurrentParts.barrel.barrelTip.position, Quaternion.identity);
 			IProjectile projectile = instance.GetComponent<IProjectile>();
 
-			projectile.PreSpawnInitialize(this, shot, currentData);
-			NetworkServer.Spawn(instance);
+			if (projectile.PreSpawnInitialize(this, shot, currentData))
+				NetworkServer.Spawn(instance);
 			projectile.PostSpawnInitialize(this, shot, currentData);
 		}
 

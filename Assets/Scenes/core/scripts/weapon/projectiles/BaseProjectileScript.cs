@@ -20,9 +20,10 @@ namespace FiringSquad.Gameplay.Weapons
 
 		/// <inheritdoc />
 		[Server]
-		public virtual void PreSpawnInitialize(IWeapon weapon, Ray initialDirection, WeaponData data)
+		public virtual bool PreSpawnInitialize(IWeapon weapon, Ray initialDirection, WeaponData data)
 		{
 			sourceWeapon = weapon;
+			return true;
 		}
 
 		/// <inheritdoc />
