@@ -70,7 +70,6 @@ namespace FiringSquad.Gameplay.Weapons
 				}
 			}
 
-			SetupShot(endPoint);
 			PositionAndVisualize(endPoint);
 			StartCoroutine(WaitAndKillSelf());
 		}
@@ -79,37 +78,10 @@ namespace FiringSquad.Gameplay.Weapons
 		/// Get the amount of damage this hitscan projectile applies based on falloff and weapon data.
 		/// </summary>
 		/// <returns>The amount of damage this bullet should do.</returns>
-		[Server]
 		private float GetDamage(WeaponData data, float distance)
 		{
 			float distancePercent = Mathf.Clamp(distance / data.damageFalloffDistance, 0.0f, 1.0f);
 			return mFalloffCurve.Evaluate(distancePercent) * data.damage;
-		}
-
-		/// <summary>
-		/// Notify all local clients to create a shot locally so that it's visual effect matches what happened on the server.
-		/// </summary>
-		/// <param name="endPoint">The world postiion where this bullet hit.</param>
-		[Server]
-		private void SetupShot(Vector3 endPoint)
-		{
-			RpcCreateShot(source.netId, endPoint);
-		}
-
-		/// <summary>
-		/// Reflect a visual shot that occurred on the server so that the local visualizer matches what happened.
-		/// </summary>
-		/// <param name="s">The network ID of the source of this shot.</param>
-		/// <param name="endPoint">The world position where this bullet hit.</param>
-		[ClientRpc]
-		private void RpcCreateShot(NetworkInstanceId s, Vector3 endPoint) // TODO: Does this need to be an RPC?? Poorly optimized
-		{
-			GameObject theSource = ClientScene.FindLocalObject(s);
-			if (theSource == null)
-				return;
-
-			sourceWeapon = theSource.GetComponent<IWeaponBearer>().weapon;
-			PositionAndVisualize(endPoint);
 		}
 
 		/// <summary>
@@ -125,12 +97,12 @@ namespace FiringSquad.Gameplay.Weapons
 		}
 
 		/// <summary>
-		/// Wait until our visualizer has finished and then destroy this object on the network.
+		/// Wait until our visualizer has finished and then destroy this object.
 		/// </summary>
 		private IEnumerator WaitAndKillSelf()
 		{
 			yield return new WaitForSeconds(0.25f);
-			NetworkServer.Destroy(gameObject);
+			Destroy(gameObject);
 		}
 	}
 }
