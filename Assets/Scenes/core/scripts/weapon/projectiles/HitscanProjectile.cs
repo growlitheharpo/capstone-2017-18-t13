@@ -11,12 +11,27 @@ namespace FiringSquad.Gameplay.Weapons
 	/// <inheritdoc />
 	public class HitscanProjectile : MonoBehaviour, IProjectile
 	{
-		public const short HITSCAN_MESSAGE_TYPE = MsgType.Highest + 8;
+		/// <summary>
+		/// Packages the data necessary to display a local effect for a projectile.
+		/// </summary>
 		public class HitscanMessage : MessageBase
 		{
+			/// <summary>
+			/// The final world position hit.
+			/// </summary>
 			public Vector3 mEnd;
-			public NetworkInstanceId mSource, mHitObject;
+			
+			/// <summary>
+			/// The network ID of the source player of this projectile.
+			/// </summary>
+			public NetworkInstanceId mSource;
+
+			/// <summary>
+			/// The Network ID (or INVALID) for the hit object to determine the local sound.
+			/// </summary>
+			public NetworkInstanceId mHitObject;
 		}
+		public const short HITSCAN_MESSAGE_TYPE = MsgType.Highest + 8;
 
 		/// Inspector variables
 		[SerializeField] private float mAudioWeaponType;
