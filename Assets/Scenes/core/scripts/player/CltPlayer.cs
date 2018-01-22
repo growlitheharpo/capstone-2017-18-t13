@@ -509,6 +509,10 @@ namespace FiringSquad.Gameplay
 				EventManager.Notify(() => EventManager.Local.LocalPlayerCausedDamage(amount));
 
 			mHitIndicator.NotifyHit(this, origin, point, normal, amount);
+			ServiceLocator.Get<IAudioManager>()
+				.CreateSound(AudioEvent.PlayerDamagedGrunt, transform)
+				.AttachToRigidbody(GetComponent<Rigidbody>());
+
 		}
 
 		/// <summary>

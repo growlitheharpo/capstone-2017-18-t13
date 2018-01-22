@@ -30,6 +30,7 @@ namespace FiringSquad.Core.Audio
 		AnnouncerMatchEnds = 85,
 		AnnouncerStageAreaSpawns = 90,
 		AnnouncerStageAreaCaptured = 95,
+		PlayerDamagedGrunt = 100,
 	}
 
 	/// <inheritdoc cref="IAudioManager"/>
