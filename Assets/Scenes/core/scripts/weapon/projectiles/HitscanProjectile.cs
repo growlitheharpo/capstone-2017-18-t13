@@ -1,5 +1,7 @@
 ﻿using System.Collections;
 using System.Linq;
+using FiringSquad.Core;
+using FiringSquad.Core.Audio;
 using FiringSquad.Data;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -70,7 +72,6 @@ namespace FiringSquad.Gameplay.Weapons
 				}
 			}
 
-			PositionAndVisualize(endPoint);
 			StartCoroutine(WaitAndKillSelf());
 		}
 
@@ -87,13 +88,23 @@ namespace FiringSquad.Gameplay.Weapons
 		/// <summary>
 		/// Move this GameObject and notify our visualizer how it should display itself.
 		/// </summary>
+		/// <param name="weapon">The weapon of the player firing this shot.</param>
 		/// <param name="endPoint"></param>
-		private void PositionAndVisualize(Vector3 endPoint)
+		/// <param name="audioEvent">Which audio event type to use.</param>
+		public void PositionAndVisualize(IWeapon weapon, Vector3 endPoint, AudioEvent audioEvent)
 		{
+			sourceWeapon = weapon;
+
 			transform.position = sourceWeapon.currentParts.barrel != null ? sourceWeapon.currentParts.barrel.barrelTip.position : sourceWeapon.transform.position;
 			transform.forward = sourceWeapon.transform.forward;
 
+			ServiceLocator.Get<IAudioManager>()
+				.CreateSound(audioEvent, transform, endPoint, Space.World, false)
+				.SetParameter("WeaponType", mAudioWeaponType)
+				.Start();
+
 			mEffect.PlayEffect(endPoint);
+			StartCoroutine(WaitAndKillSelf());
 		}
 
 		/// <summary>
