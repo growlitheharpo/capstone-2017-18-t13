@@ -11,6 +11,13 @@ namespace FiringSquad.Gameplay.Weapons
 	/// <inheritdoc />
 	public class HitscanProjectile : MonoBehaviour, IProjectile
 	{
+		public const short HITSCAN_MESSAGE_TYPE = MsgType.Highest + 8;
+		public class HitscanMessage : MessageBase
+		{
+			public Vector3 mEnd;
+			public NetworkInstanceId mSource, mHitObject;
+		}
+
 		/// Inspector variables
 		[SerializeField] private float mAudioWeaponType;
 		[SerializeField] private AnimationCurve mFalloffCurve;
@@ -71,8 +78,21 @@ namespace FiringSquad.Gameplay.Weapons
 					break;
 				}
 			}
+			
+			// Prepare the network message for this object
+			NetworkBehaviour netObject = hitObject as NetworkBehaviour;
+			HitscanMessage msg = new HitscanMessage
+			{
+				mSource = source.netId,
+				mEnd = endPoint,
+				mHitObject = netObject == null ? NetworkInstanceId.Invalid : netObject.netId
+			};
 
-			StartCoroutine(WaitAndKillSelf());
+			NetworkServer.SendToAll(HITSCAN_MESSAGE_TYPE, msg);
+
+			// TODO: Instantiating and immediately destroying is wasteful, is there a better way?
+			// TODO: This means that, for the host, each bullet is spawned and destroyed twice. Better than the network waste before, but not good.
+			Destroy(gameObject); // We don't actually need this object on the server, so destroy it.
 		}
 
 		/// <summary>
