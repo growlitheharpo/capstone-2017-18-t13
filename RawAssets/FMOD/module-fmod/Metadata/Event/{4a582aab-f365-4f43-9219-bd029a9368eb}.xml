@@ -146,7 +146,11 @@
     </object>
     <object class="MixerBusPanner" id="{ef2d8939-8aa0-47ce-98f7-f78f0975eeb4}"/>
     <object class="MixerBusFader" id="{b93b114c-2acd-4fa7-a70c-5b9e0a0e08b6}"/>
-    <object class="SpatialiserEffect" id="{1ba9fa2d-9b44-4d6d-a3bd-e6cacfc2f507}"/>
+    <object class="SpatialiserEffect" id="{1ba9fa2d-9b44-4d6d-a3bd-e6cacfc2f507}">
+        <property name="maximumDistance">
+            <value>7</value>
+        </property>
+    </object>
     <object class="SingleSound" id="{3cac66a5-199e-43ec-965a-d95f94ae99ed}">
         <relationship name="audioFile">
             <destination>{88ef166d-6cec-4967-a6f2-683392b18038}</destination>
