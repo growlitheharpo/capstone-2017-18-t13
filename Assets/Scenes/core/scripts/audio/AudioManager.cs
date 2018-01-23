@@ -16,6 +16,8 @@ namespace FiringSquad.Core.Audio
 		LoopWalking = 30,
 		LoopGravGun = 40,
 		MagnetArmGrab = 45,
+		LocalDealDamage = 48,
+		GetKill = 55,
 
 		// Weapons
 		Reload = 15,
