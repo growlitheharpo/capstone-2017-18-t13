@@ -4,6 +4,7 @@ using FiringSquad.Core.State;
 using FMOD;
 using FMOD.Studio;
 using UnityEngine;
+using Logger = FiringSquad.Debug.Logger;
 
 namespace FiringSquad.Core.Audio
 {
@@ -185,6 +186,8 @@ namespace FiringSquad.Core.Audio
 		/// <inheritdoc />
 		public IAudioReference CreateSound(AudioEvent e, Transform location, bool autoPlay = true)
 		{
+			Logger.Info("Creating sound: " + e, Logger.System.Audio);
+
 			EventInstance fmodEvent = FMODUnity.RuntimeManager.CreateInstance(mEventDictionary[e]);
 			AudioReference reference = new AudioReference(fmodEvent);
 
