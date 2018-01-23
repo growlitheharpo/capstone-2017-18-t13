@@ -119,6 +119,9 @@ namespace FiringSquad.Core.Audio
 			public float weaponType { get { return GetParameter("WeaponType"); } set { SetParameter("WeaponType", value); } }
 
 			/// <inheritdoc />
+			public float isCurrentPlayer { get { return GetParameter("IsCurrentPlayer"); } set { SetParameter("IsCurrentPlayer", value); } }
+
+			/// <inheritdoc />
 			public IAudioReference SetParameter(string name, float value)
 			{
 				RESULT result = mEvent.setParameterValue(name, value);
