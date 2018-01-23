@@ -26,7 +26,7 @@ namespace UnityEditor
 			kCommitBuild = true;
 			kProjectPath = Path.GetFullPath(Application.dataPath + "\\..");
 			EditorApplication.update += Update;
-			kCurrentState = UpdateRepoState;
+			kCurrentState = ConfirmAudioState;
 		}
 		
 		[MenuItem("Pipeline/Create Build and Run")]
@@ -50,6 +50,20 @@ namespace UnityEditor
 		}
 
 		#region States
+		
+		private static void ConfirmAudioState()
+		{
+			SimpleTextEntryWindow window = SimpleTextEntryWindow.Initialize(
+				"Audio Data Reminder", "",
+				"Please triple-check that you have built the latest audio data in FMOD before continuing.",
+				val => val);
+			window.OnSubmit += result =>
+			{
+				kCurrentState = UpdateRepoState;
+			};
+
+			kCurrentState = Waiting;
+		}
 
 		private static void UpdateRepoState()
 		{
