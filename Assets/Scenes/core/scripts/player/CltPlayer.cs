@@ -506,9 +506,17 @@ namespace FiringSquad.Gameplay
 		{
 			ICharacter realSource = ClientScene.FindLocalObject(source).GetComponent<ICharacter>();
 			if (realSource.isCurrentPlayer)
+			{
 				EventManager.Notify(() => EventManager.Local.LocalPlayerCausedDamage(amount));
+				ServiceLocator.Get<IAudioManager>().CreateSound(AudioEvent.LocalDealDamage, realSource.transform);
+			}
 
 			mHitIndicator.NotifyHit(this, origin, point, normal, amount);
+			ServiceLocator.Get<IAudioManager>()
+				.CreateSound(AudioEvent.PlayerDamagedGrunt, transform)
+				.SetParameter("IsCurrentPlayer", Convert.ToSingle(isCurrentPlayer))
+				.AttachToRigidbody(GetComponent<Rigidbody>());
+
 		}
 
 		/// <summary>
@@ -583,6 +591,9 @@ namespace FiringSquad.Gameplay
 		[Client]
 		private void OnKillsUpdate(int value)
 		{
+			if (value > mKills && isCurrentPlayer)
+				ServiceLocator.Get<IAudioManager>().CreateSound(AudioEvent.GetKill, transform);
+
 			mKills = value;
 			if (mLocalKillsVar != null)
 				mLocalKillsVar.value = value;

@@ -142,6 +142,9 @@ namespace FiringSquad.Core
 				public float weaponType { get { return default(float); } set { } }
 
 				/// <inheritdoc />
+				public float isCurrentPlayer { get { return default(float); } set { } }
+
+				/// <inheritdoc />
 				public IAudioReference SetParameter(string name, float value)
 				{
 					return this;
