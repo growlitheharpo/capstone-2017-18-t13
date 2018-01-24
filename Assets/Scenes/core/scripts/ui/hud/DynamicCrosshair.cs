@@ -13,12 +13,15 @@ namespace FiringSquad.Gameplay.UI
 	{
 		/// Inspector variables
 		[SerializeField] private RectTransform mImageHolder;
+		[SerializeField] private RectTransform mHitMarkerHolder;
 		[SerializeField] private float mFadeTime;
 
 		/// Private variables
 		private CltPlayer mPlayerRef;
 		private Color[] mOriginalColors;
+		private Color[] mHitOriginalColors;
 		private Image[] mImages;
+		private Image[] mHitImages;
 
 		/// <summary>
 		/// Unity's Awake function
@@ -27,6 +30,10 @@ namespace FiringSquad.Gameplay.UI
 		{
 			mImages = mImageHolder.GetComponentsInChildren<Image>();
 			mOriginalColors = mImages.Select(x => x.color).ToArray();
+
+			// Do the same as the above for the hitmarkers
+			mHitImages = mHitMarkerHolder.GetComponentsInChildren<Image>();
+			mHitOriginalColors = mHitImages.Select(x => x.color).ToArray();
 
 			EventManager.LocalGUI.OnSetCrosshairVisible += OnSetCrosshairVisible;
 			EventManager.Local.OnLocalPlayerSpawned += OnLocalPlayerSpawned;
@@ -114,12 +121,19 @@ namespace FiringSquad.Gameplay.UI
 				for (int i = 0; i < mImages.Length; i++)
 					mImages[i].color = Color.Lerp(Color.red, mOriginalColors[i], currentTime / time);
 
+				// Adding in the hit marker container as well
+				for (int i = 0; i < mHitImages.Length; i++)
+					mHitImages[i].color = Color.Lerp(Color.red, mHitOriginalColors[i], currentTime / time);
+
 				currentTime += Time.deltaTime;
 				yield return null;
 			}
 
 			for (int i = 0; i < mImages.Length; i++)
 				mImages[i].color = mOriginalColors[i];
+
+			for (int i = 0; i < mHitImages.Length; i++)
+				mHitImages[i].color = mHitOriginalColors[i];
 		}
 	}
 }
