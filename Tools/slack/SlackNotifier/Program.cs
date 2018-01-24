@@ -35,6 +35,8 @@ namespace SlackNotifier
 			{
 				if (lines[i].ToLower().StartsWith("commit"))
 					break;
+
+				lines[i] = lines[i].Replace("\"", "''");
 				otherData.Add(lines[i]);
 			}
 
