@@ -62,9 +62,6 @@
         <property name="priority">
             <value>1</value>
         </property>
-        <property name="dopplerEnabled">
-            <value>true</value>
-        </property>
     </object>
     <object class="MarkerTrack" id="{a5164e99-6f21-45bf-a423-689fa4f2b464}"/>
     <object class="MarkerTrack" id="{3faf4867-8ddc-4a2f-a31a-24c360b0ecbc}"/>
@@ -159,7 +156,7 @@
     </object>
     <object class="EventMixerGroup" id="{923c53c8-6e89-41ec-9221-7100590c206a}">
         <property name="volume">
-            <value>3.5</value>
+            <value>4</value>
         </property>
         <property name="name">
             <value>Audio 2</value>
@@ -261,11 +258,7 @@
         </relationship>
     </object>
     <object class="MixerBusFader" id="{a05af6d3-02ce-45f2-bb2b-b88610b09a2d}"/>
-    <object class="SpatialiserEffect" id="{65c96b6f-be46-4697-bd14-2026cf0240f7}">
-        <property name="maximumDistance">
-            <value>10</value>
-        </property>
-    </object>
+    <object class="SpatialiserEffect" id="{65c96b6f-be46-4697-bd14-2026cf0240f7}"/>
     <object class="MixerBusFader" id="{68b8c631-48cc-4652-9638-a5714be3b0ec}"/>
     <object class="SingleSound" id="{c70813b9-ffb3-4894-a895-2aaeff63f6bd}">
         <relationship name="audioFile">
