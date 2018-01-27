@@ -4,6 +4,7 @@ using FiringSquad.Core.State;
 using FMOD;
 using FMOD.Studio;
 using UnityEngine;
+using Logger = FiringSquad.Debug.Logger;
 
 namespace FiringSquad.Core.Audio
 {
@@ -16,6 +17,8 @@ namespace FiringSquad.Core.Audio
 		LoopWalking = 30,
 		LoopGravGun = 40,
 		MagnetArmGrab = 45,
+		LocalDealDamage = 48,
+		GetKill = 55,
 
 		// Weapons
 		Reload = 15,
@@ -30,6 +33,7 @@ namespace FiringSquad.Core.Audio
 		AnnouncerMatchEnds = 85,
 		AnnouncerStageAreaSpawns = 90,
 		AnnouncerStageAreaCaptured = 95,
+		PlayerDamagedGrunt = 100,
 	}
 
 	/// <inheritdoc cref="IAudioManager"/>
@@ -116,6 +120,9 @@ namespace FiringSquad.Core.Audio
 			public float weaponType { get { return GetParameter("WeaponType"); } set { SetParameter("WeaponType", value); } }
 
 			/// <inheritdoc />
+			public float isCurrentPlayer { get { return GetParameter("IsCurrentPlayer"); } set { SetParameter("IsCurrentPlayer", value); } }
+
+			/// <inheritdoc />
 			public IAudioReference SetParameter(string name, float value)
 			{
 				RESULT result = mEvent.setParameterValue(name, value);
@@ -179,6 +186,8 @@ namespace FiringSquad.Core.Audio
 		/// <inheritdoc />
 		public IAudioReference CreateSound(AudioEvent e, Transform location, bool autoPlay = true)
 		{
+			Logger.Info("Creating sound: " + e, Logger.System.Audio);
+
 			EventInstance fmodEvent = FMODUnity.RuntimeManager.CreateInstance(mEventDictionary[e]);
 			AudioReference reference = new AudioReference(fmodEvent);
 
