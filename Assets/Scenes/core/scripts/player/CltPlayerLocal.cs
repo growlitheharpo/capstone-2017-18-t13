@@ -45,9 +45,9 @@ namespace FiringSquad.Gameplay
 				.RegisterInput(Input.GetButton, inputMap.fireWeaponButton, INPUT_WeaponFireHold, InputLevel.Gameplay)
 				.RegisterInput(Input.GetButtonUp, inputMap.fireWeaponButton, INPUT_WeaponFireUp, InputLevel.Gameplay)
 				.RegisterInput(Input.GetButtonDown, inputMap.reloadButton, INPUT_WeaponReload, InputLevel.Gameplay)
-				.RegisterInput(Input.GetButtonDown, inputMap.interactButton, INPUT_ActivateInteract, InputLevel.Gameplay)
-				.RegisterInput(Input.GetButton, inputMap.fireGravGunButton, INPUT_MagnetArmHeld, InputLevel.Gameplay)
-				.RegisterInput(Input.GetButtonUp, inputMap.fireGravGunButton, INPUT_MagnetArmUp, InputLevel.Gameplay)
+				.RegisterInput(Input.GetButtonDown, inputMap.fireMagnetArmButton, INPUT_MagnetArmDown, InputLevel.Gameplay)
+				.RegisterInput(Input.GetButton, inputMap.fireMagnetArmButton, INPUT_MagnetArmHeld, InputLevel.Gameplay)
+				.RegisterInput(Input.GetButtonUp, inputMap.fireMagnetArmButton, INPUT_MagnetArmUp, InputLevel.Gameplay)
 
 				// local
 				.RegisterInput(Input.GetButtonDown, inputMap.activateADSButton, INPUT_EnterAimDownSights, InputLevel.Gameplay)
@@ -82,7 +82,7 @@ namespace FiringSquad.Gameplay
 				.UnregisterInput(INPUT_WeaponFireHold)
 				.UnregisterInput(INPUT_WeaponFireUp)
 				.UnregisterInput(INPUT_WeaponReload)
-				.UnregisterInput(INPUT_ActivateInteract)
+				.UnregisterInput(INPUT_MagnetArmDown)
 				.UnregisterInput(INPUT_MagnetArmHeld)
 				.UnregisterInput(INPUT_MagnetArmUp)
 
@@ -161,6 +161,15 @@ namespace FiringSquad.Gameplay
 		}
 
 		/// <summary>
+		/// INPUT HANDLER: Pressed down the trigger of our magnet arm.
+		/// </summary>
+		private void INPUT_MagnetArmDown()
+		{
+			// Call this if we have something in our hand
+			//playerRoot.CmdActivateInteract(playerRoot.eye.position, playerRoot.eye.forward);
+		}
+
+		/// <summary>
 		/// INPUT HANDLER: Hold down the trigger of our magnet arm.
 		/// </summary>
 		private void INPUT_MagnetArmHeld()
@@ -178,15 +187,7 @@ namespace FiringSquad.Gameplay
 		{
 			playerRoot.magnetArm.FireUp();
 		}
-
-		/// <summary>
-		/// INPUT HANDLER: Immediately call "interact" on the server.
-		/// </summary>
-		private void INPUT_ActivateInteract()
-		{
-			playerRoot.CmdActivateInteract(playerRoot.eye.position, playerRoot.eye.forward);
-		}
-
+		
 		/// <summary>
 		/// INPUT HANDLER: Toggle the game's pause menu.
 		/// </summary>
