@@ -54,9 +54,9 @@ namespace FiringSquad.Gameplay.UI
 		/// EVENT HANDLER: Local.OnLocalPlayerSpawned
 		/// Saves a reference to the player.
 		/// </summary>
-		private void OnLocalPlayerSpawned(CltPlayer obj)
+		private void OnLocalPlayerSpawned(CltPlayer player)
 		{
-			mPlayerRef = obj;
+			mPlayerRef = player;
 			EventManager.Local.OnLocalPlayerSpawned -= OnLocalPlayerSpawned;
 		}
 
