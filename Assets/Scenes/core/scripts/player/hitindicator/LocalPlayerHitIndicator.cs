@@ -10,11 +10,12 @@ namespace FiringSquad.Gameplay.UI
 	{
 		/// Private variables
 		private UIImage mVignetteImage;
+		private UIImage mHitSpikeImage;
 		private GameObjectPool mIndicatorPool;
 		private Color mVisibleRadColor, mHiddenRadColor, mVisibleVinColor, mHiddenVinColor;
 		private Coroutine mFadeVignetteRoutine;
 
-		private const float FADE_OUT_TIME = 0.25f;
+		private const float FADE_OUT_TIME = 0.35f;
 
 		/// <summary>
 		/// Unity's Awake function.
@@ -22,7 +23,8 @@ namespace FiringSquad.Gameplay.UI
 		private void Awake()
 		{
 			mVignetteImage = transform.Find("Vignette").GetComponent<UIImage>();
-			mVisibleVinColor = mHiddenVinColor = mVignetteImage.color;
+			mHitSpikeImage = transform.Find("Hit Spike").GetComponent<UIImage>();
+			mVisibleVinColor = mHiddenVinColor = mVignetteImage.color = mHitSpikeImage.color;
 			mHiddenVinColor.a = 0.0f;
 
 			UIImage image = GetComponent<UIImage>();
@@ -32,6 +34,7 @@ namespace FiringSquad.Gameplay.UI
 
 			image.color = mHiddenRadColor;
 			mVignetteImage.color = mHiddenVinColor;
+			mHitSpikeImage.color = mHiddenVinColor;
 		}
 
 		/// <summary>
@@ -82,6 +85,16 @@ namespace FiringSquad.Gameplay.UI
 			Vector3 b = sourcePosition;
 			Vector3 dir = b - a;
 
+			// Determine distance between two for spike scaling
+			float dis = Vector3.Distance(a, b);
+
+			// Scale the damage spike based on distance
+			// Clamp between scale of .25 and .5
+			float yScale = newObj.transform.Find("Hit Spike").transform.localScale.y + ((dis / 2) / 100);
+			Mathf.Clamp(yScale, .25f, .5f);
+			print(yScale);
+			newObj.transform.Find("Hit Spike").transform.localScale.Set(newObj.transform.Find("Hit Spike").transform.localScale.x, yScale, newObj.transform.Find("Hit Spike").transform.localScale.z);
+ 
 			// "Flatten" the direction along the vertical axis.
 			cam = new Vector3(cam.x, 0.0f, cam.z);
 			dir = new Vector3(dir.x, 0.0f, dir.z);
@@ -90,6 +103,9 @@ namespace FiringSquad.Gameplay.UI
 			t.localRotation = Quaternion.Euler(0.0f, 0.0f, angle);
 
 			StartCoroutine(FadeOutColor(newObj.GetComponent<UIImage>(), mVisibleRadColor, mHiddenRadColor, FADE_OUT_TIME * 1.75f, true));
+
+			// Start the same coroutine for the hit spike
+			StartCoroutine(FadeOutColor(newObj.transform.Find("Hit Spike").GetComponent<UIImage>(), mVisibleRadColor, mHiddenRadColor, FADE_OUT_TIME * 1.75f, false));
 		}
 
 		/// <summary>
