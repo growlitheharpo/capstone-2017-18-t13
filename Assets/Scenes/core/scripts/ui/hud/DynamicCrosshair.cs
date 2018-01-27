@@ -47,9 +47,9 @@ namespace FiringSquad.Gameplay.UI
 		/// EVENT HANDLER: Local.OnLocalPlayerSpawned
 		/// Saves a reference to the player.
 		/// </summary>
-		private void OnLocalPlayerSpawned(CltPlayer obj)
+		private void OnLocalPlayerSpawned(CltPlayer player)
 		{
-			mPlayerRef = obj;
+			mPlayerRef = player;
 			EventManager.Local.OnLocalPlayerSpawned -= OnLocalPlayerSpawned;
 		}
 
@@ -68,6 +68,11 @@ namespace FiringSquad.Gameplay.UI
 		{
 			StopAllCoroutines();
 			StartCoroutine(FadeBackColors(mFadeTime));
+
+			// Spawn a hitmarker
+			GameObject marker = Instantiate(Resources.Load<GameObject>("prefabs/ui/p_animated-hit-indicator"), this.transform);
+			marker.transform.localPosition = new Vector3(0, 0, 0);
+			marker.transform.localScale = new Vector3(.75f, .75f, .75f);
 		}
 
 		/// <summary>
@@ -120,6 +125,7 @@ namespace FiringSquad.Gameplay.UI
 
 			for (int i = 0; i < mImages.Length; i++)
 				mImages[i].color = mOriginalColors[i];
+
 		}
 	}
 }
