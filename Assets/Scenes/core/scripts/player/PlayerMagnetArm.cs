@@ -6,6 +6,7 @@ using FiringSquad.Core.Audio;
 using FiringSquad.Gameplay.Weapons;
 using UnityEngine;
 using UnityEngine.Networking;
+using Logger = FiringSquad.Debug.Logger;
 
 namespace FiringSquad.Gameplay
 {
@@ -21,8 +22,7 @@ namespace FiringSquad.Gameplay
 		private enum DirtyBitFlags
 		{
 			Bearer = 1 << 1,
-			LockedObject = 1 << 2,
-			HeldObject = 1 << 3,
+			HeldObject = 1 << 2,
 		}
 		
 		/// Inspector variables
@@ -31,13 +31,24 @@ namespace FiringSquad.Gameplay
 		[SerializeField] private LayerMask mGrabLayers;
 
 		/// Private variables
-		private WeaponPickupScript mHeldObject;
-		private IAudioReference mGrabSound;
 		private CltPlayer mBearer;
-		private WeaponPickupScript mGrabCandidate;
+		private IAudioReference mGrabSound;
+		private WeaponPickupScript mReelingObject;
+		private float mInputTime;
 
+		private const float INPUT_CONSUMED = float.NegativeInfinity;
 		private const float SNAP_THRESHOLD_DISTANCE = 2.5f;
 		private const float THROW_HOLD_SECONDS = 1.0f;
+
+		private WeaponPickupScript reelingObject
+		{
+			get { return mReelingObject; }
+			set
+			{
+				mReelingObject = value;
+				SetDirtyBit(syncVarDirtyBits | (uint)DirtyBitFlags.HeldObject);
+			}
+		}
 
 		/// <summary>
 		/// The current bearer of this magnet arm.
@@ -62,6 +73,14 @@ namespace FiringSquad.Gameplay
 			if (forceAll)
 			{
 				writer.Write(bearer.netId);
+
+				if (reelingObject == null)
+					writer.Write(false);
+				else
+				{
+					writer.Write(true);
+					writer.Write(reelingObject.netId);
+				}
 			}
 			else
 			{
@@ -70,6 +89,16 @@ namespace FiringSquad.Gameplay
 
 				if ((flags & DirtyBitFlags.Bearer) != 0)
 					writer.Write(bearer.netId);
+				if ((flags & DirtyBitFlags.HeldObject) != 0)
+				{
+					if (reelingObject == null)
+						writer.Write(false);
+					else
+					{
+						writer.Write(true);
+						writer.Write(reelingObject.netId);
+					}
+				}
 			}
 
 			ClearAllDirtyBits();
@@ -85,6 +114,7 @@ namespace FiringSquad.Gameplay
 			{
 				NetworkInstanceId id = reader.ReadNetworkId();
 				StartCoroutine(BindToBearer(id));
+				DeserializeReelingObject(reader);
 			}
 			else
 			{
@@ -92,6 +122,8 @@ namespace FiringSquad.Gameplay
 
 				if ((flags & DirtyBitFlags.Bearer) != 0)
 					StartCoroutine(BindToBearer(reader.ReadNetworkId()));
+				if ((flags & DirtyBitFlags.HeldObject) != 0)
+					DeserializeReelingObject(reader);
 			}
 		}
 
@@ -116,26 +148,102 @@ namespace FiringSquad.Gameplay
 			}
 		}
 
+		/// <summary>
+		/// Read and determine the object we are reeling based on the data in the stream.
+		/// </summary>
+		/// <param name="reader">The serialization stream, advanced to the position of the reeling object data.</param>
+		private void DeserializeReelingObject(NetworkReader reader)
+		{
+			if (reader.ReadBoolean() == false) // false means there is no reeling object
+			{
+				if (mReelingObject != null)
+				{
+					mReelingObject.UnlockFromReel();
+					mReelingObject = null;
+				}
+			}
+			else // there is an object in the stream
+			{
+				GameObject obj = ClientScene.FindLocalObject(reader.ReadNetworkId());
+				if (obj == null)
+				{
+					Logger.Warn("PlayerMagnetArm::DeserializeReelingObject could not find held object!");
+					return;
+				}
+
+				WeaponPickupScript script = obj.GetComponent<WeaponPickupScript>();
+				if (script == null)
+				{
+					Logger.Warn("PlayerMagnetArm::DeserializeReelingObject could not find weapon script on held object!");
+					return;
+				}
+
+				mReelingObject = script;
+				mReelingObject.LockToPlayerReel(mBearer);
+			}
+		}
+
 		#endregion
 
 		/// <summary>
+		/// INPUT_HANDLER: Handle the player first pressing the "magnet arm fire" button.
+		/// </summary>
+		[Client]
+		public void FirePressed()
+		{
+			// If we have an object in-hand, ignore the initial "press" event
+			if (mReelingObject != null)
+				return;
+
+			TryFindGrabCandidate();
+
+			if (mReelingObject == null)
+			{
+				// if we were unsuccessful, consume the input and play the fail sound
+				mInputTime = INPUT_CONSUMED;
+				// TODO: We need a sound event to play when the player tries to grab with nothing there.
+			}
+			else 
+			{
+				// start to grab this object
+				mReelingObject.LockToPlayerReel(bearer);
+				CmdAssignClientAuthority(mReelingObject.netId);
+			}
+		}
+
+		/// <summary>
 		/// INPUT_HANDLER: Handle the player's "magnet arm fire" button being held down.
-		/// Result depends on our internal state.
 		/// </summary>
 		[Client]
 		public void FireHeld()
 		{
-			UpdateSound(true);
+			if (float.IsNegativeInfinity(mInputTime)) // INPUT_CONSUMED == negativeInfinity
+				return;
+
+			mInputTime += Time.deltaTime;
+
+			if (mReelingObject.transform.parent == transform)
+			{
+				// the object already snapped into place, we just need to tick that timer.
+				return;
+			}
+
+			// otherwise, we need to reel it in.
+			mReelingObject.TickReelToPlayer(mPullRate, mInputTime);
+			if (Vector3.Distance(mReelingObject.transform.position, transform.position) < SNAP_THRESHOLD_DISTANCE)
+				mReelingObject.SnapIntoReelPosition();
 		}
 
 		/// <summary>
 		/// INPUT_HANDLER: Handle the player's "magnet arm fire" button being released.
-		/// Result depends on our internal state.
 		/// </summary>
 		[Client]
 		public void FireUp()
 		{
 			UpdateSound(false);
+
+			// Reset whether the input was consumed.
+			mInputTime = 0.0f;
 		}
 
 		/// <summary>
@@ -158,15 +266,13 @@ namespace FiringSquad.Gameplay
 		}
 
 		/// <summary>
-		/// Fire out a spherecast and check the objects it hit. Sets mGrabCandidate to null if
+		/// Fire out a spherecast and check the objects it hit. Sets mReelingObject to null if
 		/// no objects are found, or to the closeset hit object.
 		/// </summary>
 		[Client]
 		private void TryFindGrabCandidate()
 		{
 			Ray r = new Ray(bearer.eye.position, bearer.eye.forward);
-
-			UnityEngine.Debug.DrawLine(r.origin, r.origin + r.direction * 1000.0f, Color.green, 0.1f, true);
 
 			var hits = Physics.SphereCastAll(r, mPullRadius, mGrabLayers);
 			if (hits.Length == 0)
@@ -180,12 +286,34 @@ namespace FiringSquad.Gameplay
 				WeaponPickupScript grabbable = hitInfo.collider.GetComponentInParent<WeaponPickupScript>();
 				if (grabbable != null && !grabbable.currentlyLocked)
 				{
-					mGrabCandidate = grabbable;
+					mReelingObject = grabbable;
 					return;
 				}
 			}
 
-			mGrabCandidate = null;
+			mReelingObject = null;
+		}
+
+		/// <summary>
+		/// Give this client control over an item that it is trying to reel in.
+		/// </summary>
+		/// <param name="grabCandidateNetId">The network id of object the client is reeling.</param>
+		[Command]
+		private void CmdAssignClientAuthority(NetworkInstanceId grabCandidateNetId)
+		{
+			GameObject obj = NetworkServer.FindLocalObject(grabCandidateNetId);
+			obj.GetComponent<NetworkIdentity>().AssignClientAuthority(bearer.connectionToClient);
+		}
+
+		/// <summary>
+		/// Release this client's control over an item that it is trying to reel in.
+		/// </summary>
+		/// <param name="heldObjectId">The network id of object the client was reeling.</param>
+		[Command]
+		private void CmdReleaseClientAuthority(NetworkInstanceId heldObjectId)
+		{
+			GameObject obj = NetworkServer.FindLocalObject(heldObjectId);
+			obj.GetComponent<NetworkIdentity>().RemoveClientAuthority(bearer.connectionToClient);
 		}
 	}
 }
