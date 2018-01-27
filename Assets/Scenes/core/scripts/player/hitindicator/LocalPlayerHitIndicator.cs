@@ -15,7 +15,7 @@ namespace FiringSquad.Gameplay.UI
 		private Color mVisibleRadColor, mHiddenRadColor, mVisibleVinColor, mHiddenVinColor;
 		private Coroutine mFadeVignetteRoutine;
 
-		private const float FADE_OUT_TIME = 0.25f;
+		private const float FADE_OUT_TIME = 0.35f;
 
 		/// <summary>
 		/// Unity's Awake function.
