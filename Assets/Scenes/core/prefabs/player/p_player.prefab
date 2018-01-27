@@ -1152,7 +1152,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mAssets:
-    mGravityGunPrefab: {fileID: 1869346815917706, guid: 17e1a9e481a4d7c46875a83919e1d9d4,
+    mMagnetArmPrefab: {fileID: 1869346815917706, guid: 17e1a9e481a4d7c46875a83919e1d9d4,
       type: 2}
     mBaseWeaponPrefab: {fileID: 1953974638818940, guid: 42f896f0792e3de45b8ab2626f0fbe75,
       type: 2}
@@ -1162,20 +1162,17 @@ MonoBehaviour:
       type: 2}
   mInformation:
     mDefaultWeaponParts:
-      mScope: {fileID: 114756210916309946, guid: 363ec9baf39beb0458b6c51a5e07d379,
+      mMechanism: {fileID: 114425948192369884, guid: ac89948562eb23e47810effcccae5243,
         type: 2}
       mBarrel: {fileID: 114623667425927558, guid: ae2a9ffdc62cede43828d78624b9146c,
         type: 2}
-      mMechanism: {fileID: 114425948192369884, guid: ac89948562eb23e47810effcccae5243,
+      mScope: {fileID: 114756210916309946, guid: 363ec9baf39beb0458b6c51a5e07d379,
         type: 2}
       mGrip: {fileID: 114035792997203982, guid: bf400f714370ec646bb93b34e1e624d0,
         type: 2}
     mInteractDistance: 4.5
-    mDefaultHealth: 250
+    mDefaultHealth: 100
     mRespawnTime: 4.5
-    mShouldInstantiateWeapon: 1
-    mShouldInstantiateGravityGun: 1
-    mInstantiateParts: 1
   mCameraOffset: {fileID: 4999094504190870}
   mGun1Offset: {fileID: 4098957100354382}
   mGun2Offset: {fileID: 4883558922381024}
