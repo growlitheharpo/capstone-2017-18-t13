@@ -344,11 +344,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mParts:
-    mScope: {fileID: 114756210916309946, guid: 363ec9baf39beb0458b6c51a5e07d379, type: 2}
-    mBarrel: {fileID: 114314945546383498, guid: 17592fca01a55b74bafe2e36a610920a,
-      type: 2}
     mMechanism: {fileID: 114425948192369884, guid: ac89948562eb23e47810effcccae5243,
       type: 2}
+    mBarrel: {fileID: 114314945546383498, guid: 17592fca01a55b74bafe2e36a610920a,
+      type: 2}
+    mScope: {fileID: 114756210916309946, guid: 363ec9baf39beb0458b6c51a5e07d379, type: 2}
     mGrip: {fileID: 114606895374649628, guid: 1ae0ed4a343a9fd428165c0cce0a84f2, type: 2}
   mData:
     mTargetingRange: 20
@@ -359,7 +359,7 @@ MonoBehaviour:
     mVisibilityMask:
       serializedVersion: 2
       m_Bits: 4294965247
-    mDefaultHealth: 350
+    mDefaultHealth: 140
     mRespawnTime: 50
     mPartsToDrop: 14
   mWeaponAttachPoint: {fileID: 4209325649630058}
