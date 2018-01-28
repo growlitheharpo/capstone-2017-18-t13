@@ -99,10 +99,18 @@ namespace UnityEditor
 
 		private static void AddAllFilesToCloudRepoState()
 		{
-			Debug.Log("Tag written. Adding all files to SVN.");
-			AddFilesToRepo();
+			if (kCommitBuild)
+			{
+				Debug.Log("Tag written. Adding all files to SVN.");
+				AddFilesToRepo();
 
-			kCurrentState = Waiting;
+				kCurrentState = Waiting;
+			}
+			else
+			{
+				Debug.Log("Build complete. Stopping before upload as requested.");
+				Complete();
+			}
 		}
 		
 		private static void CommitNewBuildState()
