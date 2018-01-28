@@ -35,10 +35,9 @@ namespace FiringSquad.Gameplay
 		private CltPlayer mBearer;
 		private IAudioReference mGrabSound;
 		private WeaponPickupScript mReelingObject;
-		private float mInputTime;
+		private float mInputTime, mReelingTime;
 
 		private const float SNAP_THRESHOLD_DISTANCE = 2.5f;
-		private const float THROW_HOLD_SECONDS = 1.0f;
 
 		/// <summary>
 		/// Private reference at the object we're reeling. Setting this updates it on the network.
@@ -224,6 +223,7 @@ namespace FiringSquad.Gameplay
 				reelingObject.LockToPlayerReel(bearer);
 				CmdAssignClientAuthority(reelingObject.netId);
 				mInputTime = float.NegativeInfinity;
+				mReelingTime = 0.0f;
 			}
 		}
 
@@ -244,7 +244,8 @@ namespace FiringSquad.Gameplay
 			}
 
 			// otherwise, we need to reel it in.
-			reelingObject.TickReelToPlayer(mPullRate, mInputTime);
+			mReelingTime += Time.deltaTime;
+			reelingObject.TickReelToPlayer(mPullRate, mReelingTime);
 			if (Vector3.Distance(reelingObject.transform.position, transform.position) < SNAP_THRESHOLD_DISTANCE)
 				reelingObject.SnapIntoReelPosition();
 		}

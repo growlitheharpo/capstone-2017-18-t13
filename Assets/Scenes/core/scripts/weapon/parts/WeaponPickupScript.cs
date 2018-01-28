@@ -213,10 +213,11 @@ namespace FiringSquad.Gameplay.Weapons
 			if (currentHolder == null)
 				return;
 
-			// TODO: account for elapsed time and do some smoothing at the start.
+			// Ramp up the pull rate over the first 0.15 seconds
+			float realPullRate = Mathf.Lerp(0.0f, pullRate, elapsedTime / 0.15f);
 
 			Vector3 targetPos = currentHolder.magnetArm.transform.position;
-			Vector3 newPos = Vector3.MoveTowards(transform.position, targetPos, pullRate * Time.deltaTime);
+			Vector3 newPos = Vector3.MoveTowards(transform.position, targetPos, realPullRate * Time.deltaTime);
 			transform.position = newPos;
 		}
 
