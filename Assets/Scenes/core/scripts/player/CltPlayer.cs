@@ -229,8 +229,9 @@ namespace FiringSquad.Gameplay
 			// Prioritize anything held by the magnet arm.
 			if (magnetArm != null)
 			{
-				interactable = magnetArm.heldWeaponPart;
-				magnetArm.ForceDropItem();
+				interactable = magnetArm.currentlyHeldObject;
+				if (interactable != null)
+					magnetArm.ForceDropItem();
 			}
 
 			// If there's nothing that we're holding, look ahead of us.

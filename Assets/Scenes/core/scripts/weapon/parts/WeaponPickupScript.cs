@@ -204,6 +204,7 @@ namespace FiringSquad.Gameplay.Weapons
 			currentHolder = null;
 			mRigidbody.isKinematic = false;
 			mPickupView.transform.localScale = Vector3.one;
+			transform.SetParent(null);
 		}
 
 		/// <inheritdoc />
@@ -240,9 +241,8 @@ namespace FiringSquad.Gameplay.Weapons
 				return;
 
 			CltPlayer player = currentHolder;
-			transform.SetParent(null);
-			mRigidbody.AddForce(throwForce, ForceMode.Impulse);
 			UnlockFromReel();
+			mRigidbody.AddForce(throwForce, ForceMode.Impulse);
 
 			if (player.isCurrentPlayer)
 				EventManager.Notify(() => EventManager.Local.LocalPlayerReleasedPart(mPartScript));

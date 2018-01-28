@@ -36,10 +36,12 @@ namespace FiringSquad.Gameplay
 		private WeaponPickupScript mReelingObject;
 		private float mInputTime;
 
-		private const float INPUT_CONSUMED = float.NegativeInfinity;
 		private const float SNAP_THRESHOLD_DISTANCE = 2.5f;
 		private const float THROW_HOLD_SECONDS = 1.0f;
 
+		/// <summary>
+		/// Private reference at the object we're reeling. Setting this updates it on the network.
+		/// </summary>
 		private WeaponPickupScript reelingObject
 		{
 			get { return mReelingObject; }
@@ -47,6 +49,19 @@ namespace FiringSquad.Gameplay
 			{
 				mReelingObject = value;
 				SetDirtyBit(syncVarDirtyBits | (uint)DirtyBitFlags.HeldObject);
+			}
+		}
+
+		/// <summary>
+		/// Reference to the current weapon part that has been snapped into the player's hand.
+		/// </summary>
+		public WeaponPickupScript currentlyHeldObject
+		{
+			get
+			{
+				if (reelingObject != null && reelingObject.transform.parent == transform)
+					return reelingObject;
+				return null;
 			}
 		}
 
@@ -192,22 +207,22 @@ namespace FiringSquad.Gameplay
 		public void FirePressed()
 		{
 			// If we have an object in-hand, ignore the initial "press" event
-			if (mReelingObject != null)
+			if (reelingObject != null)
 				return;
 
 			TryFindGrabCandidate();
 
-			if (mReelingObject == null)
+			if (reelingObject == null)
 			{
-				// if we were unsuccessful, consume the input and play the fail sound
-				mInputTime = INPUT_CONSUMED;
 				// TODO: We need a sound event to play when the player tries to grab with nothing there.
+				mInputTime = 0.0f;
 			}
 			else 
 			{
 				// start to grab this object
-				mReelingObject.LockToPlayerReel(bearer);
-				CmdAssignClientAuthority(mReelingObject.netId);
+				reelingObject.LockToPlayerReel(bearer);
+				CmdAssignClientAuthority(reelingObject.netId);
+				mInputTime = float.NegativeInfinity;
 			}
 		}
 
@@ -217,21 +232,17 @@ namespace FiringSquad.Gameplay
 		[Client]
 		public void FireHeld()
 		{
-			if (float.IsNegativeInfinity(mInputTime)) // INPUT_CONSUMED == negativeInfinity
-				return;
-
-			mInputTime += Time.deltaTime;
-
-			if (mReelingObject.transform.parent == transform)
+			if (reelingObject.transform.parent == transform)
 			{
 				// the object already snapped into place, we just need to tick that timer.
+				mInputTime += Time.deltaTime;
 				return;
 			}
 
 			// otherwise, we need to reel it in.
-			mReelingObject.TickReelToPlayer(mPullRate, mInputTime);
-			if (Vector3.Distance(mReelingObject.transform.position, transform.position) < SNAP_THRESHOLD_DISTANCE)
-				mReelingObject.SnapIntoReelPosition();
+			reelingObject.TickReelToPlayer(mPullRate, mInputTime);
+			if (Vector3.Distance(reelingObject.transform.position, transform.position) < SNAP_THRESHOLD_DISTANCE)
+				reelingObject.SnapIntoReelPosition();
 		}
 
 		/// <summary>
@@ -240,9 +251,23 @@ namespace FiringSquad.Gameplay
 		[Client]
 		public void FireUp()
 		{
-			UpdateSound(false);
+			if (mInputTime < 0.0f)
+			{
+				// if the input was less than zero seconds, we were in our "pull" button cycle.
+				// Ignore the up event.
+			}
+			else if (mInputTime < 0.1f)
+			{
+				// This counts as a press. Equip the item.
+				bearer.CmdActivateInteract(bearer.eye.position, bearer.eye.forward);
+			}
+			else
+			{
+				// this counts as a throw. Throw it.
+				CmdThrowHeldItem(bearer.eye.forward);
+			}
 
-			// Reset whether the input was consumed.
+			UpdateSound(false);
 			mInputTime = 0.0f;
 		}
 
@@ -266,7 +291,7 @@ namespace FiringSquad.Gameplay
 		}
 
 		/// <summary>
-		/// Fire out a spherecast and check the objects it hit. Sets mReelingObject to null if
+		/// Fire out a spherecast and check the objects it hit. Sets reelingObject to null if
 		/// no objects are found, or to the closeset hit object.
 		/// </summary>
 		[Client]
@@ -286,12 +311,28 @@ namespace FiringSquad.Gameplay
 				WeaponPickupScript grabbable = hitInfo.collider.GetComponentInParent<WeaponPickupScript>();
 				if (grabbable != null && !grabbable.currentlyLocked)
 				{
-					mReelingObject = grabbable;
+					reelingObject = grabbable;
 					return;
 				}
 			}
 
-			mReelingObject = null;
+			reelingObject = null;
+		}
+
+		/// <summary>
+		/// Throw the item that we are currently holding on the server.
+		/// Requires running on the server because 
+		/// </summary>
+		/// <param name="currentForward">The current forward vector of the player.</param>
+		[Command]
+		private void CmdThrowHeldItem(Vector3 currentForward)
+		{
+			if (reelingObject == null)
+				return;
+
+			reelingObject.UnlockAndThrow(currentForward * 30.0f);
+			reelingObject.GetComponent<NetworkIdentity>().RemoveClientAuthority(bearer.connectionToClient);
+			reelingObject = null;
 		}
 
 		/// <summary>
@@ -302,7 +343,9 @@ namespace FiringSquad.Gameplay
 		private void CmdAssignClientAuthority(NetworkInstanceId grabCandidateNetId)
 		{
 			GameObject obj = NetworkServer.FindLocalObject(grabCandidateNetId);
-			obj.GetComponent<NetworkIdentity>().AssignClientAuthority(bearer.connectionToClient);
+			bool success = obj.GetComponent<NetworkIdentity>().AssignClientAuthority(bearer.connectionToClient);
+			if (success)
+				Logger.Warn("PlayerMagnetArm::AssignClientAuthority was unnsuccessful!");
 		}
 
 		/// <summary>
@@ -313,7 +356,23 @@ namespace FiringSquad.Gameplay
 		private void CmdReleaseClientAuthority(NetworkInstanceId heldObjectId)
 		{
 			GameObject obj = NetworkServer.FindLocalObject(heldObjectId);
-			obj.GetComponent<NetworkIdentity>().RemoveClientAuthority(bearer.connectionToClient);
+			bool success = obj.GetComponent<NetworkIdentity>().RemoveClientAuthority(bearer.connectionToClient);
+			if (success)
+				Logger.Warn("PlayerMagnetArm::ReleaseClientAuthority was unnsuccessful!");
+		}
+
+		/// <summary>
+		/// Immediately drop any item that this magnet arm is reeling or considering pulling.
+		/// </summary>
+		[Server]
+		public void ForceDropItem()
+		{
+			if (reelingObject == null)
+				return;
+
+			reelingObject.UnlockFromReel();
+			reelingObject.GetComponent<NetworkIdentity>().RemoveClientAuthority(bearer.connectionToClient);
+			reelingObject = null;
 		}
 	}
 }
