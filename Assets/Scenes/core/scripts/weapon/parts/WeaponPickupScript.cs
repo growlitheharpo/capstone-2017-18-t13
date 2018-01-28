@@ -217,7 +217,7 @@ namespace FiringSquad.Gameplay.Weapons
 
 			Vector3 targetPos = currentHolder.magnetArm.transform.position;
 			Vector3 newPos = Vector3.MoveTowards(transform.position, targetPos, pullRate * Time.deltaTime);
-			transform.position = newPos;
+			mRigidbody.MovePosition(newPos);
 		}
 
 		/// <inheritdoc />
