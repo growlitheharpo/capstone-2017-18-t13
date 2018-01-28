@@ -165,8 +165,10 @@ namespace FiringSquad.Gameplay
 		/// </summary>
 		private void INPUT_MagnetArmDown()
 		{
-			// Call this if we have something in our hand
-			//playerRoot.CmdActivateInteract(playerRoot.eye.position, playerRoot.eye.forward);
+			if (inAimDownSightsMode)
+				return;
+
+			playerRoot.magnetArm.FirePressed();
 		}
 
 		/// <summary>

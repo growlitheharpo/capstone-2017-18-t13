@@ -24,8 +24,9 @@ namespace FiringSquad.Gameplay
 			Bearer = 1 << 1,
 			HeldObject = 1 << 2,
 		}
-		
+
 		/// Inspector variables
+		[SerializeField] private float mClickHoldThreshold = 0.2f;
 		[SerializeField] private float mPullRate;
 		[SerializeField] private float mPullRadius;
 		[SerializeField] private LayerMask mGrabLayers;
@@ -232,6 +233,9 @@ namespace FiringSquad.Gameplay
 		[Client]
 		public void FireHeld()
 		{
+			if (reelingObject == null)
+				return;
+
 			if (reelingObject.transform.parent == transform)
 			{
 				// the object already snapped into place, we just need to tick that timer.
@@ -254,9 +258,14 @@ namespace FiringSquad.Gameplay
 			if (mInputTime < 0.0f)
 			{
 				// if the input was less than zero seconds, we were in our "pull" button cycle.
-				// Ignore the up event.
+				// Check if we successfully grabbed it. If not, let it go.
+				if (reelingObject != null && reelingObject.transform.parent != transform)
+				{
+					reelingObject.UnlockFromReel();
+					reelingObject = null;
+				}
 			}
-			else if (mInputTime < 0.1f)
+			else if (mInputTime < mClickHoldThreshold)
 			{
 				// This counts as a press. Equip the item.
 				bearer.CmdActivateInteract(bearer.eye.position, bearer.eye.forward);
@@ -264,7 +273,8 @@ namespace FiringSquad.Gameplay
 			else
 			{
 				// this counts as a throw. Throw it.
-				CmdThrowHeldItem(bearer.eye.forward);
+				if (reelingObject != null)
+					CmdThrowHeldItem(bearer.eye.forward);
 			}
 
 			UpdateSound(false);
