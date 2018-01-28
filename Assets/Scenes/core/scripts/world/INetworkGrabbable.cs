@@ -32,28 +32,36 @@ namespace FiringSquad.Gameplay
 		/// <summary>
 		/// Whether or not this object is currently held.
 		/// </summary>
-		bool currentlyHeld { get; }
+		bool currentlyLocked { get; }
 
 		/// <summary>
-		/// Apply a physics force towards the provided pulling player.
+		/// Lock the grabbable to a player. Will not be grabbable by anyone else until unlocked.
 		/// </summary>
-		/// <param name="player">The player to pull towards. Must have a valid magnet arm.</param>
-		void PullTowards(CltPlayer player);
+		/// <param name="player"></param>
+		void LockToPlayerReel(CltPlayer player);
 
 		/// <summary>
-		/// Snap from being in physics mode to being locked/"grabbed" in the player's hand.
+		/// Unlock this grabbable from its current player. Will now be grabbable by anyone.
 		/// </summary>
-		/// <param name="player">The player that is grabbing this part.</param>
-		void GrabNow(CltPlayer player);
+		void UnlockFromReel();
 
 		/// <summary>
-		/// Throw this part with physics force based on where our current holder is looking.
+		/// Ticks the lerp towards a player by the given rate.
 		/// </summary>
-		void Throw();
+		/// <param name="pullRate">Units per second that we should move towards the player.</param>
+		/// <param name="elapsedTime">The amount of time that has elapsed on this pull. Used for smoothing.</param>
+		void TickReelToPlayer(float pullRate, float elapsedTime);
 
 		/// <summary>
-		/// Release this part and let it fall to the ground without any extra force.
+		/// Immediately snap the grabbable into the current user's hand.
 		/// </summary>
-		void Release();
+		void SnapIntoReelPosition();
+
+		/// <summary>
+		/// Unlock this grabbable from its current player. Will now be grabbable by anyone.
+		/// Also adds an immediate force to the grabbable.
+		/// </summary>
+		/// <param name="throwForce">The force to apply to the object.</param>
+		void UnlockAndThrow(Vector3 throwForce);
 	}
 }

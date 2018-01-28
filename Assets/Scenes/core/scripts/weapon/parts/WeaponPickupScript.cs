@@ -33,7 +33,7 @@ namespace FiringSquad.Gameplay.Weapons
 		public CltPlayer currentHolder { get; private set; }
 
 		/// <inheritdoc />
-		public bool currentlyHeld { get { return currentHolder != null; } }
+		public bool currentlyLocked { get { return currentHolder != null; } }
 
 		/// <summary>
 		/// The durability of this weapon part when it is picked up.
@@ -189,66 +189,68 @@ namespace FiringSquad.Gameplay.Weapons
 		}
 
 		/// <inheritdoc />
-		public void PullTowards(CltPlayer player)
+		public void LockToPlayerReel(CltPlayer player)
 		{
-			if (currentlyHeld)
+			if (currentlyLocked)
 				return;
 
-			Vector3 direction = player.magnetArm.transform.position - transform.position;
-			direction = direction.normalized * player.magnetArm.pullForce;
-
-			mRigidbody.AddForce(direction, ForceMode.Force);
-		}
-
-		/// <inheritdoc />
-		public void GrabNow(CltPlayer player)
-		{
 			currentHolder = player;
-
-			// TODO: Lerp this?
-
-			mPickupView.transform.localScale = Vector3.one * 0.45f;
 			mRigidbody.isKinematic = true;
-
-			transform.SetParent(player.magnetArm.transform);
-			transform.ResetLocalValues();
-
-			if (player.isCurrentPlayer)
-				EventManager.Notify(() => EventManager.Local.LocalPlayerHoldingPart(mPartScript));
 		}
 
 		/// <inheritdoc />
-		public void Throw()
+		public void UnlockFromReel()
+		{
+			currentHolder = null;
+			mRigidbody.isKinematic = false;
+			mPickupView.transform.localScale = Vector3.one;
+			transform.SetParent(null);
+		}
+
+		/// <inheritdoc />
+		public void TickReelToPlayer(float pullRate, float elapsedTime)
 		{
 			if (currentHolder == null)
 				return;
 
-			Vector3 direction = currentHolder.eye.forward;
+			// Ramp up the pull rate over the first 0.15 seconds
+			float realPullRate = Mathf.Lerp(0.0f, pullRate, elapsedTime / 0.15f);
 
-			transform.SetParent(null);
-			mRigidbody.isKinematic = false;
-			mPickupView.transform.localScale = Vector3.one;
-
-			mRigidbody.AddForce(direction * 30.0f, ForceMode.Impulse);
-
-			if (currentHolder.isCurrentPlayer)
-				EventManager.Notify(() => EventManager.Local.LocalPlayerReleasedPart(mPartScript));
-
-			currentHolder = null;
+			Vector3 targetPos = currentHolder.magnetArm.transform.position;
+			Vector3 newPos = Vector3.MoveTowards(transform.position, targetPos, realPullRate * Time.deltaTime);
+			transform.position = newPos;
 		}
 
 		/// <inheritdoc />
-		public void Release()
+		public void SnapIntoReelPosition()
 		{
-			transform.SetParent(null);
+			if (currentHolder == null)
+				return;
 
-			mRigidbody.isKinematic = false;
-			mPickupView.transform.localScale = Vector3.one;
+			mPickupView.transform.localScale = Vector3.one * 0.45f;
+			transform.SetParent(currentHolder.magnetArm.transform);
+			transform.ResetLocalValues();
 
-			if (currentHolder != null && currentHolder.isCurrentPlayer)
+			if (currentHolder.isCurrentPlayer)
+				EventManager.Notify(() => EventManager.Local.LocalPlayerHoldingPart(mPartScript));
+		}
+
+		/// <inheritdoc />
+		public void UnlockAndThrow(Vector3 throwForce)
+		{
+			if (currentHolder == null)
+				return;
+
+			CltPlayer player = currentHolder;
+			UnlockFromReel();
+
+			// TODO: For now, we're disabling throwing; the player will just drop the item instead.
+			// This was causing weird authority issues, where it would start to throw on non-host clients but then
+			// snap back into place. Low priority, so we can come back to it.
+			//mRigidbody.AddForce(throwForce, ForceMode.Impulse);
+
+			if (player.isCurrentPlayer)
 				EventManager.Notify(() => EventManager.Local.LocalPlayerReleasedPart(mPartScript));
-
-			currentHolder = null;
 		}
 	}
 }
