@@ -342,14 +342,24 @@ namespace FiringSquad.Gameplay
 		/// Requires running on the server because 
 		/// </summary>
 		/// <param name="currentForward">The current forward vector of the player.</param>
+		/// <param name="objectId">The network instance ID of the currently held object.</param>
 		[Command]
-		private void CmdThrowHeldItem(Vector3 currentForward)
+		private void CmdThrowHeldItem(Vector3 currentForward, NetworkInstanceId objectId)
 		{
-			if (reelingObject == null)
+			GameObject go = NetworkServer.FindLocalObject(objectId);
+			if (go == null)
 				return;
 
-			reelingObject.UnlockAndThrow(currentForward * 30.0f);
-			reelingObject.GetComponent<NetworkIdentity>().RemoveClientAuthority(bearer.connectionToClient);
+			WeaponPickupScript grabbable = go.GetComponent<WeaponPickupScript>();
+			if (grabbable == null)
+				return;
+
+			bool success = grabbable.GetComponent<NetworkIdentity>().RemoveClientAuthority(bearer.connectionToClient);
+			if (!success)
+				Logger.Warn("PlayerMagnetArm::ReleaseClientAuthority was unnsuccessful!");
+
+			grabbable.UnlockAndThrow(currentForward * 30.0f);
+
 			reelingObject = null;
 		}
 
@@ -362,23 +372,10 @@ namespace FiringSquad.Gameplay
 		{
 			GameObject obj = NetworkServer.FindLocalObject(grabCandidateNetId);
 			bool success = obj.GetComponent<NetworkIdentity>().AssignClientAuthority(bearer.connectionToClient);
-			if (success)
+			if (!success)
 				Logger.Warn("PlayerMagnetArm::AssignClientAuthority was unnsuccessful!");
 		}
-
-		/// <summary>
-		/// Release this client's control over an item that it is trying to reel in.
-		/// </summary>
-		/// <param name="heldObjectId">The network id of object the client was reeling.</param>
-		[Command]
-		private void CmdReleaseClientAuthority(NetworkInstanceId heldObjectId)
-		{
-			GameObject obj = NetworkServer.FindLocalObject(heldObjectId);
-			bool success = obj.GetComponent<NetworkIdentity>().RemoveClientAuthority(bearer.connectionToClient);
-			if (success)
-				Logger.Warn("PlayerMagnetArm::ReleaseClientAuthority was unnsuccessful!");
-		}
-
+		
 		/// <summary>
 		/// Immediately drop any item that this magnet arm is reeling or considering pulling.
 		/// </summary>

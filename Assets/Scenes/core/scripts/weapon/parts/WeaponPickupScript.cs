@@ -243,7 +243,11 @@ namespace FiringSquad.Gameplay.Weapons
 
 			CltPlayer player = currentHolder;
 			UnlockFromReel();
-			mRigidbody.AddForce(throwForce, ForceMode.Impulse);
+
+			// TODO: For now, we're disabling throwing; the player will just drop the item instead.
+			// This was causing weird authority issues, where it would start to throw on non-host clients but then
+			// snap back into place. Low priority, so we can come back to it.
+			//mRigidbody.AddForce(throwForce, ForceMode.Impulse);
 
 			if (player.isCurrentPlayer)
 				EventManager.Notify(() => EventManager.Local.LocalPlayerReleasedPart(mPartScript));
