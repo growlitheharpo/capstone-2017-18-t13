@@ -250,6 +250,24 @@ namespace FiringSquad.Gameplay
 				interactable.Interact(this);
 		}
 
+		/// <summary>
+		/// Activate the "interact" input command on the server on a particular object.
+		/// </summary>
+		/// <param name="objectId">The network instance ID of the IInteractable to activate.</param>
+		[Command]
+		public void CmdActivateInteractWithObject(NetworkInstanceId objectId)
+		{
+			GameObject go = NetworkServer.FindLocalObject(objectId);
+			if (go == null)
+				return;
+
+			IInteractable interactable = go.GetComponent<IInteractable>();
+			if (interactable == null)
+				return;
+
+			interactable.Interact(this);
+		}
+
 		#region Animations
 
 		/// <summary>

@@ -268,20 +268,27 @@ namespace FiringSquad.Gameplay
 			else if (mInputTime < mClickHoldThreshold)
 			{
 				// This counts as a press. Equip the item.
-				bearer.CmdActivateInteract(bearer.eye.position, bearer.eye.forward);
+				if (reelingObject != null)
+					bearer.CmdActivateInteractWithObject(reelingObject.netId);
+				else
+					bearer.CmdActivateInteract(bearer.eye.position, bearer.eye.forward);
 			}
 			else
 			{
 				// this counts as a throw. Throw it.
 				if (reelingObject != null)
-					CmdThrowHeldItem(bearer.eye.forward);
+				{
+					reelingObject.UnlockAndThrow(bearer.eye.forward * 30.0f);
+					CmdThrowHeldItem(bearer.eye.forward, reelingObject.netId);
+				}
+				reelingObject = null;
 			}
 
 			UpdateSound(false);
 			mInputTime = 0.0f;
 		}
 
-		/// <summary>
+		/// <summary>``
 		/// Send an update to FMOD on whether or not to play the magnet arm "grab" sound.
 		/// </summary>
 		/// <param name="shouldPlay">Whether or not the sound should be playing.</param>
