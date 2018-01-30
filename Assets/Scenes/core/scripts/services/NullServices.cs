@@ -89,6 +89,9 @@ namespace FiringSquad.Core
 			public bool isAlive { get { return false; } }
 
 			/// <inheritdoc />
+			public string currentUserName { get; set; }
+
+			/// <inheritdoc />
 			public void RequestShutdown()
 			{
 				Logger.Info("NULL SERVICE: NullGamestateManager.RequestShutdown()", Logger.System.Services);
