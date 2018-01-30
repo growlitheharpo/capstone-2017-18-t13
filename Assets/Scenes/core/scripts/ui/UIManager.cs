@@ -134,7 +134,7 @@ namespace FiringSquad.Core.UI
 		}
 
 		/// <inheritdoc />
-		public IUIManager RegisterPanel(IScreenPanel panelObject, ScreenPanelTypes type)
+		public IUIManager RegisterPanel(IScreenPanel panelObject, ScreenPanelTypes type, bool disablePanel = true)
 		{
 			if (mPanelTypeToObjectMap.ContainsKey(type) || mPanelObjectToTypeMap.ContainsKey(panelObject))
 				throw new ArgumentException("Registering a panel for more than one type, or more than one panel for a type!");
@@ -142,7 +142,8 @@ namespace FiringSquad.Core.UI
 			mPanelObjectToTypeMap[panelObject] = type;
 			mPanelTypeToObjectMap[type] = panelObject;
 
-			panelObject.gameObject.SetActive(false);
+			if (disablePanel)
+				panelObject.gameObject.SetActive(false);
 
 			return this;
 		}

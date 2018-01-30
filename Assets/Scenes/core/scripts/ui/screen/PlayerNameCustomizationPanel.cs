@@ -23,7 +23,7 @@ namespace FiringSquad.Gameplay.UI
 			mConfirmButton.OnClick += ConfirmName;
 			
 			ServiceLocator.Get<IUIManager>()
-				.RegisterPanel(this, ScreenPanelTypes.PlayerNameEntry);
+				.RegisterPanel(this, ScreenPanelTypes.PlayerNameEntry, false);
 		}
 
 		/// <summary>

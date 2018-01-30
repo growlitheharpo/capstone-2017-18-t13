@@ -68,7 +68,8 @@ namespace FiringSquad.Core.UI
 		/// </summary>
 		/// <param name="panelObject">The GameObject for this panel type.</param>
 		/// <param name="type">Which type of panel this is.</param>
-		IUIManager RegisterPanel(IScreenPanel panelObject, ScreenPanelTypes type);
+		/// <param name="disablePanel">Whether or not to disable the panel immediately.</param>
+		IUIManager RegisterPanel(IScreenPanel panelObject, ScreenPanelTypes type, bool disablePanel = true);
 
 		/// <summary>
 		/// Register a panel to be used by the UI system.

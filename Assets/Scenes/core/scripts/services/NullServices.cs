@@ -338,7 +338,7 @@ namespace FiringSquad.Core
 			}
 
 			/// <inheritdoc />
-			public IUIManager RegisterPanel(IScreenPanel panelObject, ScreenPanelTypes type)
+			public IUIManager RegisterPanel(IScreenPanel panelObject, ScreenPanelTypes type, bool disablePanel = true)
 			{
 				return this;
 			}
