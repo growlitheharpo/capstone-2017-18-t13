@@ -3,6 +3,7 @@ using System.Collections;
 using System.Linq;
 using FiringSquad.Core;
 using FiringSquad.Core.Audio;
+using FiringSquad.Core.State;
 using FiringSquad.Core.UI;
 using FiringSquad.Core.Weapons;
 using FiringSquad.Data;
@@ -162,6 +163,7 @@ namespace FiringSquad.Gameplay
 			foreach (Renderer r in renderers)
 				Destroy(r);
 
+			// Send the "spawned" event.
 			EventManager.Notify(() => EventManager.Local.LocalPlayerSpawned(this));
 		}
 
@@ -399,6 +401,9 @@ namespace FiringSquad.Gameplay
 		public void TargetStartLobbyCountdown(NetworkConnection connection, long endTime)
 		{
 			EventManager.Notify(() => EventManager.Local.ReceiveLobbyEndTime(this, endTime));
+
+			// Lobby means that all players have connected. Let's fire off our name now.
+			CmdSetPlayerName(ServiceLocator.Get<IGamestateManager>().currentUserName);
 		}
 
 		/// <summary>

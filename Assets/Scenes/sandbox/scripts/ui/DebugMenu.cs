@@ -110,5 +110,11 @@ namespace FiringSquad.Debug
 			}
 			GUILayout.EndArea();
 		}
+
+		/// <inheritdoc />
+		public void OnEnablePanel() { }
+
+		/// <inheritdoc />
+		public void OnDisablePanel() { }
 	}
 }
