@@ -165,9 +165,6 @@ namespace FiringSquad.Gameplay
 
 			// Send the "spawned" event.
 			EventManager.Notify(() => EventManager.Local.LocalPlayerSpawned(this));
-
-			// In 5 frames (after some 'breathing' time), send our name to the server.
-			StartCoroutine(Coroutines.InvokeAfterFrames(5, () => { CmdSetPlayerName(ServiceLocator.Get<IGamestateManager>().currentUserName); }));
 		}
 
 		/// <summary>
@@ -404,6 +401,9 @@ namespace FiringSquad.Gameplay
 		public void TargetStartLobbyCountdown(NetworkConnection connection, long endTime)
 		{
 			EventManager.Notify(() => EventManager.Local.ReceiveLobbyEndTime(this, endTime));
+
+			// Lobby means that all players have connected. Let's fire off our name now.
+			CmdSetPlayerName(ServiceLocator.Get<IGamestateManager>().currentUserName);
 		}
 
 		/// <summary>
