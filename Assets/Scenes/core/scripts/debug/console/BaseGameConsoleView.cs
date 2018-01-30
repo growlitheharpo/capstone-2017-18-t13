@@ -26,5 +26,11 @@ namespace FiringSquad.Debug
 		/// Register a handler for commands being entered into this console.
 		/// </summary>
 		public abstract void RegisterCommandHandler(Action<string[]> handler);
+
+		/// <inheritdoc />
+		public virtual void OnEnablePanel() { }
+
+		/// <inheritdoc />
+		public void OnDisablePanel() { }
 	}
 }

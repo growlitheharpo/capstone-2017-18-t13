@@ -144,5 +144,11 @@ namespace FiringSquad.Gameplay.UI
 		{
 			mConfirmationPanel.SetActive(false);
 		}
+
+		/// <inheritdoc />
+		public void OnEnablePanel() { }
+
+		/// <inheritdoc />
+		public void OnDisablePanel() { }
 	}
 }

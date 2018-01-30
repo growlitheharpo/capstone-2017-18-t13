@@ -45,9 +45,17 @@ namespace FiringSquad.Gameplay.UI
 		{
 			ServiceLocator.Get<IUIManager>()
 				.PopPanel(ScreenPanelTypes.PlayerNameEntry)
+				.UnregisterPanel(this)
 				.PushNewPanel(ScreenPanelTypes.HandleConnection);
 
 			ServiceLocator.Get<IGamestateManager>().currentUserName = mInputField.text;
+			Destroy(gameObject);
 		}
+
+		/// <inheritdoc />
+		public void OnEnablePanel() { }
+
+		/// <inheritdoc />
+		public void OnDisablePanel() { }
 	}
 }

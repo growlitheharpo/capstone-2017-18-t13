@@ -83,7 +83,9 @@ namespace FiringSquad.Core.UI
 
 			IScreenPanel panel = mPanelTypeToObjectMap[type];
 			GameObject go = panel.gameObject;
+
 			go.SetActive(true);
+			panel.OnEnablePanel();
 
 			ServiceLocator.Get<IInput>()
 				.DisableInputLevel(InputLevel.Gameplay)
@@ -103,6 +105,8 @@ namespace FiringSquad.Core.UI
 
 			IScreenPanel panel = mPanelTypeToObjectMap[type];
 			GameObject go = panel.gameObject;
+
+			panel.OnDisablePanel();
 			go.SetActive(false);
 			mActivePanels.Remove(go);
 
