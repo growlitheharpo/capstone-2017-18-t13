@@ -70,7 +70,7 @@ namespace FiringSquad.Gameplay.Weapons
 		private int mShotsSinceRelease;
 		private bool mReloading, mAimDownSightsActive;
 
-		private const float CAMERA_FOLLOW_FACTOR = 15.0f;
+		private const float CAMERA_FOLLOW_FACTOR = 10.0f;
 
 		private Quaternion mCurrentWorldRot; // Used for weapon intertia
 
@@ -173,14 +173,7 @@ namespace FiringSquad.Gameplay.Weapons
 			Vector3 location = transform.position;
 			Vector3 targetLocation = bearer.eye.TransformPoint(positionOffset);
 
-			Quaternion rot = transform.rotation;
-			Quaternion targetRot = bearer.eye.rotation;
-			//Quaternion origRot = transform.rotation;
-
-			UnityEngine.Debug.Log(targetRot);
-
 			transform.position = Vector3.Lerp(location, targetLocation, Time.deltaTime * CAMERA_FOLLOW_FACTOR);
-			transform.rotation = Quaternion.Lerp(rot, targetRot, Time.deltaTime * CAMERA_FOLLOW_FACTOR);
 		}
 
 		/// <summary>
@@ -189,9 +182,15 @@ namespace FiringSquad.Gameplay.Weapons
 		private void LateUpdate()
 		{
 			transform.rotation = mCurrentWorldRot;
-			Quaternion targetRot = new Quaternion(bearer.eye.rotation.x, mCurrentWorldRot.y, bearer.eye.rotation.z, bearer.eye.rotation.w);
+			Quaternion targetRot = Quaternion.Euler(bearer.eye.rotation.eulerAngles.x, bearer.transform.rotation.eulerAngles.y, bearer.transform.rotation.z);
 
-			transform.rotation = Quaternion.Lerp(mCurrentWorldRot, targetRot, Time.deltaTime * CAMERA_FOLLOW_FACTOR);
+			transform.rotation = Quaternion.Slerp(mCurrentWorldRot, targetRot, Time.deltaTime * CAMERA_FOLLOW_FACTOR);
+
+			// Compare rotations to snap if close enough
+			if (Quaternion.Angle(transform.rotation, targetRot) <= 0.05)
+			{
+				transform.rotation = targetRot;
+			}
 
 			mCurrentWorldRot = transform.rotation;
 		}
