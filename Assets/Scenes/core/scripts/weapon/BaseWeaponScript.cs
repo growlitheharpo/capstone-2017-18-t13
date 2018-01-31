@@ -70,7 +70,9 @@ namespace FiringSquad.Gameplay.Weapons
 		private int mShotsSinceRelease;
 		private bool mReloading, mAimDownSightsActive;
 
-		private const float CAMERA_FOLLOW_FACTOR = 10.0f;
+		private const float CAMERA_FOLLOW_FACTOR = 15.0f;
+
+		private Quaternion mCurrentWorldRot; // Used for weapon intertia
 
 
 		/// <inheritdoc />
@@ -138,6 +140,8 @@ namespace FiringSquad.Gameplay.Weapons
 			mAnimator = GetComponent<Animator>();
 
 			mPartBreakPrefab = Resources.Load<GameObject>("prefabs/weapons/effects/p_vfx_partBreak").GetComponent<ParticleSystem>();
+
+			mCurrentWorldRot = transform.rotation;
 		}
 		
 		/// <summary>
@@ -171,9 +175,25 @@ namespace FiringSquad.Gameplay.Weapons
 
 			Quaternion rot = transform.rotation;
 			Quaternion targetRot = bearer.eye.rotation;
+			//Quaternion origRot = transform.rotation;
+
+			UnityEngine.Debug.Log(targetRot);
 
 			transform.position = Vector3.Lerp(location, targetLocation, Time.deltaTime * CAMERA_FOLLOW_FACTOR);
 			transform.rotation = Quaternion.Lerp(rot, targetRot, Time.deltaTime * CAMERA_FOLLOW_FACTOR);
+		}
+
+		/// <summary>
+		/// Unity's LateUpdate function. Using to lerp gun rotation
+		/// </summary>
+		private void LateUpdate()
+		{
+			transform.rotation = mCurrentWorldRot;
+			Quaternion targetRot = new Quaternion(bearer.eye.rotation.x, mCurrentWorldRot.y, bearer.eye.rotation.z, bearer.eye.rotation.w);
+
+			transform.rotation = Quaternion.Lerp(mCurrentWorldRot, targetRot, Time.deltaTime * CAMERA_FOLLOW_FACTOR);
+
+			mCurrentWorldRot = transform.rotation;
 		}
 
 		#region Serialization
