@@ -534,9 +534,14 @@ namespace FiringSquad.Gameplay
 				EventManager.Notify(() => EventManager.Local.LocalPlayerCausedDamage(amount));
 				ServiceLocator.Get<IAudioManager>().CreateSound(AudioEvent.LocalDealDamage, realSource.transform);
 			}
+			else
+			{
+				// else notify the camera it should shake
+				FindObjectOfType<Camera>().GetComponent<ScreenShake>().NotifyHit(this, origin, point, normal, amount);
+			}
 
 			mHitIndicator.NotifyHit(this, origin, point, normal, amount);
-			eye.GetComponentInChildren<ScreenShake>().NotifyHit(this, origin, point, normal, amount); // Notify the camera of the screen shake
+			//eye.GetComponentInChildren<ScreenShake>().NotifyHit(this, origin, point, normal, amount); // Notify the camera of the screen shake
 			ServiceLocator.Get<IAudioManager>()
 				.CreateSound(AudioEvent.PlayerDamagedGrunt, transform)
 				.SetParameter("IsCurrentPlayer", Convert.ToSingle(isCurrentPlayer))
