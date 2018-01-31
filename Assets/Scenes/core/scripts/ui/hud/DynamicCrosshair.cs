@@ -20,6 +20,8 @@ namespace FiringSquad.Gameplay.UI
 		private Color[] mOriginalColors;
 		private Image[] mImages;
 
+		GameObject mMarker;
+
 		/// <summary>
 		/// Unity's Awake function
 		/// </summary>
@@ -27,6 +29,7 @@ namespace FiringSquad.Gameplay.UI
 		{
 			mImages = mImageHolder.GetComponentsInChildren<Image>();
 			mOriginalColors = mImages.Select(x => x.color).ToArray();
+			mMarker = Resources.Load<GameObject>("prefabs/ui/p_animated-hit-indicator");
 
 			EventManager.LocalGUI.OnSetCrosshairVisible += OnSetCrosshairVisible;
 			EventManager.Local.OnLocalPlayerSpawned += OnLocalPlayerSpawned;
@@ -69,10 +72,12 @@ namespace FiringSquad.Gameplay.UI
 			StopAllCoroutines();
 			StartCoroutine(FadeBackColors(mFadeTime));
 
+			GameObject tmpMarker;
+
 			// Spawn a hitmarker
-			GameObject marker = Instantiate(Resources.Load<GameObject>("prefabs/ui/p_animated-hit-indicator"), this.transform);
-			marker.transform.localPosition = new Vector3(0, 0, 0);
-			marker.transform.localScale = new Vector3(.75f, .75f, .75f);
+			tmpMarker = Instantiate(mMarker, this.transform);
+			tmpMarker.transform.localPosition = new Vector3(0, 0, 0);
+			tmpMarker.transform.localScale = new Vector3(.5f, .5f, .5f);
 		}
 
 		/// <summary>
