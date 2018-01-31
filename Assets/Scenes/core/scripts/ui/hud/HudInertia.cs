@@ -10,10 +10,10 @@ namespace FiringSquad.Gameplay.UI
 	public class HudInertia : MonoBehaviour
 	{
 		// Serialized fields for number tweaking
-		[SerializeField]
-		private float mDTscalar;
-		[SerializeField]
-		private float mMaxOffset;
+		//[SerializeField]
+		//private float mDTscalar;
+		//[SerializeField]
+		//private float mMaxOffset;
 
 		// private variables
 		private CltPlayer mPlayer; // keeping track of the player in order to get their rotation
@@ -27,7 +27,7 @@ namespace FiringSquad.Gameplay.UI
 		private void Awake()
 		{
 			EventManager.Local.OnLocalPlayerSpawned += OnLocalPlayerSpawned;
-			mOrigPosition = transform.localPosition;
+			//mOrigPosition = transform.localPosition;
 		}
 
 		/// <summary>
@@ -72,16 +72,16 @@ namespace FiringSquad.Gameplay.UI
 					// check if the rotation is greater in euler angles than the previous
 					if (newRot.eulerAngles.y > prevRot.eulerAngles.y)
 					{
-						transform.localPosition = Vector3.Lerp(transform.localPosition, new Vector3(mOrigPosition.x - mMaxOffset, mOrigPosition.y, mOrigPosition.z), Time.deltaTime / mDTscalar);
+						transform.localPosition = Vector3.Lerp(transform.localPosition, new Vector3(mOrigPosition.x - 50.0f, mOrigPosition.y, mOrigPosition.z), Time.deltaTime / 2f);
 					}
 					else if (newRot.eulerAngles.y < prevRot.eulerAngles.y)
 					{
-						transform.localPosition = Vector3.Lerp(transform.localPosition, new Vector3(mOrigPosition.x + mMaxOffset, mOrigPosition.y, mOrigPosition.z), Time.deltaTime / mDTscalar);
+						transform.localPosition = Vector3.Lerp(transform.localPosition, new Vector3(mOrigPosition.x + 50.0f, mOrigPosition.y, mOrigPosition.z), Time.deltaTime / 2f);
 					}
 				}
 				else
 				{
-					transform.localPosition = Vector3.Lerp(transform.localPosition, mOrigPosition, Time.deltaTime * mDTscalar);
+					transform.localPosition = Vector3.Lerp(transform.localPosition, mOrigPosition, Time.deltaTime * 3);
 				}
 
 				mPlayerPrevRot = newRot;
