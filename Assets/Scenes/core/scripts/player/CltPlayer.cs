@@ -536,6 +536,7 @@ namespace FiringSquad.Gameplay
 			}
 
 			mHitIndicator.NotifyHit(this, origin, point, normal, amount);
+			eye.GetComponentInChildren<ScreenShake>().NotifyHit(this, origin, point, normal, amount); // Notify the camera of the screen shake
 			ServiceLocator.Get<IAudioManager>()
 				.CreateSound(AudioEvent.PlayerDamagedGrunt, transform)
 				.SetParameter("IsCurrentPlayer", Convert.ToSingle(isCurrentPlayer))
