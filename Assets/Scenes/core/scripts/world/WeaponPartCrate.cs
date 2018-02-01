@@ -76,6 +76,9 @@ namespace FiringSquad.Gameplay
 			CmdSpawnPart();
 		}
 
+		/// <inheritdoc />
+		public void HealDamage(float amount) { }
+
 		/// <summary>
 		/// Spawn a part after the crate has taken damage.
 		/// </summary>

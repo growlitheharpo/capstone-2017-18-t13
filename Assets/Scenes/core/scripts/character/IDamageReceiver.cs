@@ -15,5 +15,11 @@ namespace FiringSquad.Gameplay
 		/// <param name="normal">The normal/tangent of the hit.</param>
 		/// <param name="cause">The source of this damage.</param>
 		void ApplyDamage(float amount, Vector3 point, Vector3 normal, IDamageSource cause);
+
+		/// <summary>
+		/// Heal a certain amount of health to this receiver.
+		/// </summary>
+		/// <param name="amount">The amount of health to heal.</param>
+		void HealDamage(float amount);
 	}
 }
