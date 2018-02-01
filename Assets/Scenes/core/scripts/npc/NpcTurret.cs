@@ -200,6 +200,12 @@ namespace FiringSquad.Gameplay.NPC
 				HandleTurretDeath();
 		}
 
+		/// <inheritdoc />
+		public void HealDamage(float amount)
+		{
+			mHealth = Mathf.Clamp(mHealth + amount, 0.0f, mData.defaultHealth);
+		}
+
 		/// <summary>
 		/// Reflect damage that occured on the server on each local client.
 		/// </summary>

@@ -94,6 +94,12 @@ namespace FiringSquad.Prototyping
 			StartCoroutine(FadeText());
 		}
 
+		/// <inheritdoc />
+		public void HealDamage(float amount)
+		{
+			mHealth.value += amount;
+		}
+
 		/// <summary>
 		/// Fade out our text after the hit occurs.
 		/// </summary>

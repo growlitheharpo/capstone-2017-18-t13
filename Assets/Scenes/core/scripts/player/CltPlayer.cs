@@ -488,6 +488,12 @@ namespace FiringSquad.Gameplay
 				EventManager.Notify(() => EventManager.Server.PlayerHealthHitZero(this, cause));
 		}
 
+		/// <inheritdoc />
+		public void HealDamage(float amount)
+		{
+			mHealth = Mathf.Clamp(mHealth + amount, 0.0f, defaultData.defaultHealth);
+		}
+
 		/// <summary>
 		/// EVENT HANDLER: Server.OnPlayerDied
 		/// </summary>
