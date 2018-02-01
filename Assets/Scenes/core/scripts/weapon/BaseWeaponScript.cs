@@ -197,19 +197,10 @@ namespace FiringSquad.Gameplay.Weapons
 			{
 				// if the current rotation is greater...
 				if (transform.rotation.eulerAngles.y > targetRot.eulerAngles.y)
-				{
 					transform.rotation = Quaternion.Euler(targetRot.eulerAngles.x, targetRot.eulerAngles.y + 20, targetRot.eulerAngles.z);
-					UnityEngine.Debug.Log(transform.rotation.eulerAngles);
-					UnityEngine.Debug.Log(targetRot.eulerAngles);
-
-				}
 				// else if the target rotation is greater
 				else if(transform.rotation.eulerAngles.y < targetRot.eulerAngles.y)
-				{
 					transform.rotation = Quaternion.Euler(targetRot.eulerAngles.x, targetRot.eulerAngles.y - 20, targetRot.eulerAngles.z);
-					UnityEngine.Debug.Log(transform.rotation.eulerAngles);
-					UnityEngine.Debug.Log(targetRot.eulerAngles);
-				}
 			}
 
 			mCurrentWorldRot = transform.rotation;
