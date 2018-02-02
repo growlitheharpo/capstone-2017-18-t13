@@ -153,8 +153,12 @@ namespace FiringSquad.Gameplay
 		private void SetViewActivated()
 		{
 			mPadMaterial.SetColor("_EmissionColor", mActiveColor);
-			mLight.color = mActiveColor;
-			mLight.intensity = 3.0f;
+
+			if (mLight != null)
+			{
+				mLight.color = mActiveColor;
+				mLight.intensity = 3.0f;
+			}
 		}
 
 		/// <summary>
@@ -163,8 +167,12 @@ namespace FiringSquad.Gameplay
 		private void SetViewDeactivated()
 		{
 			mPadMaterial.SetColor("_EmissionColor", mInactiveColor);
-			mLight.color = mInactiveColor;
-			mLight.intensity = 1.0f;
+
+			if (mLight != null)
+			{
+				mLight.color = mInactiveColor;
+				mLight.intensity = 1.0f;
+			}
 		}
 	}
 }
