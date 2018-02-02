@@ -6,6 +6,7 @@ using KeatsLib.Collections;
 using KeatsLib.Unity;
 using UnityEngine.Networking;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace FiringSquad.Gameplay
 {
@@ -30,8 +31,10 @@ namespace FiringSquad.Gameplay
 
 		/// Inspector variables
 		[HideInInspector] [SerializeField] private List<PartWeightSet> mParts; // [HideInInspector] because this is drawn with custom editor
-		[SerializeField] private float mRespawnTimePlayerGrabbed;
-		[SerializeField] private float mRespawnTimeTimeout;
+		[SerializeField] private float mRespawnTimePlayerGrabbedMin;
+		[SerializeField] private float mRespawnTimePlayerGrabbedMax;
+		[SerializeField] private float mRespawnTimeTimeoutMin;
+		[SerializeField] private float mRespawnTimeTimeoutMax;
 
 		/// Syncvars
 		[SyncVar(hook = "OnChangeActivated")] private bool mActivated = true;
@@ -128,7 +131,10 @@ namespace FiringSquad.Gameplay
 		private IEnumerator PrepRespawn(bool playerGrabbed)
 		{
 			mActivated = false;
-			yield return new WaitForSeconds(playerGrabbed ? mRespawnTimePlayerGrabbed : mRespawnTimeTimeout);
+			float pickupTime = playerGrabbed
+				? Random.Range(mRespawnTimePlayerGrabbedMin, mRespawnTimePlayerGrabbedMax)
+				: Random.Range(mRespawnTimeTimeoutMin, mRespawnTimeTimeoutMax);
+			yield return new WaitForSeconds(pickupTime);
 			
 			SpawnPart();
 		}

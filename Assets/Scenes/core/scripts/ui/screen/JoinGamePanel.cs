@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 using FiringSquad.Core;
 using FiringSquad.Core.UI;
 using FiringSquad.Networking;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.Networking.Match;
 using UnityEngine.UI;
+using Logger = FiringSquad.Debug.Logger;
 
 namespace FiringSquad.Gameplay.UI
 {
@@ -104,33 +107,47 @@ namespace FiringSquad.Gameplay.UI
 			DestroyAllMatchPanels();
 
 			// TODO: Use the number of players for this scene as the "domain"!
-			mNetworkManager.matchMaker.ListMatches(0, 8, "", false, 0, 0, (success, extendedResult, matchList) =>
+			if (mNetworkManager.matchMaker == null)
+				mNetworkManager.StartMatchMaker();
+
+			mNetworkManager.matchMaker.ListMatches(0, 8, "", false, 0, 0, OnRefreshMatchList);
+		}
+
+		/// <summary>
+		/// Handle receiving the match list data.
+		/// </summary>
+		private void OnRefreshMatchList(bool success, string extendedResult, List<MatchInfoSnapshot> matchList)
+		{
+			if (!success)
 			{
-				if (!success)
+				DisplayError("Unable to find matches\nERR: " + extendedResult);
+				return;
+			}
+
+			mNetworkManager.OnMatchList(true, extendedResult, matchList);
+
+			foreach (MatchInfoSnapshot match in matchList)
+			{
+				MatchDataInfoPanel matchData = Instantiate(mMatchDataPrefab.gameObject, mMatchDataHolder.transform, false).GetComponent<MatchDataInfoPanel>();
+				string matchName = match.name.Split(':')[0],
+						matchIp = match.name.Split(':')[1];
+
+				matchData.matchName = matchName;
+				matchData.matchCurrentPlayers = match.currentSize;
+				matchData.matchMaxPlayers = match.maxSize;
+				matchData.RefreshPlayerString();
+
+				MatchInfoSnapshot matchCopy = match;
+				matchData.joinMatchButton.onClick.AddListener(() =>
 				{
-					DisplayError("Unable to find matches\nERR: " + extendedResult);
-					return;
-				}
+					mNetworkManager.matchName = matchName;
+					mNetworkManager.matchSize = (uint)matchCopy.currentSize;
 
-				mNetworkManager.OnMatchList(true, extendedResult, matchList);
-
-				foreach (MatchInfoSnapshot match in matchList)
-				{
-					MatchDataInfoPanel matchData = Instantiate(mMatchDataPrefab.gameObject, mMatchDataHolder.transform, false).GetComponent<MatchDataInfoPanel>();
-					matchData.matchName = match.name;
-					matchData.matchCurrentPlayers = match.currentSize;
-					matchData.matchMaxPlayers = match.maxSize;
-					matchData.RefreshPlayerString();
-
-					MatchInfoSnapshot matchCopy = match;
-					matchData.joinMatchButton.onClick.AddListener(delegate
-					{
-						mNetworkManager.matchName = matchCopy.name;
-						mNetworkManager.matchSize = (uint)matchCopy.currentSize;
-						mNetworkManager.matchMaker.JoinMatch(matchCopy.networkId, "", "", "", 0, 0, OnJoinMatch);
-					});
-				}
-			});
+					mNetworkManager.StopMatchMaker();
+					mNetworkManager.networkAddress = matchIp;
+					mNetworkManager.StartClient();
+				});
+			}
 		}
 
 		/// <summary>
