@@ -3,10 +3,10 @@
 namespace UnityEditor
 {
 	/// <summary>
-	/// Custom inspector for weapon pads.
+	/// Custom inspector for crates.
 	/// Auto-balances weights and draws a prettier list.
 	/// </summary>
-	[CustomEditor(typeof(FiringSquad.Gameplay.WeaponPartPad))]
+	[CustomEditor(typeof(FiringSquad.Gameplay.WeaponPartPad))][CanEditMultipleObjects]
 	public class WeaponPartPadEditor : Editor
 	{
 		private UnityEditorInternal.ReorderableList mList;
@@ -21,7 +21,10 @@ namespace UnityEditor
 			mList =
 				new UnityEditorInternal.ReorderableList(serializedObject, mPartsProperty, true, true, true, true)
 				{
-					drawHeaderCallback = rect => { EditorGUI.LabelField(rect, "Parts and Weights"); },
+					drawHeaderCallback = rect =>
+					{
+						EditorGUI.LabelField(rect, "Parts and Weights");
+					},
 					drawElementCallback = (rect, index, isActive, isFocused) =>
 					{
 						SerializedProperty element = mList.serializedProperty.GetArrayElementAtIndex(index);
@@ -43,6 +46,9 @@ namespace UnityEditor
 			mList.DoLayoutList();
 			BalanceWeights();
 
+			if (GUILayout.Button("Snap To Floor"))
+				SnapToFloor((target) as Component);
+
 			serializedObject.ApplyModifiedProperties();
 		}
 
@@ -60,6 +66,23 @@ namespace UnityEditor
 
 			for (int i = 0; i < mPartsProperty.arraySize; i++)
 				mPartsProperty.GetArrayElementAtIndex(i).FindPropertyRelative("mWeight").floatValue /= sum;
+		}
+
+		/// <summary>
+		/// Snap the crates to the floor.
+		/// </summary>
+		/// <param name="component"></param>
+		private void SnapToFloor(Component component)
+		{
+			Transform t = component.transform;
+			Ray r = new Ray(t.position, Vector3.down);
+
+			RaycastHit hitInfo;
+			if (!Physics.Raycast(r, out hitInfo))
+				return;
+
+			Vector3 point = hitInfo.point;
+			t.position = point;
 		}
 	}
 }
