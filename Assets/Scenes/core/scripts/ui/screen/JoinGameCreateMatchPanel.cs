@@ -7,6 +7,7 @@ using FiringSquad.Networking;
 using UnityEngine;
 using UnityEngine.Networking.Match;
 using UnityEngine.UI;
+using Logger = FiringSquad.Debug.Logger;
 
 namespace FiringSquad.Gameplay.UI
 {
@@ -65,7 +66,9 @@ namespace FiringSquad.Gameplay.UI
 		/// </summary>
 		private void OnClickConfirmButton()
 		{
-			mNetworkManager.matchMaker.CreateMatch(mNameEntryField.text, 5, true, "", "", "", 0, 0, OnMatchCreate);
+			string matchName = mNameEntryField.text;
+			matchName += ":" + Network.player.ipAddress;
+			mNetworkManager.matchMaker.CreateMatch(matchName, 5, true, "", Network.player.ipAddress, Network.player.ipAddress, 0, 0, OnMatchCreate);
 		}
 
 		/// <summary>
@@ -80,7 +83,8 @@ namespace FiringSquad.Gameplay.UI
 				return;
 			}
 
-			mNetworkManager.OnMatchCreate(true, extendedinfo, responsedata);
+			//mNetworkManager.OnMatchCreate(true, extendedinfo, responsedata);
+			mNetworkManager.StartHost();
 			mJoinGamePanel.FinishConnection();
 		}
 	}
