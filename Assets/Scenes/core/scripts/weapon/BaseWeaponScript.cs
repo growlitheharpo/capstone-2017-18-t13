@@ -407,11 +407,11 @@ namespace FiringSquad.Gameplay.Weapons
 
 			if (instance.attachPoint == Attachment.Mechanism || mCurrentData.clipSize != originalClipsize)
 			{
-				if (mCurrentParts.mechanism == null)
-					return;
-
-				mShotsInClip.value = mCurrentData.clipSize;
-				mTotalClipSize.value = mCurrentData.clipSize;
+				if (mCurrentParts.mechanism != null)
+				{
+					mShotsInClip.value = mCurrentData.clipSize;
+					mTotalClipSize.value = mCurrentData.clipSize;
+				}
 			}
 
 
@@ -423,7 +423,7 @@ namespace FiringSquad.Gameplay.Weapons
 					EventManager.Notify(() => EventManager.Local.LocalPlayerAttachedPart(this, instance));
 			}
 
-			if (instance.attachPoint == Attachment.Scope && mAimDownSightsActive)
+			if (instance.attachPoint == Attachment.Scope && mAimDownSightsActive && currentParts.scope != null)
 				currentParts.scope.ActivateAimDownSightsEffect(this);
 		}
 
@@ -651,10 +651,13 @@ namespace FiringSquad.Gameplay.Weapons
 		/// </summary>
 		private Transform GetAimRoot()
 		{
-			if (!mCurrentParts.mechanism.overrideHitscanMethod && aimRoot != null)
+			if (mCurrentParts.mechanism != null && !mCurrentParts.mechanism.overrideHitscanMethod && aimRoot != null)
 				return aimRoot;
 
-			return mCurrentParts.barrel.barrelTip;
+			if (mCurrentParts.barrel != null)
+				return mCurrentParts.barrel.barrelTip;
+
+			return transform;
 		}
 
 		/// <summary>
