@@ -1,4 +1,5 @@
 ﻿using FiringSquad.Core;
+using FiringSquad.Core.State;
 using FiringSquad.Core.UI;
 using UnityEngine;
 using UnityEngine.UI;
@@ -14,9 +15,6 @@ namespace FiringSquad.Gameplay.UI
 		[SerializeField] private InputField mInputField;
 		[SerializeField] private ActionProvider mConfirmButton;
 
-		/// Private variables
-		private CltPlayer mPlayerRef;
-
 		/// <summary>
 		/// Unity's Start function.
 		/// </summary>
@@ -25,7 +23,7 @@ namespace FiringSquad.Gameplay.UI
 			mConfirmButton.OnClick += ConfirmName;
 			
 			ServiceLocator.Get<IUIManager>()
-				.RegisterPanel(this, ScreenPanelTypes.PlayerNameEntry);
+				.RegisterPanel(this, ScreenPanelTypes.PlayerNameEntry, false);
 		}
 
 		/// <summary>
@@ -40,23 +38,24 @@ namespace FiringSquad.Gameplay.UI
 		}
 
 		/// <summary>
-		/// Set the player that this panel will change.
-		/// </summary>
-		/// <param name="obj"></param>
-		public void SetPlayer(CltPlayer obj)
-		{
-			mPlayerRef = obj;
-		}
-
-		/// <summary>
 		/// Handle the player confirming their name.
 		/// Hide the panel and re-enable input.
 		/// </summary>
 		private void ConfirmName()
 		{
-			mPlayerRef.CmdSetPlayerName(mInputField.text);
-			ServiceLocator.Get<IUIManager>().PopPanel(ScreenPanelTypes.PlayerNameEntry);
+			ServiceLocator.Get<IUIManager>()
+				.PopPanel(ScreenPanelTypes.PlayerNameEntry)
+				.UnregisterPanel(this)
+				.PushNewPanel(ScreenPanelTypes.HandleConnection);
+
+			ServiceLocator.Get<IGamestateManager>().currentUserName = mInputField.text;
 			Destroy(gameObject);
 		}
+
+		/// <inheritdoc />
+		public void OnEnablePanel() { }
+
+		/// <inheritdoc />
+		public void OnDisablePanel() { }
 	}
 }

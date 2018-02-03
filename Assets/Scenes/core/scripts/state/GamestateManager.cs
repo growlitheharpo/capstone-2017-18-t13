@@ -72,6 +72,9 @@ namespace FiringSquad.Core.State
 		public bool isAlive { get { return true; } }
 
 		/// <inheritdoc />
+		public string currentUserName { get; set; }
+
+		/// <inheritdoc />
 		public void RequestShutdown()
 		{
 			//TODO: Transition to shutdown state

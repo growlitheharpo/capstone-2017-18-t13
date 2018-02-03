@@ -3,6 +3,7 @@ using System.Collections;
 using System.Linq;
 using FiringSquad.Core;
 using FiringSquad.Core.Audio;
+using FiringSquad.Core.State;
 using FiringSquad.Core.UI;
 using FiringSquad.Core.Weapons;
 using FiringSquad.Data;
@@ -162,6 +163,7 @@ namespace FiringSquad.Gameplay
 			foreach (Renderer r in renderers)
 				Destroy(r);
 
+			// Send the "spawned" event.
 			EventManager.Notify(() => EventManager.Local.LocalPlayerSpawned(this));
 		}
 
@@ -399,6 +401,9 @@ namespace FiringSquad.Gameplay
 		public void TargetStartLobbyCountdown(NetworkConnection connection, long endTime)
 		{
 			EventManager.Notify(() => EventManager.Local.ReceiveLobbyEndTime(this, endTime));
+
+			// Lobby means that all players have connected. Let's fire off our name now.
+			CmdSetPlayerName(ServiceLocator.Get<IGamestateManager>().currentUserName);
 		}
 
 		/// <summary>
@@ -483,6 +488,12 @@ namespace FiringSquad.Gameplay
 				EventManager.Notify(() => EventManager.Server.PlayerHealthHitZero(this, cause));
 		}
 
+		/// <inheritdoc />
+		public void HealDamage(float amount)
+		{
+			mHealth = Mathf.Clamp(mHealth + amount, 0.0f, defaultData.defaultHealth);
+		}
+
 		/// <summary>
 		/// EVENT HANDLER: Server.OnPlayerDied
 		/// </summary>
@@ -528,6 +539,17 @@ namespace FiringSquad.Gameplay
 			{
 				EventManager.Notify(() => EventManager.Local.LocalPlayerCausedDamage(amount));
 				ServiceLocator.Get<IAudioManager>().CreateSound(AudioEvent.LocalDealDamage, realSource.transform);
+			}
+			else if (this.isCurrentPlayer)
+			{
+				// else notify the camera it should shake
+				Camera cameraRef = GetComponentInChildren<Camera>();
+				if (cameraRef != null)
+				{
+					ScreenShake screenShake = cameraRef.GetComponent<ScreenShake>();
+					if (screenShake != null)
+						screenShake.NotifyHit(this, origin, point, normal, amount);
+				}
 			}
 
 			mHitIndicator.NotifyHit(this, origin, point, normal, amount);

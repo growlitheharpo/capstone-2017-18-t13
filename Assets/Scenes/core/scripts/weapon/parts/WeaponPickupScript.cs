@@ -4,6 +4,7 @@ using FiringSquad.Gameplay.UI;
 using KeatsLib.Unity;
 using UnityEngine;
 using UnityEngine.Networking;
+using Random = UnityEngine.Random;
 
 namespace FiringSquad.Gameplay.Weapons
 {
@@ -12,12 +13,12 @@ namespace FiringSquad.Gameplay.Weapons
 	/// </summary>
 	public class WeaponPickupScript : NetworkBehaviour, IInteractable, INetworkGrabbable
 	{
-		private const float PICKUP_LIFETIME = 30.0f; // in seconds
-
 		/// Inspector variables
 		[SerializeField] private GameObject mGunView;
 		[SerializeField] private GameObject mPickupView;
 		[SerializeField] private GameObject mParticleSystem;
+		[SerializeField] private float mPickupLifetimeMin;
+		[SerializeField] private float mPickupLifetimeMax;
 
 		/// Sync variables
 		[SyncVar] private long mDeathTimeTicks;
@@ -107,7 +108,10 @@ namespace FiringSquad.Gameplay.Weapons
 				return;
 
 			if (isServer)
-				mDeathTimeTicks = DateTime.Now.Ticks + (int)(PICKUP_LIFETIME * TimeSpan.TicksPerSecond);
+			{
+				float pickupTime = Random.Range(mPickupLifetimeMin, mPickupLifetimeMax);
+				mDeathTimeTicks = DateTime.Now.Ticks + (int)(pickupTime * TimeSpan.TicksPerSecond);
+			}
 
 			// flip the model views
 			mGunView.SetActive(false);

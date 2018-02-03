@@ -72,6 +72,8 @@ namespace FiringSquad.Gameplay.Weapons
 
 		private const float CAMERA_FOLLOW_FACTOR = 10.0f;
 
+		private Quaternion mCurrentWorldRot; // Used for weapon intertia
+
 
 		/// <inheritdoc />
 		public Transform aimRoot { get; set; }
@@ -138,6 +140,8 @@ namespace FiringSquad.Gameplay.Weapons
 			mAnimator = GetComponent<Animator>();
 
 			mPartBreakPrefab = Resources.Load<GameObject>("prefabs/weapons/effects/p_vfx_partBreak").GetComponent<ParticleSystem>();
+
+			mCurrentWorldRot = transform.rotation;
 		}
 		
 		/// <summary>
@@ -169,11 +173,37 @@ namespace FiringSquad.Gameplay.Weapons
 			Vector3 location = transform.position;
 			Vector3 targetLocation = bearer.eye.TransformPoint(positionOffset);
 
-			Quaternion rot = transform.rotation;
-			Quaternion targetRot = bearer.eye.rotation;
-
 			transform.position = Vector3.Lerp(location, targetLocation, Time.deltaTime * CAMERA_FOLLOW_FACTOR);
-			transform.rotation = Quaternion.Lerp(rot, targetRot, Time.deltaTime * CAMERA_FOLLOW_FACTOR);
+		}
+
+		/// <summary>
+		/// Unity's LateUpdate function. Using to lerp gun rotation
+		/// </summary>
+		private void LateUpdate()
+		{
+			transform.rotation = mCurrentWorldRot;
+			Quaternion targetRot = Quaternion.Euler(bearer.eye.rotation.eulerAngles.x, bearer.transform.rotation.eulerAngles.y, bearer.transform.rotation.z);
+
+			transform.rotation = Quaternion.Slerp(mCurrentWorldRot, targetRot, Time.deltaTime * CAMERA_FOLLOW_FACTOR);
+
+			// Compare rotations to snap if close enough
+			if (Quaternion.Angle(transform.rotation, targetRot) <= 0.05)
+			{
+				transform.rotation = targetRot;
+			}
+
+			// If the rotations are too far apart, clamp to 20 degrees
+			if (Quaternion.Angle(transform.rotation, targetRot) >= 20)
+			{
+				// if the current rotation is greater...
+				if (transform.rotation.eulerAngles.y > targetRot.eulerAngles.y)
+					transform.rotation = Quaternion.Euler(targetRot.eulerAngles.x, targetRot.eulerAngles.y + 20, targetRot.eulerAngles.z);
+				// else if the target rotation is greater
+				else if(transform.rotation.eulerAngles.y < targetRot.eulerAngles.y)
+					transform.rotation = Quaternion.Euler(targetRot.eulerAngles.x, targetRot.eulerAngles.y - 20, targetRot.eulerAngles.z);
+			}
+
+			mCurrentWorldRot = transform.rotation;
 		}
 
 		#region Serialization
