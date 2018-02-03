@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using FiringSquad.Core;
 using FiringSquad.Core.Audio;
 using FiringSquad.Core.UI;
@@ -49,10 +48,6 @@ namespace FiringSquad.Gameplay.Weapons
 		}
 
 		/// Inspector variables
-		[SerializeField] private Transform mBarrelAttach;
-		[SerializeField] private Transform mScopeAttach;
-		[SerializeField] private Transform mMechanismAttach;
-		[SerializeField] private Transform mGripAttach;
 		[SerializeField] private float mAimDownSightsDispersionMod;
 		[SerializeField] private WeaponData mDefaultData;
 
@@ -60,20 +55,13 @@ namespace FiringSquad.Gameplay.Weapons
 		private IWeaponBearer mBearer;
 		private WeaponPartCollection mCurrentParts;
 		private WeaponData mCurrentData, mAimDownSightsData;
+		private BaseWeaponView mWeaponView;
 
 		private BoundProperty<int> mShotsInClip, mTotalClipSize;
-		private ParticleSystem mShotParticles, mPartBreakPrefab;
-		private Dictionary<Attachment, Transform> mAttachPoints;
-		private Animator mAnimator;
 
 		private List<float> mRecentShotTimes;
 		private int mShotsSinceRelease;
 		private bool mReloading, mAimDownSightsActive;
-
-		private const float CAMERA_FOLLOW_FACTOR = 10.0f;
-
-		private Quaternion mCurrentWorldRot; // Used for weapon intertia
-
 
 		/// <inheritdoc />
 		public Transform aimRoot { get; set; }
@@ -126,22 +114,11 @@ namespace FiringSquad.Gameplay.Weapons
 			mRecentShotTimes = new List<float>();
 			mCurrentParts = new WeaponPartCollection();
 
-			mAttachPoints = new Dictionary<Attachment, Transform>
-			{
-				{ Attachment.Scope, mScopeAttach },
-				{ Attachment.Barrel, mBarrelAttach },
-				{ Attachment.Mechanism, mMechanismAttach },
-				{ Attachment.Grip, mGripAttach }
-			};
 
 			mShotsInClip = new BoundProperty<int>();
 			mTotalClipSize = new BoundProperty<int>();
-			mShotParticles = transform.Find("shot_particles").GetComponent<ParticleSystem>();
-			mAnimator = GetComponent<Animator>();
-
-			mPartBreakPrefab = Resources.Load<GameObject>("prefabs/weapons/effects/p_vfx_partBreak").GetComponent<ParticleSystem>();
-
-			mCurrentWorldRot = transform.rotation;
+			GetComponent<Animator>();
+			mWeaponView = GetComponent<BaseWeaponView>();
 		}
 		
 		/// <summary>
@@ -160,51 +137,6 @@ namespace FiringSquad.Gameplay.Weapons
 			mTotalClipSize = new BoundProperty<int>(mTotalClipSize == null ? 0 : mTotalClipSize.value, UIManager.CLIP_TOTAL);
 		}
 
-		/// <summary>
-		/// Unity's Update function. Runs on client AND server.
-		/// </summary>
-		private void Update()
-		{
-			// Follow my player
-			// TODO: Put this in a seperate "view" class.
-			if (bearer == null || bearer.eye == null)
-				return;
-
-			Vector3 location = transform.position;
-			Vector3 targetLocation = bearer.eye.TransformPoint(positionOffset);
-
-			transform.position = Vector3.Lerp(location, targetLocation, Time.deltaTime * CAMERA_FOLLOW_FACTOR);
-		}
-
-		/// <summary>
-		/// Unity's LateUpdate function. Using to lerp gun rotation
-		/// </summary>
-		private void LateUpdate()
-		{
-			transform.rotation = mCurrentWorldRot;
-			Quaternion targetRot = Quaternion.Euler(bearer.eye.rotation.eulerAngles.x, bearer.transform.rotation.eulerAngles.y, bearer.transform.rotation.z);
-
-			transform.rotation = Quaternion.Slerp(mCurrentWorldRot, targetRot, Time.deltaTime * CAMERA_FOLLOW_FACTOR);
-
-			// Compare rotations to snap if close enough
-			if (Quaternion.Angle(transform.rotation, targetRot) <= 0.05)
-			{
-				transform.rotation = targetRot;
-			}
-
-			// If the rotations are too far apart, clamp to 20 degrees
-			if (Quaternion.Angle(transform.rotation, targetRot) >= 20)
-			{
-				// if the current rotation is greater...
-				if (transform.rotation.eulerAngles.y > targetRot.eulerAngles.y)
-					transform.rotation = Quaternion.Euler(targetRot.eulerAngles.x, targetRot.eulerAngles.y + 20, targetRot.eulerAngles.z);
-				// else if the target rotation is greater
-				else if(transform.rotation.eulerAngles.y < targetRot.eulerAngles.y)
-					transform.rotation = Quaternion.Euler(targetRot.eulerAngles.x, targetRot.eulerAngles.y - 20, targetRot.eulerAngles.z);
-			}
-
-			mCurrentWorldRot = transform.rotation;
-		}
 
 		#region Serialization
 
@@ -396,7 +328,7 @@ namespace FiringSquad.Gameplay.Weapons
 
 			int originalClipsize = mCurrentData.clipSize;
 
-			MoveAttachmentToPoint(instance);
+			mWeaponView.MoveAttachmentToPoint(instance);
 			mCurrentParts[instance.attachPoint] = instance;
 
 			instance.durability = durability == WeaponPartScript.USE_DEFAULT_DURABILITY ? prefab.durability : durability;
@@ -427,23 +359,6 @@ namespace FiringSquad.Gameplay.Weapons
 				currentParts.scope.ActivateAimDownSightsEffect(this);
 		}
 
-		/// <summary>
-		/// Move this weapon instance to the position on the gun.
-		/// </summary>
-		/// <param name="instance">The weapon part to move.</param>
-		private void MoveAttachmentToPoint(WeaponPartScript instance)
-		{
-			Attachment place = instance.attachPoint;
-
-			WeaponPartScript current = mCurrentParts[place];
-			if (current != null)
-				Destroy(current.gameObject);
-
-			instance.transform.SetParent(mAttachPoints[place]);
-			instance.transform.ResetLocalValues();
-		}
-
-
 		#endregion
 
 		#region Reloading
@@ -455,8 +370,8 @@ namespace FiringSquad.Gameplay.Weapons
 				return;
 
 			mReloading = true;
-			PlayReloadEffect(currentData.reloadTime);
-			Invoke("FinishReload", currentData.reloadTime);
+			mWeaponView.PlayReloadEffect(currentData.reloadTime);
+			StartCoroutine(Coroutines.InvokeAfterSeconds(currentData.reloadTime, FinishReload));
 		}
 
 		/// <summary>
@@ -466,37 +381,6 @@ namespace FiringSquad.Gameplay.Weapons
 		{
 			mShotsInClip.value = currentData.clipSize;
 			mReloading = false;
-		}
-
-		/// <summary>
-		/// Play an effect to show the player that they are reloading.
-		/// </summary>
-		/// <param name="time">The amount of time it takes to reload.</param>
-		private void PlayReloadEffect(float time)
-		{
-			IAudioReference effect = ServiceLocator.Get<IAudioManager>().CreateSound(AudioEvent.Reload, transform, false);
-			if (mCurrentParts.mechanism != null)
-				effect.weaponType = mCurrentParts.mechanism.audioOverrideWeaponType;
-			effect.AttachToRigidbody(bearer.gameObject.GetComponent<Rigidbody>()); // TODO: Cache this??
-			effect.Start();
-
-			AnimationUtility.PlayAnimation(mAnimator, "reload");
-			StartCoroutine(WaitForReload(time));
-		}
-
-		/// <summary>
-		/// Wait until the reload is finished, then reset our animator.
-		/// </summary>
-		/// <param name="time">The amount of time it takes to reload.</param>
-		private IEnumerator WaitForReload(float time)
-		{
-			mReloading = true;
-
-			yield return null;
-			yield return null;
-			mAnimator.speed = 1.0f / time;
-			yield return new WaitForAnimation(mAnimator);
-			mAnimator.speed = 1.0f;
 		}
 
 		#endregion
@@ -527,7 +411,7 @@ namespace FiringSquad.Gameplay.Weapons
 				return;
 
 			int count = mCurrentParts.barrel != null ? mCurrentParts.barrel.projectileCount : 1;
-			List<Vector3> origins = new List<Vector3>(), directions = new List<Vector3>();;
+			List<Vector3> origins = new List<Vector3>(), directions = new List<Vector3>();
 			for (int i = 0; i < count; i++)
 			{
 				Ray shot = CalculateShotDirection(i == 0);
@@ -540,7 +424,7 @@ namespace FiringSquad.Gameplay.Weapons
 			mShotsInClip.value--;
 
 			CmdOnShotFireComplete(origins.ToArray(), directions.ToArray());
-			PlayFireEffect();
+			mWeaponView.PlayFireEffect();
 			CmdDegradeDurability();
 		}
 
@@ -584,7 +468,7 @@ namespace FiringSquad.Gameplay.Weapons
 		private void RpcReflectPlayerShotWeapon()
 		{
 			if (!bearer.isCurrentPlayer)
-				PlayFireEffect();
+				mWeaponView.PlayFireEffect();
 		}
 
 		/// <summary>
@@ -699,12 +583,7 @@ namespace FiringSquad.Gameplay.Weapons
 		[ClientRpc]
 		private void RpcCreateBreakPartEffect()
 		{
-			ParticleSystem instance = Instantiate(mPartBreakPrefab.gameObject).GetComponent<ParticleSystem>();
-			instance.transform.SetParent(transform);
-			instance.transform.ResetLocalValues();
-			instance.Play();
-
-			StartCoroutine(Coroutines.WaitAndDestroyParticleSystem(instance));
+			mWeaponView.CreateBreakPartEffect();
 		}
 
 		#endregion
@@ -776,21 +655,6 @@ namespace FiringSquad.Gameplay.Weapons
 			}
 
 			return value * currentData.recoilAmount;
-		}
-
-		/// <summary>
-		/// Activate the 'shoot' effect for this weapon.
-		/// Includes audio and visuals.
-		/// </summary>
-		public void PlayFireEffect()
-		{
-			bearer.PlayFireAnimation();
-			mShotParticles.transform.position = currentParts.barrel.barrelTip.position;
-			mShotParticles.Play();
-
-			IAudioReference effect = ServiceLocator.Get<IAudioManager>().CreateSound(AudioEvent.Shoot, transform, false);
-			effect.weaponType = mCurrentParts.mechanism.audioOverrideWeaponType;
-			effect.Start();
 		}
 
 		#endregion
