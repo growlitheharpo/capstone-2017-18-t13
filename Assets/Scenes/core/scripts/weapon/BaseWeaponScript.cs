@@ -425,7 +425,7 @@ namespace FiringSquad.Gameplay.Weapons
 
 			CmdOnShotFireComplete(origins.ToArray(), directions.ToArray());
 			mWeaponView.PlayFireEffect();
-			CmdDegradeDurability();
+			DegradeDurability();
 		}
 
 		/// <summary>
@@ -546,11 +546,8 @@ namespace FiringSquad.Gameplay.Weapons
 
 		/// <summary>
 		/// Immediately degrade the weapon's durability.
-		/// TODO: There is NO NEED for this to be a command. Durability can be changed locally and reflected via dirty flags.
-		/// If it changes, we need to examine how to break parts. Can also be done locally??
 		/// </summary>
-		[Command]
-		private void CmdDegradeDurability()
+		private void DegradeDurability()
 		{
 			foreach (WeaponPartScript part in mCurrentParts)
 			{
@@ -569,11 +566,20 @@ namespace FiringSquad.Gameplay.Weapons
 		/// Break a part immediately.
 		/// </summary>
 		/// <param name="part">The weapon part to break.</param>
-		[Server]
 		private void BreakPart(WeaponPartScript part)
 		{
-			RpcCreateBreakPartEffect();
+			CmdRequestBreakEffect();
+			mWeaponView.CreateBreakPartEffect();
 			AttachNewPart(bearer.defaultParts[part.attachPoint].partId, WeaponPartScript.INFINITE_DURABILITY);
+		}
+
+		/// <summary>
+		/// Play the break effect across all clients.
+		/// </summary>
+		[Command]
+		private void CmdRequestBreakEffect()
+		{
+			RpcCreateBreakPartEffect();
 		}
 
 		/// <summary>
@@ -583,7 +589,8 @@ namespace FiringSquad.Gameplay.Weapons
 		[ClientRpc]
 		private void RpcCreateBreakPartEffect()
 		{
-			mWeaponView.CreateBreakPartEffect();
+			if (!bearer.isCurrentPlayer)
+				mWeaponView.CreateBreakPartEffect();
 		}
 
 		#endregion
