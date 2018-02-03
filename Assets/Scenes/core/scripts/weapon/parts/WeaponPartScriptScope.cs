@@ -12,6 +12,14 @@ namespace FiringSquad.Gameplay.Weapons
 		public override BaseWeaponScript.Attachment attachPoint { get { return BaseWeaponScript.Attachment.Scope; } }
 
 		/// <summary>
+		/// Create a COPY of our effect to avoid shared-resource problems.
+		/// </summary>
+		private void Start()
+		{
+			mAimDownSightsEffect = Instantiate(mAimDownSightsEffect);
+		}
+
+		/// <summary>
 		/// Activate the Aim Down Sights effect for this script.
 		/// </summary>
 		/// <param name="weapon">The weapon we are attached to.</param>
@@ -36,7 +44,10 @@ namespace FiringSquad.Gameplay.Weapons
 		public void OnDestroy()
 		{
 			if (mAimDownSightsEffect != null)
+			{
 				mAimDownSightsEffect.DeactivateEffect(this, true);
+				Destroy(mAimDownSightsEffect);
+			}
 		}
 	}
 }
