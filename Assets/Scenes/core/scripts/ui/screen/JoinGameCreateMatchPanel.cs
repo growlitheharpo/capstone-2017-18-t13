@@ -68,6 +68,10 @@ namespace FiringSquad.Gameplay.UI
 		{
 			string matchName = mNameEntryField.text;
 			matchName += ":" + Network.player.ipAddress;
+
+			if (mNetworkManager.matchMaker == null)
+				mNetworkManager.StartMatchMaker();
+
 			mNetworkManager.matchMaker.CreateMatch(matchName, 5, true, "", Network.player.ipAddress, Network.player.ipAddress, 0, 0, OnMatchCreate);
 		}
 
