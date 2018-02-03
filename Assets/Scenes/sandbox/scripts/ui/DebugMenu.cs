@@ -28,10 +28,10 @@ namespace FiringSquad.Debug
 		{
 			var parts = ServiceLocator.Get<IWeaponPartManager>().GetAllPrefabScripts(true).Values;
 
-			mMechanisms = parts.Where(x => x.attachPoint == BaseWeaponScript.Attachment.Mechanism).ToArray();
-			mBarrels = parts.Where(x => x.attachPoint == BaseWeaponScript.Attachment.Barrel).ToArray();
-			mScopes = parts.Where(x => x.attachPoint == BaseWeaponScript.Attachment.Scope).ToArray();
-			mGrips = parts.Where(x => x.attachPoint == BaseWeaponScript.Attachment.Grip).ToArray();
+			mMechanisms = parts.Where(x => x.attachPoint == Attachment.Mechanism).ToArray();
+			mBarrels = parts.Where(x => x.attachPoint == Attachment.Barrel).ToArray();
+			mScopes = parts.Where(x => x.attachPoint == Attachment.Scope).ToArray();
+			mGrips = parts.Where(x => x.attachPoint == Attachment.Grip).ToArray();
 		}
 
 		/// <summary>

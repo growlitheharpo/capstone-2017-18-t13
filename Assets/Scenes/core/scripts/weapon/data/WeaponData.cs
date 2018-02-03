@@ -231,9 +231,9 @@ namespace FiringSquad.Data
 					start = new WeaponData(start, data);
 			};
 
-			var partOrder = new[] { BaseWeaponScript.Attachment.Mechanism, BaseWeaponScript.Attachment.Barrel, BaseWeaponScript.Attachment.Scope, BaseWeaponScript.Attachment.Grip };
+			var partOrder = new[] { Attachment.Mechanism, Attachment.Barrel, Attachment.Scope, Attachment.Grip };
 
-			foreach (BaseWeaponScript.Attachment part in partOrder)
+			foreach (Attachment part in partOrder)
 			{
 				if (parts[part] != null)
 					apply(parts[part]);

@@ -20,19 +20,6 @@ namespace FiringSquad.Gameplay.Weapons
 	public class BaseWeaponScript : NetworkBehaviour, IModifiableWeapon
 	{
 		/// <summary>
-		/// The four weapon attachment spots.
-		/// TODO: Move this to the IWeapon file and have it float in the namespace instead of in this class.
-		/// </summary>
-		[Flags]
-		public enum Attachment
-		{
-			Scope = 0x1,
-			Barrel = 0x2,
-			Mechanism = 0x4,
-			Grip = 0x8,
-		}
-
-		/// <summary>
 		/// The enum for masking what network updates must be sent.
 		/// </summary>
 		[Flags]

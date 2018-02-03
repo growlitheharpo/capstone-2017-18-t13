@@ -4,7 +4,6 @@ using FiringSquad.Core;
 using FiringSquad.Core.Audio;
 using KeatsLib.Unity;
 using UnityEngine;
-using Attachment = FiringSquad.Gameplay.Weapons.BaseWeaponScript.Attachment;
 
 namespace FiringSquad.Gameplay.Weapons
 {
