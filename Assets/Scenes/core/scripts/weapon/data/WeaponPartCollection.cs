@@ -110,19 +110,19 @@ namespace FiringSquad.Data
 		/// Access a particular attachment using its enum Attachment.
 		/// </summary>
 		/// <param name="index">Which attachment slot to access.</param>
-		public WeaponPartScript this[BaseWeaponScript.Attachment index]
+		public WeaponPartScript this[Attachment index]
 		{
 			get
 			{
 				switch (index)
 				{
-					case BaseWeaponScript.Attachment.Scope:
+					case Attachment.Scope:
 						return scope;
-					case BaseWeaponScript.Attachment.Barrel:
+					case Attachment.Barrel:
 						return barrel;
-					case BaseWeaponScript.Attachment.Mechanism:
+					case Attachment.Mechanism:
 						return mechanism;
-					case BaseWeaponScript.Attachment.Grip:
+					case Attachment.Grip:
 						return grip;
 					default:
 						throw new ArgumentOutOfRangeException("index", index, null);
@@ -132,16 +132,16 @@ namespace FiringSquad.Data
 			{
 				switch (index)
 				{
-					case BaseWeaponScript.Attachment.Scope:
+					case Attachment.Scope:
 						mScope = value as WeaponPartScriptScope;
 						break;
-					case BaseWeaponScript.Attachment.Barrel:
+					case Attachment.Barrel:
 						mBarrel = value as WeaponPartScriptBarrel;
 						break;
-					case BaseWeaponScript.Attachment.Mechanism:
+					case Attachment.Mechanism:
 						mMechanism = value as WeaponPartScriptMechanism;
 						break;
-					case BaseWeaponScript.Attachment.Grip:
+					case Attachment.Grip:
 						mGrip = value as WeaponPartScriptGrip;
 						break;
 					default:

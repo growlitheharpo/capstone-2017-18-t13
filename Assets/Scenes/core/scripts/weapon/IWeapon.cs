@@ -1,8 +1,21 @@
-﻿using FiringSquad.Data;
+﻿using System;
+using FiringSquad.Data;
 using UnityEngine;
 
 namespace FiringSquad.Gameplay.Weapons
 {
+	/// <summary>
+	/// The four weapon attachment spots.
+	/// </summary>
+	[Flags]
+	public enum Attachment
+	{
+		Scope = 0x1,
+		Barrel = 0x2,
+		Mechanism = 0x4,
+		Grip = 0x8,
+	}
+
 	/// <summary>
 	/// The interface for a basic weapon in the game.
 	/// </summary>

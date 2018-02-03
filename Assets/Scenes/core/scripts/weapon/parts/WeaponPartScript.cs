@@ -30,7 +30,7 @@ namespace FiringSquad.Gameplay.Weapons
 		/// <summary>
 		/// Which attachment point we connect to.
 		/// </summary>
-		public abstract BaseWeaponScript.Attachment attachPoint { get; }
+		public abstract Attachment attachPoint { get; }
 
 		/// <summary>
 		/// The collection of modifier data for this part.

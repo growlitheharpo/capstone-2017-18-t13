@@ -9,7 +9,15 @@ namespace FiringSquad.Gameplay.Weapons
 		[HideInInspector] [SerializeField] private AimDownSightsEffect mAimDownSightsEffect;
 
 		/// <inheritdoc />
-		public override BaseWeaponScript.Attachment attachPoint { get { return BaseWeaponScript.Attachment.Scope; } }
+		public override Attachment attachPoint { get { return Attachment.Scope; } }
+
+		/// <summary>
+		/// Create a COPY of our effect to avoid shared-resource problems.
+		/// </summary>
+		private void Start()
+		{
+			mAimDownSightsEffect = Instantiate(mAimDownSightsEffect);
+		}
 
 		/// <summary>
 		/// Activate the Aim Down Sights effect for this script.
@@ -36,7 +44,10 @@ namespace FiringSquad.Gameplay.Weapons
 		public void OnDestroy()
 		{
 			if (mAimDownSightsEffect != null)
+			{
 				mAimDownSightsEffect.DeactivateEffect(this, true);
+				Destroy(mAimDownSightsEffect);
+			}
 		}
 	}
 }
