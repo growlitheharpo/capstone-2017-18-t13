@@ -224,6 +224,7 @@ namespace FiringSquad.Gameplay
 				CmdAssignClientAuthority(reelingObject.netId);
 				mInputTime = float.NegativeInfinity;
 				mReelingTime = 0.0f;
+				UpdateReelingSound(true);
 			}
 		}
 
@@ -247,7 +248,11 @@ namespace FiringSquad.Gameplay
 			mReelingTime += Time.deltaTime;
 			reelingObject.TickReelToPlayer(mPullRate, mReelingTime);
 			if (Vector3.Distance(reelingObject.transform.position, transform.position) < SNAP_THRESHOLD_DISTANCE)
+			{
 				reelingObject.SnapIntoReelPosition();
+				UpdateReelingSound(false);
+				PlaySnappedSound();
+			}
 		}
 
 		/// <summary>
@@ -285,16 +290,16 @@ namespace FiringSquad.Gameplay
 				reelingObject = null;
 			}
 
-			UpdateSound(false);
+			UpdateReelingSound(false);
 			mInputTime = 0.0f;
 		}
 
-		/// <summary>``
+		/// <summary>
 		/// Send an update to FMOD on whether or not to play the magnet arm "grab" sound.
 		/// </summary>
 		/// <param name="shouldPlay">Whether or not the sound should be playing.</param>
 		[Client]
-		private void UpdateSound(bool shouldPlay)
+		private void UpdateReelingSound(bool shouldPlay)
 		{
 			if (shouldPlay && mGrabSound == null)
 			{
@@ -306,6 +311,15 @@ namespace FiringSquad.Gameplay
 				mGrabSound.Kill();
 				mGrabSound = null;
 			}
+		}
+
+		/// <summary>
+		/// Immediately fire the "part snapped into hand" sound event.
+		/// </summary>
+		private void PlaySnappedSound()
+		{
+			ServiceLocator.Get<IAudioManager>()
+				.CreateSound(AudioEvent.MagnetArmGrab, transform).AttachToRigidbody(bearer.GetComponent<Rigidbody>());
 		}
 
 		/// <summary>
