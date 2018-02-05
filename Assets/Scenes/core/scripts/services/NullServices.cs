@@ -148,6 +148,9 @@ namespace FiringSquad.Core
 				public float isCurrentPlayer { get { return default(float); } set { } }
 
 				/// <inheritdoc />
+				public float healthGained { get { return default(float); } set { } }
+
+				/// <inheritdoc />
 				public IAudioReference SetParameter(string name, float value)
 				{
 					return this;

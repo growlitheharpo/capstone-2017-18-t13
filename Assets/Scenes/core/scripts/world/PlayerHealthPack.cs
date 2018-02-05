@@ -1,4 +1,7 @@
 ﻿using System.Collections;
+using System.Linq;
+using FiringSquad.Core;
+using FiringSquad.Core.Audio;
 using UnityEngine;
 using UnityEngine.Networking;
 using Logger = FiringSquad.Debug.Logger;
@@ -97,8 +100,32 @@ namespace FiringSquad.Gameplay
 		{
 			mVisible = newValue;
 
+			if (!mVisible)
+				CheckForAudio();
+
 			mView.SetActive(mVisible);
 			mCollider.enabled = mVisible;
+		}
+
+		/// <summary>
+		/// Checks to see if we should play an audio event for being picked up.
+		/// In order to avoid sending extra network messages, we use a slight hack
+		/// where we see if the player closest to this pack is the local player. If yes,
+		/// we play the sound.
+		/// </summary>
+		private void CheckForAudio()
+		{
+			var allPlayers = FindObjectsOfType<CltPlayer>().OrderBy(x => Vector3.Distance(transform.position, x.transform.position));
+			CltPlayer first = allPlayers.FirstOrDefault();
+
+			if (first == null || !first.isCurrentPlayer)
+				return;
+
+			IAudioReference audRef = ServiceLocator.Get<IAudioManager>()
+				.CreateSound(AudioEvent.PlayerHealthPickup, first.transform, false);
+
+			audRef.healthGained = mProvidedHealth;
+			audRef.Start();
 		}
 	}
 }
