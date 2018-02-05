@@ -48,6 +48,11 @@ namespace FiringSquad.Core.Audio
 		/// FMOD PARAMETER "IsCurrentPlayer"
 		/// </summary>
 		float isCurrentPlayer { get; set; }
+		
+		/// <summary>
+		/// FMOD PARAMETER "HealthGained"
+		/// </summary>
+		float healthGained { get; set; }
 
 		/// <summary>
 		/// Directly set an FMOD parameter for this audio clip.
