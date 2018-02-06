@@ -3,6 +3,7 @@ using System.Collections;
 using System.Linq;
 using FiringSquad.Core;
 using FiringSquad.Core.Audio;
+using FiringSquad.Gameplay.UI;
 using FiringSquad.Gameplay.Weapons;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -36,6 +37,7 @@ namespace FiringSquad.Gameplay
 		private IAudioReference mGrabSound;
 		private WeaponPickupScript mReelingObject;
 		private float mInputTime, mReelingTime;
+		private bool mPushedCrosshairHint;
 
 		private const float SNAP_THRESHOLD_DISTANCE = 2.5f;
 
@@ -201,6 +203,37 @@ namespace FiringSquad.Gameplay
 		#endregion
 
 		/// <summary>
+		/// Unity's Update function
+		/// </summary>
+		[ClientCallback]
+		private void Update()
+		{
+			UpdateCrosshairHints();
+		}
+
+		/// <summary>
+		/// Ensure that the crosshair hint is up-to-date.
+		/// </summary>
+		private void UpdateCrosshairHints()
+		{
+			if (reelingObject != null)
+				return;
+
+			WeaponPickupScript potentialTarget = TryFindGrabCandidate();
+			if (potentialTarget != null && !mPushedCrosshairHint)
+			{
+				EventManager.LocalGUI.SetHintState(CrosshairHintText.Hint.MagnetArmGrab, true);
+				mPushedCrosshairHint = true;
+			}
+			else if (potentialTarget == null && mPushedCrosshairHint)
+			{
+				EventManager.LocalGUI.SetHintState(CrosshairHintText.Hint.MagnetArmGrab, false);
+				mPushedCrosshairHint = false;
+
+			}
+		}
+
+		/// <summary>
 		/// INPUT_HANDLER: Handle the player first pressing the "magnet arm fire" button.
 		/// </summary>
 		[Client]
@@ -210,7 +243,7 @@ namespace FiringSquad.Gameplay
 			if (reelingObject != null)
 				return;
 
-			TryFindGrabCandidate();
+			reelingObject = TryFindGrabCandidate();
 
 			if (reelingObject == null)
 			{
@@ -249,6 +282,12 @@ namespace FiringSquad.Gameplay
 			reelingObject.TickReelToPlayer(mPullRate, mReelingTime);
 			if (Vector3.Distance(reelingObject.transform.position, transform.position) < SNAP_THRESHOLD_DISTANCE)
 			{
+				if (mPushedCrosshairHint)
+					EventManager.LocalGUI.SetHintState(CrosshairHintText.Hint.MagnetArmGrab, false);
+				
+				EventManager.LocalGUI.SetHintState(CrosshairHintText.Hint.ItemEquipOrDrop, true);
+				mPushedCrosshairHint = true;
+
 				reelingObject.SnapIntoReelPosition();
 				UpdateReelingSound(false);
 				PlaySnappedSound();
@@ -278,6 +317,10 @@ namespace FiringSquad.Gameplay
 					bearer.CmdActivateInteractWithObject(reelingObject.netId);
 				else
 					bearer.CmdActivateInteract(bearer.eye.position, bearer.eye.forward);
+
+				// Hide the "press" hint
+				EventManager.LocalGUI.SetHintState(CrosshairHintText.Hint.ItemEquipOrDrop, false);
+				mPushedCrosshairHint = false;
 			}
 			else
 			{
@@ -286,8 +329,12 @@ namespace FiringSquad.Gameplay
 				{
 					reelingObject.UnlockAndThrow(bearer.eye.forward * 30.0f);
 					CmdThrowHeldItem(bearer.eye.forward, reelingObject.netId);
+					reelingObject = null;
 				}
-				reelingObject = null;
+
+				// Hide the "throw" hint
+				EventManager.LocalGUI.SetHintState(CrosshairHintText.Hint.ItemEquipOrDrop, false);
+				mPushedCrosshairHint = false;
 			}
 
 			UpdateReelingSound(false);
@@ -327,13 +374,13 @@ namespace FiringSquad.Gameplay
 		/// no objects are found, or to the closeset hit object.
 		/// </summary>
 		[Client]
-		private void TryFindGrabCandidate()
+		private WeaponPickupScript TryFindGrabCandidate()
 		{
 			Ray r = new Ray(bearer.eye.position, bearer.eye.forward);
 
 			var hits = Physics.SphereCastAll(r, mPullRadius, mGrabLayers);
 			if (hits.Length == 0)
-				return;
+				return null;
 
 			// could also sort by dot product instead of distance to get the "most accurate" pull instead of the closest.
 			hits = hits.OrderBy(x => x.distance).ToArray(); 
@@ -342,13 +389,10 @@ namespace FiringSquad.Gameplay
 			{
 				WeaponPickupScript grabbable = hitInfo.collider.GetComponentInParent<WeaponPickupScript>();
 				if (grabbable != null && !grabbable.currentlyLocked)
-				{
-					reelingObject = grabbable;
-					return;
-				}
+					return grabbable;
 			}
 
-			reelingObject = null;
+			return null;
 		}
 
 		/// <summary>
