@@ -1,7 +1,6 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using KeatsLib.Unity;
+using UnityEngine;
 
 namespace FiringSquad.Gameplay.UI
 {
@@ -11,30 +10,20 @@ namespace FiringSquad.Gameplay.UI
 	/// <inheritdoc cref="IPlayerHitIndicator" />
 	public class ScreenShake : MonoBehaviour, IPlayerHitIndicator
 	{
-		// Private variables
-		private Transform mCameraTransform;
-		[SerializeField]
-		private float mAmount;
-		[SerializeField]
-		private float mDuration;
+		/// Inspector variables
+		[SerializeField] private float mAmount;
+		[SerializeField] private float mDuration;
 
-		Vector3 mOrigPosition;
+		// Private variables
+		private Vector3 mOrigPosition;
 
 		/// <summary>
 		/// Unity's awake function
 		/// </summary>
 		private void Awake()
 		{
-			// If the camera transform is null
-			if (!mCameraTransform)
-			{
-				mCameraTransform = GetComponent<Transform>(); // Get the transform
-			}
-
 			// Get the original position
-			mOrigPosition = new Vector3(0, 0, 0);
-
-			// Event handlers 
+			mOrigPosition = Vector3.zero;
 		}
 
 		/// <inheritdoc />
@@ -56,13 +45,14 @@ namespace FiringSquad.Gameplay.UI
 				// Get random position within the unit circle to move the camera to
 				Vector2 new_xy = new Vector2(mOrigPosition.x, mOrigPosition.y);
 				new_xy = new_xy + Random.insideUnitCircle * mAmount;
-				mCameraTransform.localPosition = new Vector3(new_xy.x, new_xy.y, mOrigPosition.z);
+
+				transform.localPosition = new Vector3(new_xy.x, new_xy.y, mOrigPosition.z);
 
 				currentTime += Time.deltaTime;
 				yield return null;
 			}
 
-			mCameraTransform.localPosition = mOrigPosition;
+			transform.localPosition = Vector3.zero;
 			mDuration = 0.0f;
 		}
 	}
