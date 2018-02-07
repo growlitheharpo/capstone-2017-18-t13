@@ -78,6 +78,10 @@ namespace FiringSquad.Gameplay
 			if (player == null)
 				return;
 
+			CltPlayer realPlayer = player as CltPlayer;
+			if (realPlayer != null && realPlayer.currentHealth >= realPlayer.defaultData.defaultHealth)
+				return;
+
 			player.HealDamage(mProvidedHealth);
 			mVisible = false;
 			StartCoroutine(WaitAndReappear());
