@@ -23,6 +23,9 @@ namespace FiringSquad.Prototyping
 		/// Private variables
 		private BoundProperty<float> mHealth;
 
+		/// <inheritdoc />
+		public float currentHealth { get { return mHealth.value; } }
+
 		/// <summary>
 		/// The health of this target.
 		/// </summary>

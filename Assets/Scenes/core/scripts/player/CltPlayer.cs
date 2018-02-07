@@ -63,6 +63,9 @@ namespace FiringSquad.Gameplay
 		/// <inheritdoc />
 		public Transform eye { get { return mCameraOffset; } }
 
+		/// <inheritdoc />
+		public float currentHealth { get { return mHealth; } }
+
 		/// <summary>
 		/// The local animator for this player.
 		/// </summary>
