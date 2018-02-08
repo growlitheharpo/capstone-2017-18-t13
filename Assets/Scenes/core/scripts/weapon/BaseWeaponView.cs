@@ -27,6 +27,8 @@ namespace FiringSquad.Gameplay.Weapons
 		private Queue<Quaternion> mRecentPlayerRotations;
 		private WeaponMovementData mCurrentMovementData;
 
+		#region Unity Callbacks
+
 		/// <summary>
 		/// Unity's Awake function
 		/// </summary>
@@ -60,10 +62,7 @@ namespace FiringSquad.Gameplay.Weapons
 				return;
 
 			mCurrentMovementData = mWeaponScript.aimDownSightsActive ? mAimDownSightsMovementData : mGeneralMovementData;
-
-			Vector3 location = transform.position;
-			Vector3 targetLoc = mWeaponScript.bearer.eye.TransformPoint(mWeaponScript.positionOffset);
-			transform.position = Vector3.Lerp(location, targetLoc, Time.deltaTime * mCurrentMovementData.cameraMovementFollowFactor);
+			HandleWeaponMovement();
 		}
 
 		/// <summary>
@@ -79,6 +78,20 @@ namespace FiringSquad.Gameplay.Weapons
 
 			UpdateRecentRotations(bearer);
 			HandleWeaponInertia(bearer);
+		}
+
+		#endregion
+
+		#region Weapon Inertia
+
+		/// <summary>
+		/// Handle following the player's movement with the weapon.
+		/// </summary>
+		private void HandleWeaponMovement()
+		{
+			Vector3 location = transform.position;
+			Vector3 targetLoc = mWeaponScript.bearer.eye.TransformPoint(mWeaponScript.positionOffset);
+			transform.position = Vector3.Lerp(location, targetLoc, Time.deltaTime * mCurrentMovementData.cameraMovementFollowFactor);
 		}
 
 		/// <summary>
@@ -114,6 +127,7 @@ namespace FiringSquad.Gameplay.Weapons
 		private Quaternion CalculateAverageRotationalVelocity()
 		{
 			var recentRotations = mRecentPlayerRotations.ToArray();
+			float sampleWeightSum = CalculateTotalWeightCurveSum(recentRotations.Length);
 
 			Quaternion accumulation = Quaternion.identity;
 			for (int i = 0; i < recentRotations.Length - 1; ++i)
@@ -121,7 +135,7 @@ namespace FiringSquad.Gameplay.Weapons
 				Quaternion a = recentRotations[i], b = recentRotations[i + 1];
 				Quaternion diff = b * Quaternion.Inverse(a);
 
-				float weight = CalculateRotationWeight(i, recentRotations.Length);
+				float weight = CalculateRotationWeight(i, recentRotations.Length, sampleWeightSum);
 				Quaternion weightedDiff = Quaternion.Slerp(Quaternion.identity, diff, weight);
 
 				accumulation = accumulation * weightedDiff;
@@ -131,27 +145,31 @@ namespace FiringSquad.Gameplay.Weapons
 		}
 
 		/// <summary>
+		/// Calculate the total sum (integration) of the curve we're using for weighting our velocity.
+		/// </summary>
+		private float CalculateTotalWeightCurveSum(int recentRotationsLength)
+		{
+			float sum = 0.0f;
+			for (int i = 0; i < recentRotationsLength - 1; ++i)
+				sum += mCurrentMovementData.sampleWeighting.Evaluate((float)i / (recentRotationsLength - 1));
+			return sum;
+		}
+
+		/// <summary>
 		/// Calculate the weight (0 - 1) of the rotation at this axis.
 		/// </summary>
 		/// <param name="i">The current index.</param>
 		/// <param name="listLength">The length of the list.</param>
-		private float CalculateRotationWeight(int i, int listLength)
+		/// <param name="weightSum">The total sum of the values under the weight curve.</param>
+		private float CalculateRotationWeight(int i, int listLength, float weightSum)
 		{
-			float sum = 0.0f;
-			float sample = 0.0f;
+			float sample = mCurrentMovementData.sampleWeighting.Evaluate((float)i / (listLength - 1));
+			sample /= weightSum;
 
-			for (int j = 0; j < listLength - 1; ++j)
-			{
-				float position = (float)j / (listLength - 1);
-				float s = mCurrentMovementData.sampleWeighting.Evaluate(position);
-				sum += s;
-				if (j == i)
-					sample = s;
-			}
-
-			sample /= sum;
 			return float.IsNaN(sample) ? 0.0f : sample;
 		}
+
+		#endregion
 
 		#region Part Attachment
 
