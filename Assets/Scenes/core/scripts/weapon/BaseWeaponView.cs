@@ -18,6 +18,7 @@ namespace FiringSquad.Gameplay.Weapons
 		[SerializeField] private float mCameraMovementFollowFactor = 10.0f;
 		[SerializeField] private int mPlayerRotationSamples = 30;
 		[SerializeField] private float mCameraRotationFollowFactor = 10.0f;
+		[SerializeField] private AnimationCurve mSampleWeighting;
 
 		/// Private variables
 		private BaseWeaponScript mWeaponScript;
@@ -75,52 +76,76 @@ namespace FiringSquad.Gameplay.Weapons
 			HandleWeaponInertia(bearer);
 		}
 
+		/// <summary>
+		/// Update our recent player rotation queue to match our desired sample count and included the latest rotation.
+		/// </summary>
+		/// <param name="bearer">The bearer of this weapon.</param>
 		private void UpdateRecentRotations(IWeaponBearer bearer)
 		{
+			mRecentPlayerRotations.Enqueue(bearer.eye.rotation);
+
 			while (mRecentPlayerRotations.Count > mPlayerRotationSamples)
 				mRecentPlayerRotations.Dequeue();
-
-			mRecentPlayerRotations.Enqueue(bearer.eye.rotation);
 		}
 
+		/// <summary>
+		/// Rotate the weapon to follow the player's looking direction and the desired weapon inertia using the player's
+		/// rotational velocity.
+		/// </summary>
+		/// <param name="bearer">The bearer of this weapon.</param>
 		private void HandleWeaponInertia(IWeaponBearer bearer)
 		{
-			Quaternion avgRot = CalculateAverageRotation();
-
-			float avgAngle;
-			Vector3 avgAxis;
-			avgRot.ToAngleAxis(out avgAngle, out avgAxis);
-			Logger.Info("Avg player rotation: " + avgAxis + " @ " + avgAngle);
-
+			Quaternion bearerRotVelocity = CalculateAverageRotationalVelocity();
 			Quaternion targetRot = bearer.eye.rotation;
-
-			targetRot = targetRot * avgRot;
+			targetRot = targetRot * bearerRotVelocity;
 
 			transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, mCameraRotationFollowFactor);
 		}
 
-		private Quaternion CalculateAverageRotation()
+		/// <summary>
+		/// Calculate a weighted average of the change in the player's local rotations.
+		/// Essentially gives a weighted rotational velocity in the form of a Quaternion.
+		/// </summary>
+		private Quaternion CalculateAverageRotationalVelocity()
 		{
 			var recentRotations = mRecentPlayerRotations.ToArray();
 
-			float angle = 0.0f;
-			Vector3 axis = Vector3.zero;
+			Quaternion accumulation = Quaternion.identity;
 			for (int i = 0; i < recentRotations.Length - 1; ++i)
 			{
 				Quaternion a = recentRotations[i], b = recentRotations[i + 1];
 				Quaternion diff = b * Quaternion.Inverse(a);
 
-				float thisAngle;
-				Vector3 thisAxis;
-				diff.ToAngleAxis(out thisAngle, out thisAxis);
+				float weight = CalculateRotationWeight(i, recentRotations.Length);
+				Quaternion weightedDiff = Quaternion.Slerp(Quaternion.identity, diff, weight);
 
-				angle += thisAngle;
-				axis += thisAxis;
+				accumulation = accumulation * weightedDiff;
 			}
 
-			angle /= recentRotations.Length - 1;
-			axis /= recentRotations.Length - 1;
-			return Quaternion.AngleAxis(angle, axis);
+			return accumulation;
+		}
+
+		/// <summary>
+		/// Calculate the weight (0 - 1) of the rotation at this axis.
+		/// </summary>
+		/// <param name="i">The current index.</param>
+		/// <param name="listLength">The length of the list.</param>
+		private float CalculateRotationWeight(int i, int listLength)
+		{
+			float sum = 0.0f;
+			float sample = 0.0f;
+
+			for (int j = 0; j < listLength - 1; ++j)
+			{
+				float position = (float)j / (listLength - 1);
+				float s = mSampleWeighting.Evaluate(position);
+				sum += s;
+				if (j == i)
+					sample = s;
+			}
+
+			sample /= sum;
+			return float.IsNaN(sample) ? 0.0f : sample;
 		}
 
 		#region Part Attachment
