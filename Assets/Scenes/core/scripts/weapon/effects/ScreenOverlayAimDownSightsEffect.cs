@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using KeatsLib.Unity;
+using UnityEngine;
 using UnityEngine.Rendering.PostProcessing;
 
 namespace FiringSquad.Gameplay.Weapons
@@ -7,15 +8,19 @@ namespace FiringSquad.Gameplay.Weapons
 	[CreateAssetMenu(menuName = "reMod Data/ADS Effect - Overlay")]
 	public class ScreenOverlayAimDownSightsEffect : AimDownSightsEffect
 	{
+		/// Inspector variables
 		[SerializeField] private float mTargetFieldOfView = 15.0f;
 		[SerializeField] private float mFadeTime;
 		[SerializeField] private float mVignetteIntensity = 1.0f;
+		[SerializeField] private Vector3 mAimDownSightsPosition;
 
 		/// Private variables
 		private bool mActive;
 		private Quickfade mQuickfade;
 		private Vignette mVignette;
 		private PostProcessVolume mTemporaryVolume;
+		private Coroutine mMoveRoutine;
+		private IWeapon mCurrentWeapon;
 
 		/// <inheritdoc />
 		public override void ActivateEffect(IWeapon weapon, WeaponPartScript part)
@@ -23,6 +28,7 @@ namespace FiringSquad.Gameplay.Weapons
 			if (mActive)
 				return;
 
+			mCurrentWeapon = weapon;
 			mActive = true;
 			base.ActivateEffect(weapon, part);
 
@@ -33,6 +39,13 @@ namespace FiringSquad.Gameplay.Weapons
 			mTemporaryVolume.weight = 1.0f;
 
 			EventManager.Notify(() => EventManager.LocalGUI.SetCrosshairVisible(false));
+
+			Transform subView = weapon.transform.Find("View").GetChild(0);
+			if (mMoveRoutine != null)
+				part.StopCoroutine(mMoveRoutine);
+
+			mMoveRoutine = part.StartCoroutine(Coroutines.LerpPosition(subView, mAimDownSightsPosition, 0.2f, Space.Self, Coroutines.MATHF_SMOOTHSTEP));
+
 			mQuickfade.Activate(part, false, () =>
 			{
 				// called once we are faded to black
@@ -87,6 +100,15 @@ namespace FiringSquad.Gameplay.Weapons
 					Destroy(mVignette);
 				});
 			});
+
+			Transform subView = mCurrentWeapon.transform.Find("View").GetChild(0);
+			if (mMoveRoutine != null)
+				part.StopCoroutine(mMoveRoutine);
+
+			if (!immediate)
+				mMoveRoutine = part.StartCoroutine(Coroutines.LerpPosition(subView, Vector3.zero, 0.2f, Space.Self, Coroutines.MATHF_SMOOTHSTEP));
+			else
+				subView.transform.localPosition = Vector3.zero;
 		}
 	}
 }
