@@ -4,6 +4,7 @@ using FiringSquad.Core;
 using FiringSquad.Core.Audio;
 using KeatsLib.Unity;
 using UnityEngine;
+using Logger = FiringSquad.Debug.Logger;
 
 namespace FiringSquad.Gameplay.Weapons
 {
@@ -15,14 +16,15 @@ namespace FiringSquad.Gameplay.Weapons
 		[SerializeField] private Transform mMechanismAttach;
 		[SerializeField] private Transform mGripAttach;
 		[SerializeField] private float mCameraMovementFollowFactor = 10.0f;
+		[SerializeField] private int mPlayerRotationSamples = 30;
 		[SerializeField] private float mCameraRotationFollowFactor = 10.0f;
 
 		/// Private variables
 		private BaseWeaponScript mWeaponScript;
 		private Dictionary<Attachment, Transform> mAttachPoints;
 		private ParticleSystem mShotParticles, mPartBreakPrefab;
-		private Quaternion mPreviousRotation;
 		private Animator mAnimator;
+		private Queue<Quaternion> mRecentPlayerRotations;
 
 		/// <summary>
 		/// Unity's Awake function
@@ -41,6 +43,8 @@ namespace FiringSquad.Gameplay.Weapons
 				{ Attachment.Mechanism, mMechanismAttach },
 				{ Attachment.Grip, mGripAttach }
 			};
+
+			mRecentPlayerRotations = new Queue<Quaternion>();
 		}
 
 		/// <summary>
@@ -67,28 +71,56 @@ namespace FiringSquad.Gameplay.Weapons
 			if (bearer == null)
 				return;
 
-			// TODO: The weird "snapping" we're seeing is likely a result of using Euler angles instead of working directly with quaternions!
+			UpdateRecentRotations(bearer);
+			HandleWeaponInertia(bearer);
+		}
 
-			transform.rotation = mPreviousRotation;
-			Quaternion targetRot = Quaternion.Euler(bearer.eye.rotation.eulerAngles.x, bearer.transform.rotation.eulerAngles.y, bearer.transform.rotation.z);
+		private void UpdateRecentRotations(IWeaponBearer bearer)
+		{
+			while (mRecentPlayerRotations.Count > mPlayerRotationSamples)
+				mRecentPlayerRotations.Dequeue();
 
-			transform.rotation = Quaternion.Slerp(mPreviousRotation, targetRot, Time.deltaTime * mCameraRotationFollowFactor);
+			mRecentPlayerRotations.Enqueue(bearer.eye.rotation);
+		}
 
-			// Compare rotations to snap if close enough
-			if (Quaternion.Angle(transform.rotation, targetRot) <= 0.05) transform.rotation = targetRot;
+		private void HandleWeaponInertia(IWeaponBearer bearer)
+		{
+			Quaternion avgRot = CalculateAverageRotation();
 
-			// If the rotations are too far apart, clamp to 20 degrees
-			if (Quaternion.Angle(transform.rotation, targetRot) >= 20)
+			float avgAngle;
+			Vector3 avgAxis;
+			avgRot.ToAngleAxis(out avgAngle, out avgAxis);
+			Logger.Info("Avg player rotation: " + avgAxis + " @ " + avgAngle);
+
+			Quaternion targetRot = bearer.eye.rotation;
+
+			targetRot = targetRot * avgRot;
+
+			transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, mCameraRotationFollowFactor);
+		}
+
+		private Quaternion CalculateAverageRotation()
+		{
+			var recentRotations = mRecentPlayerRotations.ToArray();
+
+			float angle = 0.0f;
+			Vector3 axis = Vector3.zero;
+			for (int i = 0; i < recentRotations.Length - 1; ++i)
 			{
-				// if the current rotation is greater...
-				if (transform.rotation.eulerAngles.y > targetRot.eulerAngles.y)
-					transform.rotation = Quaternion.Euler(targetRot.eulerAngles.x, targetRot.eulerAngles.y + 20, targetRot.eulerAngles.z);
-				// else if the target rotation is greater
-				else if (transform.rotation.eulerAngles.y < targetRot.eulerAngles.y)
-					transform.rotation = Quaternion.Euler(targetRot.eulerAngles.x, targetRot.eulerAngles.y - 20, targetRot.eulerAngles.z);
+				Quaternion a = recentRotations[i], b = recentRotations[i + 1];
+				Quaternion diff = b * Quaternion.Inverse(a);
+
+				float thisAngle;
+				Vector3 thisAxis;
+				diff.ToAngleAxis(out thisAngle, out thisAxis);
+
+				angle += thisAngle;
+				axis += thisAxis;
 			}
 
-			mPreviousRotation = transform.rotation;
+			angle /= recentRotations.Length - 1;
+			axis /= recentRotations.Length - 1;
+			return Quaternion.AngleAxis(angle, axis);
 		}
 
 		#region Part Attachment
@@ -110,7 +142,6 @@ namespace FiringSquad.Gameplay.Weapons
 		}
 
 		#endregion
-
 
 		#region Reloading
 
