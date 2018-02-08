@@ -9,6 +9,7 @@ namespace FiringSquad.Gameplay.Weapons
 	{
 		[SerializeField] private float mTargetFieldOfView = 15.0f;
 		[SerializeField] private float mFadeTime;
+		[SerializeField] private float mVignetteIntensity = 1.0f;
 
 		/// Private variables
 		private bool mActive;
@@ -37,7 +38,7 @@ namespace FiringSquad.Gameplay.Weapons
 				// called once we are faded to black
 				mVignette = CreateInstance<Vignette>();
 				mVignette.enabled.Override(true);
-				mVignette.intensity.Override(1.0f);
+				mVignette.intensity.Override(mVignetteIntensity);
 				mVignette.smoothness.Override(0.15f);
 				mVignette.rounded.Override(true);
 				mVignette.roundness.Override(1.0f);
