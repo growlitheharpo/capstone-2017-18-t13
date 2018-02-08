@@ -37,6 +37,11 @@ namespace FiringSquad.Gameplay.Weapons
 		WeaponData currentData { get; }
 
 		/// <summary>
+		/// Whether or not this weapon is currently in Aim Down Sights mode.
+		/// </summary>
+		bool aimDownSightsActive { get; }
+
+		/// <summary>
 		/// Attach a new part to this weapon.
 		/// </summary>
 		/// <param name="partId">The part to be attached.</param>

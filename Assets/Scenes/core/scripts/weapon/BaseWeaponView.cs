@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using FiringSquad.Core;
 using FiringSquad.Core.Audio;
+using FiringSquad.Data;
 using KeatsLib.Unity;
 using UnityEngine;
+using Logger = FiringSquad.Debug.Logger;
 
 namespace FiringSquad.Gameplay.Weapons
 {
@@ -14,15 +16,16 @@ namespace FiringSquad.Gameplay.Weapons
 		[SerializeField] private Transform mScopeAttach;
 		[SerializeField] private Transform mMechanismAttach;
 		[SerializeField] private Transform mGripAttach;
-		[SerializeField] private float mCameraMovementFollowFactor = 10.0f;
-		[SerializeField] private float mCameraRotationFollowFactor = 10.0f;
+		[SerializeField] private WeaponMovementData mGeneralMovementData;
+		[SerializeField] private WeaponMovementData mAimDownSightsMovementData;
 
 		/// Private variables
 		private BaseWeaponScript mWeaponScript;
 		private Dictionary<Attachment, Transform> mAttachPoints;
 		private ParticleSystem mShotParticles, mPartBreakPrefab;
-		private Quaternion mPreviousRotation;
 		private Animator mAnimator;
+		private Queue<Quaternion> mRecentPlayerRotations;
+		private WeaponMovementData mCurrentMovementData;
 
 		/// <summary>
 		/// Unity's Awake function
@@ -41,6 +44,9 @@ namespace FiringSquad.Gameplay.Weapons
 				{ Attachment.Mechanism, mMechanismAttach },
 				{ Attachment.Grip, mGripAttach }
 			};
+
+			mRecentPlayerRotations = new Queue<Quaternion>();
+			mCurrentMovementData = mGeneralMovementData;
 		}
 
 		/// <summary>
@@ -53,9 +59,11 @@ namespace FiringSquad.Gameplay.Weapons
 			if (mWeaponScript.bearer == null || mWeaponScript.bearer.eye == null)
 				return;
 
+			mCurrentMovementData = mWeaponScript.aimDownSightsActive ? mAimDownSightsMovementData : mGeneralMovementData;
+
 			Vector3 location = transform.position;
 			Vector3 targetLoc = mWeaponScript.bearer.eye.TransformPoint(mWeaponScript.positionOffset);
-			transform.position = Vector3.Lerp(location, targetLoc, Time.deltaTime * mCameraMovementFollowFactor);
+			transform.position = Vector3.Lerp(location, targetLoc, Time.deltaTime * mCurrentMovementData.cameraMovementFollowFactor);
 		}
 
 		/// <summary>
@@ -66,29 +74,83 @@ namespace FiringSquad.Gameplay.Weapons
 			IWeaponBearer bearer = mWeaponScript.bearer;
 			if (bearer == null)
 				return;
+			
+			mCurrentMovementData = mWeaponScript.aimDownSightsActive ? mAimDownSightsMovementData : mGeneralMovementData;
 
-			// TODO: The weird "snapping" we're seeing is likely a result of using Euler angles instead of working directly with quaternions!
+			UpdateRecentRotations(bearer);
+			HandleWeaponInertia(bearer);
+		}
 
-			transform.rotation = mPreviousRotation;
-			Quaternion targetRot = Quaternion.Euler(bearer.eye.rotation.eulerAngles.x, bearer.transform.rotation.eulerAngles.y, bearer.transform.rotation.z);
+		/// <summary>
+		/// Update our recent player rotation queue to match our desired sample count and included the latest rotation.
+		/// </summary>
+		/// <param name="bearer">The bearer of this weapon.</param>
+		private void UpdateRecentRotations(IWeaponBearer bearer)
+		{
+			mRecentPlayerRotations.Enqueue(bearer.eye.rotation);
 
-			transform.rotation = Quaternion.Slerp(mPreviousRotation, targetRot, Time.deltaTime * mCameraRotationFollowFactor);
+			while (mRecentPlayerRotations.Count > mCurrentMovementData.playerRotationSamples)
+				mRecentPlayerRotations.Dequeue();
+		}
 
-			// Compare rotations to snap if close enough
-			if (Quaternion.Angle(transform.rotation, targetRot) <= 0.05) transform.rotation = targetRot;
+		/// <summary>
+		/// Rotate the weapon to follow the player's looking direction and the desired weapon inertia using the player's
+		/// rotational velocity.
+		/// </summary>
+		/// <param name="bearer">The bearer of this weapon.</param>
+		private void HandleWeaponInertia(IWeaponBearer bearer)
+		{
+			Quaternion bearerRotVelocity = CalculateAverageRotationalVelocity();
+			Quaternion targetRot = bearer.eye.rotation;
+			targetRot = targetRot * bearerRotVelocity;
 
-			// If the rotations are too far apart, clamp to 20 degrees
-			if (Quaternion.Angle(transform.rotation, targetRot) >= 20)
+			transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, mCurrentMovementData.cameraRotationFollowFactor * Time.deltaTime);
+		}
+
+		/// <summary>
+		/// Calculate a weighted average of the change in the player's local rotations.
+		/// Essentially gives a weighted rotational velocity in the form of a Quaternion.
+		/// </summary>
+		private Quaternion CalculateAverageRotationalVelocity()
+		{
+			var recentRotations = mRecentPlayerRotations.ToArray();
+
+			Quaternion accumulation = Quaternion.identity;
+			for (int i = 0; i < recentRotations.Length - 1; ++i)
 			{
-				// if the current rotation is greater...
-				if (transform.rotation.eulerAngles.y > targetRot.eulerAngles.y)
-					transform.rotation = Quaternion.Euler(targetRot.eulerAngles.x, targetRot.eulerAngles.y + 20, targetRot.eulerAngles.z);
-				// else if the target rotation is greater
-				else if (transform.rotation.eulerAngles.y < targetRot.eulerAngles.y)
-					transform.rotation = Quaternion.Euler(targetRot.eulerAngles.x, targetRot.eulerAngles.y - 20, targetRot.eulerAngles.z);
+				Quaternion a = recentRotations[i], b = recentRotations[i + 1];
+				Quaternion diff = b * Quaternion.Inverse(a);
+
+				float weight = CalculateRotationWeight(i, recentRotations.Length);
+				Quaternion weightedDiff = Quaternion.Slerp(Quaternion.identity, diff, weight);
+
+				accumulation = accumulation * weightedDiff;
 			}
 
-			mPreviousRotation = transform.rotation;
+			return accumulation;
+		}
+
+		/// <summary>
+		/// Calculate the weight (0 - 1) of the rotation at this axis.
+		/// </summary>
+		/// <param name="i">The current index.</param>
+		/// <param name="listLength">The length of the list.</param>
+		private float CalculateRotationWeight(int i, int listLength)
+		{
+			float sum = 0.0f;
+			float sample = 0.0f;
+
+			for (int j = 0; j < listLength - 1; ++j)
+			{
+				float position = (float)j / (listLength - 1);
+				float s = mCurrentMovementData.sampleWeighting.Evaluate(position);
+				sum += s;
+				if (j == i)
+					sample = s;
+			}
+
+			sample /= sum;
+			return float.IsNaN(sample) ? 0.0f : sample;
 		}
 
 		#region Part Attachment
@@ -110,7 +172,6 @@ namespace FiringSquad.Gameplay.Weapons
 		}
 
 		#endregion
-
 
 		#region Reloading
 

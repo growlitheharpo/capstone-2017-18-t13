@@ -321,8 +321,50 @@ MonoBehaviour:
   mScopeAttach: {fileID: 4197488167877586}
   mMechanismAttach: {fileID: 4891504686318262}
   mGripAttach: {fileID: 4904606761592194}
-  mCameraMovementFollowFactor: 10
-  mCameraRotationFollowFactor: 10
+  mGeneralMovementData:
+    mCameraMovementFollowFactor: 10
+    mCameraRotationFollowFactor: 15
+    mPlayerRotationSamples: 20
+    mSampleWeighting:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 2
+        time: 0
+        value: 0
+        inSlope: 2
+        outSlope: 2
+        tangentMode: 0
+      - serializedVersion: 2
+        time: 1
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 0
+  mAimDownSightsMovementData:
+    mCameraMovementFollowFactor: 30
+    mCameraRotationFollowFactor: 30
+    mPlayerRotationSamples: 2
+    mSampleWeighting:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 2
+        time: 0
+        value: 0
+        inSlope: 2
+        outSlope: 2
+        tangentMode: 0
+      - serializedVersion: 2
+        time: 1
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 0
 --- !u!114 &114320469336684846
 MonoBehaviour:
   m_ObjectHideFlags: 1
