@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using FiringSquad.Core;
 using FiringSquad.Core.Audio;
+using FiringSquad.Data;
 using KeatsLib.Unity;
 using UnityEngine;
 using Logger = FiringSquad.Debug.Logger;
@@ -15,10 +16,8 @@ namespace FiringSquad.Gameplay.Weapons
 		[SerializeField] private Transform mScopeAttach;
 		[SerializeField] private Transform mMechanismAttach;
 		[SerializeField] private Transform mGripAttach;
-		[SerializeField] private float mCameraMovementFollowFactor = 10.0f;
-		[SerializeField] private int mPlayerRotationSamples = 30;
-		[SerializeField] private float mCameraRotationFollowFactor = 10.0f;
-		[SerializeField] private AnimationCurve mSampleWeighting;
+		[SerializeField] private WeaponMovementData mGeneralMovementData;
+		[SerializeField] private WeaponMovementData mAimDownSightsMovementData;
 
 		/// Private variables
 		private BaseWeaponScript mWeaponScript;
@@ -26,6 +25,7 @@ namespace FiringSquad.Gameplay.Weapons
 		private ParticleSystem mShotParticles, mPartBreakPrefab;
 		private Animator mAnimator;
 		private Queue<Quaternion> mRecentPlayerRotations;
+		private WeaponMovementData mCurrentMovementData;
 
 		/// <summary>
 		/// Unity's Awake function
@@ -46,6 +46,7 @@ namespace FiringSquad.Gameplay.Weapons
 			};
 
 			mRecentPlayerRotations = new Queue<Quaternion>();
+			mCurrentMovementData = mGeneralMovementData;
 		}
 
 		/// <summary>
@@ -58,9 +59,11 @@ namespace FiringSquad.Gameplay.Weapons
 			if (mWeaponScript.bearer == null || mWeaponScript.bearer.eye == null)
 				return;
 
+			mCurrentMovementData = mWeaponScript.aimDownSightsActive ? mAimDownSightsMovementData : mGeneralMovementData;
+
 			Vector3 location = transform.position;
 			Vector3 targetLoc = mWeaponScript.bearer.eye.TransformPoint(mWeaponScript.positionOffset);
-			transform.position = Vector3.Lerp(location, targetLoc, Time.deltaTime * mCameraMovementFollowFactor);
+			transform.position = Vector3.Lerp(location, targetLoc, Time.deltaTime * mCurrentMovementData.cameraMovementFollowFactor);
 		}
 
 		/// <summary>
@@ -71,6 +74,8 @@ namespace FiringSquad.Gameplay.Weapons
 			IWeaponBearer bearer = mWeaponScript.bearer;
 			if (bearer == null)
 				return;
+			
+			mCurrentMovementData = mWeaponScript.aimDownSightsActive ? mAimDownSightsMovementData : mGeneralMovementData;
 
 			UpdateRecentRotations(bearer);
 			HandleWeaponInertia(bearer);
@@ -84,7 +89,7 @@ namespace FiringSquad.Gameplay.Weapons
 		{
 			mRecentPlayerRotations.Enqueue(bearer.eye.rotation);
 
-			while (mRecentPlayerRotations.Count > mPlayerRotationSamples)
+			while (mRecentPlayerRotations.Count > mCurrentMovementData.playerRotationSamples)
 				mRecentPlayerRotations.Dequeue();
 		}
 
@@ -99,7 +104,7 @@ namespace FiringSquad.Gameplay.Weapons
 			Quaternion targetRot = bearer.eye.rotation;
 			targetRot = targetRot * bearerRotVelocity;
 
-			transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, mCameraRotationFollowFactor);
+			transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, mCurrentMovementData.cameraRotationFollowFactor * Time.deltaTime);
 		}
 
 		/// <summary>
@@ -138,7 +143,7 @@ namespace FiringSquad.Gameplay.Weapons
 			for (int j = 0; j < listLength - 1; ++j)
 			{
 				float position = (float)j / (listLength - 1);
-				float s = mSampleWeighting.Evaluate(position);
+				float s = mCurrentMovementData.sampleWeighting.Evaluate(position);
 				sum += s;
 				if (j == i)
 					sample = s;
