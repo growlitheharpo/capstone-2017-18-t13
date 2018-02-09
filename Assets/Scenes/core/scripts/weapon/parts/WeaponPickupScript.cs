@@ -149,7 +149,10 @@ namespace FiringSquad.Gameplay.Weapons
 		private IEnumerator Timeout(GameObject vfxPack)
 		{
 			Light vfxLight = vfxPack.GetComponentInChildren<Light>();
-			float originalIntensity = vfxLight.intensity;
+			float originalIntensity = 0.0f;
+
+			if (vfxLight != null)
+				originalIntensity = vfxLight.intensity;
 
 			while (true)
 			{
@@ -163,7 +166,8 @@ namespace FiringSquad.Gameplay.Weapons
 					continue;
 				}
 
-				vfxLight.intensity = Mathf.Lerp(0.0f, originalIntensity, remaining / 5.0f);
+				if (vfxLight != null)
+					vfxLight.intensity = Mathf.Lerp(0.0f, originalIntensity, remaining / 5.0f);
 				mCanvas.SetMaxAlpha(Mathf.Clamp(remaining / 5.0f, 0.0f, 1.0f));
 			}
 
