@@ -5,7 +5,6 @@ using FiringSquad.Core.Audio;
 using FiringSquad.Data;
 using KeatsLib.Unity;
 using UnityEngine;
-using Logger = FiringSquad.Debug.Logger;
 
 namespace FiringSquad.Gameplay.Weapons
 {
@@ -109,10 +108,67 @@ namespace FiringSquad.Gameplay.Weapons
 		private void HandleWeaponMovement()
 		{
 			Vector3 location = transform.localPosition;
+
+			// Target location is our offset. Transform it into a local position within our parent.
 			Vector3 targetLoc = mWeaponScript.bearer.eye.TransformPoint(mWeaponScript.positionOffset);
 			targetLoc = transform.parent.InverseTransformPoint(targetLoc);
 
+			// Add the weapon bob (based on player velocity)
+			targetLoc += CalculateWeaponBobOffset();
+
+			// Lerp to that position smoothly
 			transform.localPosition = Vector3.Lerp(location, targetLoc, Time.deltaTime * mCurrentMovementData.cameraMovementFollowFactor);
+		}
+
+		/// <summary>
+		/// Return a Vector3 adjustment to the weapon's local position based on the player's movement speed.
+		/// </summary>
+		/// <returns></returns>
+		private Vector3 CalculateWeaponBobOffset()
+		{
+			Vector3 playerVelocity = CalculatePlayerVelocity();
+			float speed = playerVelocity.magnitude;
+
+			// If the player is (basically) stopped, reset our progress and don't apply any bob.
+			if (speed < 0.01f)
+			{
+				mWeaponBobProgress = 0.0f;
+				return Vector3.zero;
+			}
+
+			// Calculate our progress ("circular" from a sine wave. Provides automatic smoothing and is "fast enough")
+			float param = mWeaponBobProgress * Mathf.PI * mCurrentMovementData.playerWeaponBobFrequency;
+			float progress = Mathf.Sin(param) * 0.5f + 0.5f;
+
+			// Increment our time and speed-based bob progress.
+			mWeaponBobProgress += Time.deltaTime * speed;
+
+			// Get the positions based on the input variables.
+			Vector3 maxBobPosition = Vector3.forward * mCurrentMovementData.playerWeaponBobZAmount
+									+ Vector3.left * mCurrentMovementData.playerWeaponBobXAmount
+									+ Vector3.up * mCurrentMovementData.playerWeaponBobYAmount;
+			Vector3 minBobPosition = maxBobPosition * -1.0f;
+
+			// Lerp between them based on our progress.
+			return Vector3.Lerp(minBobPosition, maxBobPosition, progress);
+		}
+
+		/// <summary>
+		/// Estimate the player's recent velocity based on the number of samples provided.
+		/// </summary>
+		private Vector3 CalculatePlayerVelocity()
+		{
+			Vector3 result = Vector3.zero;
+			var positions = mRecentPlayerPositions.ToArray();
+			if (positions.Length < 2)
+				return result;
+
+			// Average the change in the player's position over the last few frames.
+			// This is (roughly) the player's velocity.
+			for (int i = 0; i < positions.Length - 1; ++i)
+				result += (positions[i + 1] - positions[i]);
+
+			return result / (positions.Length - 1);
 		}
 
 		/// <summary>
