@@ -49,14 +49,15 @@
 				fixed4 emission = tex2D(_EmissionMap, IN.uv_MainTex);
 				fixed3 normal = UnpackScaleNormal(tex2D(_BumpMap, IN.uv_MainTex), 1);
 
-				/*fixed3 mask = tex2D(_ColorMask, IN.uv_MainTex);
-				if (length(mask) > 0.5)
-					albedo.rgb = albedo.rgb * _ColorMaskColor;*/
 				fixed3 mask = tex2D(_ColorMask, IN.uv_MainTex).rgb;
+				
+				// Invert the mask and add the color, then clamp.
+				// Result is what used to be black is now white,
+				// and what used to be white is now the overlay color.
 				mask = fixed3(1, 1, 1) - mask + _ColorMaskColor;
 				mask = clamp(mask, fixed3(0, 0, 0), fixed3(1, 1, 1));
 
-				//mask = smoothstep(mask, { 0.5, 0.5, 0.5 });
+				// ... which means we can just multiply!
 				albedo.rgb = albedo.rgb * mask;
 
 				o.Albedo = albedo.rgb;
