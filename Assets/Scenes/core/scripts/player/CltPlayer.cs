@@ -140,6 +140,7 @@ namespace FiringSquad.Gameplay
 			mHitIndicator = hitObject.AddComponent<RemotePlayerHitIndicator>();
 
 			mLocalHealthVar = new BoundProperty<float>(mInformation.defaultHealth);
+			defaultData.firstPersonView.SetActive(false);
 		}
 
 		/// <summary>
@@ -162,12 +163,40 @@ namespace FiringSquad.Gameplay
 			StartCoroutine(GrabLocalHitIndicator());
 
 			// Disable the renderers for the local player.
-			var renderers = mAnimator.transform.GetComponentsInChildren<Renderer>();
-			foreach (Renderer r in renderers)
-				Destroy(r);
+			StartCoroutine(AdjustToLocalView());
 
 			// Send the "spawned" event.
 			EventManager.Notify(() => EventManager.Local.LocalPlayerSpawned(this));
+		}
+
+		/// <summary>
+		/// Adjust the "view" GameObjects to reflect that this is the local player.
+		/// </summary>
+		private IEnumerator AdjustToLocalView()
+		{
+			while (weapon == null)
+				yield return null;
+
+			// Enable the first person view.
+			defaultData.firstPersonView.SetActive(true);
+
+			// Destroy the third person renderers so that we can disable that view but still
+			// let the animator update properly (necessary for UNET).
+			var renderers = defaultData.thirdPersonView.GetComponentsInChildren<Renderer>();
+			foreach (Renderer r in renderers)
+				Destroy(r);
+
+			//we have to do a delicate dance of changing parents now
+			Transform viewHolder = weapon.transform.Find("View").Find("ViewHolder");
+			Transform gunMesh = viewHolder.GetChild(0);
+
+			defaultData.firstPersonView.transform.SetParent(viewHolder);
+			gunMesh.SetParent(defaultData.firstPersonWeaponBone);
+
+			// Update the BaseWeaponView of what our arm's animator is.
+			BaseWeaponView view = weapon.gameObject.GetComponent<BaseWeaponView>();
+			if (view != null)
+				view.SetArmAnimator(defaultData.firstPersonView.GetComponentInChildren<Animator>());
 		}
 
 		/// <summary>

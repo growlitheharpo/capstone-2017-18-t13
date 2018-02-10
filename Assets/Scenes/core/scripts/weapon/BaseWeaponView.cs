@@ -22,7 +22,7 @@ namespace FiringSquad.Gameplay.Weapons
 		private BaseWeaponScript mWeaponScript;
 
 		private Dictionary<Attachment, Transform> mAttachPoints;
-		private Animator mAnimator;
+		private Animator mAnimator, mArmAnimator;
 
 		private ParticleSystem mShotParticles, mPartBreakPrefab;
 
@@ -56,7 +56,7 @@ namespace FiringSquad.Gameplay.Weapons
 			mRecentPlayerRotations = new Queue<Quaternion>(Mathf.Max(mGeneralMovementData.playerRotationSamples, mAimDownSightsMovementData.playerRotationSamples) + 1);
 			mCurrentMovementData = mGeneralMovementData;
 		}
-		
+
 		/// <summary>
 		/// Unity's LateUpdate function. Using to lerp gun rotation and follow the player's eye position.
 		/// </summary>
@@ -65,7 +65,10 @@ namespace FiringSquad.Gameplay.Weapons
 			IWeaponBearer bearer = mWeaponScript.bearer;
 			if (bearer == null || bearer.eye == null)
 				return;
-			
+
+			if (mArmAnimator != null)
+				mArmAnimator.SetBool("AimDownSightsActive", mWeaponScript.aimDownSightsActive);
+
 			mCurrentMovementData = mWeaponScript.aimDownSightsActive ? mAimDownSightsMovementData : mGeneralMovementData;
 
 			AccumulateRecentPositions(bearer);
@@ -334,5 +337,14 @@ namespace FiringSquad.Gameplay.Weapons
 		}
 
 		#endregion
+
+		/// <summary>
+		/// Update the animator that we will update "ADS" status on.
+		/// </summary>
+		/// <param name="armAnimator">The animator to use.</param>
+		public void SetArmAnimator(Animator armAnimator)
+		{
+			mArmAnimator = armAnimator;
+		}
 	}
 }
