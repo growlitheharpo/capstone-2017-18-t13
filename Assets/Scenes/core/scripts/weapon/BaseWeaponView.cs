@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using FiringSquad.Core;
 using FiringSquad.Core.Audio;
+using FiringSquad.Data;
 using KeatsLib.Unity;
 using UnityEngine;
 
@@ -14,15 +15,23 @@ namespace FiringSquad.Gameplay.Weapons
 		[SerializeField] private Transform mScopeAttach;
 		[SerializeField] private Transform mMechanismAttach;
 		[SerializeField] private Transform mGripAttach;
-		[SerializeField] private float mCameraMovementFollowFactor = 10.0f;
-		[SerializeField] private float mCameraRotationFollowFactor = 10.0f;
+		[SerializeField] private WeaponMovementData mGeneralMovementData;
+		[SerializeField] private WeaponMovementData mAimDownSightsMovementData;
 
 		/// Private variables
 		private BaseWeaponScript mWeaponScript;
+
 		private Dictionary<Attachment, Transform> mAttachPoints;
-		private ParticleSystem mShotParticles, mPartBreakPrefab;
-		private Quaternion mPreviousRotation;
 		private Animator mAnimator;
+
+		private ParticleSystem mShotParticles, mPartBreakPrefab;
+
+		private float mWeaponBobProgress;
+		private Queue<Vector3> mRecentPlayerPositions;
+		private Queue<Quaternion> mRecentPlayerRotations;
+		private WeaponMovementData mCurrentMovementData;
+
+		#region Unity Callbacks
 
 		/// <summary>
 		/// Unity's Awake function
@@ -41,55 +50,196 @@ namespace FiringSquad.Gameplay.Weapons
 				{ Attachment.Mechanism, mMechanismAttach },
 				{ Attachment.Grip, mGripAttach }
 			};
+
+			// Initialize the queues with enough storage to hold the max they should need to. This will help avoid allocations at runtime.
+			mRecentPlayerPositions = new Queue<Vector3>(Mathf.Max(mGeneralMovementData.playerPositionSamples, mAimDownSightsMovementData.playerPositionSamples) + 1);
+			mRecentPlayerRotations = new Queue<Quaternion>(Mathf.Max(mGeneralMovementData.playerRotationSamples, mAimDownSightsMovementData.playerRotationSamples) + 1);
+			mCurrentMovementData = mGeneralMovementData;
 		}
-
+		
 		/// <summary>
-		/// Unity's Update function
-		/// Used to set our position to follow the player
-		/// </summary>
-		private void Update()
-		{
-			//Follow my player
-			if (mWeaponScript.bearer == null || mWeaponScript.bearer.eye == null)
-				return;
-
-			Vector3 location = transform.position;
-			Vector3 targetLoc = mWeaponScript.bearer.eye.TransformPoint(mWeaponScript.positionOffset);
-			transform.position = Vector3.Lerp(location, targetLoc, Time.deltaTime * mCameraMovementFollowFactor);
-		}
-
-		/// <summary>
-		/// Unity's LateUpdate function. Using to lerp gun rotation
+		/// Unity's LateUpdate function. Using to lerp gun rotation and follow the player's eye position.
 		/// </summary>
 		private void LateUpdate()
 		{
 			IWeaponBearer bearer = mWeaponScript.bearer;
-			if (bearer == null)
+			if (bearer == null || bearer.eye == null)
 				return;
+			
+			mCurrentMovementData = mWeaponScript.aimDownSightsActive ? mAimDownSightsMovementData : mGeneralMovementData;
 
-			// TODO: The weird "snapping" we're seeing is likely a result of using Euler angles instead of working directly with quaternions!
+			AccumulateRecentPositions(bearer);
+			AccumulateRecentRotations(bearer);
 
-			transform.rotation = mPreviousRotation;
-			Quaternion targetRot = Quaternion.Euler(bearer.eye.rotation.eulerAngles.x, bearer.transform.rotation.eulerAngles.y, bearer.transform.rotation.z);
+			HandleWeaponMovement(bearer);
+			HandleWeaponInertia(bearer);
+		}
 
-			transform.rotation = Quaternion.Slerp(mPreviousRotation, targetRot, Time.deltaTime * mCameraRotationFollowFactor);
+		#endregion
 
-			// Compare rotations to snap if close enough
-			if (Quaternion.Angle(transform.rotation, targetRot) <= 0.05) transform.rotation = targetRot;
+		#region Weapon Inertia
 
-			// If the rotations are too far apart, clamp to 20 degrees
-			if (Quaternion.Angle(transform.rotation, targetRot) >= 20)
+		/// <summary>
+		/// Update our recent player position queue to match our desired sample count and include the latest position.
+		/// </summary>
+		/// <param name="bearer">The bearer of this weapon.</param>
+		private void AccumulateRecentPositions(ICharacter bearer)
+		{
+			mRecentPlayerPositions.Enqueue(bearer.transform.position);
+
+			while (mRecentPlayerPositions.Count > mCurrentMovementData.playerPositionSamples)
+				mRecentPlayerPositions.Dequeue();
+		}
+
+		/// <summary>
+		/// Update our recent player rotation queue to match our desired sample count and included the latest rotation.
+		/// </summary>
+		/// <param name="bearer">The bearer of this weapon.</param>
+		private void AccumulateRecentRotations(ICharacter bearer)
+		{
+			mRecentPlayerRotations.Enqueue(bearer.eye.rotation);
+
+			while (mRecentPlayerRotations.Count > mCurrentMovementData.playerRotationSamples)
+				mRecentPlayerRotations.Dequeue();
+		}
+
+		/// <summary>
+		/// Handle following the player's movement with the weapon.
+		/// </summary>
+		/// <param name="bearer">The bearer of this weapon.</param>
+		private void HandleWeaponMovement(ICharacter bearer)
+		{
+			Vector3 location = transform.localPosition;
+
+			// Target location is our offset. Transform it into a local position within our parent.
+			Vector3 targetLoc = mWeaponScript.bearer.eye.TransformPoint(mWeaponScript.positionOffset);
+			targetLoc = transform.parent.InverseTransformPoint(targetLoc);
+
+			// Add the weapon bob (based on player velocity) to the local player only.
+			if (bearer.isCurrentPlayer)
+				targetLoc += CalculateWeaponBobOffset();
+
+			// Lerp to that position smoothly
+			transform.localPosition = Vector3.Lerp(location, targetLoc, Time.deltaTime * mCurrentMovementData.cameraMovementFollowFactor);
+		}
+
+		/// <summary>
+		/// Return a Vector3 adjustment to the weapon's local position based on the player's movement speed.
+		/// </summary>
+		/// <returns></returns>
+		private Vector3 CalculateWeaponBobOffset()
+		{
+			Vector3 playerVelocity = CalculatePlayerVelocity();
+			float speed = playerVelocity.magnitude;
+
+			// If the player is (basically) stopped, reset our progress and don't apply any bob.
+			if (speed < 0.01f)
 			{
-				// if the current rotation is greater...
-				if (transform.rotation.eulerAngles.y > targetRot.eulerAngles.y)
-					transform.rotation = Quaternion.Euler(targetRot.eulerAngles.x, targetRot.eulerAngles.y + 20, targetRot.eulerAngles.z);
-				// else if the target rotation is greater
-				else if (transform.rotation.eulerAngles.y < targetRot.eulerAngles.y)
-					transform.rotation = Quaternion.Euler(targetRot.eulerAngles.x, targetRot.eulerAngles.y - 20, targetRot.eulerAngles.z);
+				mWeaponBobProgress = 0.0f;
+				return Vector3.zero;
 			}
 
-			mPreviousRotation = transform.rotation;
+			// Calculate our progress ("circular" from a sine wave. Provides automatic smoothing and is "fast enough")
+			float param = mWeaponBobProgress * Mathf.PI * mCurrentMovementData.playerWeaponBobFrequency;
+			float progress = Mathf.Sin(param) * 0.5f + 0.5f;
+
+			// Increment our time and speed-based bob progress.
+			mWeaponBobProgress += Time.deltaTime * speed;
+
+			// Get the positions based on the input variables.
+			Vector3 maxBobPosition = Vector3.forward * mCurrentMovementData.playerWeaponBobZAmount
+									+ Vector3.left * mCurrentMovementData.playerWeaponBobXAmount
+									+ Vector3.up * mCurrentMovementData.playerWeaponBobYAmount;
+			Vector3 minBobPosition = maxBobPosition * -1.0f;
+
+			// Lerp between them based on our progress.
+			return Vector3.Lerp(minBobPosition, maxBobPosition, progress);
 		}
+
+		/// <summary>
+		/// Estimate the player's recent velocity based on the number of samples provided.
+		/// </summary>
+		private Vector3 CalculatePlayerVelocity()
+		{
+			Vector3 result = Vector3.zero;
+			var positions = mRecentPlayerPositions.ToArray();
+			if (positions.Length < 2)
+				return result;
+
+			// Average the change in the player's position over the last few frames.
+			// This is (roughly) the player's velocity.
+			for (int i = 0; i < positions.Length - 1; ++i)
+				result += (positions[i + 1] - positions[i]);
+
+			return result / (positions.Length - 1);
+		}
+
+		/// <summary>
+		/// Rotate the weapon to follow the player's looking direction and the desired weapon inertia using the player's
+		/// rotational velocity.
+		/// </summary>
+		/// <param name="bearer">The bearer of this weapon.</param>
+		private void HandleWeaponInertia(IWeaponBearer bearer)
+		{
+			Quaternion targetRot = bearer.eye.rotation;
+
+			// Apply extra inertia to the current player's weapon based on their rotational velocity.
+			if (bearer.isCurrentPlayer)
+				targetRot = targetRot * CalculateAverageRotationalVelocity();
+
+			transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, mCurrentMovementData.cameraRotationFollowFactor * Time.deltaTime);
+		}
+
+		/// <summary>
+		/// Calculate a weighted average of the change in the player's local rotations.
+		/// Essentially gives a weighted rotational velocity in the form of a Quaternion.
+		/// </summary>
+		private Quaternion CalculateAverageRotationalVelocity()
+		{
+			var recentRotations = mRecentPlayerRotations.ToArray();
+			float sampleWeightSum = CalculateTotalWeightCurveSum(recentRotations.Length);
+
+			Quaternion accumulation = Quaternion.identity;
+			for (int i = 0; i < recentRotations.Length - 1; ++i)
+			{
+				Quaternion a = recentRotations[i], b = recentRotations[i + 1];
+				Quaternion diff = b * Quaternion.Inverse(a);
+
+				float weight = CalculateRotationWeight(i, recentRotations.Length, sampleWeightSum);
+				Quaternion weightedDiff = Quaternion.Slerp(Quaternion.identity, diff, weight);
+
+				accumulation = accumulation * weightedDiff;
+			}
+
+			return accumulation;
+		}
+
+		/// <summary>
+		/// Calculate the total sum (integration) of the curve we're using for weighting our velocity.
+		/// </summary>
+		private float CalculateTotalWeightCurveSum(int recentRotationsLength)
+		{
+			float sum = 0.0f;
+			for (int i = 0; i < recentRotationsLength - 1; ++i)
+				sum += mCurrentMovementData.sampleWeighting.Evaluate((float)i / (recentRotationsLength - 1));
+			return sum;
+		}
+
+		/// <summary>
+		/// Calculate the weight (0 - 1) of the rotation at this axis.
+		/// </summary>
+		/// <param name="i">The current index.</param>
+		/// <param name="listLength">The length of the list.</param>
+		/// <param name="weightSum">The total sum of the values under the weight curve.</param>
+		private float CalculateRotationWeight(int i, int listLength, float weightSum)
+		{
+			float sample = mCurrentMovementData.sampleWeighting.Evaluate((float)i / (listLength - 1));
+			sample /= weightSum;
+
+			return float.IsNaN(sample) ? 0.0f : sample;
+		}
+
+		#endregion
 
 		#region Part Attachment
 
@@ -110,7 +260,6 @@ namespace FiringSquad.Gameplay.Weapons
 		}
 
 		#endregion
-
 
 		#region Reloading
 

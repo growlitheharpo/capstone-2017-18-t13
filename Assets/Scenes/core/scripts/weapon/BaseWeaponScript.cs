@@ -63,6 +63,9 @@ namespace FiringSquad.Gameplay.Weapons
 		public WeaponPartCollection currentParts { get { return mCurrentParts; } }
 
 		/// <inheritdoc />
+		public bool aimDownSightsActive {get { return mAimDownSightsActive; }}
+
+		/// <inheritdoc />
 		public WeaponData currentData
 		{
 			get

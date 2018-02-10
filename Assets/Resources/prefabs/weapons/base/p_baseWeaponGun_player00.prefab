@@ -321,8 +321,60 @@ MonoBehaviour:
   mScopeAttach: {fileID: 4197488167877586}
   mMechanismAttach: {fileID: 4891504686318262}
   mGripAttach: {fileID: 4904606761592194}
-  mCameraMovementFollowFactor: 10
-  mCameraRotationFollowFactor: 10
+  mGeneralMovementData:
+    mCameraMovementFollowFactor: 10
+    mPlayerPositionSamples: 5
+    mPlayerWeaponBobFrequency: 25
+    mPlayerWeaponBobXAmount: 0.01
+    mPlayerWeaponBobYAmount: 0.01
+    mPlayerWeaponBobZAmount: 0.07
+    mCameraRotationFollowFactor: 15
+    mPlayerRotationSamples: 20
+    mSampleWeighting:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 2
+        time: 0
+        value: 0
+        inSlope: 2
+        outSlope: 2
+        tangentMode: 0
+      - serializedVersion: 2
+        time: 1
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 0
+  mAimDownSightsMovementData:
+    mCameraMovementFollowFactor: 30
+    mPlayerPositionSamples: 2
+    mPlayerWeaponBobFrequency: 2
+    mPlayerWeaponBobXAmount: 0
+    mPlayerWeaponBobYAmount: 0
+    mPlayerWeaponBobZAmount: 0
+    mCameraRotationFollowFactor: 30
+    mPlayerRotationSamples: 2
+    mSampleWeighting:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 2
+        time: 0
+        value: 0
+        inSlope: 2
+        outSlope: 2
+        tangentMode: 0
+      - serializedVersion: 2
+        time: 1
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 0
 --- !u!114 &114320469336684846
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -336,8 +388,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mAimDownSightsDispersionMod: 0.25
   mDefaultData:
-    mMinimumDispersion: 0.02
-    mMaximumDispersion: 0.06
+    mMinimumDispersion: 0.05
+    mMaximumDispersion: 0.09
     mDispersionRamp: 0.2
     mRecoilAmount: 0.75
     mRecoilTime: 0.35

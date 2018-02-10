@@ -49,6 +49,9 @@ namespace FiringSquad.Gameplay.NPC
 		/// <inheritdoc />
 		public bool isCurrentPlayer { get { return false; } }
 
+		/// <inheritdoc />
+		public float currentHealth { get { return mHealth; } }
+
 		#region Unity Callbacks
 
 		/// <summary>
