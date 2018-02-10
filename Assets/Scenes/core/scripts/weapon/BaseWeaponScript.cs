@@ -356,7 +356,7 @@ namespace FiringSquad.Gameplay.Weapons
 		/// <inheritdoc />
 		public void Reload()
 		{
-			if (mReloading)
+			if (mReloading || mAimDownSightsActive)
 				return;
 
 			mReloading = true;
