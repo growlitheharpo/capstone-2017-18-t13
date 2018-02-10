@@ -51,8 +51,9 @@ namespace FiringSquad.Gameplay.Weapons
 				{ Attachment.Grip, mGripAttach }
 			};
 
-			mRecentPlayerPositions = new Queue<Vector3>();
-			mRecentPlayerRotations = new Queue<Quaternion>();
+			// Initialize the queues with enough storage to hold the max they should need to. This will help avoid allocations at runtime.
+			mRecentPlayerPositions = new Queue<Vector3>(Mathf.Max(mGeneralMovementData.playerPositionSamples, mAimDownSightsMovementData.playerPositionSamples) + 1);
+			mRecentPlayerRotations = new Queue<Quaternion>(Mathf.Max(mGeneralMovementData.playerRotationSamples, mAimDownSightsMovementData.playerRotationSamples) + 1);
 			mCurrentMovementData = mGeneralMovementData;
 		}
 		
@@ -70,7 +71,7 @@ namespace FiringSquad.Gameplay.Weapons
 			AccumulateRecentPositions(bearer);
 			AccumulateRecentRotations(bearer);
 
-			HandleWeaponMovement();
+			HandleWeaponMovement(bearer);
 			HandleWeaponInertia(bearer);
 		}
 
@@ -105,7 +106,8 @@ namespace FiringSquad.Gameplay.Weapons
 		/// <summary>
 		/// Handle following the player's movement with the weapon.
 		/// </summary>
-		private void HandleWeaponMovement()
+		/// <param name="bearer">The bearer of this weapon.</param>
+		private void HandleWeaponMovement(ICharacter bearer)
 		{
 			Vector3 location = transform.localPosition;
 
@@ -113,8 +115,9 @@ namespace FiringSquad.Gameplay.Weapons
 			Vector3 targetLoc = mWeaponScript.bearer.eye.TransformPoint(mWeaponScript.positionOffset);
 			targetLoc = transform.parent.InverseTransformPoint(targetLoc);
 
-			// Add the weapon bob (based on player velocity)
-			targetLoc += CalculateWeaponBobOffset();
+			// Add the weapon bob (based on player velocity) to the local player only.
+			if (bearer.isCurrentPlayer)
+				targetLoc += CalculateWeaponBobOffset();
 
 			// Lerp to that position smoothly
 			transform.localPosition = Vector3.Lerp(location, targetLoc, Time.deltaTime * mCurrentMovementData.cameraMovementFollowFactor);
@@ -178,9 +181,11 @@ namespace FiringSquad.Gameplay.Weapons
 		/// <param name="bearer">The bearer of this weapon.</param>
 		private void HandleWeaponInertia(IWeaponBearer bearer)
 		{
-			Quaternion bearerRotVelocity = CalculateAverageRotationalVelocity();
 			Quaternion targetRot = bearer.eye.rotation;
-			targetRot = targetRot * bearerRotVelocity;
+
+			// Apply extra inertia to the current player's weapon based on their rotational velocity.
+			if (bearer.isCurrentPlayer)
+				targetRot = targetRot * CalculateAverageRotationalVelocity();
 
 			transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, mCurrentMovementData.cameraRotationFollowFactor * Time.deltaTime);
 		}
