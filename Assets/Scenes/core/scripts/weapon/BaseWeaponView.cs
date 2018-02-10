@@ -5,7 +5,6 @@ using FiringSquad.Core.Audio;
 using FiringSquad.Data;
 using KeatsLib.Unity;
 using UnityEngine;
-using Logger = FiringSquad.Debug.Logger;
 
 namespace FiringSquad.Gameplay.Weapons
 {
@@ -21,9 +20,14 @@ namespace FiringSquad.Gameplay.Weapons
 
 		/// Private variables
 		private BaseWeaponScript mWeaponScript;
+
 		private Dictionary<Attachment, Transform> mAttachPoints;
-		private ParticleSystem mShotParticles, mPartBreakPrefab;
 		private Animator mAnimator;
+
+		private ParticleSystem mShotParticles, mPartBreakPrefab;
+
+		private float mWeaponBobProgress;
+		private Queue<Vector3> mRecentPlayerPositions;
 		private Queue<Quaternion> mRecentPlayerRotations;
 		private WeaponMovementData mCurrentMovementData;
 
@@ -47,36 +51,27 @@ namespace FiringSquad.Gameplay.Weapons
 				{ Attachment.Grip, mGripAttach }
 			};
 
-			mRecentPlayerRotations = new Queue<Quaternion>();
+			// Initialize the queues with enough storage to hold the max they should need to. This will help avoid allocations at runtime.
+			mRecentPlayerPositions = new Queue<Vector3>(Mathf.Max(mGeneralMovementData.playerPositionSamples, mAimDownSightsMovementData.playerPositionSamples) + 1);
+			mRecentPlayerRotations = new Queue<Quaternion>(Mathf.Max(mGeneralMovementData.playerRotationSamples, mAimDownSightsMovementData.playerRotationSamples) + 1);
 			mCurrentMovementData = mGeneralMovementData;
 		}
-
+		
 		/// <summary>
-		/// Unity's Update function
-		/// Used to set our position to follow the player
-		/// </summary>
-		private void Update()
-		{
-			//Follow my player
-			if (mWeaponScript.bearer == null || mWeaponScript.bearer.eye == null)
-				return;
-
-			mCurrentMovementData = mWeaponScript.aimDownSightsActive ? mAimDownSightsMovementData : mGeneralMovementData;
-			HandleWeaponMovement();
-		}
-
-		/// <summary>
-		/// Unity's LateUpdate function. Using to lerp gun rotation
+		/// Unity's LateUpdate function. Using to lerp gun rotation and follow the player's eye position.
 		/// </summary>
 		private void LateUpdate()
 		{
 			IWeaponBearer bearer = mWeaponScript.bearer;
-			if (bearer == null)
+			if (bearer == null || bearer.eye == null)
 				return;
 			
 			mCurrentMovementData = mWeaponScript.aimDownSightsActive ? mAimDownSightsMovementData : mGeneralMovementData;
 
-			UpdateRecentRotations(bearer);
+			AccumulateRecentPositions(bearer);
+			AccumulateRecentRotations(bearer);
+
+			HandleWeaponMovement(bearer);
 			HandleWeaponInertia(bearer);
 		}
 
@@ -85,25 +80,98 @@ namespace FiringSquad.Gameplay.Weapons
 		#region Weapon Inertia
 
 		/// <summary>
-		/// Handle following the player's movement with the weapon.
+		/// Update our recent player position queue to match our desired sample count and include the latest position.
 		/// </summary>
-		private void HandleWeaponMovement()
+		/// <param name="bearer">The bearer of this weapon.</param>
+		private void AccumulateRecentPositions(ICharacter bearer)
 		{
-			Vector3 location = transform.position;
-			Vector3 targetLoc = mWeaponScript.bearer.eye.TransformPoint(mWeaponScript.positionOffset);
-			transform.position = Vector3.Lerp(location, targetLoc, Time.deltaTime * mCurrentMovementData.cameraMovementFollowFactor);
+			mRecentPlayerPositions.Enqueue(bearer.transform.position);
+
+			while (mRecentPlayerPositions.Count > mCurrentMovementData.playerPositionSamples)
+				mRecentPlayerPositions.Dequeue();
 		}
 
 		/// <summary>
 		/// Update our recent player rotation queue to match our desired sample count and included the latest rotation.
 		/// </summary>
 		/// <param name="bearer">The bearer of this weapon.</param>
-		private void UpdateRecentRotations(IWeaponBearer bearer)
+		private void AccumulateRecentRotations(ICharacter bearer)
 		{
 			mRecentPlayerRotations.Enqueue(bearer.eye.rotation);
 
 			while (mRecentPlayerRotations.Count > mCurrentMovementData.playerRotationSamples)
 				mRecentPlayerRotations.Dequeue();
+		}
+
+		/// <summary>
+		/// Handle following the player's movement with the weapon.
+		/// </summary>
+		/// <param name="bearer">The bearer of this weapon.</param>
+		private void HandleWeaponMovement(ICharacter bearer)
+		{
+			Vector3 location = transform.localPosition;
+
+			// Target location is our offset. Transform it into a local position within our parent.
+			Vector3 targetLoc = mWeaponScript.bearer.eye.TransformPoint(mWeaponScript.positionOffset);
+			targetLoc = transform.parent.InverseTransformPoint(targetLoc);
+
+			// Add the weapon bob (based on player velocity) to the local player only.
+			if (bearer.isCurrentPlayer)
+				targetLoc += CalculateWeaponBobOffset();
+
+			// Lerp to that position smoothly
+			transform.localPosition = Vector3.Lerp(location, targetLoc, Time.deltaTime * mCurrentMovementData.cameraMovementFollowFactor);
+		}
+
+		/// <summary>
+		/// Return a Vector3 adjustment to the weapon's local position based on the player's movement speed.
+		/// </summary>
+		/// <returns></returns>
+		private Vector3 CalculateWeaponBobOffset()
+		{
+			Vector3 playerVelocity = CalculatePlayerVelocity();
+			float speed = playerVelocity.magnitude;
+
+			// If the player is (basically) stopped, reset our progress and don't apply any bob.
+			if (speed < 0.01f)
+			{
+				mWeaponBobProgress = 0.0f;
+				return Vector3.zero;
+			}
+
+			// Calculate our progress ("circular" from a sine wave. Provides automatic smoothing and is "fast enough")
+			float param = mWeaponBobProgress * Mathf.PI * mCurrentMovementData.playerWeaponBobFrequency;
+			float progress = Mathf.Sin(param) * 0.5f + 0.5f;
+
+			// Increment our time and speed-based bob progress.
+			mWeaponBobProgress += Time.deltaTime * speed;
+
+			// Get the positions based on the input variables.
+			Vector3 maxBobPosition = Vector3.forward * mCurrentMovementData.playerWeaponBobZAmount
+									+ Vector3.left * mCurrentMovementData.playerWeaponBobXAmount
+									+ Vector3.up * mCurrentMovementData.playerWeaponBobYAmount;
+			Vector3 minBobPosition = maxBobPosition * -1.0f;
+
+			// Lerp between them based on our progress.
+			return Vector3.Lerp(minBobPosition, maxBobPosition, progress);
+		}
+
+		/// <summary>
+		/// Estimate the player's recent velocity based on the number of samples provided.
+		/// </summary>
+		private Vector3 CalculatePlayerVelocity()
+		{
+			Vector3 result = Vector3.zero;
+			var positions = mRecentPlayerPositions.ToArray();
+			if (positions.Length < 2)
+				return result;
+
+			// Average the change in the player's position over the last few frames.
+			// This is (roughly) the player's velocity.
+			for (int i = 0; i < positions.Length - 1; ++i)
+				result += (positions[i + 1] - positions[i]);
+
+			return result / (positions.Length - 1);
 		}
 
 		/// <summary>
@@ -113,9 +181,11 @@ namespace FiringSquad.Gameplay.Weapons
 		/// <param name="bearer">The bearer of this weapon.</param>
 		private void HandleWeaponInertia(IWeaponBearer bearer)
 		{
-			Quaternion bearerRotVelocity = CalculateAverageRotationalVelocity();
 			Quaternion targetRot = bearer.eye.rotation;
-			targetRot = targetRot * bearerRotVelocity;
+
+			// Apply extra inertia to the current player's weapon based on their rotational velocity.
+			if (bearer.isCurrentPlayer)
+				targetRot = targetRot * CalculateAverageRotationalVelocity();
 
 			transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, mCurrentMovementData.cameraRotationFollowFactor * Time.deltaTime);
 		}

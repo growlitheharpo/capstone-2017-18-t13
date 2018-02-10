@@ -323,6 +323,11 @@ MonoBehaviour:
   mGripAttach: {fileID: 4904606761592194}
   mGeneralMovementData:
     mCameraMovementFollowFactor: 10
+    mPlayerPositionSamples: 5
+    mPlayerWeaponBobFrequency: 25
+    mPlayerWeaponBobXAmount: 0.01
+    mPlayerWeaponBobYAmount: 0.01
+    mPlayerWeaponBobZAmount: 0.07
     mCameraRotationFollowFactor: 15
     mPlayerRotationSamples: 20
     mSampleWeighting:
@@ -345,6 +350,11 @@ MonoBehaviour:
       m_RotationOrder: 0
   mAimDownSightsMovementData:
     mCameraMovementFollowFactor: 30
+    mPlayerPositionSamples: 2
+    mPlayerWeaponBobFrequency: 2
+    mPlayerWeaponBobXAmount: 0
+    mPlayerWeaponBobYAmount: 0
+    mPlayerWeaponBobZAmount: 0
     mCameraRotationFollowFactor: 30
     mPlayerRotationSamples: 2
     mSampleWeighting:
