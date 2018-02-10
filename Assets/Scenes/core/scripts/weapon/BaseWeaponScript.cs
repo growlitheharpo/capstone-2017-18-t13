@@ -63,6 +63,9 @@ namespace FiringSquad.Gameplay.Weapons
 		public WeaponPartCollection currentParts { get { return mCurrentParts; } }
 
 		/// <inheritdoc />
+		public bool aimDownSightsActive {get { return mAimDownSightsActive; }}
+
+		/// <inheritdoc />
 		public WeaponData currentData
 		{
 			get
@@ -353,7 +356,7 @@ namespace FiringSquad.Gameplay.Weapons
 		/// <inheritdoc />
 		public void Reload()
 		{
-			if (mReloading)
+			if (mReloading || mAimDownSightsActive)
 				return;
 
 			mReloading = true;
