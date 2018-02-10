@@ -15,6 +15,10 @@ namespace FiringSquad.Data
 		[SerializeField] private float mDefaultHealth;
 		[SerializeField] private float mRespawnTime;
 
+		[SerializeField] private GameObject mThirdPersonView;
+		[SerializeField] private GameObject mFirstPersonView;
+		[SerializeField] private Transform mFirstPersonWeaponBone;
+
 		/// <summary> The default collection of parts for this player. </summary>
 		public WeaponPartCollection defaultWeaponParts { get { return mDefaultWeaponParts; } }
 
@@ -26,5 +30,20 @@ namespace FiringSquad.Data
 
 		/// <summary> The amount of time in seconds after dying before this player respawns. </summary>
 		public float respawnTime { get { return mRespawnTime; } }
+
+		/// <summary>
+		/// The GameObject holding the player's third person view.
+		/// </summary>
+		public GameObject thirdPersonView { get { return mThirdPersonView; } }
+
+		/// <summary>
+		/// The GameObject holding the player's first person view (hand)
+		/// </summary>
+		public GameObject firstPersonView { get { return mFirstPersonView; } }
+
+		/// <summary>
+		/// The Transform bone under which the weapon view will be moved.
+		/// </summary>
+		public Transform firstPersonWeaponBone { get { return mFirstPersonWeaponBone; } }
 	}
 }

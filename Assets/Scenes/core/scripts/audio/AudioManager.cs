@@ -18,6 +18,7 @@ namespace FiringSquad.Core.Audio
 		LoopGravGun = 40,
 		MagnetArmGrab = 45,
 		LocalDealDamage = 48,
+		PlayerHealthPickup = 53,
 		GetKill = 55,
 
 		// Weapons
@@ -121,6 +122,9 @@ namespace FiringSquad.Core.Audio
 
 			/// <inheritdoc />
 			public float isCurrentPlayer { get { return GetParameter("IsCurrentPlayer"); } set { SetParameter("IsCurrentPlayer", value); } }
+
+			/// <inheritdoc />
+			public float healthGained { get { return GetParameter("HealthGained"); } set { SetParameter("HealthGained", value); } }
 
 			/// <inheritdoc />
 			public IAudioReference SetParameter(string name, float value)

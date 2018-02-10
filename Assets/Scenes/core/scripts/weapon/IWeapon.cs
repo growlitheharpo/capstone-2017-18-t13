@@ -1,8 +1,21 @@
-﻿using FiringSquad.Data;
+﻿using System;
+using FiringSquad.Data;
 using UnityEngine;
 
 namespace FiringSquad.Gameplay.Weapons
 {
+	/// <summary>
+	/// The four weapon attachment spots.
+	/// </summary>
+	[Flags]
+	public enum Attachment
+	{
+		Scope = 0x1,
+		Barrel = 0x2,
+		Mechanism = 0x4,
+		Grip = 0x8,
+	}
+
 	/// <summary>
 	/// The interface for a basic weapon in the game.
 	/// </summary>
@@ -22,6 +35,11 @@ namespace FiringSquad.Gameplay.Weapons
 		/// The current data for this weapon, including things like recoil effects.
 		/// </summary>
 		WeaponData currentData { get; }
+
+		/// <summary>
+		/// Whether or not this weapon is currently in Aim Down Sights mode.
+		/// </summary>
+		bool aimDownSightsActive { get; }
 
 		/// <summary>
 		/// Attach a new part to this weapon.

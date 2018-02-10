@@ -21,5 +21,10 @@ namespace FiringSquad.Gameplay
 		/// </summary>
 		/// <param name="amount">The amount of health to heal.</param>
 		void HealDamage(float amount);
+
+		/// <summary>
+		/// The current health value of this damage receiver.
+		/// </summary>
+		float currentHealth { get; }
 	}
 }

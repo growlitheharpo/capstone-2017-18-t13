@@ -24,7 +24,7 @@ namespace FiringSquad.Gameplay.NPC
 		[SerializeField] private LayerMask mVisibilityMask;
 		[SerializeField] private float mDefaultHealth;
 		[SerializeField] private float mRespawnTime;
-		[SerializeField] [EnumFlags] private BaseWeaponScript.Attachment mPartsToDrop;
+		[SerializeField] [EnumFlags] private Attachment mPartsToDrop;
 
 		/// <summary> How far the turret is able to "see" targets. </summary>
 		public float targetingRange { get { return mTargetingRange; } }
@@ -51,6 +51,6 @@ namespace FiringSquad.Gameplay.NPC
 		public LayerMask visibilityMask { get { return mVisibilityMask; } }
 
 		/// <summary> Which parts this turret should drop when it dies. </summary>
-		public BaseWeaponScript.Attachment partsToDrop { get { return mPartsToDrop; } }
+		public Attachment partsToDrop { get { return mPartsToDrop; } }
 	}
 }

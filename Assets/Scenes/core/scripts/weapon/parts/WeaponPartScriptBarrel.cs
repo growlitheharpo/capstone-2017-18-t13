@@ -14,7 +14,7 @@ namespace FiringSquad.Gameplay.Weapons
 		[HideInInspector] [SerializeField] private AnimationCurve mRecoilCurve;
 		
 		/// <inheritdoc />
-		public override BaseWeaponScript.Attachment attachPoint { get { return BaseWeaponScript.Attachment.Barrel; } }
+		public override Attachment attachPoint { get { return Attachment.Barrel; } }
 
 		/// <summary>
 		/// The Transform of the tip of this barrel, where effects should originate from.

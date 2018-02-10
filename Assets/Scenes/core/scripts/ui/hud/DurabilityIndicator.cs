@@ -38,19 +38,19 @@ namespace FiringSquad.Gameplay.UI
 		{
 			switch (part.attachPoint)
 			{
-				case BaseWeaponScript.Attachment.Scope:
+				case Attachment.Scope:
 					mScope.sprite = part.durabilitySprite;
 					mScope.color = Color.white;
 					break;
-				case BaseWeaponScript.Attachment.Barrel:
+				case Attachment.Barrel:
 					mBarrel.sprite = part.durabilitySprite;
 					mBarrel.color = Color.white;
 					break;
-				case BaseWeaponScript.Attachment.Mechanism:
+				case Attachment.Mechanism:
 					mMech.sprite = part.durabilitySprite;
 					mMech.color = Color.white;
 					break;
-				case BaseWeaponScript.Attachment.Grip:
+				case Attachment.Grip:
 					mGrip.sprite = part.durabilitySprite;
 					mMech.color = Color.white;
 					break;

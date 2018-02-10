@@ -19,8 +19,7 @@ namespace FiringSquad.Gameplay.UI
 		private CltPlayer mPlayerRef;
 		private Color[] mOriginalColors;
 		private Image[] mImages;
-
-		GameObject mMarker;
+		private GameObject mMarker;
 
 		/// <summary>
 		/// Unity's Awake function
@@ -32,7 +31,6 @@ namespace FiringSquad.Gameplay.UI
 			mMarker = Resources.Load<GameObject>("prefabs/ui/p_animated-hit-indicator");
 
 			EventManager.LocalGUI.OnSetCrosshairVisible += OnSetCrosshairVisible;
-			EventManager.Local.OnLocalPlayerSpawned += OnLocalPlayerSpawned;
 			EventManager.Local.OnLocalPlayerCausedDamage += OnLocalPlayerCausedDamage;
 		}
 
@@ -42,18 +40,7 @@ namespace FiringSquad.Gameplay.UI
 		private void OnDestroy()
 		{
 			EventManager.LocalGUI.OnSetCrosshairVisible -= OnSetCrosshairVisible;
-			EventManager.Local.OnLocalPlayerSpawned -= OnLocalPlayerSpawned;
 			EventManager.Local.OnLocalPlayerCausedDamage -= OnLocalPlayerCausedDamage;
-		}
-
-		/// <summary>
-		/// EVENT HANDLER: Local.OnLocalPlayerSpawned
-		/// Saves a reference to the player.
-		/// </summary>
-		private void OnLocalPlayerSpawned(CltPlayer player)
-		{
-			mPlayerRef = player;
-			EventManager.Local.OnLocalPlayerSpawned -= OnLocalPlayerSpawned;
 		}
 
 		/// <summary>
@@ -85,6 +72,8 @@ namespace FiringSquad.Gameplay.UI
 		/// </summary>
 		private void Update()
 		{
+			SearchForPlayer();
+
 			// Ensure we have a player and a weapon.
 			if (mPlayerRef == null)
 				return;
@@ -111,6 +100,18 @@ namespace FiringSquad.Gameplay.UI
 
 			mImageHolder.anchorMax = new Vector2(0.5f + width, 0.5f + height);
 			mImageHolder.anchorMin = new Vector2(0.5f - width, 0.5f - height);
+		}
+
+		/// <summary>
+		/// Attempts to grab a reference to the local player. Runs every frame until success.
+		/// Acceptable because there is only one crosshair in the scene.
+		/// </summary>
+		private void SearchForPlayer()
+		{
+			if (mPlayerRef != null)
+				return;
+
+			mPlayerRef = FindObjectsOfType<CltPlayer>().FirstOrDefault(x => x.isCurrentPlayer);
 		}
 
 		/// <summary>

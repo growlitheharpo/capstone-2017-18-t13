@@ -13,7 +13,7 @@ namespace FiringSquad.Gameplay.Weapons
 		[SerializeField] private bool mFireFromBarrelTip;
 
 		/// <inheritdoc />
-		public override BaseWeaponScript.Attachment attachPoint { get { return BaseWeaponScript.Attachment.Mechanism; } }
+		public override Attachment attachPoint { get { return Attachment.Mechanism; } }
 
 		/// <summary>
 		/// Which audio weapon type to use for this mechanism.
