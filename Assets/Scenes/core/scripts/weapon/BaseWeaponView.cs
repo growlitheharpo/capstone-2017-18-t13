@@ -15,6 +15,7 @@ namespace FiringSquad.Gameplay.Weapons
 		[SerializeField] private Transform mScopeAttach;
 		[SerializeField] private Transform mMechanismAttach;
 		[SerializeField] private Transform mGripAttach;
+		[SerializeField] private Animator mArmAnimator;
 		[SerializeField] private WeaponMovementData mGeneralMovementData;
 		[SerializeField] private WeaponMovementData mAimDownSightsMovementData;
 
@@ -56,7 +57,7 @@ namespace FiringSquad.Gameplay.Weapons
 			mRecentPlayerRotations = new Queue<Quaternion>(Mathf.Max(mGeneralMovementData.playerRotationSamples, mAimDownSightsMovementData.playerRotationSamples) + 1);
 			mCurrentMovementData = mGeneralMovementData;
 		}
-		
+
 		/// <summary>
 		/// Unity's LateUpdate function. Using to lerp gun rotation and follow the player's eye position.
 		/// </summary>
@@ -65,7 +66,10 @@ namespace FiringSquad.Gameplay.Weapons
 			IWeaponBearer bearer = mWeaponScript.bearer;
 			if (bearer == null || bearer.eye == null)
 				return;
-			
+
+			if (mArmAnimator != null)
+				mArmAnimator.SetBool("AimDownSightsActive", mWeaponScript.aimDownSightsActive);
+
 			mCurrentMovementData = mWeaponScript.aimDownSightsActive ? mAimDownSightsMovementData : mGeneralMovementData;
 
 			AccumulateRecentPositions(bearer);
