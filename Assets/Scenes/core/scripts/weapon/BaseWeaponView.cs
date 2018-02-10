@@ -15,7 +15,6 @@ namespace FiringSquad.Gameplay.Weapons
 		[SerializeField] private Transform mScopeAttach;
 		[SerializeField] private Transform mMechanismAttach;
 		[SerializeField] private Transform mGripAttach;
-		[SerializeField] private Animator mArmAnimator;
 		[SerializeField] private WeaponMovementData mGeneralMovementData;
 		[SerializeField] private WeaponMovementData mAimDownSightsMovementData;
 
@@ -23,7 +22,7 @@ namespace FiringSquad.Gameplay.Weapons
 		private BaseWeaponScript mWeaponScript;
 
 		private Dictionary<Attachment, Transform> mAttachPoints;
-		private Animator mAnimator;
+		private Animator mAnimator, mArmAnimator;
 
 		private ParticleSystem mShotParticles, mPartBreakPrefab;
 
@@ -338,5 +337,14 @@ namespace FiringSquad.Gameplay.Weapons
 		}
 
 		#endregion
+
+		/// <summary>
+		/// Update the animator that we will update "ADS" status on.
+		/// </summary>
+		/// <param name="armAnimator">The animator to use.</param>
+		public void SetArmAnimator(Animator armAnimator)
+		{
+			mArmAnimator = armAnimator;
+		}
 	}
 }
