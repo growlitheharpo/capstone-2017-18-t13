@@ -9,6 +9,9 @@ namespace FiringSquad.Data
 		[SerializeField] [Tooltip("The rate at which the weapon should follow the camera's positional movement.")]
 		private float mCameraMovementFollowFactor = 10.0f;
 
+		[SerializeField] [Tooltip("How many samples into the past the weapon should check for linear velocity.")]
+		private int mPlayerPositionSamples = 5;
+
 		[SerializeField] [Tooltip("The rate at which the weapon should follow the camera's rotational movement.")]
 		private float mCameraRotationFollowFactor = 15.0f;
 		
@@ -22,6 +25,11 @@ namespace FiringSquad.Data
 		/// The rate at which the weapon should follow the camera's positional movement.
 		/// </summary>
 		public float cameraMovementFollowFactor { get { return mCameraMovementFollowFactor; } }
+
+		/// <summary>
+		/// How many samples into the past the weapon should check for linear velocity.
+		/// </summary>
+		public int playerPositionSamples { get { return mPlayerPositionSamples; } }
 
 		/// <summary>
 		/// The rate at which the weapon should follow the camera's rotational movement.

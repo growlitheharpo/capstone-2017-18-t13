@@ -21,9 +21,14 @@ namespace FiringSquad.Gameplay.Weapons
 
 		/// Private variables
 		private BaseWeaponScript mWeaponScript;
+
 		private Dictionary<Attachment, Transform> mAttachPoints;
-		private ParticleSystem mShotParticles, mPartBreakPrefab;
 		private Animator mAnimator;
+
+		private ParticleSystem mShotParticles, mPartBreakPrefab;
+
+		private float mWeaponBobProgress;
+		private Queue<Vector3> mRecentPlayerPositions;
 		private Queue<Quaternion> mRecentPlayerRotations;
 		private WeaponMovementData mCurrentMovementData;
 
@@ -47,36 +52,26 @@ namespace FiringSquad.Gameplay.Weapons
 				{ Attachment.Grip, mGripAttach }
 			};
 
+			mRecentPlayerPositions = new Queue<Vector3>();
 			mRecentPlayerRotations = new Queue<Quaternion>();
 			mCurrentMovementData = mGeneralMovementData;
 		}
-
+		
 		/// <summary>
-		/// Unity's Update function
-		/// Used to set our position to follow the player
-		/// </summary>
-		private void Update()
-		{
-			//Follow my player
-			if (mWeaponScript.bearer == null || mWeaponScript.bearer.eye == null)
-				return;
-
-			mCurrentMovementData = mWeaponScript.aimDownSightsActive ? mAimDownSightsMovementData : mGeneralMovementData;
-			HandleWeaponMovement();
-		}
-
-		/// <summary>
-		/// Unity's LateUpdate function. Using to lerp gun rotation
+		/// Unity's LateUpdate function. Using to lerp gun rotation and follow the player's eye position.
 		/// </summary>
 		private void LateUpdate()
 		{
 			IWeaponBearer bearer = mWeaponScript.bearer;
-			if (bearer == null)
+			if (bearer == null || bearer.eye == null)
 				return;
 			
 			mCurrentMovementData = mWeaponScript.aimDownSightsActive ? mAimDownSightsMovementData : mGeneralMovementData;
 
-			UpdateRecentRotations(bearer);
+			AccumulateRecentPositions(bearer);
+			AccumulateRecentRotations(bearer);
+
+			HandleWeaponMovement();
 			HandleWeaponInertia(bearer);
 		}
 
@@ -85,25 +80,39 @@ namespace FiringSquad.Gameplay.Weapons
 		#region Weapon Inertia
 
 		/// <summary>
-		/// Handle following the player's movement with the weapon.
+		/// Update our recent player position queue to match our desired sample count and include the latest position.
 		/// </summary>
-		private void HandleWeaponMovement()
+		/// <param name="bearer">The bearer of this weapon.</param>
+		private void AccumulateRecentPositions(ICharacter bearer)
 		{
-			Vector3 location = transform.position;
-			Vector3 targetLoc = mWeaponScript.bearer.eye.TransformPoint(mWeaponScript.positionOffset);
-			transform.position = Vector3.Lerp(location, targetLoc, Time.deltaTime * mCurrentMovementData.cameraMovementFollowFactor);
+			mRecentPlayerPositions.Enqueue(bearer.transform.position);
+
+			while (mRecentPlayerPositions.Count > mCurrentMovementData.playerPositionSamples)
+				mRecentPlayerPositions.Dequeue();
 		}
 
 		/// <summary>
 		/// Update our recent player rotation queue to match our desired sample count and included the latest rotation.
 		/// </summary>
 		/// <param name="bearer">The bearer of this weapon.</param>
-		private void UpdateRecentRotations(IWeaponBearer bearer)
+		private void AccumulateRecentRotations(ICharacter bearer)
 		{
 			mRecentPlayerRotations.Enqueue(bearer.eye.rotation);
 
 			while (mRecentPlayerRotations.Count > mCurrentMovementData.playerRotationSamples)
 				mRecentPlayerRotations.Dequeue();
+		}
+
+		/// <summary>
+		/// Handle following the player's movement with the weapon.
+		/// </summary>
+		private void HandleWeaponMovement()
+		{
+			Vector3 location = transform.localPosition;
+			Vector3 targetLoc = mWeaponScript.bearer.eye.TransformPoint(mWeaponScript.positionOffset);
+			targetLoc = transform.parent.InverseTransformPoint(targetLoc);
+
+			transform.localPosition = Vector3.Lerp(location, targetLoc, Time.deltaTime * mCurrentMovementData.cameraMovementFollowFactor);
 		}
 
 		/// <summary>
