@@ -64,7 +64,7 @@ namespace FiringSquad.Core.State
 		public const string MAIN_SCENE = "main";
 		public const string MENU_SCENE = "menu";
 		public const string ART_PROTOTYPE_SCENE = "artproto";
-		public const string DRAFT_GAMEPLAY = "draftLevel_gameplay";
+		public const string DRAFT_GAMEPLAY = "draft6player_gameplay";
 		public const string FOURPLAYER_GAMEPLAY = "game4player_gameplay";
 		public const string TWOPLAYER_WORLD = "game2player_world";
 		public const string TWOPLAYER_GAMEPLAY = "game2player_gameplay";
