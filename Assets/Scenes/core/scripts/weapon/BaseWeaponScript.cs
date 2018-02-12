@@ -415,7 +415,6 @@ namespace FiringSquad.Gameplay.Weapons
 
 			CmdOnShotFireComplete(origins.ToArray(), directions.ToArray());
 			mWeaponView.PlayFireEffect();
-			DegradeDurability();
 		}
 
 		/// <summary>
@@ -428,6 +427,7 @@ namespace FiringSquad.Gameplay.Weapons
 				InstantiateShot(origins[i], directions[i]);
 
 			RpcReflectPlayerShotWeapon();
+			DegradeDurability();
 		}
 
 		/// <summary>
@@ -443,7 +443,7 @@ namespace FiringSquad.Gameplay.Weapons
 			if (mCurrentParts.mechanism == null || mCurrentParts.barrel == null)
 				throw new InvalidOperationException("Attempted to fire a weapon without setting the mechanism and barrel!");
 
-			GameObject instance = Instantiate(mCurrentParts.mechanism.projectilePrefab, mCurrentParts.barrel.barrelTip.position, Quaternion.identity);
+			GameObject instance = Instantiate(currentParts.mechanism.projectilePrefab, currentParts.barrel.barrelTip.position, Quaternion.identity);
 			IProjectile projectile = instance.GetComponent<IProjectile>();
 
 			if (projectile.PreSpawnInitialize(this, shot, currentData))
@@ -537,6 +537,7 @@ namespace FiringSquad.Gameplay.Weapons
 		/// <summary>
 		/// Immediately degrade the weapon's durability.
 		/// </summary>
+		[Server]
 		private void DegradeDurability()
 		{
 			foreach (WeaponPartScript part in mCurrentParts)
@@ -556,10 +557,10 @@ namespace FiringSquad.Gameplay.Weapons
 		/// Break a part immediately.
 		/// </summary>
 		/// <param name="part">The weapon part to break.</param>
+		[Server]
 		private void BreakPart(WeaponPartScript part)
 		{
 			CmdRequestBreakEffect();
-			mWeaponView.CreateBreakPartEffect();
 			AttachNewPart(bearer.defaultParts[part.attachPoint].partId, WeaponPartScript.INFINITE_DURABILITY);
 		}
 
@@ -579,8 +580,7 @@ namespace FiringSquad.Gameplay.Weapons
 		[ClientRpc]
 		private void RpcCreateBreakPartEffect()
 		{
-			if (!bearer.isCurrentPlayer)
-				mWeaponView.CreateBreakPartEffect();
+			mWeaponView.CreateBreakPartEffect();
 		}
 
 		#endregion
