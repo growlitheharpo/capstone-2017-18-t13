@@ -3,6 +3,7 @@ using System.Collections;
 using System.Linq;
 using FiringSquad.Core;
 using FiringSquad.Core.Audio;
+using FiringSquad.Core.State;
 using FiringSquad.Core.UI;
 using FiringSquad.Core.Weapons;
 using FiringSquad.Data;
@@ -61,6 +62,9 @@ namespace FiringSquad.Gameplay
 
 		/// <inheritdoc />
 		public Transform eye { get { return mCameraOffset; } }
+
+		/// <inheritdoc />
+		public float currentHealth { get { return mHealth; } }
 
 		/// <summary>
 		/// The local animator for this player.
@@ -136,6 +140,7 @@ namespace FiringSquad.Gameplay
 			mHitIndicator = hitObject.AddComponent<RemotePlayerHitIndicator>();
 
 			mLocalHealthVar = new BoundProperty<float>(mInformation.defaultHealth);
+			defaultData.firstPersonView.SetActive(false);
 		}
 
 		/// <summary>
@@ -158,11 +163,40 @@ namespace FiringSquad.Gameplay
 			StartCoroutine(GrabLocalHitIndicator());
 
 			// Disable the renderers for the local player.
-			var renderers = mAnimator.transform.GetComponentsInChildren<Renderer>();
+			StartCoroutine(AdjustToLocalView());
+
+			// Send the "spawned" event.
+			EventManager.Notify(() => EventManager.Local.LocalPlayerSpawned(this));
+		}
+
+		/// <summary>
+		/// Adjust the "view" GameObjects to reflect that this is the local player.
+		/// </summary>
+		private IEnumerator AdjustToLocalView()
+		{
+			while (weapon == null)
+				yield return null;
+
+			// Enable the first person view.
+			defaultData.firstPersonView.SetActive(true);
+
+			// Destroy the third person renderers so that we can disable that view but still
+			// let the animator update properly (necessary for UNET).
+			var renderers = defaultData.thirdPersonView.GetComponentsInChildren<Renderer>();
 			foreach (Renderer r in renderers)
 				Destroy(r);
 
-			EventManager.Notify(() => EventManager.Local.LocalPlayerSpawned(this));
+			//we have to do a delicate dance of changing parents now
+			Transform viewHolder = weapon.transform.Find("View").Find("ViewHolder");
+			Transform gunMesh = viewHolder.GetChild(0);
+
+			defaultData.firstPersonView.transform.SetParent(viewHolder);
+			gunMesh.SetParent(defaultData.firstPersonWeaponBone);
+
+			// Update the BaseWeaponView of what our arm's animator is.
+			BaseWeaponView view = weapon.gameObject.GetComponent<BaseWeaponView>();
+			if (view != null)
+				view.SetArmAnimator(defaultData.firstPersonView.GetComponentInChildren<Animator>());
 		}
 
 		/// <summary>
@@ -229,8 +263,9 @@ namespace FiringSquad.Gameplay
 			// Prioritize anything held by the magnet arm.
 			if (magnetArm != null)
 			{
-				interactable = magnetArm.heldWeaponPart;
-				magnetArm.ForceDropItem();
+				interactable = magnetArm.currentlyHeldObject;
+				if (interactable != null)
+					magnetArm.ForceDropItem();
 			}
 
 			// If there's nothing that we're holding, look ahead of us.
@@ -247,6 +282,24 @@ namespace FiringSquad.Gameplay
 
 			if (interactable != null)
 				interactable.Interact(this);
+		}
+
+		/// <summary>
+		/// Activate the "interact" input command on the server on a particular object.
+		/// </summary>
+		/// <param name="objectId">The network instance ID of the IInteractable to activate.</param>
+		[Command]
+		public void CmdActivateInteractWithObject(NetworkInstanceId objectId)
+		{
+			GameObject go = NetworkServer.FindLocalObject(objectId);
+			if (go == null)
+				return;
+
+			IInteractable interactable = go.GetComponent<IInteractable>();
+			if (interactable == null)
+				return;
+
+			interactable.Interact(this);
 		}
 
 		#region Animations
@@ -380,6 +433,9 @@ namespace FiringSquad.Gameplay
 		public void TargetStartLobbyCountdown(NetworkConnection connection, long endTime)
 		{
 			EventManager.Notify(() => EventManager.Local.ReceiveLobbyEndTime(this, endTime));
+
+			// Lobby means that all players have connected. Let's fire off our name now.
+			CmdSetPlayerName(ServiceLocator.Get<IGamestateManager>().currentUserName);
 		}
 
 		/// <summary>
@@ -464,6 +520,12 @@ namespace FiringSquad.Gameplay
 				EventManager.Notify(() => EventManager.Server.PlayerHealthHitZero(this, cause));
 		}
 
+		/// <inheritdoc />
+		public void HealDamage(float amount)
+		{
+			mHealth = Mathf.Clamp(mHealth + amount, 0.0f, defaultData.defaultHealth);
+		}
+
 		/// <summary>
 		/// EVENT HANDLER: Server.OnPlayerDied
 		/// </summary>
@@ -509,6 +571,17 @@ namespace FiringSquad.Gameplay
 			{
 				EventManager.Notify(() => EventManager.Local.LocalPlayerCausedDamage(amount));
 				ServiceLocator.Get<IAudioManager>().CreateSound(AudioEvent.LocalDealDamage, realSource.transform);
+			}
+			else if (this.isCurrentPlayer)
+			{
+				// else notify the camera it should shake
+				Camera cameraRef = GetComponentInChildren<Camera>();
+				if (cameraRef != null)
+				{
+					ScreenShake screenShake = cameraRef.GetComponent<ScreenShake>();
+					if (screenShake != null)
+						screenShake.NotifyHit(this, origin, point, normal, amount);
+				}
 			}
 
 			mHitIndicator.NotifyHit(this, origin, point, normal, amount);

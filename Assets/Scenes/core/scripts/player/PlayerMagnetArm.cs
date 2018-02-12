@@ -5,7 +5,6 @@ using FiringSquad.Core;
 using FiringSquad.Core.Audio;
 using FiringSquad.Gameplay.UI;
 using FiringSquad.Gameplay.Weapons;
-using JetBrains.Annotations;
 using UnityEngine;
 using UnityEngine.Networking;
 using Logger = FiringSquad.Debug.Logger;
@@ -23,53 +22,48 @@ namespace FiringSquad.Gameplay
 		[Flags]
 		private enum DirtyBitFlags
 		{
-			Bearer = 0x1,
-			HeldObject = 0x2,
-		}
-
-		/// <summary> The current input state of the magnet arm. </summary>
-		private enum State
-		{
-			Idle,
-			Reeling,
-			Locked
+			Bearer = 1 << 1,
+			HeldObject = 1 << 2,
 		}
 
 		/// Inspector variables
-		[SerializeField] private float mPullForce;
+		[SerializeField] private float mClickHoldThreshold = 0.2f;
+		[SerializeField] private float mPullRate;
 		[SerializeField] private float mPullRadius;
 		[SerializeField] private LayerMask mGrabLayers;
 
 		/// Private variables
-		private WeaponPickupScript mHeldObject;
-		private IAudioReference mGrabSound;
 		private CltPlayer mBearer;
-		private WeaponPickupScript mGrabCandidate;
-		private float mHeldTimer;
-		private State mState;
+		private IAudioReference mGrabSound;
+		private WeaponPickupScript mReelingObject;
+		private float mInputTime, mReelingTime;
+		private bool mPushedCrosshairHint;
 
 		private const float SNAP_THRESHOLD_DISTANCE = 2.5f;
-		private const float THROW_HOLD_SECONDS = 1.0f;
-
-		/// <summary> 
-		/// The pull force of this magnet arm. 
-		/// TODO: Does this need to be public or can it be passed as a parameter where it is used?
-		/// </summary>
-		public float pullForce { get { return mPullForce; } }
 
 		/// <summary>
-		/// The current held weapon part of this magnet arm, or null if we are not holding one.
+		/// Private reference at the object we're reeling. Setting this updates it on the network.
 		/// </summary>
-		[CanBeNull] public WeaponPickupScript heldWeaponPart
+		private WeaponPickupScript reelingObject
 		{
-			get { return mHeldObject; }
+			get { return mReelingObject; }
 			set
 			{
-				if (mHeldObject == value)
-					return;
-
-				mHeldObject = value;
+				mReelingObject = value;
 				SetDirtyBit(syncVarDirtyBits | (uint)DirtyBitFlags.HeldObject);
+			}
+		}
+
+		/// <summary>
+		/// Reference to the current weapon part that has been snapped into the player's hand.
+		/// </summary>
+		public WeaponPickupScript currentlyHeldObject
+		{
+			get
+			{
+				if (reelingObject != null && reelingObject.transform.parent == transform)
+					return reelingObject;
+				return null;
 			}
 		}
 
@@ -97,12 +91,12 @@ namespace FiringSquad.Gameplay
 			{
 				writer.Write(bearer.netId);
 
-				if (heldWeaponPart == null)
+				if (reelingObject == null)
 					writer.Write(false);
 				else
 				{
 					writer.Write(true);
-					writer.Write(heldWeaponPart.netId);
+					writer.Write(reelingObject.netId);
 				}
 			}
 			else
@@ -114,12 +108,12 @@ namespace FiringSquad.Gameplay
 					writer.Write(bearer.netId);
 				if ((flags & DirtyBitFlags.HeldObject) != 0)
 				{
-					if (heldWeaponPart == null)
+					if (reelingObject == null)
 						writer.Write(false);
 					else
 					{
 						writer.Write(true);
-						writer.Write(heldWeaponPart.netId);
+						writer.Write(reelingObject.netId);
 					}
 				}
 			}
@@ -137,8 +131,7 @@ namespace FiringSquad.Gameplay
 			{
 				NetworkInstanceId id = reader.ReadNetworkId();
 				StartCoroutine(BindToBearer(id));
-
-				DeserializeHeldObject(reader);
+				DeserializeReelingObject(reader);
 			}
 			else
 			{
@@ -147,42 +140,7 @@ namespace FiringSquad.Gameplay
 				if ((flags & DirtyBitFlags.Bearer) != 0)
 					StartCoroutine(BindToBearer(reader.ReadNetworkId()));
 				if ((flags & DirtyBitFlags.HeldObject) != 0)
-					DeserializeHeldObject(reader);
-			}
-		}
-
-		/// <summary>
-		/// Determine our held object from the network reader.
-		/// </summary>
-		private void DeserializeHeldObject(NetworkReader reader)
-		{
-			// Check if we have a part. If not, make sure to locally reflect that.
-			bool hasPart = reader.ReadBoolean();
-			if (!hasPart)
-			{
-				if (mHeldObject != null)
-					mHeldObject.Release();
-				mHeldObject = null;
-			}
-			else
-			{
-				// We do have a part. Try to find it and grab it.
-				GameObject heldObject = ClientScene.FindLocalObject(reader.ReadNetworkId());
-				if (heldObject == null)
-				{
-					Logger.Warn("OnDeserialize: Magnet arm server is holding an object that does not exist on client!", Logger.System.Network);
-					return;
-				}
-
-				mHeldObject = heldObject.GetComponent<WeaponPickupScript>();
-				if (mHeldObject == null)
-				{
-					Logger.Warn("OnDeserialize: Magnet arm server is holding an object that does not exist on client!", Logger.System.Network);
-					return;
-				}
-
-				if (mHeldObject.currentHolder != bearer)
-					mHeldObject.GrabNow(bearer);
+					DeserializeReelingObject(reader);
 			}
 		}
 
@@ -208,66 +166,179 @@ namespace FiringSquad.Gameplay
 		}
 
 		/// <summary>
-		/// Unity's Update function.
+		/// Read and determine the object we are reeling based on the data in the stream.
 		/// </summary>
-		private void Update()
+		/// <param name="reader">The serialization stream, advanced to the position of the reeling object data.</param>
+		private void DeserializeReelingObject(NetworkReader reader)
 		{
-			if (bearer == null || !bearer.isCurrentPlayer)
-				return;
+			if (reader.ReadBoolean() == false) // false means there is no reeling object
+			{
+				if (mReelingObject != null)
+				{
+					mReelingObject.UnlockFromReel();
+					mReelingObject = null;
+				}
+			}
+			else // there is an object in the stream
+			{
+				GameObject obj = ClientScene.FindLocalObject(reader.ReadNetworkId());
+				if (obj == null)
+				{
+					Logger.Warn("PlayerMagnetArm::DeserializeReelingObject could not find held object!");
+					return;
+				}
 
-			// TODO: This is *not* how these next few lines should work. We should only send the events when something has changed!
-			TryFindGrabCandidate();
-			EventManager.Notify(() => EventManager.LocalGUI.SetHintState(CrosshairHintText.Hint.MagnetArmGrab, mGrabCandidate != null));
-			EventManager.Notify(() => EventManager.LocalGUI.SetHintState(CrosshairHintText.Hint.ItemEquipOrDrop, heldWeaponPart != null));
+				WeaponPickupScript script = obj.GetComponent<WeaponPickupScript>();
+				if (script == null)
+				{
+					Logger.Warn("PlayerMagnetArm::DeserializeReelingObject could not find weapon script on held object!");
+					return;
+				}
+
+				mReelingObject = script;
+				mReelingObject.LockToPlayerReel(mBearer);
+			}
 		}
 
 		#endregion
 
 		/// <summary>
+		/// Unity's Update function
+		/// </summary>
+		[ClientCallback]
+		private void Update()
+		{
+			UpdateCrosshairHints();
+		}
+
+		/// <summary>
+		/// Ensure that the crosshair hint is up-to-date.
+		/// </summary>
+		private void UpdateCrosshairHints()
+		{
+			if (reelingObject != null)
+				return;
+
+			WeaponPickupScript potentialTarget = TryFindGrabCandidate();
+			if (potentialTarget != null && !mPushedCrosshairHint)
+			{
+				EventManager.LocalGUI.SetHintState(CrosshairHintText.Hint.MagnetArmGrab, true);
+				mPushedCrosshairHint = true;
+			}
+			else if (potentialTarget == null && mPushedCrosshairHint)
+			{
+				EventManager.LocalGUI.SetHintState(CrosshairHintText.Hint.MagnetArmGrab, false);
+				mPushedCrosshairHint = false;
+
+			}
+		}
+
+		/// <summary>
+		/// INPUT_HANDLER: Handle the player first pressing the "magnet arm fire" button.
+		/// </summary>
+		[Client]
+		public void FirePressed()
+		{
+			// If we have an object in-hand, ignore the initial "press" event
+			if (reelingObject != null)
+				return;
+
+			reelingObject = TryFindGrabCandidate();
+
+			if (reelingObject == null)
+			{
+				// TODO: We need a sound event to play when the player tries to grab with nothing there.
+				mInputTime = 0.0f;
+			}
+			else 
+			{
+				// start to grab this object
+				reelingObject.LockToPlayerReel(bearer);
+				CmdAssignClientAuthority(reelingObject.netId);
+				mInputTime = float.NegativeInfinity;
+				mReelingTime = 0.0f;
+				UpdateReelingSound(true);
+			}
+		}
+
+		/// <summary>
 		/// INPUT_HANDLER: Handle the player's "magnet arm fire" button being held down.
-		/// Result depends on our internal state.
 		/// </summary>
 		[Client]
 		public void FireHeld()
 		{
-			switch (mState)
+			if (reelingObject == null)
+				return;
+
+			if (reelingObject.transform.parent == transform)
 			{
-				case State.Idle:
-					if (mGrabCandidate == null)
-						TryFindGrabCandidate();
-					ReelGrabCandidate();
-					UpdateSound(true);
-					break;
-				case State.Reeling:
-					ReelGrabCandidate();
-					UpdateSound(true);
-					break;
-				case State.Locked:
-					mHeldTimer += Time.deltaTime;
-					break;
+				// the object already snapped into place, we just need to tick that timer.
+				mInputTime += Time.deltaTime;
+				return;
+			}
+
+			// otherwise, we need to reel it in.
+			mReelingTime += Time.deltaTime;
+			reelingObject.TickReelToPlayer(mPullRate, mReelingTime);
+			if (Vector3.Distance(reelingObject.transform.position, transform.position) < SNAP_THRESHOLD_DISTANCE)
+			{
+				if (mPushedCrosshairHint)
+					EventManager.LocalGUI.SetHintState(CrosshairHintText.Hint.MagnetArmGrab, false);
+				
+				EventManager.LocalGUI.SetHintState(CrosshairHintText.Hint.ItemEquipOrDrop, true);
+				mPushedCrosshairHint = true;
+
+				reelingObject.SnapIntoReelPosition();
+				UpdateReelingSound(false);
+				PlaySnappedSound();
 			}
 		}
 
 		/// <summary>
 		/// INPUT_HANDLER: Handle the player's "magnet arm fire" button being released.
-		/// Result depends on our internal state.
 		/// </summary>
 		[Client]
 		public void FireUp()
 		{
-			switch (mState)
+			if (mInputTime < 0.0f)
 			{
-				case State.Idle:
-					UpdateSound(false);
-					break;
-				case State.Reeling:
-					mState = heldWeaponPart != null ? State.Locked : State.Idle;
-					UpdateSound(false);
-					break;
-				case State.Locked:
-					ThrowOrDropItem();
-					break;
+				// if the input was less than zero seconds, we were in our "pull" button cycle.
+				// Check if we successfully grabbed it. If not, let it go.
+				if (reelingObject != null && reelingObject.transform.parent != transform)
+				{
+					reelingObject.UnlockFromReel();
+					reelingObject = null;
+				}
 			}
+			else if (mInputTime < mClickHoldThreshold)
+			{
+				// This counts as a press. Equip the item.
+				if (reelingObject != null)
+					bearer.CmdActivateInteractWithObject(reelingObject.netId);
+				else
+					bearer.CmdActivateInteract(bearer.eye.position, bearer.eye.forward);
+
+				// Hide the "press" hint
+				EventManager.LocalGUI.SetHintState(CrosshairHintText.Hint.ItemEquipOrDrop, false);
+				mPushedCrosshairHint = false;
+			}
+			else
+			{
+				// this counts as a throw. Throw it.
+				if (reelingObject != null)
+				{
+					reelingObject.UnlockAndThrow(bearer.eye.forward * 30.0f);
+					CmdThrowHeldItem(bearer.eye.forward, reelingObject.netId);
+					reelingObject = null;
+				}
+
+				// Hide the "throw" hint
+				EventManager.LocalGUI.SetHintState(CrosshairHintText.Hint.ItemEquipOrDrop, false);
+				mPushedCrosshairHint = false;
+			}
+
+			UpdateReelingSound(false);
+			mInputTime = 0.0f;
 		}
 
 		/// <summary>
@@ -275,7 +346,7 @@ namespace FiringSquad.Gameplay
 		/// </summary>
 		/// <param name="shouldPlay">Whether or not the sound should be playing.</param>
 		[Client]
-		private void UpdateSound(bool shouldPlay)
+		private void UpdateReelingSound(bool shouldPlay)
 		{
 			if (shouldPlay && mGrabSound == null)
 			{
@@ -290,19 +361,26 @@ namespace FiringSquad.Gameplay
 		}
 
 		/// <summary>
-		/// Fire out a spherecast and check the objects it hit. Sets mGrabCandidate to null if
+		/// Immediately fire the "part snapped into hand" sound event.
+		/// </summary>
+		private void PlaySnappedSound()
+		{
+			ServiceLocator.Get<IAudioManager>()
+				.CreateSound(AudioEvent.MagnetArmGrab, transform).AttachToRigidbody(bearer.GetComponent<Rigidbody>());
+		}
+
+		/// <summary>
+		/// Fire out a spherecast and check the objects it hit. Sets reelingObject to null if
 		/// no objects are found, or to the closeset hit object.
 		/// </summary>
 		[Client]
-		private void TryFindGrabCandidate()
+		private WeaponPickupScript TryFindGrabCandidate()
 		{
 			Ray r = new Ray(bearer.eye.position, bearer.eye.forward);
 
-			UnityEngine.Debug.DrawLine(r.origin, r.origin + r.direction * 1000.0f, Color.green, 0.1f, true);
-
 			var hits = Physics.SphereCastAll(r, mPullRadius, mGrabLayers);
 			if (hits.Length == 0)
-				return;
+				return null;
 
 			// could also sort by dot product instead of distance to get the "most accurate" pull instead of the closest.
 			hits = hits.OrderBy(x => x.distance).ToArray(); 
@@ -310,156 +388,64 @@ namespace FiringSquad.Gameplay
 			foreach (RaycastHit hitInfo in hits)
 			{
 				WeaponPickupScript grabbable = hitInfo.collider.GetComponentInParent<WeaponPickupScript>();
-				if (grabbable != null && !grabbable.currentlyHeld)
-				{
-					mGrabCandidate = grabbable;
-					return;
-				}
+				if (grabbable != null && !grabbable.currentlyLocked)
+					return grabbable;
 			}
 
-			mGrabCandidate = null;
+			return null;
 		}
 
 		/// <summary>
-		/// Pull our current grab candidate towards us if we have one. Will abort if we are holding a part.
-		/// When the object is closer than SNAP_THRESHOLD_DISTANCE, snaps the object into the hand.
+		/// Throw the item that we are currently holding on the server.
+		/// Requires running on the server because 
 		/// </summary>
-		[Client]
-		private void ReelGrabCandidate()
+		/// <param name="currentForward">The current forward vector of the player.</param>
+		/// <param name="objectId">The network instance ID of the currently held object.</param>
+		[Command]
+		private void CmdThrowHeldItem(Vector3 currentForward, NetworkInstanceId objectId)
 		{
-			if (mGrabCandidate == null || heldWeaponPart != null)
+			GameObject go = NetworkServer.FindLocalObject(objectId);
+			if (go == null)
 				return;
 
-			mState = State.Reeling;
-
-			// Check if it's close enough to grab.
-			Vector3 direction = mGrabCandidate.transform.position - bearer.eye.position;
-			if (direction.magnitude < SNAP_THRESHOLD_DISTANCE)
-			{
-				EventManager.Notify(() => EventManager.LocalGUI.SetHintState(CrosshairHintText.Hint.MagnetArmGrab, false));
-				EventManager.Notify(() => EventManager.LocalGUI.SetHintState(CrosshairHintText.Hint.ItemEquipOrDrop, true));
-				CmdGrabItem(mGrabCandidate.netId);
-
-				ServiceLocator.Get<IAudioManager>()
-					.CreateSound(AudioEvent.MagnetArmGrab, transform)
-					.AttachToRigidbody(mBearer.GetComponent<Rigidbody>());
-
+			WeaponPickupScript grabbable = go.GetComponent<WeaponPickupScript>();
+			if (grabbable == null)
 				return;
-			}
 
-			// Check if we're still more or less looking at the object.
-			Vector3 looking = bearer.eye.forward;
-			float dot = Vector3.Dot(direction.normalized, looking.normalized);
-			if (dot < 0.9f)
-			{
-				mGrabCandidate = null;
-				return;
-			}
+			bool success = grabbable.GetComponent<NetworkIdentity>().RemoveClientAuthority(bearer.connectionToClient);
+			if (!success)
+				Logger.Warn("PlayerMagnetArm::ReleaseClientAuthority was unnsuccessful!");
 
-			// Pull it towards us locally and on the server.
-			mGrabCandidate.PullTowards(bearer);
-			CmdReelObject(mGrabCandidate.netId);
+			grabbable.UnlockAndThrow(currentForward * 30.0f);
+
+			reelingObject = null;
 		}
 
 		/// <summary>
-		/// Releases our currently held item. Throws or drops depending on the current hold time.
+		/// Give this client control over an item that it is trying to reel in.
 		/// </summary>
-		[Client]
-		private void ThrowOrDropItem()
+		/// <param name="grabCandidateNetId">The network id of object the client is reeling.</param>
+		[Command]
+		private void CmdAssignClientAuthority(NetworkInstanceId grabCandidateNetId)
 		{
-			EventManager.Notify(() => EventManager.LocalGUI.SetHintState(CrosshairHintText.Hint.ItemEquipOrDrop, false));
-			if (heldWeaponPart != null && heldWeaponPart.currentHolder == bearer)
-			{
-				bool throwObj = mHeldTimer >= THROW_HOLD_SECONDS;
-
-				if (throwObj)
-					heldWeaponPart.Throw();
-				else
-					heldWeaponPart.Release();
-
-				CmdReleaseItem(heldWeaponPart.netId, !throwObj);
-			}
-
-			heldWeaponPart = null;
-			mGrabCandidate = null;
-			mHeldTimer = 0.0f;
-			mState = State.Idle;
+			GameObject obj = NetworkServer.FindLocalObject(grabCandidateNetId);
+			bool success = obj.GetComponent<NetworkIdentity>().AssignClientAuthority(bearer.connectionToClient);
+			if (!success)
+				Logger.Warn("PlayerMagnetArm::AssignClientAuthority was unnsuccessful!");
 		}
-
+		
 		/// <summary>
-		/// Force the magnet arm to immediately drop a held item. Will not throw if there is no held item.
+		/// Immediately drop any item that this magnet arm is reeling or considering pulling.
 		/// </summary>
 		[Server]
 		public void ForceDropItem()
 		{
-			if (heldWeaponPart == null)
+			if (reelingObject == null)
 				return;
 
-			CmdReleaseItem(heldWeaponPart.netId, true);
-			RpcForceReleaseItem();
-		}
-
-		/// <summary>
-		/// Reflect a "ForceDropItem" call on the server on each local instance.
-		/// </summary>
-		[ClientRpc]
-		private void RpcForceReleaseItem()
-		{
-			mState = State.Idle;
-			ThrowOrDropItem();
-		}
-
-		/// <summary>
-		/// Reflect an item reel on the server so that all clients can sync it.
-		/// </summary>
-		/// <param name="id">The id of the object to reel in.</param>
-		[Command]
-		private void CmdReelObject(NetworkInstanceId id)
-		{
-			GameObject go = NetworkServer.FindLocalObject(id);
-			go.GetComponent<INetworkGrabbable>().PullTowards(bearer);
-		}
-
-		/// <summary>
-		/// Reflect an immediate grab/snap command from the client on the server so that all clients can sync it.
-		/// </summary>
-		/// <param name="id">The id of the object to snap.</param>
-		[Command]
-		private void CmdGrabItem(NetworkInstanceId id)
-		{
-			GameObject go = NetworkServer.FindLocalObject(id);
-			mGrabCandidate = go.GetComponent<WeaponPickupScript>();
-
-			if (mGrabCandidate.currentlyHeld)
-				return;
-
-			mGrabCandidate.GrabNow(bearer);
-			heldWeaponPart = mGrabCandidate;
-			mGrabCandidate = null;
-		}
-
-		/// <summary>
-		/// Reflect a "release" command on the server so that all clients can sync it.
-		/// </summary>
-		/// <param name="itemId">The id of the object to release. Should be our held weapon.</param>
-		/// <param name="drop">True to simply drop the object to the ground, false to throw it with force.</param>
-		[Command]
-		private void CmdReleaseItem(NetworkInstanceId itemId, bool drop)
-		{
-			heldWeaponPart = null;
-
-			GameObject obj = NetworkServer.FindLocalObject(itemId);
-			if (obj == null)
-				return;
-
-			WeaponPickupScript script = obj.GetComponent<WeaponPickupScript>();
-			if (script == null)
-				return;
-
-			if (drop)
-				script.Release();
-			else
-				script.Throw();
+			reelingObject.UnlockFromReel();
+			reelingObject.GetComponent<NetworkIdentity>().RemoveClientAuthority(bearer.connectionToClient);
+			reelingObject = null;
 		}
 	}
 }

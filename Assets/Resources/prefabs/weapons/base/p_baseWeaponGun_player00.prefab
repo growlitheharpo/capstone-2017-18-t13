@@ -11,6 +11,21 @@ Prefab:
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 1953974638818940}
   m_IsPrefabParent: 1
+--- !u!1 &1109411168365502
+GameObject:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 4528866960880298}
+  m_Layer: 9
+  m_Name: ViewHolder
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
 --- !u!1 &1155633757885550
 GameObject:
   m_ObjectHideFlags: 1
@@ -131,6 +146,7 @@ GameObject:
   - component: {fileID: 114943338203428434}
   - component: {fileID: 114320469336684846}
   - component: {fileID: 95394249164853166}
+  - component: {fileID: 114216206082323156}
   m_Layer: 9
   m_Name: p_baseWeaponGun_player00
   m_TagString: Untagged
@@ -148,7 +164,7 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1.68, y: 1.68, z: 1.68}
   m_Children:
-  - {fileID: 4412481125528598}
+  - {fileID: 4528866960880298}
   m_Father: {fileID: 4064075139203806}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -199,17 +215,31 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1474517497673106}
-  m_LocalRotation: {x: 0, y: 0.7071068, z: -0, w: -0.7071068}
-  m_LocalPosition: {x: -0, y: 0, z: 0}
+  m_LocalRotation: {x: -0, y: 0.7071068, z: -0, w: -0.7071068}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4904606761592194}
   - {fileID: 4096145057804758}
   - {fileID: 4197488167877586}
   - {fileID: 4891504686318262}
-  m_Father: {fileID: 4001952394694160}
+  m_Father: {fileID: 4528866960880298}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 270, z: 0}
+--- !u!4 &4528866960880298
+Transform:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1109411168365502}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 4412481125528598}
+  m_Father: {fileID: 4001952394694160}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &4891504686318262
 Transform:
   m_ObjectHideFlags: 1
@@ -305,6 +335,76 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
+--- !u!114 &114216206082323156
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1953974638818940}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 79c8744fe2da6bb4e861cd0b77ff3714, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mBarrelAttach: {fileID: 4096145057804758}
+  mScopeAttach: {fileID: 4197488167877586}
+  mMechanismAttach: {fileID: 4891504686318262}
+  mGripAttach: {fileID: 4904606761592194}
+  mArmAnimator: {fileID: 0}
+  mGeneralMovementData:
+    mCameraMovementFollowFactor: 10
+    mPlayerPositionSamples: 5
+    mPlayerWeaponBobFrequency: 11
+    mPlayerWeaponBobXAmount: 0.01
+    mPlayerWeaponBobYAmount: 0.025
+    mPlayerWeaponBobZAmount: 0.02
+    mCameraRotationFollowFactor: 15
+    mPlayerRotationSamples: 20
+    mSampleWeighting:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 2
+        time: 0
+        value: 0
+        inSlope: 2
+        outSlope: 2
+        tangentMode: 0
+      - serializedVersion: 2
+        time: 1
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 0
+  mAimDownSightsMovementData:
+    mCameraMovementFollowFactor: 30
+    mPlayerPositionSamples: 2
+    mPlayerWeaponBobFrequency: 2
+    mPlayerWeaponBobXAmount: 0
+    mPlayerWeaponBobYAmount: 0
+    mPlayerWeaponBobZAmount: 0
+    mCameraRotationFollowFactor: 30
+    mPlayerRotationSamples: 2
+    mSampleWeighting:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 2
+        time: 0
+        value: 0
+        inSlope: 2
+        outSlope: 2
+        tangentMode: 0
+      - serializedVersion: 2
+        time: 1
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 0
 --- !u!114 &114320469336684846
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -316,14 +416,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 012ed6da583da6149b8ecf1dd8032c61, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mBarrelAttach: {fileID: 4096145057804758}
-  mScopeAttach: {fileID: 4197488167877586}
-  mMechanismAttach: {fileID: 4891504686318262}
-  mGripAttach: {fileID: 4904606761592194}
   mAimDownSightsDispersionMod: 0.25
   mDefaultData:
-    mMinimumDispersion: 0.02
-    mMaximumDispersion: 0.06
+    mMinimumDispersion: 0.05
+    mMaximumDispersion: 0.09
     mDispersionRamp: 0.2
     mRecoilAmount: 0.75
     mRecoilTime: 0.35
@@ -351,7 +447,7 @@ MonoBehaviour:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 0
-    mDamage: 50
+    mDamage: 14
     mDamageFalloffDistance: 40
     mFireRate: 2
     mReloadTime: 1
@@ -447,7 +543,7 @@ ParticleSystem:
   moveWithTransform: 0
   moveWithCustomTransform: {fileID: 0}
   scalingMode: 1
-  randomSeed: -1822201618
+  randomSeed: -1323642131
   InitialModule:
     serializedVersion: 3
     enabled: 1

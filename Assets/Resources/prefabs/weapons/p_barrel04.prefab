@@ -366,10 +366,10 @@ MonoBehaviour:
   mDescription: A buckshot shotgun.
   mData:
     mMinDispersionModifier:
-      mAmount: 2
+      mAmount: 2.5
       mType: 3
     mMaxDispersionModifier:
-      mAmount: 2.5
+      mAmount: 4
       mType: 3
     mDispersionRampModifier:
       mAmount: 4
@@ -381,10 +381,10 @@ MonoBehaviour:
       mAmount: 2
       mType: 3
     mDamageModifier:
-      mAmount: 0.3
+      mAmount: 0.2
       mType: 2
     mDamageFalloffDistanceModifier:
-      mAmount: -20
+      mAmount: -25
       mType: 0
     mFireRateModifier:
       mAmount: 0.75
@@ -396,7 +396,7 @@ MonoBehaviour:
       mAmount: -4
       mType: 0
   mDurabilitySprite: {fileID: 21300000, guid: 380286c874978504a83bb8cc8d72dd83, type: 3}
-  mDurability: 12
+  mDurability: 24
   mTip: {fileID: 4467395475359334}
   mProjectileCount: 5
   mShotsPerClick: 1
@@ -456,7 +456,7 @@ MonoBehaviour:
     i14: 122
     i15: 220
   m_ServerOnly: 0
-  m_LocalPlayerAuthority: 0
+  m_LocalPlayerAuthority: 1
 --- !u!114 &114735160409266678
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -484,3 +484,5 @@ MonoBehaviour:
   mPickupView: {fileID: 1234691483115276}
   mParticleSystem: {fileID: 1348211536031428, guid: 12ff1094bf922bc4695b1fc22cd0cf54,
     type: 2}
+  mPickupLifetimeMin: 20
+  mPickupLifetimeMax: 40

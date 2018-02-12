@@ -89,6 +89,9 @@ namespace FiringSquad.Core
 			public bool isAlive { get { return false; } }
 
 			/// <inheritdoc />
+			public string currentUserName { get; set; }
+
+			/// <inheritdoc />
 			public void RequestShutdown()
 			{
 				Logger.Info("NULL SERVICE: NullGamestateManager.RequestShutdown()", Logger.System.Services);
@@ -143,6 +146,9 @@ namespace FiringSquad.Core
 
 				/// <inheritdoc />
 				public float isCurrentPlayer { get { return default(float); } set { } }
+
+				/// <inheritdoc />
+				public float healthGained { get { return default(float); } set { } }
 
 				/// <inheritdoc />
 				public IAudioReference SetParameter(string name, float value)
@@ -335,7 +341,7 @@ namespace FiringSquad.Core
 			}
 
 			/// <inheritdoc />
-			public IUIManager RegisterPanel(IScreenPanel panelObject, ScreenPanelTypes type)
+			public IUIManager RegisterPanel(IScreenPanel panelObject, ScreenPanelTypes type, bool disablePanel = true)
 			{
 				return this;
 			}

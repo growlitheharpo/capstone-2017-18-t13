@@ -15,6 +15,11 @@ namespace FiringSquad.Core.State
 		bool isAlive { get; }
 
 		/// <summary>
+		/// The name that this player wants to use to identify themselves.
+		/// </summary>
+		string currentUserName { get; set; }
+
+		/// <summary>
 		/// Request a safe shutdown of the application.
 		/// Will do things like save and release resources before
 		/// killing the application.

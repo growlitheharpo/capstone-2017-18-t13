@@ -49,6 +49,9 @@ namespace FiringSquad.Gameplay.NPC
 		/// <inheritdoc />
 		public bool isCurrentPlayer { get { return false; } }
 
+		/// <inheritdoc />
+		public float currentHealth { get { return mHealth; } }
+
 		#region Unity Callbacks
 
 		/// <summary>
@@ -198,6 +201,12 @@ namespace FiringSquad.Gameplay.NPC
 
 			if (mHealth <= 0.0f)
 				HandleTurretDeath();
+		}
+
+		/// <inheritdoc />
+		public void HealDamage(float amount)
+		{
+			mHealth = Mathf.Clamp(mHealth + amount, 0.0f, mData.defaultHealth);
 		}
 
 		/// <summary>

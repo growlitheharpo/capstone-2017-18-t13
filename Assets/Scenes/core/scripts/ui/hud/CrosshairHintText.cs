@@ -24,12 +24,12 @@ namespace FiringSquad.Gameplay.UI
 		/// </summary>
 		private readonly Dictionary<Hint, string> mHintTextMap = new Dictionary<Hint, string>
 		{
-			{ Hint.MagnetArmGrab, "Hold F to pull" },
-			{ Hint.ItemEquipOrDrop, "Press E to equip or F to drop" },
+			{ Hint.MagnetArmGrab, "Hold E to pull" },
+			{ Hint.ItemEquipOrDrop, "Press E to equip or hold E to drop" },
 		};
 
 		private UnityEngine.UI.Text mUIText;
-		private Stack<Hint> mActiveHints;
+		private List<Hint> mActiveHints;
 
 		/// <summary>
 		/// Unity's Awake function.
@@ -38,7 +38,7 @@ namespace FiringSquad.Gameplay.UI
 		{
 			mUIText = GetComponent<UnityEngine.UI.Text>();
 			EventManager.LocalGUI.OnSetHintState += OnSetHintState;
-			mActiveHints = new Stack<Hint>();
+			mActiveHints = new List<Hint>();
 
 			UpdateText();
 		}
@@ -57,9 +57,9 @@ namespace FiringSquad.Gameplay.UI
 		private void OnSetHintState(Hint hint, bool state)
 		{
 			if (state && !mActiveHints.Contains(hint))
-				mActiveHints.Push(hint);
+				mActiveHints.Add(hint);
 			if (!state)
-				mActiveHints = new Stack<Hint>(mActiveHints.Where(x => x != hint).ToArray());
+				mActiveHints = mActiveHints.Where(x => x != hint).ToList();
 
 			UpdateText();
 		}
@@ -69,7 +69,7 @@ namespace FiringSquad.Gameplay.UI
 		/// </summary>
 		private void UpdateText()
 		{
-			mUIText.text = mActiveHints.Count <= 0 ? "" : mHintTextMap[mActiveHints.Peek()];
+			mUIText.text = mActiveHints.Count <= 0 ? "" : mHintTextMap[mActiveHints.Last()];
 		}
 	}
 }

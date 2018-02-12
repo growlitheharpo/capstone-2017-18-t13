@@ -353,6 +353,8 @@ MonoBehaviour:
   mPickupView: {fileID: 1436793809100020}
   mParticleSystem: {fileID: 1810346366702796, guid: f7ee1a281a44c5a409088c0375a0a986,
     type: 2}
+  mPickupLifetimeMin: 20
+  mPickupLifetimeMax: 40
 --- !u!114 &114490438522106582
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -466,4 +468,4 @@ MonoBehaviour:
     i14: 211
     i15: 121
   m_ServerOnly: 0
-  m_LocalPlayerAuthority: 0
+  m_LocalPlayerAuthority: 1

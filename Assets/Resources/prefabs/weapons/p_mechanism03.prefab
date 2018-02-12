@@ -1227,7 +1227,7 @@ MonoBehaviour:
     i14: 22
     i15: 164
   m_ServerOnly: 0
-  m_LocalPlayerAuthority: 0
+  m_LocalPlayerAuthority: 1
 --- !u!114 &114985881179183656
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1243,3 +1243,5 @@ MonoBehaviour:
   mPickupView: {fileID: 1382295102792298}
   mParticleSystem: {fileID: 1810346366702796, guid: f3ae932e37bab2f47b257d4271e07d96,
     type: 2}
+  mPickupLifetimeMin: 20
+  mPickupLifetimeMax: 40

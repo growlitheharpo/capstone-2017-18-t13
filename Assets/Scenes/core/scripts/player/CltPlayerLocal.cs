@@ -23,6 +23,7 @@ namespace FiringSquad.Gameplay
 		/// Private variables
 		private Camera mCameraRef;
 		private Vector3 mCameraOriginalPos;
+		private GameObject mDeathCameraHolder;
 		private Quaternion mCameraOriginalRot;
 		private BoundProperty<float> mRespawnTimer;
 
@@ -40,14 +41,16 @@ namespace FiringSquad.Gameplay
 		/// </summary>
 		private void Start()
 		{
+			mDeathCameraHolder = new GameObject("DYNAMIC OBJECT - DEATH CAMERA HOLDER");
+
 			ServiceLocator.Get<IInput>()
 				// networked
 				.RegisterInput(Input.GetButton, inputMap.fireWeaponButton, INPUT_WeaponFireHold, InputLevel.Gameplay)
 				.RegisterInput(Input.GetButtonUp, inputMap.fireWeaponButton, INPUT_WeaponFireUp, InputLevel.Gameplay)
 				.RegisterInput(Input.GetButtonDown, inputMap.reloadButton, INPUT_WeaponReload, InputLevel.Gameplay)
-				.RegisterInput(Input.GetButtonDown, inputMap.interactButton, INPUT_ActivateInteract, InputLevel.Gameplay)
-				.RegisterInput(Input.GetButton, inputMap.fireGravGunButton, INPUT_MagnetArmHeld, InputLevel.Gameplay)
-				.RegisterInput(Input.GetButtonUp, inputMap.fireGravGunButton, INPUT_MagnetArmUp, InputLevel.Gameplay)
+				.RegisterInput(Input.GetButtonDown, inputMap.fireMagnetArmButton, INPUT_MagnetArmDown, InputLevel.Gameplay)
+				.RegisterInput(Input.GetButton, inputMap.fireMagnetArmButton, INPUT_MagnetArmHeld, InputLevel.Gameplay)
+				.RegisterInput(Input.GetButtonUp, inputMap.fireMagnetArmButton, INPUT_MagnetArmUp, InputLevel.Gameplay)
 
 				// local
 				.RegisterInput(Input.GetButtonDown, inputMap.activateADSButton, INPUT_EnterAimDownSights, InputLevel.Gameplay)
@@ -73,6 +76,9 @@ namespace FiringSquad.Gameplay
 		/// </summary>
 		private void OnDestroy()
 		{
+			if (mDeathCameraHolder != null)
+				Destroy(mDeathCameraHolder);
+
 			EventManager.Local.OnLocalPlayerDied -= OnLocalPlayerDied;
 			EventManager.Local.OnApplyOptionsData -= OnApplyOptionsData;
 			CleanupCamera();
@@ -82,7 +88,7 @@ namespace FiringSquad.Gameplay
 				.UnregisterInput(INPUT_WeaponFireHold)
 				.UnregisterInput(INPUT_WeaponFireUp)
 				.UnregisterInput(INPUT_WeaponReload)
-				.UnregisterInput(INPUT_ActivateInteract)
+				.UnregisterInput(INPUT_MagnetArmDown)
 				.UnregisterInput(INPUT_MagnetArmHeld)
 				.UnregisterInput(INPUT_MagnetArmUp)
 
@@ -161,6 +167,17 @@ namespace FiringSquad.Gameplay
 		}
 
 		/// <summary>
+		/// INPUT HANDLER: Pressed down the trigger of our magnet arm.
+		/// </summary>
+		private void INPUT_MagnetArmDown()
+		{
+			if (inAimDownSightsMode)
+				return;
+
+			playerRoot.magnetArm.FirePressed();
+		}
+
+		/// <summary>
 		/// INPUT HANDLER: Hold down the trigger of our magnet arm.
 		/// </summary>
 		private void INPUT_MagnetArmHeld()
@@ -178,15 +195,7 @@ namespace FiringSquad.Gameplay
 		{
 			playerRoot.magnetArm.FireUp();
 		}
-
-		/// <summary>
-		/// INPUT HANDLER: Immediately call "interact" on the server.
-		/// </summary>
-		private void INPUT_ActivateInteract()
-		{
-			playerRoot.CmdActivateInteract(playerRoot.eye.position, playerRoot.eye.forward);
-		}
-
+		
 		/// <summary>
 		/// INPUT HANDLER: Toggle the game's pause menu.
 		/// </summary>
@@ -268,14 +277,15 @@ namespace FiringSquad.Gameplay
 
 			INPUT_ExitAimDownSights(); // force an ADS exit
 
-			// TODO: Do a cool thing with the camera here?
 			// For now, just leave it where it was when we died. We'll grab it again when we respawn.
-			mCameraRef.transform.SetParent(null);
+			mDeathCameraHolder.transform.position = playerRoot.eye.position;
+			mDeathCameraHolder.transform.rotation = playerRoot.eye.rotation;
+			mCameraRef.transform.SetParent(mDeathCameraHolder.transform, false);
 
 			if (killer != null && !ReferenceEquals(killer, playerRoot))
 			{
-				StartCoroutine(Coroutines.LerpRotation(mCameraRef.transform,
-					Quaternion.LookRotation(killer.transform.position - mCameraRef.transform.position, Vector3.up), 0.75f));
+				Quaternion targetRot = Quaternion.LookRotation(killer.transform.position - mDeathCameraHolder.transform.position, Vector3.up);
+				StartCoroutine(Coroutines.LerpRotation(mDeathCameraHolder.transform,targetRot, 0.75f));
 			}
 
 			// Move us way out of the level.
@@ -304,7 +314,7 @@ namespace FiringSquad.Gameplay
 					.EnableInputLevel(InputLevel.Gameplay)
 					.EnableInputLevel(InputLevel.PauseMenu);
 
-				// Send is back to the spawn position the server chose for us.
+				// Send us back to the spawn position the server chose for us.
 				playerRoot.ResetPlayerValues(spawnPosition, spawnRotation);
 				mCameraRef.transform.SetParent(playerRoot.eye, false);
 				mCameraRef.transform.ResetLocalValues();

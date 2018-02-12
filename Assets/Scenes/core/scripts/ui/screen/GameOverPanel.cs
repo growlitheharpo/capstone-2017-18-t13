@@ -74,5 +74,11 @@ namespace FiringSquad.Gameplay.UI
 		{
 			EventManager.Notify(EventManager.Local.ConfirmQuitGame);
 		}
+
+		/// <inheritdoc />
+		public void OnEnablePanel() { }
+
+		/// <inheritdoc />
+		public void OnDisablePanel() { }
 	}
 }

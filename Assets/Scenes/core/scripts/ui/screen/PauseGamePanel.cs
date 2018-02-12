@@ -126,6 +126,7 @@ namespace FiringSquad.Gameplay.UI
 		/// </summary>
 		private void HandleResume()
 		{
+			mConfirmationPanel.SetActive(false);
 			EventManager.Notify(EventManager.Local.TogglePause);
 		}
 
@@ -144,5 +145,11 @@ namespace FiringSquad.Gameplay.UI
 		{
 			mConfirmationPanel.SetActive(false);
 		}
+
+		/// <inheritdoc />
+		public void OnEnablePanel() { }
+
+		/// <inheritdoc />
+		public void OnDisablePanel() { }
 	}
 }

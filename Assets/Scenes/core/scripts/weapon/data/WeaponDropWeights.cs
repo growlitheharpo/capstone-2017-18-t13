@@ -41,17 +41,17 @@ namespace FiringSquad.Data
 		/// Choose a random attachment based on the weights in this instance.
 		/// </summary>
 		/// <returns></returns>
-		public BaseWeaponScript.Attachment ChooseRandomWeightedAttachment()
+		public Attachment ChooseRandomWeightedAttachment()
 		{
 			float val = Random.value;
 			if (val < mMechanismWeight)
-				return BaseWeaponScript.Attachment.Mechanism;
+				return Attachment.Mechanism;
 			if (val < mMechanismWeight + mBarrelWeight)
-				return BaseWeaponScript.Attachment.Barrel;
+				return Attachment.Barrel;
 			if (val < mMechanismWeight + mBarrelWeight + mScopeWeight)
-				return BaseWeaponScript.Attachment.Scope;
+				return Attachment.Scope;
 
-			return BaseWeaponScript.Attachment.Grip;
+			return Attachment.Grip;
 		}
 	}
 }

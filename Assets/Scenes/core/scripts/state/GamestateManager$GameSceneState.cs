@@ -146,10 +146,6 @@ namespace FiringSquad.Core.State
 				private void OnReceiveLobbyEndTime(CltPlayer player, long time)
 				{
 					OnReceiveStartEvent(time);
-
-					IScreenPanel panel = ServiceLocator.Get<IUIManager>()
-						.PushNewPanel(ScreenPanelTypes.PlayerNameEntry);
-					((PlayerNameCustomizationPanel)panel).SetPlayer(player);
 				}
 
 				/// <summary>

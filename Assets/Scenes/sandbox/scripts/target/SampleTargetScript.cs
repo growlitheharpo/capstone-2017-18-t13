@@ -23,6 +23,9 @@ namespace FiringSquad.Prototyping
 		/// Private variables
 		private BoundProperty<float> mHealth;
 
+		/// <inheritdoc />
+		public float currentHealth { get { return mHealth.value; } }
+
 		/// <summary>
 		/// The health of this target.
 		/// </summary>
@@ -92,6 +95,12 @@ namespace FiringSquad.Prototyping
 			Instantiate(mHitIndicator, point, Quaternion.identity);
 
 			StartCoroutine(FadeText());
+		}
+
+		/// <inheritdoc />
+		public void HealDamage(float amount)
+		{
+			mHealth.value += amount;
 		}
 
 		/// <summary>

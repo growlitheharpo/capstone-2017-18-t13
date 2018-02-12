@@ -123,7 +123,6 @@ GameObject:
   - component: {fileID: 224400311457029590}
   - component: {fileID: 223832016805623462}
   - component: {fileID: 114533631434227152}
-  - component: {fileID: 114623689674950004}
   m_Layer: 11
   m_Name: UICanvas
   m_TagString: Untagged
@@ -374,22 +373,6 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
---- !u!114 &114623689674950004
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1928570959157722}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 1301386320, guid: f70555f144d8491a825f0804e09c671c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_IgnoreReversedGraphics: 1
-  m_BlockingObjects: 0
-  m_BlockingMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
 --- !u!114 &114722369330996410
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -402,11 +385,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mParts:
-    mScope: {fileID: 114412117028516678, guid: 90411c74ce32c4d45b8fdd979d2001a4, type: 2}
-    mBarrel: {fileID: 114439042836857858, guid: ee84b24b05b85574cad2a56c257e292f,
-      type: 2}
     mMechanism: {fileID: 114425948192369884, guid: ac89948562eb23e47810effcccae5243,
       type: 2}
+    mBarrel: {fileID: 114439042836857858, guid: ee84b24b05b85574cad2a56c257e292f,
+      type: 2}
+    mScope: {fileID: 114412117028516678, guid: 90411c74ce32c4d45b8fdd979d2001a4, type: 2}
     mGrip: {fileID: 114035792997203982, guid: bf400f714370ec646bb93b34e1e624d0, type: 2}
   mData:
     mTargetingRange: 40
@@ -417,7 +400,7 @@ MonoBehaviour:
     mVisibilityMask:
       serializedVersion: 2
       m_Bits: 4294965247
-    mDefaultHealth: 350
+    mDefaultHealth: 100
     mRespawnTime: 50
     mPartsToDrop: 7
   mWeaponAttachPoint: {fileID: 4765564046106272}

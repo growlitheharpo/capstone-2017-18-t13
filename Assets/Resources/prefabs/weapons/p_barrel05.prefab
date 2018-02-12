@@ -360,7 +360,7 @@ MonoBehaviour:
     i14: 146
     i15: 10
   m_ServerOnly: 0
-  m_LocalPlayerAuthority: 0
+  m_LocalPlayerAuthority: 1
 --- !u!114 &114279926224396024
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -413,8 +413,8 @@ MonoBehaviour:
       mAmount: 5
       mType: 3
     mReloadTimeModifier:
-      mAmount: 0.5
-      mType: 3
+      mAmount: 0
+      mType: 0
     mClipSizeModifier:
       mAmount: 8
       mType: 0
@@ -484,3 +484,5 @@ MonoBehaviour:
   mPickupView: {fileID: 1458216853000474}
   mParticleSystem: {fileID: 1810346366702796, guid: f7ee1a281a44c5a409088c0375a0a986,
     type: 2}
+  mPickupLifetimeMin: 20
+  mPickupLifetimeMax: 40

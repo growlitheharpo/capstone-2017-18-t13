@@ -14,7 +14,7 @@ namespace FiringSquad.Debug
 		/// <summary>
 		/// Utility struct that holds important information for a log.
 		/// </summary>
-		private struct LogEntryHolder
+		private class LogEntryHolder
 		{
 			public string timestamp { get; set; }
 			public string message { get; set; }
