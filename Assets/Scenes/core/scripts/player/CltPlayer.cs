@@ -51,6 +51,8 @@ namespace FiringSquad.Gameplay
 		[SyncVar(hook = "OnDeathsUpdate")] private int mDeaths;
 		private BoundProperty<int> mLocalDeathsVar;
 
+		[SyncVar(hook = "OnPlayerNameUpdate")] private string mPlayerName;
+
 		/// <inheritdoc />
 		public bool isCurrentPlayer { get { return isLocalPlayer; } }
 
@@ -94,7 +96,7 @@ namespace FiringSquad.Gameplay
 		/// <summary>
 		/// The custom player name entered by this player.
 		/// </summary>
-		public string playerName { get; private set; }
+		public string playerName { get { return mPlayerName; } }
 
 		#region Unity Callbacks
 
@@ -434,7 +436,7 @@ namespace FiringSquad.Gameplay
 		{
 			EventManager.Notify(() => EventManager.Local.ReceiveLobbyEndTime(this, endTime));
 
-			// Lobby means that all players have connected. Let's fire off our name now.
+			// Lobby means that all players have connected. Let's fire off setting our name now.
 			CmdSetPlayerName(ServiceLocator.Get<IGamestateManager>().currentUserName);
 		}
 
@@ -446,7 +448,7 @@ namespace FiringSquad.Gameplay
 		[Server]
 		public void MoveToStartPosition(Vector3 position, Quaternion rotation)
 		{
-			RpcResetPlayerValues(position, rotation);
+			TargetResetPlayerValues(connectionToClient, position, rotation);
 
 			if (magnetArm != null)
 				magnetArm.ForceDropItem();
@@ -471,6 +473,9 @@ namespace FiringSquad.Gameplay
 			EventManager.Notify(() => EventManager.Local.ReceiveStartEvent(gameEndTime));
 			ServiceLocator.Get<IAudioManager>()
 				.CreateSound(AudioEvent.AnnouncerMatchStarts, transform);
+
+			// Set our name again, just in case it wasn't updated.
+			CmdSetPlayerName(ServiceLocator.Get<IGamestateManager>().currentUserName);
 		}
 
 		/// <summary>
@@ -496,6 +501,15 @@ namespace FiringSquad.Gameplay
 			EventManager.Notify(() => EventManager.Local.ReceiveFinishEvent(scores));
 			ServiceLocator.Get<IAudioManager>()
 				.CreateSound(AudioEvent.AnnouncerMatchEnds, transform);
+		}
+
+		/// <summary>
+		/// Update the player's name to a new value on the server.
+		/// </summary>
+		[Command]
+		private void CmdSetPlayerName(string newValue)
+		{
+			mPlayerName = newValue;
 		}
 
 		#endregion
@@ -606,7 +620,10 @@ namespace FiringSquad.Gameplay
 			particles.Play();
 			StartCoroutine(Coroutines.WaitAndDestroyParticleSystem(particles));
 
-			ICharacter killerObj = killer == NetworkInstanceId.Invalid ? null : ClientScene.FindLocalObject(killer).GetComponent<ICharacter>();
+			IWeaponBearer killerObj = killer == NetworkInstanceId.Invalid ? null : ClientScene.FindLocalObject(killer).GetComponent<IWeaponBearer>();
+
+			if (killerObj != null && killerObj.isCurrentPlayer)
+				EventManager.Notify(() => EventManager.Local.LocalPlayerGotKill(this, killerObj.weapon));
 
 			if (!isLocalPlayer)
 				return;
@@ -618,10 +635,11 @@ namespace FiringSquad.Gameplay
 		/// <summary>
 		/// Reset all the values of this player (position, rotation, health, weapon parts).
 		/// </summary>
+		/// <param name="connection">The connection to the player to reset.</param>
 		/// <param name="position">The new target spawn position of the player.</param>
 		/// <param name="rotation">The new target spawn rotation of the player.</param>
-		[ClientRpc]
-		private void RpcResetPlayerValues(Vector3 position, Quaternion rotation)
+		[TargetRpc]
+		private void TargetResetPlayerValues(NetworkConnection connection, Vector3 position, Quaternion rotation)
 		{
 			ResetPlayerValues(position, rotation);
 		}
@@ -682,27 +700,18 @@ namespace FiringSquad.Gameplay
 			if (mLocalDeathsVar != null)
 				mLocalDeathsVar.value = value;
 		}
-
+		
 		/// <summary>
-		/// Set the player's customized name across the network.
+		/// Sync the player's customized name across the network (and UI).
 		/// </summary>
-		[Command]
-		public void CmdSetPlayerName(string newName)
-		{
-			RpcSetPlayerName(newName);
-		}
-
-		/// <summary>
-		/// Set the player's customized name from the server locally.
-		/// </summary>
-		[ClientRpc]
-		private void RpcSetPlayerName(string value)
+		[Client]
+		private void OnPlayerNameUpdate(string value)
 		{
 			PlayerNameWorldCanvas display = GetComponentInChildren<PlayerNameWorldCanvas>();
 			if (display != null)
 				display.SetPlayerName(value);
 
-			playerName = value;
+			mPlayerName = value;
 		}
 
 		#endregion
