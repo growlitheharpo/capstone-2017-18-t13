@@ -21,32 +21,31 @@ namespace FiringSquad.Gameplay.UI
 		/// </summary>
 		private void Start()
 		{
-			mTwoPlayerButton.OnClick += LaunchTwoPlayer;
-			mFourPlayerButton.OnClick += LaunchFourPlayer;
+			mTwoPlayerButton.OnClick += LaunchOldLevel;
+			mFourPlayerButton.OnClick += LaunchNewLevel;
 			mQuitButton.OnClick += ClickQuit;
 		}
 
 		/// <summary>
 		/// Launch the two player game.
 		/// </summary>
-		private void LaunchTwoPlayer()
-		{
-			mMainElementHolder.SetActive(false);
-
-			ServiceLocator.Get<IGamestateManager>()
-				.RequestSceneChange(GamestateManager.TWOPLAYER_WORLD)
-				.RequestSceneChange(GamestateManager.TWOPLAYER_GAMEPLAY, LoadSceneMode.Additive);
-		}
-
-		/// <summary>
-		/// Launch the four/five/six/whatever player game.
-		/// </summary>
-		private void LaunchFourPlayer()
+		private void LaunchOldLevel()
 		{
 			mMainElementHolder.SetActive(false);
 
 			ServiceLocator.Get<IGamestateManager>()
 				.RequestSceneChange(GamestateManager.FOURPLAYER_GAMEPLAY);
+		}
+
+		/// <summary>
+		/// Launch the four/five/six/whatever player game.
+		/// </summary>
+		private void LaunchNewLevel()
+		{
+			mMainElementHolder.SetActive(false);
+
+			ServiceLocator.Get<IGamestateManager>()
+				.RequestSceneChange(GamestateManager.DRAFT_GAMEPLAY);
 		}
 
 		/// <summary>
