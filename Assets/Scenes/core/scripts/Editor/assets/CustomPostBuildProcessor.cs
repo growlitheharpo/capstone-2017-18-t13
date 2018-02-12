@@ -67,6 +67,12 @@ namespace UnityEditor
 
 		private static void UpdateRepoState()
 		{
+			if (!kCommitBuild)
+			{
+				kCurrentState = GetLatestVersionState;
+				return;
+			}
+
 			Debug.Log("Getting the latest version of the build SVN repo.");
 			UpdateCloudRepo(kProjectPath);
 
