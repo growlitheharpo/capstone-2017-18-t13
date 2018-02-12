@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using FiringSquad.Gameplay.Weapons;
 using UnityEngine.UI;
-
+using KeatsLib.Unity;
 
 namespace FiringSquad.Gameplay.UI
 {
@@ -13,23 +13,25 @@ namespace FiringSquad.Gameplay.UI
 	/// </summary>
 	public class EnemyEliminationText : MonoBehaviour
 	{
+		/// Inspector variables
+		[SerializeField] private float mFadeImageTime;
+		[SerializeField] private float mFadeTextTime;
+
 		// Private variables
-		private UnityEngine.UI.Text mUIText;
+		private Text mUIText;
 		private Image mKillIndicator;
 		private Color mOriginalColor;
 		private Color mFadedColor;
 
 		// Base string for the elimination text
 		const string mBaseString = "You Eliminated: ";
-		//Time it takes for elimination text to fade away
-		const float mTextTime = 2.0f;
 
 		/// <summary>
 		/// Unity's Awake function
 		/// </summary>
 		private void Awake()
 		{
-			mUIText = GetComponent<UnityEngine.UI.Text>();
+			mUIText = GetComponentInChildren<Text>();
 
 			// Get the kill indicator and its color
 			mKillIndicator = GetComponentInChildren<Image>();
@@ -40,7 +42,7 @@ namespace FiringSquad.Gameplay.UI
 
 			mKillIndicator.color = mFadedColor;
 
-			EventManager.Server.OnPlayerDied += OnPlayerDied;
+			EventManager.Local.OnLocalPlayerGotKill += OnLocalPlayerGotKill;
 		}
 
 		/// <summary>
@@ -48,23 +50,37 @@ namespace FiringSquad.Gameplay.UI
 		/// </summary>
 		private void OnDestroy()
 		{
-			EventManager.Server.OnPlayerDied -= OnPlayerDied;
+			EventManager.Local.OnLocalPlayerGotKill -= OnLocalPlayerGotKill;
 		}
 
 		/// <summary>
-		/// EVENT HANDLER: Server.OnPlayerDied
+		/// EVENT HANDLER: Server.OnLocalPlayerGotKill
 		/// </summary>
 		[EventHandler]
-		private void OnPlayerDied(CltPlayer deadPlayer, ICharacter killer, Transform spawnPos)
+		private void OnLocalPlayerGotKill(CltPlayer deadPlayer, IWeapon currentWeapon)
 		{
-			// Compare the killer with this player
-			if (killer.isCurrentPlayer)
+			StopAllCoroutines();
+
+			// Update to the dead players name
+			UpdateText(deadPlayer.playerName);
+			mKillIndicator.color = mOriginalColor;
+
+			StartCoroutine(Coroutines.InvokeAfterSeconds(mFadeTextTime, () =>
 			{
-				// Update to the dead players name
-				UpdateText(deadPlayer.playerName);
-				StartCoroutine(RemoveText(mTextTime));
-				StartCoroutine(FadeKillIndicator(mTextTime));
-			}
+				mUIText.text = "";
+			}));
+
+			StartCoroutine(Coroutines.InvokeEveryTick((currentTime) =>
+			{
+				if (currentTime < mFadeImageTime)
+				{
+					mKillIndicator.color = Color.Lerp(mOriginalColor, mFadedColor, currentTime / mFadeImageTime);
+					return true;
+				}
+
+				mKillIndicator.color = mFadedColor;
+				return false;
+			}));
 		}
 
 		/// <summary>
@@ -73,39 +89,6 @@ namespace FiringSquad.Gameplay.UI
 		private void UpdateText(string text)
 		{
 			mUIText.text = mBaseString + text;
-		}
-
-		/// <summary>
-		/// Remove the text from the screen
-		/// </summary>
-		private IEnumerator RemoveText(float time)
-		{
-			float currentTime = 0.0f;
-			while (currentTime < time)
-			{
-				currentTime += Time.deltaTime;
-				yield return null;
-			}
-
-			mUIText.text = "";
-		}
-
-		/// <summary>
-		/// Fade the kill indicator away
-		/// </summary>
-		private IEnumerator FadeKillIndicator(float time)
-		{
-			float currentTime = 0.0f;
-			while (currentTime < time)
-			{
-				
-				mKillIndicator.color = Color.Lerp(mOriginalColor, mFadedColor, currentTime / time);
-
-				currentTime += Time.deltaTime;
-				yield return null;
-			}
-
-			mKillIndicator.color = mFadedColor;
 		}
 	}
 }
