@@ -606,7 +606,10 @@ namespace FiringSquad.Gameplay
 			particles.Play();
 			StartCoroutine(Coroutines.WaitAndDestroyParticleSystem(particles));
 
-			ICharacter killerObj = killer == NetworkInstanceId.Invalid ? null : ClientScene.FindLocalObject(killer).GetComponent<ICharacter>();
+			IWeaponBearer killerObj = killer == NetworkInstanceId.Invalid ? null : ClientScene.FindLocalObject(killer).GetComponent<IWeaponBearer>();
+
+			if (killerObj != null && killerObj.isCurrentPlayer)
+				EventManager.Notify(() => EventManager.Local.LocalPlayerGotKill(this, killerObj.weapon));
 
 			if (!isLocalPlayer)
 				return;
