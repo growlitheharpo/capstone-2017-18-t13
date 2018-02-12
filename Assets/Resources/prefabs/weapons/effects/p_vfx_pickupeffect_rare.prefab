@@ -37,7 +37,7 @@ GameObject:
   - component: {fileID: 198767187283993926}
   - component: {fileID: 199345660241580634}
   m_Layer: 0
-  m_Name: p_vfxDroppedWeapon
+  m_Name: vfx_swirls
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -54,7 +54,7 @@ GameObject:
   - component: {fileID: 198199137550004216}
   - component: {fileID: 199746097842006728}
   m_Layer: 0
-  m_Name: p_vfxDroppedWeapon
+  m_Name: vfx_data_square_verticle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -67,7 +67,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1348211536031428}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -9.75}
+  m_LocalPosition: {x: 39.588, y: 6.077, z: 9.562}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4345188430041232}
@@ -110,7 +110,7 @@ ParticleSystem:
   serializedVersion: 5
   lengthInSec: 60
   simulationSpeed: 1
-  looping: 1
+  looping: 0
   prewarm: 0
   playOnAwake: 0
   useUnscaledTime: 0
@@ -160,7 +160,7 @@ ParticleSystem:
   moveWithTransform: 1
   moveWithCustomTransform: {fileID: 0}
   scalingMode: 1
-  randomSeed: 445934508
+  randomSeed: 851488878
   InitialModule:
     serializedVersion: 3
     enabled: 1
@@ -3408,7 +3408,7 @@ ParticleSystem:
   serializedVersion: 5
   lengthInSec: 60
   simulationSpeed: 1
-  looping: 1
+  looping: 0
   prewarm: 0
   playOnAwake: 0
   useUnscaledTime: 0
@@ -3458,7 +3458,7 @@ ParticleSystem:
   moveWithTransform: 1
   moveWithCustomTransform: {fileID: 0}
   scalingMode: 1
-  randomSeed: 1442254104
+  randomSeed: -1229102163
   InitialModule:
     serializedVersion: 3
     enabled: 1
@@ -3548,7 +3548,7 @@ ParticleSystem:
       serializedVersion: 2
       minMaxState: 0
       minColor: {r: 1, g: 1, b: 1, a: 1}
-      maxColor: {r: 1, g: 1, b: 1, a: 1}
+      maxColor: {r: 1, g: 1, b: 1, a: 0.659}
       maxGradient:
         serializedVersion: 2
         key0: {r: 1, g: 1, b: 1, a: 1}
@@ -3859,27 +3859,33 @@ ParticleSystem:
     rotation3D: 0
     gravityModifier:
       serializedVersion: 2
-      minMaxState: 0
-      scalar: -0.05
+      minMaxState: 1
+      scalar: 0.05
       minScalar: 0
       maxCurve:
         serializedVersion: 2
         m_Curve:
         - serializedVersion: 2
-          time: 0
-          value: 0
-          inSlope: 0
-          outSlope: 0
+          time: 0.832625
+          value: -1
+          inSlope: 2.435577
+          outSlope: 2.435577
+          tangentMode: 0
+        - serializedVersion: 2
+          time: 0.912153
+          value: 0.39173338
+          inSlope: 2.828676
+          outSlope: 2.828676
           tangentMode: 0
         - serializedVersion: 2
           time: 1
-          value: 0
-          inSlope: 0
-          outSlope: 0
+          value: 1
+          inSlope: 8.511773
+          outSlope: 8.511773
           tangentMode: 0
         m_PreInfinity: 2
         m_PostInfinity: 2
-        m_RotationOrder: 4
+        m_RotationOrder: 0
       minCurve:
         serializedVersion: 2
         m_Curve:
@@ -4030,7 +4036,7 @@ ParticleSystem:
           outSlope: 0.1545306
           tangentMode: 0
         - serializedVersion: 2
-          time: 0.82143414
+          time: 0.8338833
           value: 1
           inSlope: -0.7894571
           outSlope: -0.7894571
@@ -6772,7 +6778,7 @@ ParticleSystemRenderer:
   m_ReflectionProbeUsage: 0
   m_Materials:
   - {fileID: 2100000, guid: 2004caa1acdd37247851b0e148db0d20, type: 2}
-  - {fileID: 2100000, guid: 4d2d5f9d7c25b7f4084a3d4862e9efb7, type: 2}
+  - {fileID: 2100000, guid: d88ddf6403fba544cb7d5a064c1326ac, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -6823,7 +6829,7 @@ ParticleSystemRenderer:
   m_LightProbeUsage: 0
   m_ReflectionProbeUsage: 0
   m_Materials:
-  - {fileID: 2100000, guid: 4d2d5f9d7c25b7f4084a3d4862e9efb7, type: 2}
+  - {fileID: 2100000, guid: d88ddf6403fba544cb7d5a064c1326ac, type: 2}
   - {fileID: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
@@ -6842,7 +6848,7 @@ ParticleSystemRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: -207
   m_RenderMode: 0
   m_SortMode: 1
   m_MinParticleSize: 0
