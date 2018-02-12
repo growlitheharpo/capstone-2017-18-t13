@@ -15,11 +15,11 @@ namespace FiringSquad.Gameplay
 		/// Unity Event handler when something hits our collider.
 		/// </summary>
 		[ServerCallback]
-		private void OnCollisionEnter(Collision other)
+		private void OnTriggerEnter(Collider other)
 		{
-			IDamageReceiver damageReceiver = other.collider.GetComponent<IDamageReceiver>();
+			IDamageReceiver damageReceiver = other.GetComponent<IDamageReceiver>();
 			if (damageReceiver != null)
-				damageReceiver.ApplyDamage(damageReceiver.currentHealth + 500.0f, other.transform.position, Vector3.up, this);
+				damageReceiver.ApplyDamage(damageReceiver.currentHealth + 500000.0f, other.transform.position, Vector3.up, this);
 		}
 	}
 }
