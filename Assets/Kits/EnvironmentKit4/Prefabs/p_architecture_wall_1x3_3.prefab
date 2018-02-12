@@ -22,9 +22,9 @@ GameObject:
   - component: {fileID: 33229380320911806}
   - component: {fileID: 23047299213510846}
   - component: {fileID: 95107605945103418}
-  - component: {fileID: 65332360374521876}
   - component: {fileID: 65564342759508846}
   - component: {fileID: 65323362533087582}
+  - component: {fileID: 65260414019420172}
   m_Layer: 0
   m_Name: p_architecture_wall_1x3_3
   m_TagString: Untagged
@@ -84,6 +84,18 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1606248059988396}
   m_Mesh: {fileID: 4300000, guid: f93dd6531a99a4a0fb213b2ee193f1a3, type: 3}
+--- !u!65 &65260414019420172
+BoxCollider:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1606248059988396}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.25, y: 2.3555768, z: 0.36220932}
+  m_Center: {x: 0.0020974015, y: 1.1776556, z: -0.14}
 --- !u!65 &65323362533087582
 BoxCollider:
   m_ObjectHideFlags: 1
@@ -94,20 +106,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 3.4659102, y: 0.6902013, z: 1.0525321}
+  m_Size: {x: 0.25, y: 0.6902013, z: 1.0525321}
   m_Center: {x: -0.041312963, y: 2.6943429, z: -0.49999994}
---- !u!65 &65332360374521876
-BoxCollider:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1606248059988396}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 3.5562406, y: 2.3555768, z: 0.36304855}
-  m_Center: {x: 0.0020974015, y: 1.1776556, z: -0.15525818}
 --- !u!65 &65564342759508846
 BoxCollider:
   m_ObjectHideFlags: 1
@@ -118,7 +118,7 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 3.5562406, y: 2.3555768, z: 0.36220932}
+  m_Size: {x: 0.25, y: 2.3555768, z: 0.36220932}
   m_Center: {x: 0.0020974015, y: 1.1776556, z: -0.84035873}
 --- !u!95 &95107605945103418
 Animator:
