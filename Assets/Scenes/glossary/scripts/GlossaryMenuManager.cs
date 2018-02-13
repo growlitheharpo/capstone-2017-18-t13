@@ -18,6 +18,8 @@ namespace FiringSquad.Gameplay.UI
 		[SerializeField] private GameObject mScrollRectContent;
 		[SerializeField] private ActionProvider mReturnToMainButton;
 		[SerializeField] private GameObject mButtonPrefab;
+		[SerializeField] private UnityEngine.UI.Text mDescriptionText;
+		[SerializeField] private GameObject mPartShowcase;
 
 		/// Var for the number of parts
 		private int mPartCount;
@@ -39,7 +41,6 @@ namespace FiringSquad.Gameplay.UI
 
 			// Populate the list and hope for the best
 			PopulateList();
-
 		}
 
 		/// <summary>
@@ -58,23 +59,6 @@ namespace FiringSquad.Gameplay.UI
 		/// </summary>
 		private void PopulateList()
 		{
-			// For the size of the weapon part list
-			//for (byte i = 0; i < mPartCount; ++i)
-			//{
-			//	  UnityEngine.Debug.Log(i);
-			//
-			//	  // Instantiate the button for the weapon part
-			//	  GameObject tmpButton = Instantiate(mButtonPrefab, mScrollRectContent.transform);
-			//	  // Set the text of the button
-			//	  
-			//	  tmpButton.GetComponentInChildren<UnityEngine.UI.Text>().text
-			//		  = ServiceLocator.Get<IWeaponPartManager>()
-			//		  .GetPartPrefab(i).GetComponent<WeaponPartScript>().prettyName;
-			//
-			//	  // Set local position to a new location
-			//	  tmpButton.transform.localPosition = new Vector3(tmpButton.transform.localPosition.x, 10 + (75 * i), tmpButton.transform.localPosition.z);
-			//}
-
 			// Iterator for moving the buttons down
 			int i = 1;
 
@@ -87,11 +71,34 @@ namespace FiringSquad.Gameplay.UI
 				tmpButton.GetComponentInChildren<UnityEngine.UI.Text>().text
 					= item.Value.GetComponent<WeaponPartScript>().prettyName;
 
+				// Get the description of the item
+				string itemDesc = item.Value.GetComponent<WeaponPartScript>().description;
+
 				// Set local position to a new location
 				tmpButton.transform.localPosition = new Vector3(tmpButton.transform.localPosition.x, -(100 * i), tmpButton.transform.localPosition.z);
 
+				// Add a the changetext function to the onclick
+				tmpButton.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(delegate { ChangeText(itemDesc);});
+				tmpButton.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(delegate { ChangeModel(item.Value.GetComponentInChildren<MeshFilter>().sharedMesh); });
+
 				++i;
 			}
+		}
+
+		/// <summary>
+		/// Changes the text of the description field
+		/// </summary>
+		private void ChangeText(string newText)
+		{
+			mDescriptionText.text = newText;
+		}
+
+		/// <summary>
+		/// Changes the current model displayed in the showcase
+		/// </summary>
+		private void ChangeModel(Mesh newMesh)
+		{
+			mPartShowcase.GetComponent<MeshFilter>().mesh = newMesh;
 		}
 	}
 }
