@@ -1,6 +1,7 @@
 ﻿using KeatsLib.Collections;
 using UnityEngine;
 using UIImage = UnityEngine.UI.Image;
+using UIText = UnityEngine.UI.Text;
 
 namespace FiringSquad.Gameplay.UI
 {
@@ -13,6 +14,7 @@ namespace FiringSquad.Gameplay.UI
 		/// Inspector variables
 		[SerializeField] private Sprite mOffscreenSprite;
 		[SerializeField] private Sprite mOnscreenSprite;
+		[SerializeField] private UIText mLabelText;
 
 		/// Private variables
 		private UIImage mImage;
@@ -49,6 +51,7 @@ namespace FiringSquad.Gameplay.UI
 		{
 			// take the viewport -0.5, * 2.0f, the magnitude should be 1
 			gameObject.SetActive(true);
+			mLabelText.gameObject.SetActive(true);
 			mTarget = target;
 			MoveAndFaceTarget();
 		}
@@ -59,6 +62,7 @@ namespace FiringSquad.Gameplay.UI
 		public void StopPointing()
 		{
 			gameObject.SetActive(false);
+			mLabelText.gameObject.SetActive(false);
 			mTarget = null;
 		}
 
@@ -95,12 +99,16 @@ namespace FiringSquad.Gameplay.UI
 			Vector2 adjustedPos = (viewportPos * Mathf.Sign(dot) - screenCenter).normalized;
 
 			Vector2 anchorPos = adjustedPos / 2.0f + screenCenter;
+			float angle = Mathf.Atan2(adjustedPos.y, adjustedPos.x) * Mathf.Rad2Deg + 90.0f;
 			mRealTransform.anchorMin = new Vector2(anchorPos.x, anchorPos.y);
 			mRealTransform.anchorMax = new Vector2(anchorPos.x, anchorPos.y);
-			mRealTransform.localRotation = Quaternion.AngleAxis(Mathf.Atan2(adjustedPos.y, adjustedPos.x) * Mathf.Rad2Deg + 90.0f, Vector3.forward);
+			mRealTransform.localRotation = Quaternion.AngleAxis(angle, Vector3.forward);
 
 			mImage.sprite = mOffscreenSprite;
 			mImage.color = mImageFarColor;
+
+			mLabelText.enabled = true;
+			mLabelText.transform.localRotation = Quaternion.AngleAxis(-angle, Vector3.forward);
 		}
 
 		/// <summary>
@@ -118,6 +126,8 @@ namespace FiringSquad.Gameplay.UI
 
 			mImage.sprite = mOnscreenSprite;
 			mImage.color = Color.Lerp(mImageCloseColor, mImageFarColor, Vector3.Distance(worldPos, Camera.main.transform.position) / 3.0f - 5.0f);
+			
+			mLabelText.enabled = false;
 		}
 	}
 }
