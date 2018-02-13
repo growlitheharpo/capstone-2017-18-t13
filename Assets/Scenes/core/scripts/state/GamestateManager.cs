@@ -68,6 +68,7 @@ namespace FiringSquad.Core.State
 		public const string FOURPLAYER_GAMEPLAY = "game4player_gameplay";
 		public const string TWOPLAYER_WORLD = "game2player_world";
 		public const string TWOPLAYER_GAMEPLAY = "game2player_gameplay";
+		public const string GUN_GLOSSARY = "gunglossary";
 
 		/// <inheritdoc />
 		public bool isAlive { get { return true; } }
