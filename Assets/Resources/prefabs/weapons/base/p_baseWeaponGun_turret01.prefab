@@ -264,7 +264,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_Materials:
-  - {fileID: 0}
+  - {fileID: 2100000, guid: 83aab3a2ea1234c4497393c73e7d2840, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -289,7 +289,7 @@ MeshFilter:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1697347829216426}
-  m_Mesh: {fileID: 4300000, guid: b7e8e949ec2ff924b9ff5cfa80f381e5, type: 3}
+  m_Mesh: {fileID: 4300002, guid: c7bae2491f40b014c930aeccac31a76d, type: 3}
 --- !u!95 &95241086362506484
 Animator:
   serializedVersion: 3
@@ -388,6 +388,11 @@ MonoBehaviour:
   mGripAttach: {fileID: 4904606761592194}
   mGeneralMovementData:
     mCameraMovementFollowFactor: 10
+    mPlayerPositionSamples: 5
+    mPlayerWeaponBobFrequency: 20
+    mPlayerWeaponBobXAmount: 0.2
+    mPlayerWeaponBobYAmount: 0.2
+    mPlayerWeaponBobZAmount: 0.2
     mCameraRotationFollowFactor: 15
     mPlayerRotationSamples: 20
     mSampleWeighting:
@@ -410,6 +415,11 @@ MonoBehaviour:
       m_RotationOrder: 0
   mAimDownSightsMovementData:
     mCameraMovementFollowFactor: 10
+    mPlayerPositionSamples: 5
+    mPlayerWeaponBobFrequency: 20
+    mPlayerWeaponBobXAmount: 0.2
+    mPlayerWeaponBobYAmount: 0.2
+    mPlayerWeaponBobZAmount: 0.2
     mCameraRotationFollowFactor: 15
     mPlayerRotationSamples: 20
     mSampleWeighting:
