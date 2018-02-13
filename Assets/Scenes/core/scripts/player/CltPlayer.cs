@@ -192,8 +192,11 @@ namespace FiringSquad.Gameplay
 			Transform viewHolder = weapon.transform.Find("View").Find("ViewHolder");
 			Transform gunMesh = viewHolder.GetChild(0);
 
-			defaultData.firstPersonView.transform.SetParent(viewHolder);
-			gunMesh.SetParent(defaultData.firstPersonWeaponBone);
+			// Assign the correct parents and reset their offset to zero.
+			defaultData.firstPersonView.transform.SetParent(viewHolder, false);
+			defaultData.firstPersonView.transform.ResetLocalValues();
+			gunMesh.SetParent(defaultData.firstPersonWeaponBone, false);
+			gunMesh.ResetLocalValues();
 
 			// Update the BaseWeaponView of what our arm's animator is.
 			BaseWeaponView view = weapon.gameObject.GetComponent<BaseWeaponView>();
