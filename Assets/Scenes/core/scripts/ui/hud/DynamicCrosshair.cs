@@ -12,6 +12,8 @@ namespace FiringSquad.Gameplay.UI
 	public class DynamicCrosshair : MonoBehaviour
 	{
 		/// Inspector variables
+		[SerializeField] private Image mLeftImage;
+		[SerializeField] private Image mRightImage;
 		[SerializeField] private RectTransform mImageHolder;
 		[SerializeField] private float mFadeTime;
 
@@ -32,6 +34,7 @@ namespace FiringSquad.Gameplay.UI
 
 			EventManager.LocalGUI.OnSetCrosshairVisible += OnSetCrosshairVisible;
 			EventManager.Local.OnLocalPlayerCausedDamage += OnLocalPlayerCausedDamage;
+			EventManager.Local.OnLocalPlayerAttachedPart += OnLocalPlayerAttachedPart;
 		}
 
 		/// <summary>
@@ -41,6 +44,7 @@ namespace FiringSquad.Gameplay.UI
 		{
 			EventManager.LocalGUI.OnSetCrosshairVisible -= OnSetCrosshairVisible;
 			EventManager.Local.OnLocalPlayerCausedDamage -= OnLocalPlayerCausedDamage;
+			EventManager.Local.OnLocalPlayerAttachedPart -= OnLocalPlayerAttachedPart;
 		}
 
 		/// <summary>
@@ -90,10 +94,8 @@ namespace FiringSquad.Gameplay.UI
 			Vector3 rightPos = cameraPos + mPlayerRef.eye.forward + mPlayerRef.eye.right * scaleVal3;
 			Vector3 upPos = cameraPos + mPlayerRef.eye.forward + mPlayerRef.eye.up * scaleVal3;
 
-			Vector3 screenRight = Camera.main.WorldToScreenPoint(rightPos);
-			Vector3 viewportRight = Camera.main.ScreenToViewportPoint(screenRight);
-			Vector3 screenUp = Camera.main.WorldToScreenPoint(upPos);
-			Vector3 viewportUp = Camera.main.ScreenToViewportPoint(screenUp);
+			Vector3 viewportRight = Camera.main.WorldToViewportPoint(rightPos);
+			Vector3 viewportUp = Camera.main.WorldToViewportPoint(upPos);
 
 			float width = Mathf.Abs(0.5f - viewportRight.x);
 			float height = Mathf.Abs(0.5f - viewportUp.y);
@@ -132,6 +134,19 @@ namespace FiringSquad.Gameplay.UI
 			for (int i = 0; i < mImages.Length; i++)
 				mImages[i].color = mOriginalColors[i];
 
+		}
+		
+		/// <summary>
+		/// EVENT HANDLER: Local.OnLocalPlayerAttachedPart
+		/// </summary>
+		private void OnLocalPlayerAttachedPart(BaseWeaponScript weapon, WeaponPartScript part)
+		{
+			if (part.attachPoint != Attachment.Barrel)
+				return;
+
+			WeaponPartScriptBarrel realPart = part as WeaponPartScriptBarrel;
+			if (realPart != null)
+				mLeftImage.sprite = mRightImage.sprite = realPart.crosshairSprite;
 		}
 	}
 }
