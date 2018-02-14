@@ -14,7 +14,7 @@ namespace FiringSquad.Data
 		/// <summary>
 		/// Unity's awake function
 		/// </summary>
-		private void Awake()
+		public override void OnStartServer()
 		{
 			EventManager.Server.OnPlayerDied += OnPlayerDied;
 
