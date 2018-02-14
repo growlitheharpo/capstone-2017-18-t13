@@ -12,6 +12,7 @@ namespace FiringSquad.Gameplay.Weapons
 		[SerializeField] private int mShotsPerClick = -1;
 		[SerializeField] private bool mOverrideRecoilCurve;
 		[HideInInspector] [SerializeField] private AnimationCurve mRecoilCurve;
+		[SerializeField] private Sprite mCrosshairSprite;
 		
 		/// <inheritdoc />
 		public override Attachment attachPoint { get { return Attachment.Barrel; } }
@@ -37,5 +38,10 @@ namespace FiringSquad.Gameplay.Weapons
 		/// If null, use the default recoil curve.
 		/// </summary>
 		[CanBeNull] public AnimationCurve recoilCurve { get { return mOverrideRecoilCurve ? mRecoilCurve : null; } }
+
+		/// <summary>
+		/// The UI image to use as our crosshair when this barrel is active.
+		/// </summary>
+		public Sprite crosshairSprite { get { return mCrosshairSprite; } }
 	}
 }
