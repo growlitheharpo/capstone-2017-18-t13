@@ -154,6 +154,7 @@ GameObject:
   - component: {fileID: 224124849831344134}
   - component: {fileID: 222906148054179582}
   - component: {fileID: 114742394009394586}
+  - component: {fileID: 114487922032916376}
   m_Layer: 5
   m_Name: bar
   m_TagString: Untagged
@@ -187,6 +188,7 @@ GameObject:
   - component: {fileID: 224430873332625138}
   - component: {fileID: 222849848798041492}
   - component: {fileID: 114817464587963666}
+  - component: {fileID: 114026223973773552}
   m_Layer: 5
   m_Name: bar
   m_TagString: Untagged
@@ -798,6 +800,20 @@ MonoBehaviour:
   m_EffectColor: {r: 0.09320098, g: 0.56824076, b: 0.661, a: 0.559}
   m_EffectDistance: {x: -0.75, y: -0.75}
   m_UseGraphicAlpha: 1
+--- !u!114 &114026223973773552
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1421765548139886}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 217304bf238aed248980ca66cf4f46ed, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mPercentProperty: player_health_current
+  mFullProperty: 
+  mFullValue: 100
 --- !u!114 &114040661305578422
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1271,6 +1287,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mFadeImageTime: 1.5
   mFadeTextTime: 3
+--- !u!114 &114487922032916376
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1387108346989108}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0a71ffd7cb09b084d95f12e9f611c593, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mPercentProperty: player_clip_current
+  mFullProperty: player_clip_total
+  mFullValue: -1
 --- !u!114 &114488552412712964
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1776,10 +1806,10 @@ MonoBehaviour:
     m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_Sprite: {fileID: 21300000, guid: 033d3c643ab16cc44b326a8ff10e52ea, type: 3}
-  m_Type: 0
+  m_Type: 3
   m_PreserveAspect: 1
   m_FillCenter: 1
-  m_FillMethod: 4
+  m_FillMethod: 1
   m_FillAmount: 1
   m_FillClockwise: 1
   m_FillOrigin: 0
