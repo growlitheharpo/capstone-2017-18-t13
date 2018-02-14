@@ -80,6 +80,7 @@ namespace FiringSquad.Gameplay.UI
 				// Add a the changetext function to the onclick
 				tmpButton.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(delegate { ChangeText(itemDesc);});
 				tmpButton.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(delegate { ChangeModel(item.Value.GetComponentInChildren<MeshFilter>().sharedMesh); });
+				tmpButton.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(delegate { ChangeMaterial(item.Value.GetComponentInChildren<MeshRenderer>().sharedMaterial); });
 
 				++i;
 			}
@@ -99,6 +100,14 @@ namespace FiringSquad.Gameplay.UI
 		private void ChangeModel(Mesh newMesh)
 		{
 			mPartShowcase.GetComponent<MeshFilter>().mesh = newMesh;
+		}
+
+		/// <summary>
+		/// Changes the material for the part
+		/// </summary>
+		private void ChangeMaterial(Material newMat)
+		{
+			mPartShowcase.GetComponent<MeshRenderer>().material = newMat;
 		}
 	}
 }
