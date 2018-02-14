@@ -40,7 +40,7 @@ namespace FiringSquad.Data
 		private void OnPlayerDied(CltPlayer deadPlayer, ICharacter killer, Transform spawnPos)
 		{
 			// Make sure the player was killed by another player
-			if (killer.gameObject.GetComponent<CltPlayer>())
+			if (killer != null)
 			{
 				// Get the killer and kill-e names
 				string strOut = killer.gameObject.GetComponent<CltPlayer>().playerName + "," + deadPlayer.playerName + ",";
@@ -74,6 +74,8 @@ namespace FiringSquad.Data
 			// Else the player was killed by the environment
 			else
 			{
+				string strOut = "Environment" + "," + deadPlayer.playerName + ",";
+				OutputToFile(strOut);
 			}
 		}
 		
