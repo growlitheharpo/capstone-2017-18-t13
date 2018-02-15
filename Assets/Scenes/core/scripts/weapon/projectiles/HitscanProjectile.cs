@@ -154,16 +154,6 @@ namespace FiringSquad.Gameplay.Weapons
 				.Start();
 
 			mEffect.PlayEffect(endPoint);
-			StartCoroutine(WaitAndKillSelf());
-		}
-
-		/// <summary>
-		/// Wait until our visualizer has finished and then destroy this object.
-		/// </summary>
-		private IEnumerator WaitAndKillSelf()
-		{
-			yield return new WaitForSeconds(0.25f);
-			Destroy(gameObject);
 		}
 	}
 }

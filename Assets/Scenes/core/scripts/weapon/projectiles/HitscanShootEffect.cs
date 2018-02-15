@@ -10,7 +10,7 @@ namespace FiringSquad.Gameplay.Weapons
 	public class HitscanShootEffect : MonoBehaviour
 	{
 		/// Inspector variables
-		[SerializeField] private float mFlashTime;
+		[SerializeField] private float mVelocity;
 
 		/// Private variables
 		private LineRenderer mRenderer;
@@ -53,15 +53,18 @@ namespace FiringSquad.Gameplay.Weapons
 			mRenderer.SetPosition(0, start);
 			mRenderer.SetPosition(1, realEnd);
 
+			float time = Vector3.Distance(start, realEnd) / mVelocity;
+
 			float currentTime = 0.0f;
-			while (currentTime < mFlashTime)
+			while (currentTime < time)
 			{
-				mRenderer.SetPosition(0, Vector3.Lerp(start, realEnd, currentTime / mFlashTime));
+				mRenderer.SetPosition(0, Vector3.Lerp(start, realEnd, currentTime / time));
 				currentTime += Time.deltaTime;
 				yield return null;
 			}
 
 			mRenderer.positionCount = 0;
+			Destroy(gameObject);
 		}
 	}
 }
