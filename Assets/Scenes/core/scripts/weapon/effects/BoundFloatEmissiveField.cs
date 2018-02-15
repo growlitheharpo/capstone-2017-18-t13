@@ -1,4 +1,6 @@
-﻿using FiringSquad.Gameplay.UI;
+﻿using System.Collections;
+using FiringSquad.Gameplay.UI;
+using KeatsLib.Collections;
 using UnityEngine;
 
 namespace FiringSquad.Gameplay.Weapons
@@ -12,9 +14,12 @@ namespace FiringSquad.Gameplay.Weapons
 		[SerializeField] private string mEmissiveProperty = "_EmissionColor";
 		[SerializeField] private Color mStartColor = Color.white;
 		[SerializeField] private Color mEndColor = Color.white;
+		[SerializeField] private float mBlinkingThreshold = 0.15f;
+		[SerializeField] private float mBlinkingRate = 0.15f;
 
 		/// Private variables
 		private Material mMaterialInstance;
+		private Coroutine mBlinkRoutine;
 
 		/// <inheritdoc />
 		protected override void Start()
@@ -26,8 +31,32 @@ namespace FiringSquad.Gameplay.Weapons
 		/// <inheritdoc />
 		protected override void HandlePropertyChanged()
 		{
-			Color val = Color.Lerp(mEndColor, mStartColor, property.value);
-			mMaterialInstance.SetColor(mEmissiveProperty, val);
+			if (property.value >= mBlinkingThreshold)
+			{
+				if (mBlinkRoutine != null)
+					StopCoroutine(mBlinkRoutine);
+
+				float percent = property.value.Rescale(mBlinkingThreshold, 1.0f);
+				Color val = Color.Lerp(mEndColor, mStartColor, percent);
+				mMaterialInstance.SetColor(mEmissiveProperty, val);
+			}
+			else if (mBlinkRoutine == null)
+				mBlinkRoutine = StartCoroutine(BlinkValue());
+		}
+
+		private IEnumerator BlinkValue()
+		{
+			Color black = Color.black;
+			float currentTime = 0.0f;
+			while (true)
+			{
+				float currentPercent = Mathf.PingPong(currentTime, mBlinkingRate) / mBlinkingRate;
+				Color val = Color.Lerp(mEndColor, black, currentPercent);
+				mMaterialInstance.SetColor(mEmissiveProperty, val);
+
+				currentTime += Time.deltaTime;
+				yield return null;
+			}
 		}
 	}
 }
