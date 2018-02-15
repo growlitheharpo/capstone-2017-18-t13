@@ -9,15 +9,25 @@ namespace FiringSquad.Gameplay.Weapons
 	public class BoundFloatEmissiveField : BoundUIElement<float>
 	{
 		/// Inspector variables
-		[SerializeField] private MeshRenderer mTargetMeshRenderer;
 		[SerializeField] private string mEmissiveProperty = "_EmissionColor";
-		[SerializeField] private Color mStartColor;
-		[SerializeField] private Color mEndColor;
+		[SerializeField] private Color mStartColor = Color.white;
+		[SerializeField] private Color mEndColor = Color.white;
+
+		/// Private variables
+		private Material mMaterialInstance;
+
+		/// <inheritdoc />
+		protected override void Start()
+		{
+			mMaterialInstance = GetComponent<MeshRenderer>().material;
+			base.Start();
+		}
 
 		/// <inheritdoc />
 		protected override void HandlePropertyChanged()
 		{
-			
+			Color val = Color.Lerp(mEndColor, mStartColor, property.value);
+			mMaterialInstance.SetColor(mEmissiveProperty, val);
 		}
 	}
 }
