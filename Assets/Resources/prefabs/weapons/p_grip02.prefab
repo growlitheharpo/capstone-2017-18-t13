@@ -52,6 +52,7 @@ GameObject:
   - component: {fileID: 4266701904208894}
   - component: {fileID: 33758039508220132}
   - component: {fileID: 23869161342175114}
+  - component: {fileID: 114176007640148624}
   m_Layer: 0
   m_Name: mesh_tacticalGrip (1)
   m_TagString: Untagged
@@ -300,6 +301,21 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 0.55, y: 0.45, z: 0.23}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &114176007640148624
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1569280287318764}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b6a79cc8387fa540af19169480e81c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mBoundProperty: player_part_durability_grip
+  mEmissiveProperty: _EmissionColor
+  mStartColor: {r: 0.97794116, g: 0.92735803, b: 0.76221883, a: 1}
+  mEndColor: {r: 1, g: 0, b: 0, a: 1}
 --- !u!114 &114227575621444936
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -410,7 +426,6 @@ MonoBehaviour:
     mClipSizeModifier:
       mAmount: 0
       mType: 0
-  mDurabilitySprite: {fileID: 21300000, guid: 7fa537902c7b6ed4ba63a367e4a2eca7, type: 3}
   mDurability: 50
 --- !u!114 &114792756489878378
 MonoBehaviour:
