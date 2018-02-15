@@ -124,6 +124,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 207bacd88e3baaa489dabd1f40ac9fc0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mFlashTime: 0.6
 --- !u!120 &120123338783791200
 LineRenderer:
   m_ObjectHideFlags: 1
@@ -137,7 +138,7 @@ LineRenderer:
   m_LightProbeUsage: 0
   m_ReflectionProbeUsage: 0
   m_Materials:
-  - {fileID: 10301, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 10306, guid: 0000000000000000f000000000000000, type: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -167,13 +168,13 @@ LineRenderer:
       m_Curve:
       - serializedVersion: 2
         time: 0
-        value: 1
+        value: 0.0065784454
         inSlope: 0
         outSlope: 0
         tangentMode: 0
       - serializedVersion: 2
         time: 1
-        value: 0.39999962
+        value: 0.953949
         inSlope: 0
         outSlope: 0
         tangentMode: 0
