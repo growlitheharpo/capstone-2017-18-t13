@@ -1,5 +1,4 @@
-﻿using KeatsLib.Unity;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Rendering.PostProcessing;
 
 namespace FiringSquad.Gameplay.Weapons
