@@ -58,6 +58,19 @@ namespace FiringSquad.Gameplay.Weapons
 		}
 
 		/// <summary>
+		/// Unity's Start function.
+		/// </summary>
+		private void Start()
+		{
+			if (ObjectHighlight.instance == null)
+				return;
+
+			var renderers = GetComponentsInChildren<Renderer>();
+			foreach (Renderer r in renderers)
+				ObjectHighlight.instance.AddOccluder(r);
+		}
+
+		/// <summary>
 		/// Unity's LateUpdate function. Using to lerp gun rotation and follow the player's eye position.
 		/// </summary>
 		private void LateUpdate()
@@ -260,6 +273,13 @@ namespace FiringSquad.Gameplay.Weapons
 
 			newPart.transform.SetParent(mAttachPoints[place]);
 			newPart.transform.ResetLocalValues();
+
+			if (ObjectHighlight.instance == null)
+				return;
+
+			var renderers = newPart.GetComponentsInChildren<Renderer>();
+			foreach (Renderer r in renderers)
+				ObjectHighlight.instance.AddOccluder(r);
 		}
 
 		#endregion
