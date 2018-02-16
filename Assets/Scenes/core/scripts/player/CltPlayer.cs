@@ -634,6 +634,14 @@ namespace FiringSquad.Gameplay
 			if (killerObj != null && killerObj.isCurrentPlayer)
 				EventManager.Notify(() => EventManager.Local.LocalPlayerGotKill(this, killerObj.weapon));
 
+			// If we died, we get removed from any potential highlight list.
+			if (ObjectHighlight.instance != null)
+			{
+				var renderers = GetComponentsInChildren<Renderer>();
+				foreach (Renderer r in renderers)
+					ObjectHighlight.instance.RemoveRendererFromHighlightList(r);
+			}
+
 			if (!isLocalPlayer)
 				return;
 
