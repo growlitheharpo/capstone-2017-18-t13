@@ -1,4 +1,6 @@
-﻿namespace FiringSquad.Gameplay
+﻿using FiringSquad.Data;
+
+namespace FiringSquad.Gameplay
 {
 	/// <summary>
 	/// Interface for all objects that can receieve damage from an IWeapon and then forward it
@@ -9,7 +11,7 @@
 		/// <summary>
 		/// The damage modification this zone provides, as a percentage.
 		/// </summary>
-		float damageModification { get; }
+		Modifier.Float damageModification { get; }
 
 		/// <summary>
 		/// The receiver that this damage zone is attached to.

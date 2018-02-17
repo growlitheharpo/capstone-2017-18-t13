@@ -25,6 +25,22 @@ namespace FiringSquad
 		}
 
 		/// <summary>
+		/// Get the damage zone on the collision object.
+		/// </summary>
+		public static IDamageZone GetDamageZone(this Collision col)
+		{
+			return col.transform.GetComponentInParent<IDamageZone>();
+		}
+
+		/// <summary>
+		/// Get the damage zone on the RaycastHit object.
+		/// </summary>
+		public static IDamageZone GetDamageZone(this RaycastHit col)
+		{
+			return col.transform.GetComponentInParent<IDamageZone>();
+		}
+
+		/// <summary>
 		/// Get the interactable interface on the collision object.
 		/// </summary>
 		public static IInteractable GetInteractableComponent(this Collision col)
