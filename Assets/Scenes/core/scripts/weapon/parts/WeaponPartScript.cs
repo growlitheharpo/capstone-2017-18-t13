@@ -75,7 +75,7 @@ namespace FiringSquad.Gameplay.Weapons
 		/// <summary>
 		/// Cleanup all listeners and event handlers
 		/// </summary>
-		private void OnDestroy()
+		protected virtual void OnDestroy()
 		{
 			mDurabilityPercent.Cleanup(); // force this so that the UI is unbound
 		}

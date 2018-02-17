@@ -16,7 +16,7 @@ namespace FiringSquad.Gameplay.Weapons
 		/// <summary>
 		/// The aim root for this weapon. Usually the character's eye.
 		/// </summary>
-		Transform aimRoot { get; set; }
+		new Transform aimRoot { get; set; }
 
 		/// <summary>
 		/// The position offset of this weapon to the character's eye.

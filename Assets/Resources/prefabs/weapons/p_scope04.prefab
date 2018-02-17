@@ -379,7 +379,7 @@ GameObject:
   - component: {fileID: 114797159808577896}
   - component: {fileID: 114496103272126318}
   m_Layer: 10
-  m_Name: p_scope03
+  m_Name: p_scope04
   m_TagString: interactable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1854,22 +1854,22 @@ MonoBehaviour:
   m_SceneId:
     m_Value: 0
   m_AssetId:
-    i0: 45
-    i1: 160
-    i2: 157
-    i3: 110
-    i4: 186
-    i5: 101
-    i6: 121
-    i7: 52
-    i8: 218
-    i9: 22
-    i10: 164
-    i11: 4
-    i12: 98
-    i13: 150
-    i14: 25
-    i15: 57
+    i0: 15
+    i1: 18
+    i2: 225
+    i3: 213
+    i4: 63
+    i5: 146
+    i6: 43
+    i7: 196
+    i8: 73
+    i9: 215
+    i10: 73
+    i11: 218
+    i12: 10
+    i13: 72
+    i14: 219
+    i15: 124
   m_ServerOnly: 0
   m_LocalPlayerAuthority: 1
 --- !u!114 &114436253009372480
@@ -1933,19 +1933,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1f72922dda36b554ba8f1e37d8e306fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mUniqueId: 183
-  mPrettyName: Reflex Sight
-  mDescription: Cheap sight that helps improve accuracy
+  mUniqueId: 184
+  mPrettyName: Camera Sight
+  mDescription: It tags shit
   mData:
     mMinDispersionModifier:
-      mAmount: 0.4
+      mAmount: 0.38
       mType: 3
     mMaxDispersionModifier:
-      mAmount: 0.5
+      mAmount: 0.45
       mType: 3
     mDispersionRampModifier:
-      mAmount: 0
-      mType: 0
+      mAmount: 0.75
+      mType: 3
     mRecoilAmountModifier:
       mAmount: 0
       mType: 0
@@ -1956,7 +1956,7 @@ MonoBehaviour:
       mAmount: 0
       mType: 0
     mDamageFalloffDistanceModifier:
-      mAmount: 10
+      mAmount: 15
       mType: 0
     mFireRateModifier:
       mAmount: 0
@@ -1967,6 +1967,7 @@ MonoBehaviour:
     mClipSizeModifier:
       mAmount: 0
       mType: 0
-  mDurability: 40
+  mDurability: 35
   mAimDownSightsEffects:
+  - {fileID: 11400000, guid: 3605a7049dc6a984ea42c074dcb86ce8, type: 2}
   - {fileID: 11400000, guid: 6fe81614cb3258040bbfdd67fe7a5885, type: 2}
