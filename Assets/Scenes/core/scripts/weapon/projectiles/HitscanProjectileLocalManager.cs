@@ -1,4 +1,6 @@
-﻿using FiringSquad.Core.Audio;
+﻿using FiringSquad.Core;
+using FiringSquad.Core.Audio;
+using FiringSquad.Core.Weapons;
 using KeatsLib.Unity;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -11,9 +13,6 @@ namespace FiringSquad.Gameplay.Weapons
 	/// </summary>
 	public class HitscanProjectileLocalManager : NetworkBehaviour
 	{
-		/// Inspector variables
-		[SerializeField] private GameObject mHitscanProjectilePrefab;
-
 		/// <summary>
 		/// Unity's client-side start event.
 		/// </summary>
@@ -30,7 +29,6 @@ namespace FiringSquad.Gameplay.Weapons
 		/// </summary>
 		private void OnDestroy()
 		{
-
 			NetworkManager.singleton.client.UnregisterHandler(HitscanProjectile.HITSCAN_MESSAGE_TYPE);
 		}
 
@@ -47,7 +45,15 @@ namespace FiringSquad.Gameplay.Weapons
 
 			AudioEvent audioEvent = BaseProjectileScript.GetHitAudioEvent(msg.mHitObject);
 
-			HitscanProjectile instance = Instantiate(mHitscanProjectilePrefab).GetComponent<HitscanProjectile>();
+			WeaponPartScriptMechanism mech = ServiceLocator.Get<IWeaponPartManager>().GetPrefabScript(msg.mMechanismId) as WeaponPartScriptMechanism;
+			if (mech == null)
+				return;
+
+			GameObject prefab = mech.projectilePrefab;
+			if (prefab == null)
+				return;
+
+			HitscanProjectile instance = Instantiate(prefab).GetComponent<HitscanProjectile>();
 			instance.PositionAndVisualize(source.weapon, msg.mEnd, audioEvent);
 		}
 	}

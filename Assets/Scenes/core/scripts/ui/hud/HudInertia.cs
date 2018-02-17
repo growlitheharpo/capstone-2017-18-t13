@@ -33,7 +33,7 @@ namespace FiringSquad.Gameplay.UI
 		/// <summary>
 		/// Unity's fixed update function
 		/// </summary>
-		void FixedUpdate()
+		private void LateUpdate()
 		{
 			CheckPlayerRotations(mPlayerPrevRot);
 		}

@@ -119,8 +119,8 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1431622717864862}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.49, y: 0.82, z: 1}
+  m_LocalPosition: {x: 0, y: 0.051, z: 0}
+  m_LocalScale: {x: 1.5962027, y: 2.4039505, z: 1}
   m_Children: []
   m_Father: {fileID: 4545102920774778}
   m_RootOrder: 0
@@ -174,8 +174,8 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1480237948555538}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.279, y: 0.104, z: 0}
-  m_LocalScale: {x: 2, y: 2, z: 2}
+  m_LocalPosition: {x: -0.897, y: 0.164, z: 0}
+  m_LocalScale: {x: 4, y: 4, z: 4}
   m_Children: []
   m_Father: {fileID: 4545102920774778}
   m_RootOrder: 1
@@ -208,7 +208,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_Materials:
-  - {fileID: 2100000, guid: 9b6825018d9a1354cb1ae99c3abe9967, type: 2}
+  - {fileID: 2100000, guid: 2cef4c4c3c4c49f499f794792c726773, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -240,7 +240,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_Materials:
-  - {fileID: 2100000, guid: 9b6825018d9a1354cb1ae99c3abe9967, type: 2}
+  - {fileID: 2100000, guid: 2cef4c4c3c4c49f499f794792c726773, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -265,14 +265,14 @@ MeshFilter:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1480237948555538}
-  m_Mesh: {fileID: 4300000, guid: e6f7fd5d6e7959444b0b70367699e9fe, type: 3}
+  m_Mesh: {fileID: 4300000, guid: 0ad4d38277f91b745bdf353e077508a0, type: 3}
 --- !u!33 &33983384191709796
 MeshFilter:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1283879393140016}
-  m_Mesh: {fileID: 4300000, guid: e6f7fd5d6e7959444b0b70367699e9fe, type: 3}
+  m_Mesh: {fileID: 4300000, guid: 0ad4d38277f91b745bdf353e077508a0, type: 3}
 --- !u!54 &54565695844076754
 Rigidbody:
   m_ObjectHideFlags: 1
@@ -372,7 +372,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mGunView: {fileID: 1833339108217666}
   mPickupView: {fileID: 1482241014274162}
-  mParticleSystem: {fileID: 1810346366702796, guid: f7ee1a281a44c5a409088c0375a0a986,
+  mParticleSystem: {fileID: 1454392645946494, guid: 5e36c0a918ea1a14d93baf25ae5f1e45,
     type: 2}
   mPickupLifetimeMin: 20
   mPickupLifetimeMax: 40

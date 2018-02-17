@@ -20,7 +20,6 @@ namespace FiringSquad.Gameplay.Weapons
 		[SerializeField] private string mPrettyName;
 		[SerializeField] private string mDescription;
 		[SerializeField] private WeaponPartData mData;
-		[SerializeField] private Sprite mDurabilitySprite;
 		[SerializeField] private int mDurability = INFINITE_DURABILITY;
 
 		/// Private variables
@@ -36,11 +35,6 @@ namespace FiringSquad.Gameplay.Weapons
 		/// The collection of modifier data for this part.
 		/// </summary>
 		public WeaponPartData[] data { get { return new[] { mData }; } }
-
-		/// <summary>
-		/// The UI sprite used to represent this part in the durability HUD.
-		/// </summary>
-		public Sprite durabilitySprite { get { return mDurabilitySprite; } }
 
 		/// <summary>
 		/// The unique part ID of this weapon part.
@@ -81,7 +75,7 @@ namespace FiringSquad.Gameplay.Weapons
 		/// <summary>
 		/// Cleanup all listeners and event handlers
 		/// </summary>
-		private void OnDestroy()
+		protected virtual void OnDestroy()
 		{
 			mDurabilityPercent.Cleanup(); // force this so that the UI is unbound
 		}

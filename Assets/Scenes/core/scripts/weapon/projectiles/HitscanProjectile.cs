@@ -30,12 +30,19 @@ namespace FiringSquad.Gameplay.Weapons
 			/// The Network ID (or INVALID) for the hit object to determine the local sound.
 			/// </summary>
 			public NetworkInstanceId mHitObject;
+
+			/// <summary>
+			/// The mechanism ID that fires this type of projectile.
+			/// </summary>
+			public byte mMechanismId;
 		}
 		public const short HITSCAN_MESSAGE_TYPE = MsgType.Highest + 8;
 
 		/// Inspector variables
 		[SerializeField] private float mAudioWeaponType;
 		[SerializeField] private AnimationCurve mFalloffCurve;
+		[SerializeField] private int mMaxPenetrationObjects;
+		[SerializeField] private int mMaxHitObjects = 1;
 
 		/// Private variables
 		private HitscanShootEffect mEffect;
@@ -75,6 +82,9 @@ namespace FiringSquad.Gameplay.Weapons
 				// Ensure that the hits are sorted by distance
 				hits = hits.OrderBy(x => Vector3.Distance(x.point, initialDirection.origin)).ToArray();
 
+				int wallPenetrationCount = mMaxPenetrationObjects,
+					hitObjectCount = mMaxHitObjects;
+
 				// Check if each hit has hit a damage receiver and break if so.
 				foreach (RaycastHit hit in hits)
 				{
@@ -88,9 +98,13 @@ namespace FiringSquad.Gameplay.Weapons
 					{
 						float damage = GetDamage(data, Vector3.Distance(weapon.transform.position, endPoint));
 						hitObject.ApplyDamage(damage, endPoint, hit.normal, this);
+						--hitObjectCount;
 					}
+					else
+						--wallPenetrationCount;
 
-					break;
+					if (hitObjectCount <= 0 || wallPenetrationCount <= 0)
+						break;
 				}
 			}
 			
@@ -100,7 +114,8 @@ namespace FiringSquad.Gameplay.Weapons
 			{
 				mSource = source.netId,
 				mEnd = endPoint,
-				mHitObject = netObject == null ? NetworkInstanceId.Invalid : netObject.netId
+				mHitObject = netObject == null ? NetworkInstanceId.Invalid : netObject.netId,
+				mMechanismId = weapon.currentParts.mechanism != null ? weapon.currentParts.mechanism.partId : (byte)0
 			};
 
 			NetworkServer.SendToAll(HITSCAN_MESSAGE_TYPE, msg);
@@ -139,16 +154,6 @@ namespace FiringSquad.Gameplay.Weapons
 				.Start();
 
 			mEffect.PlayEffect(endPoint);
-			StartCoroutine(WaitAndKillSelf());
-		}
-
-		/// <summary>
-		/// Wait until our visualizer has finished and then destroy this object.
-		/// </summary>
-		private IEnumerator WaitAndKillSelf()
-		{
-			yield return new WaitForSeconds(0.25f);
-			Destroy(gameObject);
 		}
 	}
 }

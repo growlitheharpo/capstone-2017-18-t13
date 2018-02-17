@@ -193,7 +193,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1722318588608516}
   m_LocalRotation: {x: -0, y: -0.25881857, z: -0, w: 0.965926}
-  m_LocalPosition: {x: -0.036800016, y: 0.0995, z: -0.0417}
+  m_LocalPosition: {x: 0.08499999, y: 0.0995, z: -0.0417}
   m_LocalScale: {x: 0.126, y: 0.03, z: 0.036000002}
   m_Children: []
   m_Father: {fileID: 4809319843205860}
@@ -206,7 +206,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1340045765934714}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.0368, y: 0.0995, z: 0.000000042916}
+  m_LocalPosition: {x: 0.085, y: 0.0995, z: 0.000000042916}
   m_LocalScale: {x: 0.21, y: 0.060000006, z: 0.060000006}
   m_Children: []
   m_Father: {fileID: 4809319843205860}
@@ -319,7 +319,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1718937869694078}
   m_LocalRotation: {x: -0, y: 0.2588186, z: -0, w: 0.965926}
-  m_LocalPosition: {x: -0.036800016, y: 0.0995, z: 0.045}
+  m_LocalPosition: {x: 0.08499999, y: 0.0995, z: 0.045}
   m_LocalScale: {x: 0.12600002, y: 0.03, z: 0.036000006}
   m_Children: []
   m_Father: {fileID: 4809319843205860}
@@ -715,7 +715,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mGunView: {fileID: 1402178543971514}
   mPickupView: {fileID: 1971163213560570}
-  mParticleSystem: {fileID: 1810346366702796, guid: f7ee1a281a44c5a409088c0375a0a986,
+  mParticleSystem: {fileID: 1199545404640892, guid: 729b223e97bacbe4fae697c355f56438,
     type: 2}
   mPickupLifetimeMin: 20
   mPickupLifetimeMax: 40
@@ -764,12 +764,12 @@ MonoBehaviour:
     mClipSizeModifier:
       mAmount: 0
       mType: 0
-  mDurabilitySprite: {fileID: 21300000, guid: a89531be722ca3849bcffa918b2da758, type: 3}
   mDurability: 50
-  mAudioOverrideWeaponType: 0
+  mAudioOverrideWeaponType: 3
   mProjectilePrefab: {fileID: 1377323775718846, guid: e3f38e68666cb5d4c99bf93d24b83169,
     type: 2}
   mFireFromBarrelTip: 1
+  mAmmoTypeSprite: {fileID: 21300000, guid: e1eb1008c56c17f44879a95804e87921, type: 3}
 --- !u!114 &114922298323808758
 MonoBehaviour:
   m_ObjectHideFlags: 1
