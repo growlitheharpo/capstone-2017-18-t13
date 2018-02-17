@@ -24,7 +24,7 @@ GameObject:
   - component: {fileID: 114765406182020964}
   - component: {fileID: 120123338783791200}
   m_Layer: 12
-  m_Name: p_projectile_hitscanBullet
+  m_Name: p_projectile_hitscanLaser
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -79,8 +79,8 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 0
-  mMaxPenetrationObjects: 0
-  mMaxHitObjects: 1
+  mMaxPenetrationObjects: 5
+  mMaxHitObjects: 2
 --- !u!114 &114756075130657168
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -95,22 +95,22 @@ MonoBehaviour:
   m_SceneId:
     m_Value: 0
   m_AssetId:
-    i0: 55
-    i1: 4
-    i2: 109
-    i3: 91
-    i4: 179
-    i5: 115
-    i6: 31
-    i7: 164
-    i8: 136
-    i9: 200
-    i10: 70
-    i11: 80
-    i12: 54
-    i13: 41
-    i14: 173
-    i15: 111
+    i0: 251
+    i1: 102
+    i2: 216
+    i3: 250
+    i4: 169
+    i5: 126
+    i6: 168
+    i7: 116
+    i8: 9
+    i9: 201
+    i10: 150
+    i11: 122
+    i12: 254
+    i13: 44
+    i14: 227
+    i15: 142
   m_ServerOnly: 0
   m_LocalPlayerAuthority: 0
 --- !u!114 &114765406182020964
@@ -124,7 +124,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 207bacd88e3baaa489dabd1f40ac9fc0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mVelocity: 100
+  mVelocity: 25
 --- !u!120 &120123338783791200
 LineRenderer:
   m_ObjectHideFlags: 1
@@ -138,7 +138,7 @@ LineRenderer:
   m_LightProbeUsage: 0
   m_ReflectionProbeUsage: 0
   m_Materials:
-  - {fileID: 10301, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 10306, guid: 0000000000000000f000000000000000, type: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -162,23 +162,29 @@ LineRenderer:
   - {x: 0, y: 0, z: 0}
   m_Parameters:
     serializedVersion: 2
-    widthMultiplier: 0.1
+    widthMultiplier: 0.35
     widthCurve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 2
         time: 0
-        value: 1
+        value: 0.0065784454
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+      - serializedVersion: 2
+        time: 1
+        value: 0.953949
         inSlope: 0
         outSlope: 0
         tangentMode: 0
       m_PreInfinity: 2
       m_PostInfinity: 2
-      m_RotationOrder: 4
+      m_RotationOrder: 0
     colorGradient:
       serializedVersion: 2
-      key0: {r: 1, g: 1, b: 1, a: 0.5019608}
-      key1: {r: 1, g: 1, b: 1, a: 0.5019608}
+      key0: {r: 1, g: 0, b: 0, a: 1}
+      key1: {r: 0.6691177, g: 0, b: 0, a: 1}
       key2: {r: 0, g: 0, b: 0, a: 1}
       key3: {r: 0, g: 0, b: 0, a: 0}
       key4: {r: 0, g: 0, b: 0, a: 0}
