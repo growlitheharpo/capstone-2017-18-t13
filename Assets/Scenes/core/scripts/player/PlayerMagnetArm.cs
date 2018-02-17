@@ -208,7 +208,8 @@ namespace FiringSquad.Gameplay
 		[ClientCallback]
 		private void Update()
 		{
-			UpdateCrosshairHints();
+			if (bearer.isCurrentPlayer)
+				UpdateCrosshairHints();
 		}
 
 		/// <summary>
@@ -239,6 +240,9 @@ namespace FiringSquad.Gameplay
 		[Client]
 		public void FirePressed()
 		{
+			if (!bearer.isCurrentPlayer)
+				return;
+
 			// If we have an object in-hand, ignore the initial "press" event
 			if (reelingObject != null)
 				return;
@@ -267,6 +271,9 @@ namespace FiringSquad.Gameplay
 		[Client]
 		public void FireHeld()
 		{
+			if (!bearer.isCurrentPlayer)
+				return;
+
 			if (reelingObject == null)
 				return;
 
@@ -300,6 +307,9 @@ namespace FiringSquad.Gameplay
 		[Client]
 		public void FireUp()
 		{
+			if (!bearer.isCurrentPlayer)
+				return;
+
 			if (mInputTime < 0.0f)
 			{
 				// if the input was less than zero seconds, we were in our "pull" button cycle.

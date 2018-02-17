@@ -27,5 +27,13 @@ namespace FiringSquad.Gameplay.Weapons
 		/// <param name="part">The weapon part that this effect is attached to.</param>
 		/// <param name="immediate">Whether or not to jump immediately to the "exit" state instead of lerping.</param>
 		public abstract void DeactivateEffect(WeaponPartScript part, bool immediate);
+
+		/// <summary>
+		/// Unity's OnDestroy function.
+		/// </summary>
+		private void OnDestroy()
+		{
+			DeactivateEffect(null, true);
+		}
 	}
 }

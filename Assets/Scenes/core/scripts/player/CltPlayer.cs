@@ -192,8 +192,11 @@ namespace FiringSquad.Gameplay
 			Transform viewHolder = weapon.transform.Find("View").Find("ViewHolder");
 			Transform gunMesh = viewHolder.GetChild(0);
 
-			defaultData.firstPersonView.transform.SetParent(viewHolder);
-			gunMesh.SetParent(defaultData.firstPersonWeaponBone);
+			// Assign the correct parents and reset their offset to zero.
+			defaultData.firstPersonView.transform.SetParent(viewHolder, false);
+			defaultData.firstPersonView.transform.ResetLocalValues();
+			gunMesh.SetParent(defaultData.firstPersonWeaponBone, false);
+			gunMesh.ResetLocalValues();
 
 			// Update the BaseWeaponView of what our arm's animator is.
 			BaseWeaponView view = weapon.gameObject.GetComponent<BaseWeaponView>();
@@ -630,6 +633,14 @@ namespace FiringSquad.Gameplay
 
 			if (killerObj != null && killerObj.isCurrentPlayer)
 				EventManager.Notify(() => EventManager.Local.LocalPlayerGotKill(this, killerObj.weapon));
+
+			// If we died, we get removed from any potential highlight list.
+			if (ObjectHighlight.instance != null)
+			{
+				var renderers = GetComponentsInChildren<Renderer>();
+				foreach (Renderer r in renderers)
+					ObjectHighlight.instance.RemoveRendererFromHighlightList(r);
+			}
 
 			if (!isLocalPlayer)
 				return;

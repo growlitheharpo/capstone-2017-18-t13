@@ -37,7 +37,7 @@ namespace UnityEditor
 			if (folderPath.ToLower().Contains("kit") || File.Exists(materialPath) || assetImporter.assetPath.Contains("@"))
 				return null;
 
-			Shader correctShader = Shader.Find("StandardCustom");
+			Shader correctShader = Shader.Find("Standard");
 			if (correctShader)
 			{
 				mat.shader = correctShader;
@@ -57,11 +57,11 @@ namespace UnityEditor
 		private static void FillTextureMaps(Material mat, string folder, string filename)
 		{
 			Texture color = GetTexture(folder, filename, "color");
-			Texture mrao = GetTexture(folder, filename, "mrao");
-			Texture normal = GetTexture(folder, filename, "norm");
+			Texture aorm = GetTexture(folder, filename, "aorm");
+			Texture normal = GetTexture(folder, filename, "norm") ?? GetTexture(folder, filename, "normal");
 
 			mat.SetTexture("_MainTex", color);
-			mat.SetTexture("_MetallicGlossMap", mrao);
+			mat.SetTexture("_MetallicGlossMap", aorm);
 			mat.SetTexture("_BumpMap", normal);
 		}
 

@@ -249,7 +249,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1273231669229122}
   m_LocalRotation: {x: -0, y: -0, z: -0.70710677, w: 0.7071068}
-  m_LocalPosition: {x: 0.7913, y: 0.0288, z: 0}
+  m_LocalPosition: {x: 1.0213, y: 0.0288, z: 0}
   m_LocalScale: {x: 0.02, y: 0.1, z: 0.02}
   m_Children: []
   m_Father: {fileID: 4746715297437602}
@@ -262,7 +262,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1004411413978054}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.375, y: 0.039998, z: -0.000000011279}
+  m_LocalPosition: {x: 0.60499996, y: 0.039998, z: -0.000000011279}
   m_LocalScale: {x: 0.5413825, y: 0.16643992, z: 0.19050066}
   m_Children: []
   m_Father: {fileID: 4746715297437602}
@@ -275,7 +275,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1014579340225830}
   m_LocalRotation: {x: -0, y: -0, z: -0.70710677, w: 0.7071068}
-  m_LocalPosition: {x: 0.65, y: 0.04, z: 0}
+  m_LocalPosition: {x: 0.88, y: 0.04, z: 0}
   m_LocalScale: {x: 0.15, y: 0.05, z: 0.15}
   m_Children: []
   m_Father: {fileID: 4746715297437602}
@@ -319,7 +319,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1037090046883012}
   m_LocalRotation: {x: -0, y: -0, z: -0.70710677, w: 0.7071068}
-  m_LocalPosition: {x: 0.892, y: 0.0598, z: 0}
+  m_LocalPosition: {x: 1.122, y: 0.0598, z: 0}
   m_LocalScale: {x: 0.04, y: 0.2, z: 0.04}
   m_Children: []
   m_Father: {fileID: 4746715297437602}
@@ -794,7 +794,6 @@ MonoBehaviour:
     mClipSizeModifier:
       mAmount: -2
       mType: 0
-  mDurabilitySprite: {fileID: 21300000, guid: 4f772e444d0011e4a88caa643a6b30c1, type: 3}
   mDurability: 16
   mTip: {fileID: 4693763784081758}
   mProjectileCount: 1
@@ -824,6 +823,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 0
+  mCrosshairSprite: {fileID: 21300000, guid: 1e872e46bbf1f2549a5937166db10b72, type: 3}
 --- !u!114 &114548953590943148
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -890,7 +890,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mGunView: {fileID: 1877776906967654}
   mPickupView: {fileID: 1492148197233988}
-  mParticleSystem: {fileID: 1810346366702796, guid: f7ee1a281a44c5a409088c0375a0a986,
+  mParticleSystem: {fileID: 1921881892513260, guid: ab50d7d13ebaf2a438a6ffbc26967f3e,
     type: 2}
   mPickupLifetimeMin: 20
   mPickupLifetimeMax: 40

@@ -69,6 +69,11 @@ namespace FiringSquad.Gameplay.Weapons
 		GameObject gameObject { get; }
 
 		/// <summary>
+		/// The aim root for this weapon. Usually the character's eye.
+		/// </summary>
+		Transform aimRoot { get; }
+
+		/// <summary>
 		/// Get the current set of parts on this weapon
 		/// </summary>
 		WeaponPartCollection currentParts { get; }

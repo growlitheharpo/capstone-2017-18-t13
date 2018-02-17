@@ -8,6 +8,11 @@ namespace FiringSquad.Gameplay
 	public interface IDamageReceiver
 	{
 		/// <summary>
+		/// The GameObject that this DamageReceiver is attached to.
+		/// </summary>
+		GameObject gameObject { get; }
+
+		/// <summary>
 		/// Apply damage to this receiver.
 		/// </summary>
 		/// <param name="amount">The amount of damage to apply.</param>
