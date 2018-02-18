@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace FiringSquad.Gameplay.Weapons
 {
@@ -6,7 +7,10 @@ namespace FiringSquad.Gameplay.Weapons
 	public class WeaponPartScriptScope : WeaponPartScript
 	{
 		/// Inspector variables
-		[HideInInspector] [SerializeField] private AimDownSightsEffect mAimDownSightsEffect;
+		[HideInInspector] [SerializeField] private AimDownSightsEffect[] mAimDownSightsEffects;
+
+		/// Private variables
+		private List<AimDownSightsEffect> mEffectInstances;
 
 		/// <inheritdoc />
 		public override Attachment attachPoint { get { return Attachment.Scope; } }
@@ -16,7 +20,9 @@ namespace FiringSquad.Gameplay.Weapons
 		/// </summary>
 		private void Start()
 		{
-			mAimDownSightsEffect = Instantiate(mAimDownSightsEffect);
+			mEffectInstances = new List<AimDownSightsEffect>();
+			foreach (AimDownSightsEffect e in mAimDownSightsEffects)
+				mEffectInstances.Add(Instantiate(e));
 		}
 
 		/// <summary>
@@ -25,7 +31,8 @@ namespace FiringSquad.Gameplay.Weapons
 		/// <param name="weapon">The weapon we are attached to.</param>
 		public void ActivateAimDownSightsEffect(IWeapon weapon)
 		{
-			mAimDownSightsEffect.ActivateEffect(weapon, this);
+			foreach (AimDownSightsEffect e in mEffectInstances)
+				e.ActivateEffect(weapon, this);
 		}
 
 		/// <summary>
@@ -35,18 +42,20 @@ namespace FiringSquad.Gameplay.Weapons
 		/// <param name="immediate">Whether or not to jump immediately to the "exit" state instead of lerping.</param>
 		public void DeactivateAimDownSightsEffect(IWeapon weapon, bool immediate = false)
 		{
-			mAimDownSightsEffect.DeactivateEffect(this, immediate);
+			foreach (AimDownSightsEffect e in mEffectInstances)
+				e.DeactivateEffect(this, immediate);
 		}
 
-		/// <summary>
-		/// Unity Event Handler. Called when scope is destroyed.
-		/// </summary>
-		public void OnDestroy()
+		/// <inheritdoc />
+		protected override void OnDestroy()
 		{
-			if (mAimDownSightsEffect != null)
+			foreach (AimDownSightsEffect e in mEffectInstances)
 			{
-				mAimDownSightsEffect.DeactivateEffect(this, true);
-				Destroy(mAimDownSightsEffect);
+				if (e == null)
+					continue;
+
+				e.DeactivateEffect(this, true);
+				Destroy(e);
 			}
 		}
 	}

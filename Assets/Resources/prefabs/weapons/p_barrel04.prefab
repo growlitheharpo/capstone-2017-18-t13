@@ -52,6 +52,7 @@ GameObject:
   - component: {fileID: 4903250505533382}
   - component: {fileID: 33001137633399488}
   - component: {fileID: 23176449700554654}
+  - component: {fileID: 114657050826885400}
   m_Layer: 0
   m_Name: mesh_shotgunBarrel (1)
   m_TagString: Untagged
@@ -457,6 +458,21 @@ MonoBehaviour:
     i15: 220
   m_ServerOnly: 0
   m_LocalPlayerAuthority: 1
+--- !u!114 &114657050826885400
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1226662935403292}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b6a79cc8387fa540af19169480e81c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mBoundProperty: player_part_durability_barrel
+  mEmissiveProperty: _EmissionColor
+  mStartColor: {r: 0.2629758, g: 0.9411765, b: 0.6630674, a: 1}
+  mEndColor: {r: 1, g: 0, b: 0, a: 1}
 --- !u!114 &114735160409266678
 MonoBehaviour:
   m_ObjectHideFlags: 1

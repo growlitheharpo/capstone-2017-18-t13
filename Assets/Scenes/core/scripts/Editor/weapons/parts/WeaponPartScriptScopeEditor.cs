@@ -1,4 +1,5 @@
 ﻿
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace UnityEditor
@@ -9,8 +10,20 @@ namespace UnityEditor
 	[CustomEditor(typeof(FiringSquad.Gameplay.Weapons.WeaponPartScriptScope))]
 	public class WeaponPartScriptScopeEditor : Editor
 	{
-		private Editor mCachedScriptableObjectEditor;
-		private Object mCachedObject;
+		//private Editor mCachedScriptableObjectEditor;
+		//private Object mCachedObject;
+		private class EditorObjectBind
+		{
+			public Editor editor;
+			public Object obj;
+		}
+
+		private Dictionary<SerializedProperty, EditorObjectBind> mPropertyEditors;
+
+		private void OnEnable()
+		{
+			mPropertyEditors = new Dictionary<SerializedProperty, EditorObjectBind>();
+		}
 
 		/// <inheritdoc />
 		public override void OnInspectorGUI()
@@ -24,24 +37,55 @@ namespace UnityEditor
 			so.ApplyModifiedProperties();
 		}
 
+		/// <summary>
+		/// Draw the ScriptableObjects of the aim down sights effects inside the scope editor.
+		/// </summary>
 		private void DrawAimDownSightsEffect()
 		{
-			SerializedProperty prop = serializedObject.FindProperty("mAimDownSightsEffect");
-			EditorGUILayout.PropertyField(prop);
+			SerializedProperty prop = serializedObject.FindProperty("mAimDownSightsEffects");
+			prop.isExpanded = EditorGUILayout.Foldout(prop.isExpanded, prop.displayName, true);
 
-			if (prop.objectReferenceValue != null)
+			if (!prop.isExpanded)
+				return;
+
+			EditorGUI.indentLevel++;
+
+			int newSize = EditorGUILayout.DelayedIntField(new GUIContent("Count"), prop.arraySize);
+			if (newSize != prop.arraySize)
 			{
+				Undo.RecordObject(target, "Change Count");
+				prop.arraySize = newSize;
+			}
+
+			for (int i = 0; i < prop.arraySize; ++i)
+			{
+				SerializedProperty item = prop.GetArrayElementAtIndex(i);
+				EditorGUILayout.PropertyField(item, true);
+
+				if (item.objectReferenceValue == null)
+					continue;
+
+				EditorGUI.indentLevel++;
 				EditorGUI.indentLevel++;
 
-				if (mCachedScriptableObjectEditor == null || prop.objectReferenceValue != mCachedObject)
+				// Creating an editor is expensive, so we only do it when necessary
+				bool needRefresh = !mPropertyEditors.ContainsKey(item)
+									|| mPropertyEditors[item].obj == null
+									|| mPropertyEditors[item].obj != item.objectReferenceValue
+									|| mPropertyEditors[item].editor == null;
+				if (needRefresh)
 				{
-					CreateCachedEditor(prop.objectReferenceValue, null, ref mCachedScriptableObjectEditor);
-					mCachedObject = prop.objectReferenceValue;
+					mPropertyEditors[item] = new EditorObjectBind();
+					CreateCachedEditor(item.objectReferenceValue, null, ref mPropertyEditors[item].editor);
+					mPropertyEditors[item].obj = item.objectReferenceValue;
 				}
 
-				mCachedScriptableObjectEditor.OnInspectorGUI();
+				mPropertyEditors[item].editor.OnInspectorGUI();
+				EditorGUI.indentLevel--;
 				EditorGUI.indentLevel--;
 			}
+
+			--EditorGUI.indentLevel;
 		}
 	}
 }
