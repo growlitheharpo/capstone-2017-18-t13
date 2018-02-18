@@ -15,6 +15,7 @@ namespace FiringSquad.Gameplay.UI
 		[SerializeField] private ActionProvider mTwoPlayerButton;
 		[SerializeField] private ActionProvider mFourPlayerButton;
 		[SerializeField] private ActionProvider mQuitButton;
+		[SerializeField] private ActionProvider mGunGlossaryButton;
 
 		/// <summary>
 		/// Unity's Start function
@@ -24,6 +25,8 @@ namespace FiringSquad.Gameplay.UI
 			mTwoPlayerButton.OnClick += LaunchOldLevel;
 			mFourPlayerButton.OnClick += LaunchNewLevel;
 			mQuitButton.OnClick += ClickQuit;
+			mGunGlossaryButton.OnClick += LaunchGlossary;
+
 		}
 
 		/// <summary>
@@ -55,6 +58,17 @@ namespace FiringSquad.Gameplay.UI
 		{
 			ServiceLocator.Get<IGamestateManager>()
 				.RequestShutdown();
+		}
+
+		/// <summary>
+		/// Launch the gun glossary scene
+		/// </summary>
+		private void LaunchGlossary()
+		{
+			mMainElementHolder.SetActive(false);
+
+			ServiceLocator.Get<IGamestateManager>()
+				.RequestSceneChange(GamestateManager.GUN_GLOSSARY);
 		}
 	}
 }
