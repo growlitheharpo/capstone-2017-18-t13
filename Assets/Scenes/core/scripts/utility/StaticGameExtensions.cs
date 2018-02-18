@@ -13,7 +13,7 @@ namespace FiringSquad
 		/// </summary>
 		public static IDamageReceiver GetDamageReceiver(this Collision col)
 		{
-			return col.transform.GetComponentInParent<IDamageReceiver>();
+			return col.collider.GetComponentInParent<IDamageReceiver>();
 		}
 
 		/// <summary>
@@ -21,7 +21,7 @@ namespace FiringSquad
 		/// </summary>
 		public static IDamageReceiver GetDamageReceiver(this RaycastHit col)
 		{
-			return col.transform.GetComponentInParent<IDamageReceiver>();
+			return col.collider.GetComponentInParent<IDamageReceiver>();
 		}
 
 		/// <summary>
@@ -29,7 +29,7 @@ namespace FiringSquad
 		/// </summary>
 		public static IDamageZone GetDamageZone(this Collision col)
 		{
-			return col.transform.GetComponentInParent<IDamageZone>();
+			return col.collider.GetComponentInParent<IDamageZone>();
 		}
 
 		/// <summary>
@@ -37,7 +37,7 @@ namespace FiringSquad
 		/// </summary>
 		public static IDamageZone GetDamageZone(this RaycastHit col)
 		{
-			return col.transform.GetComponentInParent<IDamageZone>();
+			return col.collider.GetComponentInParent<IDamageZone>();
 		}
 
 		/// <summary>
@@ -45,7 +45,7 @@ namespace FiringSquad
 		/// </summary>
 		public static IInteractable GetInteractableComponent(this Collision col)
 		{
-			return col.transform.GetComponentInParent<IInteractable>();
+			return col.collider.GetComponentInParent<IInteractable>();
 		}
 
 		/// <summary>
@@ -53,7 +53,7 @@ namespace FiringSquad
 		/// </summary>
 		public static IInteractable GetInteractableComponent(this RaycastHit col)
 		{
-			return col.transform.GetComponentInParent<IInteractable>();
+			return col.collider.GetComponentInParent<IInteractable>();
 		}
 	}
 }
