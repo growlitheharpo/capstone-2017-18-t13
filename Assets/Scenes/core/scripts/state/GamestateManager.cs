@@ -95,6 +95,7 @@ namespace FiringSquad.Core.State
 				{ MAIN_SCENE, new TransitionToSceneState(MENU_SCENE) },
 				{ MENU_SCENE, new MenuSceneState() },
 				{ ART_PROTOTYPE_SCENE, new MenuSceneState() },
+				{ GUN_GLOSSARY, new MenuSceneState() },
 				{ TWOPLAYER_GAMEPLAY, new GameSceneState() },
 				{ DRAFT_GAMEPLAY, new GameSceneState() },
 				{ FOURPLAYER_GAMEPLAY, new GameSceneState() },

@@ -41,6 +41,17 @@ namespace FiringSquad.Gameplay.UI
 
 			// Populate the list and hope for the best
 			PopulateList();
+
+			mPartShowcase.SetActive(true);
+		}
+
+		/// <summary>
+		/// Unity's update function
+		/// </summary>
+		private void Update()
+		{
+			// Slowly rotate the weapon around
+			mPartShowcase.transform.Rotate(0, Time.deltaTime * 35, 0, Space.World);
 		}
 
 		/// <summary>
@@ -79,8 +90,7 @@ namespace FiringSquad.Gameplay.UI
 
 				// Add a the changetext function to the onclick
 				tmpButton.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(delegate { ChangeText(itemDesc);});
-				tmpButton.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(delegate { ChangeModel(item.Value.GetComponentInChildren<MeshFilter>().sharedMesh); });
-				tmpButton.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(delegate { ChangeMaterial(item.Value.GetComponentInChildren<MeshRenderer>().sharedMaterial); });
+				tmpButton.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(delegate { ChangePart(item.Value); });
 
 				++i;
 			}
@@ -95,19 +105,11 @@ namespace FiringSquad.Gameplay.UI
 		}
 
 		/// <summary>
-		/// Changes the current model displayed in the showcase
+		/// Changes the current attached part to the model gun
 		/// </summary>
-		private void ChangeModel(Mesh newMesh)
+		private void ChangePart(GameObject item)
 		{
-			mPartShowcase.GetComponent<MeshFilter>().mesh = newMesh;
-		}
-
-		/// <summary>
-		/// Changes the material for the part
-		/// </summary>
-		private void ChangeMaterial(Material newMat)
-		{
-			mPartShowcase.GetComponent<MeshRenderer>().material = newMat;
+			mPartShowcase.GetComponent<BaseWeaponScript>().AttachNewPart(item.GetComponent<WeaponPartScript>().partId);
 		}
 	}
 }
