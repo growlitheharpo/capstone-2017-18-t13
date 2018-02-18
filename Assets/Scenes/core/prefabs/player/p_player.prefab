@@ -286,7 +286,6 @@ GameObject:
   - component: {fileID: 114240298838670862}
   - component: {fileID: 114113183744137726}
   - component: {fileID: 143384186503923910}
-  - component: {fileID: 136145069032951676}
   - component: {fileID: 54370038794602910}
   - component: {fileID: 114303902688597392}
   m_Layer: 9
@@ -365,6 +364,8 @@ GameObject:
   m_Component:
   - component: {fileID: 4763333672646934}
   - component: {fileID: 137355921608197324}
+  - component: {fileID: 135663855250178220}
+  - component: {fileID: 114088993251177000}
   m_Layer: 0
   m_Name: m_head
   m_TagString: Untagged
@@ -800,6 +801,8 @@ GameObject:
   m_Component:
   - component: {fileID: 4063383473697024}
   - component: {fileID: 137748231725372060}
+  - component: {fileID: 136459473206781654}
+  - component: {fileID: 114803625879505156}
   m_Layer: 0
   m_Name: m_torso
   m_TagString: Untagged
@@ -1656,6 +1659,20 @@ MonoBehaviour:
   m_SnapThreshold: 5
   m_InterpolateRotation: 1
   m_InterpolateMovement: 1
+--- !u!114 &114088993251177000
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1397079553538038}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0f86466abe3fbe14eafc1743947bf231, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mDamagePercentage:
+    mAmount: 1.5
+    mType: 3
 --- !u!114 &114113183744137726
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1827,6 +1844,20 @@ MonoBehaviour:
     m_VerticalOverflow: 0
     m_LineSpacing: 1
   m_Text: Player 1
+--- !u!114 &114803625879505156
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1895847306101224}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0f86466abe3fbe14eafc1743947bf231, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mDamagePercentage:
+    mAmount: 1
+    mType: 3
 --- !u!114 &114876663045548558
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1839,19 +1870,31 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mDisplayText: {fileID: 114636539893831638}
---- !u!136 &136145069032951676
+--- !u!135 &135663855250178220
+SphereCollider:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1397079553538038}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.25
+  m_Center: {x: 0, y: 1.7, z: 0}
+--- !u!136 &136459473206781654
 CapsuleCollider:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1314326850756854}
+  m_GameObject: {fileID: 1895847306101224}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
-  m_Radius: 0.5
-  m_Height: 1.75
+  m_Radius: 0.35
+  m_Height: 1.5
   m_Direction: 1
-  m_Center: {x: 0, y: 0.875, z: 0}
+  m_Center: {x: 0, y: 0.75, z: -0}
 --- !u!137 &137067740133668572
 SkinnedMeshRenderer:
   m_ObjectHideFlags: 1
