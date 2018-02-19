@@ -74,7 +74,7 @@ namespace FiringSquad.Gameplay
 		[ServerCallback]
 		private void OnTriggerEnter(Collider other)
 		{
-			IDamageReceiver player = other.GetComponent<IDamageReceiver>();
+			IDamageReceiver player = other.GetComponentInParent<IDamageReceiver>();
 			if (player == null)
 				return;
 

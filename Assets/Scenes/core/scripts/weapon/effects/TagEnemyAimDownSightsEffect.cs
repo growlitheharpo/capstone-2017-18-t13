@@ -85,7 +85,7 @@ namespace FiringSquad.Gameplay.Weapons
 				return;
 			}
 
-			if (ObjectHighlight.instance == null)
+			if (ObjectHighlight.instance == null || mActiveHighlights == null)
 				return;
 
 			foreach (Renderer r in mActiveHighlights)
