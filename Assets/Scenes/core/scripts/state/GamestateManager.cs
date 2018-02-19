@@ -68,6 +68,7 @@ namespace FiringSquad.Core.State
 		public const string FOURPLAYER_GAMEPLAY = "game4player_gameplay";
 		public const string TWOPLAYER_WORLD = "game2player_world";
 		public const string TWOPLAYER_GAMEPLAY = "game2player_gameplay";
+		public const string GUN_GLOSSARY = "gunglossary";
 
 		/// <inheritdoc />
 		public bool isAlive { get { return true; } }
@@ -94,6 +95,7 @@ namespace FiringSquad.Core.State
 				{ MAIN_SCENE, new TransitionToSceneState(MENU_SCENE) },
 				{ MENU_SCENE, new MenuSceneState() },
 				{ ART_PROTOTYPE_SCENE, new MenuSceneState() },
+				{ GUN_GLOSSARY, new MenuSceneState() },
 				{ TWOPLAYER_GAMEPLAY, new GameSceneState() },
 				{ DRAFT_GAMEPLAY, new GameSceneState() },
 				{ FOURPLAYER_GAMEPLAY, new GameSceneState() },
