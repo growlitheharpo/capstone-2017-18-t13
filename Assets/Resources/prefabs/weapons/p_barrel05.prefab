@@ -120,6 +120,7 @@ GameObject:
   - component: {fileID: 4924804726653776}
   - component: {fileID: 33120551107404738}
   - component: {fileID: 23325586655268190}
+  - component: {fileID: 114423565651764702}
   m_Layer: 0
   m_Name: mesh_burstBarrel (1)
   m_TagString: Untagged
@@ -469,6 +470,21 @@ MonoBehaviour:
   m_SnapThreshold: 5
   m_InterpolateRotation: 1
   m_InterpolateMovement: 1
+--- !u!114 &114423565651764702
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1984052635550828}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b6a79cc8387fa540af19169480e81c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mBoundProperty: player_part_durability_barrel
+  mEmissiveProperty: _EmissionColor
+  mStartColor: {r: 0.2629758, g: 0.9411765, b: 0.6630674, a: 1}
+  mEndColor: {r: 1, g: 0, b: 0, a: 1}
 --- !u!114 &114815965328033236
 MonoBehaviour:
   m_ObjectHideFlags: 1

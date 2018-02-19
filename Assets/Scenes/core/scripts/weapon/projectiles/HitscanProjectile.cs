@@ -92,11 +92,19 @@ namespace FiringSquad.Gameplay.Weapons
 						continue;
 
 					endPoint = hit.point;
+					float damage = GetDamage(data, Vector3.Distance(weapon.transform.position, endPoint));
 
-					hitObject = hit.GetDamageReceiver();
+					IDamageZone hitZone = hit.GetDamageZone();
+					if (hitZone != null)
+					{
+						hitObject = hitZone.receiver;
+						damage = hitZone.damageModification.Apply(damage);
+					}
+					else
+						hitObject = hit.GetDamageReceiver();
+
 					if (hitObject != null)
 					{
-						float damage = GetDamage(data, Vector3.Distance(weapon.transform.position, endPoint));
 						hitObject.ApplyDamage(damage, endPoint, hit.normal, this);
 						--hitObjectCount;
 					}

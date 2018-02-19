@@ -47,6 +47,18 @@ namespace FiringSquad.Gameplay.UI
 		}
 
 		/// <summary>
+		/// Unity's OnDestroy function.
+		/// Cleans everything up if we have a property.
+		/// </summary>
+		private void OnDestroy()
+		{
+			if (mProperty == null)
+				return;
+
+			CleanupProperty();
+		}
+
+		/// <summary>
 		/// Attempt to grab our property from the service so that we can bind it.
 		/// </summary>
 		private IEnumerator CheckForProperty()

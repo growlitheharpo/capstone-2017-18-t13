@@ -13,6 +13,7 @@ namespace FiringSquad.Gameplay.Weapons
 		[SerializeField] private ParticleSystem mHitParticles;
 		[SerializeField] private float mSpeed;
 		[SerializeField] private float mSplashDamageRadius;
+		[SerializeField] private bool mRecognizeHeadshots;
 
 		/// Private variables
 		private Transform mDirectHit;
@@ -59,13 +60,29 @@ namespace FiringSquad.Gameplay.Weapons
 				return;
 
 			mExploded = true;
+			
+			IDamageReceiver component = null;
+			float damage = mData.damage;
 
-			IDamageReceiver component = hit.GetDamageReceiver();
+			if (mRecognizeHeadshots)
+			{
+				IDamageZone zone = hit.GetDamageZone();
+				if (zone != null)
+				{
+					damage = zone.damageModification.Apply(mData.damage);
+					component = zone.receiver;
+				}
+			}
+			else
+				component = hit.GetDamageReceiver();
+
 			if (component != null)
 			{
-				component.ApplyDamage(mData.damage, hit.contacts[0].point, hit.contacts[0].normal, this);
+				component.ApplyDamage(damage, hit.contacts[0].point, hit.contacts[0].normal, this);
 				mDirectHit = hit.transform;
 			}
+
+
 
 			NetworkBehaviour netObject = component as NetworkBehaviour;
 			RpcPlaySound(netObject == null ? NetworkInstanceId.Invalid : netObject.netId, hit.contacts[0].point);

@@ -2,12 +2,11 @@
 using System.Collections.Generic;
 using FiringSquad.Core;
 using FiringSquad.Core.UI;
+using FiringSquad.Debug;
 using FiringSquad.Networking;
 using UnityEngine;
-using UnityEngine.Networking;
 using UnityEngine.Networking.Match;
 using UnityEngine.UI;
-using Logger = FiringSquad.Debug.Logger;
 
 namespace FiringSquad.Gameplay.UI
 {
@@ -47,6 +46,9 @@ namespace FiringSquad.Gameplay.UI
 
 			ServiceLocator.Get<IUIManager>()
 				.RegisterPanel(this, ScreenPanelTypes.HandleConnection);
+
+			ServiceLocator.Get<IGameConsole>()
+				.RegisterCommand("connect", CONSOLE_ConnectToIpAddress);
 		}
 
 		/// <summary>
@@ -57,6 +59,9 @@ namespace FiringSquad.Gameplay.UI
 			mRefreshMatchesButton.onClick.RemoveListener(RefreshMatchList);
 			mCreateMatchButton.onClick.RemoveListener(ClickCreateMatch);
 			EventManager.Local.OnLocalPlayerSpawned -= OnLocalPlayerSpawned;
+
+			ServiceLocator.Get<IGameConsole>()
+				.UnregisterCommand(CONSOLE_ConnectToIpAddress);
 		}
 
 		/// <summary>
@@ -143,11 +148,30 @@ namespace FiringSquad.Gameplay.UI
 					mNetworkManager.matchName = matchName;
 					mNetworkManager.matchSize = (uint)matchCopy.currentSize;
 
-					mNetworkManager.StopMatchMaker();
-					mNetworkManager.networkAddress = matchIp;
-					mNetworkManager.StartClient();
+					ConnectToGame(matchIp);
 				});
 			}
+		}
+
+		/// <summary>
+		/// Console command to immediately connect to the provided IP address.
+		/// </summary>
+		private void CONSOLE_ConnectToIpAddress(string[] args)
+		{
+			if (args.Length != 1)
+				throw new ArgumentException("Invalid arguments for command: connect");
+
+			ConnectToGame(args[0]);
+		}
+
+		/// <summary>
+		/// Connect immediately to the provided IP address.
+		/// </summary>
+		private void ConnectToGame(string matchIp)
+		{
+			mNetworkManager.StopMatchMaker();
+			mNetworkManager.networkAddress = matchIp;
+			mNetworkManager.StartClient();
 		}
 
 		/// <summary>

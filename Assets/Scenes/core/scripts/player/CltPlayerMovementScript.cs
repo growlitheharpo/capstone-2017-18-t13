@@ -21,7 +21,6 @@ namespace FiringSquad.Gameplay
 		[SerializeField] private CharacterMovementData mMovementData;
 
 		/// Private variables
-		private CapsuleCollider mCollider;
 		private CharacterController mController;
 
 		private CltPlayer mPlayer;
@@ -61,9 +60,8 @@ namespace FiringSquad.Gameplay
 			mPlayer = GetComponentInParent<CltPlayer>();
 			mLocalPlayer = mPlayer.GetComponentInChildren<CltPlayerLocal>();
 			mController = mPlayer.GetComponent<CharacterController>();
-			mCollider = mPlayer.GetComponent<CapsuleCollider>();
-			mStandingHeight = mCollider.height;
-			mStandingRadius = mCollider.radius;
+			mStandingHeight = mController.height;
+			mStandingRadius = mController.radius;
 
 			// Register all of the movement input
 			mInputBindings = GetComponent<CltPlayerLocal>().inputMap;
@@ -276,14 +274,12 @@ namespace FiringSquad.Gameplay
 		/// </summary>
 		private void UpdateCrouch()
 		{
-			float currentHeight = mCollider.height;
+			float currentHeight = mController.height;
 			float newHeight = Mathf.Lerp(currentHeight, mCrouching ? mStandingHeight * mMovementData.crouchHeight : mStandingHeight, Time.deltaTime * mMovementData.crouchSpeed);
-			mCollider.height = newHeight;
 			mController.height = newHeight;
 
-			float currentRadius = mCollider.radius;
+			float currentRadius = mController.radius;
 			float newRadius = Mathf.Lerp(currentRadius, mCrouching ? mStandingRadius * mMovementData.crouchHeight : mStandingRadius, Time.deltaTime * mMovementData.crouchSpeed);
-			mCollider.radius = newRadius;
 			mController.radius = newRadius;
 		}
 

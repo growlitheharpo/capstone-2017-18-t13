@@ -54,6 +54,7 @@ GameObject:
   - component: {fileID: 4714063815800050}
   - component: {fileID: 33835303921835226}
   - component: {fileID: 23591660375816384}
+  - component: {fileID: 114140076130796454}
   m_Layer: 0
   m_Name: mesh_sniperScope (1)
   m_TagString: Untagged
@@ -300,6 +301,21 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 0.88, y: 0.31924886, z: 0.47854415}
   m_Center: {x: 0.2382111, y: -0.15965113, z: 0.005713597}
+--- !u!114 &114140076130796454
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1548045053742428}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b6a79cc8387fa540af19169480e81c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mBoundProperty: player_part_durability_scope
+  mEmissiveProperty: _EmissionColor
+  mStartColor: {r: 0.2629758, g: 0.9411765, b: 0.6630674, a: 1}
+  mEndColor: {r: 1, g: 0, b: 0, a: 1}
 --- !u!114 &114309704682527254
 MonoBehaviour:
   m_ObjectHideFlags: 1

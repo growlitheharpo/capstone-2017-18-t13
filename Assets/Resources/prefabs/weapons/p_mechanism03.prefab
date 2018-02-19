@@ -73,6 +73,7 @@ GameObject:
   - component: {fileID: 4529077024628702}
   - component: {fileID: 33294949000078112}
   - component: {fileID: 23204053137754374}
+  - component: {fileID: 114935355679712000}
   m_Layer: 0
   m_Name: slideRail_low
   m_TagString: Untagged
@@ -339,6 +340,7 @@ GameObject:
   - component: {fileID: 4392159671546196}
   - component: {fileID: 33417621101411184}
   - component: {fileID: 23176162060963344}
+  - component: {fileID: 114075918903033208}
   m_Layer: 0
   m_Name: slideClamp_low
   m_TagString: Untagged
@@ -356,6 +358,7 @@ GameObject:
   - component: {fileID: 4209481982081926}
   - component: {fileID: 33555469310664164}
   - component: {fileID: 23957217598469914}
+  - component: {fileID: 114730287050436758}
   m_Layer: 0
   m_Name: slidePlate_low
   m_TagString: Untagged
@@ -1490,6 +1493,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mRotationRate: 180
+--- !u!114 &114075918903033208
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1818643686718524}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b6a79cc8387fa540af19169480e81c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mBoundProperty: player_part_durability_mechanism
+  mEmissiveProperty: _EmissionColor
+  mStartColor: {r: 0.2629758, g: 0.9411765, b: 0.6630674, a: 1}
+  mEndColor: {r: 1, g: 0, b: 0, a: 1}
 --- !u!114 &114262107658183670
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1556,12 +1574,12 @@ MonoBehaviour:
     mClipSizeModifier:
       mAmount: 0
       mType: 0
-  mDurabilitySprite: {fileID: 21300000, guid: 0c3564fe2647adc419c530a9c2effa88, type: 3}
   mDurability: 20
   mAudioOverrideWeaponType: 2
   mProjectilePrefab: {fileID: 1122678007204700, guid: 84b80f5ee9fffc84998972c5e7fc9d50,
     type: 2}
   mFireFromBarrelTip: 1
+  mAmmoTypeSprite: {fileID: 21300000, guid: 0c3564fe2647adc419c530a9c2effa88, type: 3}
 --- !u!114 &114661869823183926
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1594,6 +1612,36 @@ MonoBehaviour:
     i15: 164
   m_ServerOnly: 0
   m_LocalPlayerAuthority: 1
+--- !u!114 &114730287050436758
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1835719297364090}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b6a79cc8387fa540af19169480e81c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mBoundProperty: player_part_durability_mechanism
+  mEmissiveProperty: _EmissionColor
+  mStartColor: {r: 0.2629758, g: 0.9411765, b: 0.6630674, a: 1}
+  mEndColor: {r: 1, g: 0, b: 0, a: 1}
+--- !u!114 &114935355679712000
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1095792600983814}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b6a79cc8387fa540af19169480e81c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mBoundProperty: player_part_durability_mechanism
+  mEmissiveProperty: _EmissionColor
+  mStartColor: {r: 0.2629758, g: 0.9411765, b: 0.6630674, a: 1}
+  mEndColor: {r: 1, g: 0, b: 0, a: 1}
 --- !u!114 &114985881179183656
 MonoBehaviour:
   m_ObjectHideFlags: 1
