@@ -316,6 +316,8 @@ MonoBehaviour:
   mEmissiveProperty: _EmissionColor
   mStartColor: {r: 0.2629758, g: 0.9411765, b: 0.6630674, a: 1}
   mEndColor: {r: 1, g: 0, b: 0, a: 1}
+  mBlinkingThreshold: 0.15
+  mBlinkingRate: 0.15
 --- !u!114 &114309704682527254
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -346,7 +348,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mUniqueId: 181
   mPrettyName: Sniper Scope
-  mDescription: A sniper scope. Decreases spread.
+  mDescription: The perfect part for contestants that like to take the time to line
+    up a shot. The sniper scope turns any weapon combination into a long-range firing
+    machine. Take your opponents out from across the map. They won't know what hit
+    them.
   mData:
     mMinDispersionModifier:
       mAmount: 0.1
