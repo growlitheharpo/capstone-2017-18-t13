@@ -12,7 +12,9 @@ Properties {
 Category {
 
 	// We must be transparent, so other objects are drawn before this one.
-	Tags { "Queue"="Transparent" "RenderType"="Opaque" }
+	Tags { "Queue"="Transparent" "RenderType"="Transparent" }
+	//Natalie Edit: We dont actually want this to block objects behind it, because we want to grab them for our distortion ass. 
+	ZWrite Off
 
 
 	SubShader {
