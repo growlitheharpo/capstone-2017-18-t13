@@ -405,7 +405,7 @@ MonoBehaviour:
       mAmount: 1.5
       mType: 3
     mDamageModifier:
-      mAmount: -0.1
+      mAmount: 0.3
       mType: 2
     mDamageFalloffDistanceModifier:
       mAmount: 10
@@ -485,6 +485,8 @@ MonoBehaviour:
   mEmissiveProperty: _EmissionColor
   mStartColor: {r: 0.2629758, g: 0.9411765, b: 0.6630674, a: 1}
   mEndColor: {r: 1, g: 0, b: 0, a: 1}
+  mBlinkingThreshold: 0.15
+  mBlinkingRate: 0.15
 --- !u!114 &114815965328033236
 MonoBehaviour:
   m_ObjectHideFlags: 1
