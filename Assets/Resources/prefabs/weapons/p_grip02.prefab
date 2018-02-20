@@ -316,6 +316,8 @@ MonoBehaviour:
   mEmissiveProperty: _EmissionColor
   mStartColor: {r: 0.2629758, g: 0.9411765, b: 0.6630674, a: 1}
   mEndColor: {r: 1, g: 0, b: 0, a: 1}
+  mBlinkingThreshold: 0.15
+  mBlinkingRate: 0.15
 --- !u!114 &114227575621444936
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -394,7 +396,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mUniqueId: 61
   mPrettyName: Tactical Grip
-  mDescription: Standard grip, lowers recoil.
+  mDescription: A strategically placed and shaped grip attachment that will significantly
+    reduce recoil on any weapon combination. The tactical grip is a must-have for
+    most of our contestants.
   mData:
     mMinDispersionModifier:
       mAmount: 0.75
