@@ -19,6 +19,8 @@ namespace FiringSquad.Gameplay.Weapons
 		[SerializeField] private float mMinZoom = 1.0f;
 		[SerializeField] private float mMaxZoom = 3.0f;
 
+		private float mZoomLevel = 15.0f;
+
 		/// Private variables
 		private bool mActive;
 		private Quickfade mQuickfade;
@@ -107,12 +109,25 @@ namespace FiringSquad.Gameplay.Weapons
 		}
 
 		/// <summary>
-		/// 
+		/// Change zoom level based on scroll wheel
 		/// </summary>
 		/// <param name="val"></param>
-		private void OnZoomLevelChanged(float val)
+		private void OnZoomLevelChanged(float val, CltPlayer player)
 		{
-			UnityEngine.Debug.Log(val);
+			// If the part is attached to a player's weapon
+			
+			if (val < 0)
+			{
+				mZoomLevel += 0.5f;
+
+				EventManager.Notify(() => EventManager.LocalGUI.RequestNewFieldOfView(mZoomLevel, -1.0f));
+			}
+			else if (val > 0)
+			{
+				mZoomLevel -= 0.5f;
+
+				EventManager.Notify(() => EventManager.LocalGUI.RequestNewFieldOfView(mZoomLevel, -1.0f));
+			}
 		}
 	}
 }

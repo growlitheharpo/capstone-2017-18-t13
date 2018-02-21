@@ -251,15 +251,16 @@ public partial class EventManager
 			OnInputLevelChanged(level, state);
 		}
 
-		public static event Action<float> OnZoomLevelChanged = a => { LogEvent(); };
+		public static event Action<float,CltPlayer> OnZoomLevelChanged = (a,b) => { LogEvent(); };
 
 		/// <summary>
 		/// Event called when the player changes their zoom level in the variable sight
 		/// </summary>
 		/// <param name="zoom"></param>
-		public static void ZoomLevelChanged(float zoom)
+		/// <param name="player"></param>
+		public static void ZoomLevelChanged(float zoom, CltPlayer player)
 		{
-			OnZoomLevelChanged(zoom);
+			OnZoomLevelChanged(zoom, player);
 		}
 	}
 

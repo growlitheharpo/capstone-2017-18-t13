@@ -259,7 +259,9 @@ namespace FiringSquad.Gameplay
 		private void INPUT_ZoomLevel(float val)
 		{
 			if (inAimDownSightsMode)
+			{
 				EventManager.Local.ZoomLevelChanged(val);
+			}
 		}
 
 		/// <summary>
