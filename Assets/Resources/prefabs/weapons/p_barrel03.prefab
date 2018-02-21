@@ -345,6 +345,8 @@ MonoBehaviour:
   mEmissiveProperty: _EmissionColor
   mStartColor: {r: 0.2629758, g: 0.9411765, b: 0.6630674, a: 1}
   mEndColor: {r: 1, g: 0, b: 0, a: 1}
+  mBlinkingThreshold: 0.15
+  mBlinkingRate: 0.15
 --- !u!114 &114281026581526706
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -379,7 +381,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mUniqueId: 3
   mPrettyName: Sniper Barrel
-  mDescription: A single shot, sniper rifle barrel
+  mDescription: 'A heavy, expertly rifled barrel designed for extreme ranges. Slow
+    rate of fire with exceptional damage. '
   mData:
     mMinDispersionModifier:
       mAmount: 0.65

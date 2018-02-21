@@ -120,6 +120,7 @@ GameObject:
   - component: {fileID: 4938534981224918}
   - component: {fileID: 33123101669148490}
   - component: {fileID: 23290370491154754}
+  - component: {fileID: 114710509598987498}
   m_Layer: 0
   m_Name: mesh_minigunBarrel
   m_TagString: Untagged
@@ -294,14 +295,14 @@ MeshFilter:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1424907527110152}
-  m_Mesh: {fileID: 4300000, guid: 30c3a011fa3bead42a95cc0fa6adcf76, type: 3}
+  m_Mesh: {fileID: 4300000, guid: de309b40a634695408d4db4f20e0e968, type: 3}
 --- !u!33 &33123101669148490
 MeshFilter:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1932574258867912}
-  m_Mesh: {fileID: 4300000, guid: 30c3a011fa3bead42a95cc0fa6adcf76, type: 3}
+  m_Mesh: {fileID: 4300000, guid: de309b40a634695408d4db4f20e0e968, type: 3}
 --- !u!54 &54647162185079400
 Rigidbody:
   m_ObjectHideFlags: 1
@@ -374,7 +375,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mUniqueId: 2
   mPrettyName: Minigun Barrel
-  mDescription: High powered mini-gun
+  mDescription: 'Top of the line bullet dispenser from the folks at Rensfield Arms,
+    customized by the re[Mod] weaponry team. Unrivaled rate of fire. '
   mData:
     mMinDispersionModifier:
       mAmount: 1.5
@@ -392,7 +394,7 @@ MonoBehaviour:
       mAmount: 0.5
       mType: 0
     mDamageModifier:
-      mAmount: 0.5
+      mAmount: 1.2
       mType: 2
     mDamageFalloffDistanceModifier:
       mAmount: 10
@@ -469,6 +471,23 @@ MonoBehaviour:
   m_SnapThreshold: 5
   m_InterpolateRotation: 1
   m_InterpolateMovement: 1
+--- !u!114 &114710509598987498
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1932574258867912}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b6a79cc8387fa540af19169480e81c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mBoundProperty: player_part_durability_barrel
+  mEmissiveProperty: _EmissionColor
+  mStartColor: {r: 0.2629758, g: 0.9411765, b: 0.6630674, a: 1}
+  mEndColor: {r: 1, g: 0, b: 0, a: 1}
+  mBlinkingThreshold: 0.15
+  mBlinkingRate: 0.15
 --- !u!114 &114952005363085158
 MonoBehaviour:
   m_ObjectHideFlags: 1

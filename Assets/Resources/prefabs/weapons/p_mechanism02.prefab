@@ -328,7 +328,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mUniqueId: 121
   mPrettyName: Grenades
-  mDescription: 'Fires impact grenades: 100 damage.'
+  mDescription: Looking to pack a punch? These highly volatile grenades explode on
+    impact, causing significant damage to the target and everyone around them. Grenades
+    have a low range but deliver some real heat.
   mData:
     mMinDispersionModifier:
       mAmount: 0
@@ -346,7 +348,7 @@ MonoBehaviour:
       mAmount: 0
       mType: 0
     mDamageModifier:
-      mAmount: 0.2
+      mAmount: 2
       mType: 2
     mDamageFalloffDistanceModifier:
       mAmount: 0
@@ -434,6 +436,8 @@ MonoBehaviour:
   mEmissiveProperty: _EmissionColor
   mStartColor: {r: 0.2629758, g: 0.9411765, b: 0.6630674, a: 1}
   mEndColor: {r: 1, g: 0, b: 0, a: 1}
+  mBlinkingThreshold: 0.15
+  mBlinkingRate: 0.15
 --- !u!114 &114881024627639306
 MonoBehaviour:
   m_ObjectHideFlags: 1

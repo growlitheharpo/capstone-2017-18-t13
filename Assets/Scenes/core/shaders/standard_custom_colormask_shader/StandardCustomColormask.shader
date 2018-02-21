@@ -8,7 +8,7 @@
 		_MetallicGlossMap("Metallic (R), Smoothness (A)", 2D) = "black" {}
 		_BumpMap("Normal (RGB)", 2D) = "bump" {}
 		_EmissionMap("Emissive Map (RGB)", 2D) = "white" {}
-		_EmissionColor("Emissive Color", Color) = (0,0,0)
+        _EmissionColor("Color", Color) = (0,0,0)
 	}
 
 	SubShader
@@ -39,7 +39,7 @@
 			sampler2D _ColorMask;
 			sampler2D _MetallicGlossMap;
 			sampler2D _EmissionMap;
-			fixed4 _EmissionColor;
+			half4 _EmissionColor;
 			fixed3 _ColorMaskColor;
 
 			void surf(Input IN, inout SurfaceOutputStandard o)

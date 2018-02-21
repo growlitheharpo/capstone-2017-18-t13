@@ -18,10 +18,12 @@ namespace FiringSquad.Data
 		{
 			EventManager.Server.OnPlayerDied += OnPlayerDied;
 
-			// Start the file with formatting
-			string tmp = "Killer,Killed,Killer Location - X, Y, Z,KilledLocation - X, Y, Z,Weapon Parts,,,,\n";
-
-			System.IO.File.WriteAllText("Analytics.csv", tmp);
+			if (!System.IO.File.Exists("Analytics.csv"))
+			{
+				// Start the file with formatting
+				string tmp = "Killer,Killed,Killer Location - X, Y, Z,KilledLocation - X, Y, Z,Weapon Parts,,,,\n";
+				System.IO.File.WriteAllText("Analytics.csv", tmp);
+			}
 		}
 
 		/// <summary>

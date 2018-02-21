@@ -1508,6 +1508,8 @@ MonoBehaviour:
   mEmissiveProperty: _EmissionColor
   mStartColor: {r: 0.2629758, g: 0.9411765, b: 0.6630674, a: 1}
   mEndColor: {r: 1, g: 0, b: 0, a: 1}
+  mBlinkingThreshold: 0.15
+  mBlinkingRate: 0.15
 --- !u!114 &114262107658183670
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1542,7 +1544,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mUniqueId: 122
   mPrettyName: Rockets
-  mDescription: I'm a rocket man.
+  mDescription: 'Rockets will grab the attention of all of our contestants. Their
+    damage is unmatched, but, trying to fire one of these bad boys is no easy process.
+    Rockets add significant recoil to weapons and have a very slow rate of fire. However,
+    contestants will always find their opponents running and screaming whenever they
+    have this mechanism attached. '
   mData:
     mMinDispersionModifier:
       mAmount: 0
@@ -1560,7 +1566,7 @@ MonoBehaviour:
       mAmount: 2.5
       mType: 3
     mDamageModifier:
-      mAmount: 3
+      mAmount: 4
       mType: 2
     mDamageFalloffDistanceModifier:
       mAmount: 0
@@ -1627,6 +1633,8 @@ MonoBehaviour:
   mEmissiveProperty: _EmissionColor
   mStartColor: {r: 0.2629758, g: 0.9411765, b: 0.6630674, a: 1}
   mEndColor: {r: 1, g: 0, b: 0, a: 1}
+  mBlinkingThreshold: 0.15
+  mBlinkingRate: 0.15
 --- !u!114 &114935355679712000
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1642,6 +1650,8 @@ MonoBehaviour:
   mEmissiveProperty: _EmissionColor
   mStartColor: {r: 0.2629758, g: 0.9411765, b: 0.6630674, a: 1}
   mEndColor: {r: 1, g: 0, b: 0, a: 1}
+  mBlinkingThreshold: 0.15
+  mBlinkingRate: 0.15
 --- !u!114 &114985881179183656
 MonoBehaviour:
   m_ObjectHideFlags: 1
