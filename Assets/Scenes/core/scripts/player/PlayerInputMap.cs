@@ -15,6 +15,7 @@ namespace FiringSquad.Data
 		[SerializeField] private string mActivateADSButton;
 		[SerializeField] private string mReloadButton;
 		[SerializeField] private string mPauseButton;
+		[SerializeField] private string mZoomAxis;
 
 		[Header("Movement")] [SerializeField] private string mMoveBackFrontAxis;
 		[SerializeField] private string mMoveSidewaysAxis;
@@ -31,6 +32,7 @@ namespace FiringSquad.Data
 		public string activateADSButton { get { return mActivateADSButton; } }
 		public string reloadButton { get { return mReloadButton; } }
 		public string pauseButton { get { return mPauseButton; } }
+		public string zoomAxis { get { return mZoomAxis; } }
 
 		public string moveBackFrontAxis { get { return mMoveBackFrontAxis; } }
 		public string moveSidewaysAxis { get { return mMoveSidewaysAxis; } }

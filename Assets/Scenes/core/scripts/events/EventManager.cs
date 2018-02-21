@@ -223,7 +223,7 @@ public partial class EventManager
 		/// PARAMETER 2: The end time (in ticks) of the lobby.
 		/// </summary>
 		public static event Action<CltPlayer, long> OnReceiveLobbyEndTime = (p, t) => { LogEvent(); };
-		
+
 		/// <summary>
 		/// Event called when the local player has received an "enter lobby" event from the server.
 		/// </summary>
@@ -249,6 +249,18 @@ public partial class EventManager
 		public static void InputLevelChanged(InputLevel level, bool state)
 		{
 			OnInputLevelChanged(level, state);
+		}
+
+		public static event Action<float,CltPlayer> OnZoomLevelChanged = (a,b) => { LogEvent(); };
+
+		/// <summary>
+		/// Event called when the player changes their zoom level in the variable sight
+		/// </summary>
+		/// <param name="zoom"></param>
+		/// <param name="player"></param>
+		public static void ZoomLevelChanged(float zoom, CltPlayer player)
+		{
+			OnZoomLevelChanged(zoom, player);
 		}
 	}
 
