@@ -115,6 +115,7 @@ namespace FiringSquad.Gameplay
 
 				if (Vector3.Distance(originalPos, instance.transform.position) > 1.0f)
 				{
+					EventManager.Notify(() => EventManager.Server.PartPickedUp(this));
 					yield return PrepRespawn(true);
 					yield break;
 				}
