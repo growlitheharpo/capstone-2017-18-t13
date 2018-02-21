@@ -327,7 +327,7 @@ namespace FiringSquad.Gameplay.Weapons
 		/// </summary>
 		public void PlayFireEffect()
 		{
-			UpdateShootingAnimation(true);
+			UpdateShootingAnimation(true, true);
 			mWeaponScript.bearer.PlayFireAnimation();
 			if (mWeaponScript.currentParts.barrel != null)
 				mShotParticles.transform.position = mWeaponScript.currentParts.barrel.barrelTip.position;
@@ -344,7 +344,7 @@ namespace FiringSquad.Gameplay.Weapons
 		/// <summary>
 		/// Update the "IsFiring" state of our animator based on the current data.
 		/// </summary>
-		public void UpdateShootingAnimation(bool isFiring)
+		public void UpdateShootingAnimation(bool isFiring, bool fireNow)
 		{
 			if (mArmAnimator == null)
 				return;
@@ -352,11 +352,11 @@ namespace FiringSquad.Gameplay.Weapons
 			if (mWeaponScript.currentParts.barrel != null)
 				mArmAnimator.SetBool("WeaponIsAuto", mWeaponScript.currentParts.barrel.shotsPerClick <= 0);
 			mArmAnimator.SetFloat("RecoilAmount", mWeaponScript.currentData.recoilAmount);
-			mArmAnimator.SetFloat("FireRate", mWeaponScript.currentData.fireRate);
+			mArmAnimator.SetFloat("FireRate", mWeaponScript.currentData.fireRate * 1.1f);
 
-			//AnimatorStateInfo state = mArmAnimator.
-			
 			mArmAnimator.SetBool("IsFiring", isFiring);
+			if (fireNow)
+				mArmAnimator.SetTrigger("Fire");
 		}
 
 		#endregion

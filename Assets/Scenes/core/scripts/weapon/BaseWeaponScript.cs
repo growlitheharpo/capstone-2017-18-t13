@@ -361,7 +361,7 @@ namespace FiringSquad.Gameplay.Weapons
 				return;
 
 			mReloading = true;
-			mWeaponView.UpdateShootingAnimation(false);
+			mWeaponView.UpdateShootingAnimation(false, false);
 			mWeaponView.PlayReloadEffect(currentData.reloadTime);
 			StartCoroutine(Coroutines.InvokeAfterSeconds(currentData.reloadTime, FinishReload));
 		}
@@ -389,7 +389,7 @@ namespace FiringSquad.Gameplay.Weapons
 		public void FireWeaponUp()
 		{
 			mShotsSinceRelease = 0;
-			mWeaponView.UpdateShootingAnimation(false);
+			mWeaponView.UpdateShootingAnimation(false, false);
 		}
 
 		/// <summary>
@@ -477,7 +477,7 @@ namespace FiringSquad.Gameplay.Weapons
 			WeaponPartScriptBarrel barrel = mCurrentParts.barrel;
 			if (barrel == null || barrel.shotsPerClick > 0 && mShotsSinceRelease >= barrel.shotsPerClick)
 			{
-				mWeaponView.UpdateShootingAnimation(false);
+				mWeaponView.UpdateShootingAnimation(false, false);
 				return false;
 			}
 
