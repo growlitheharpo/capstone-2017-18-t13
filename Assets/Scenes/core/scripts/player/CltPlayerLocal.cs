@@ -57,6 +57,7 @@ namespace FiringSquad.Gameplay
 				.RegisterInput(Input.GetButtonUp, inputMap.activateADSButton, INPUT_ExitAimDownSights, InputLevel.Gameplay)
 				.RegisterInput(Input.GetButtonDown, inputMap.pauseButton, INPUT_TogglePause, InputLevel.PauseMenu)
 				.RegisterInput(Input.GetKeyDown, KeyCode.J, INPUT_ActivateGunPanic, InputLevel.Gameplay)
+				.RegisterAxis(Input.GetAxis, inputMap.zoomAxis, INPUT_ZoomLevel, InputLevel.Gameplay)
 
 				// input levels
 				.EnableInputLevel(InputLevel.Gameplay)
@@ -91,6 +92,7 @@ namespace FiringSquad.Gameplay
 				.UnregisterInput(INPUT_MagnetArmDown)
 				.UnregisterInput(INPUT_MagnetArmHeld)
 				.UnregisterInput(INPUT_MagnetArmUp)
+				.UnregisterAxis(INPUT_ZoomLevel)
 
 				// local
 				.UnregisterInput(INPUT_EnterAimDownSights)
@@ -253,7 +255,13 @@ namespace FiringSquad.Gameplay
 			weapon.positionOffset = playerRoot.eye.InverseTransformPoint(offset.position);
 			weapon.transform.SetParent(playerRoot.transform);
 		}
-		
+
+		private void INPUT_ZoomLevel(float val)
+		{
+			if (inAimDownSightsMode)
+				EventManager.Local.ZoomLevelChanged(val);
+		}
+
 		/// <summary>
 		/// EVENT HANDLER: Local.OnApplyOptionsData
 		/// </summary>
