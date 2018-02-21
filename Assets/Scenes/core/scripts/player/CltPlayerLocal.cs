@@ -260,7 +260,7 @@ namespace FiringSquad.Gameplay
 		{
 			if (inAimDownSightsMode)
 			{
-				EventManager.Local.ZoomLevelChanged(val);
+				EventManager.Local.ZoomLevelChanged(val, playerRoot);
 			}
 		}
 

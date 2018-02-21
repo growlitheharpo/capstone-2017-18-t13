@@ -18,6 +18,7 @@ namespace FiringSquad.Gameplay.Weapons
 		[SerializeField] private float mVignetteIntensity = 1.0f;
 		[SerializeField] private float mMinZoom = 1.0f;
 		[SerializeField] private float mMaxZoom = 3.0f;
+		[SerializeField] private float mZoomStep = 0.5f;
 
 		private float mZoomLevel = 15.0f;
 
@@ -35,6 +36,14 @@ namespace FiringSquad.Gameplay.Weapons
 			EventManager.Local.OnZoomLevelChanged += OnZoomLevelChanged;
 		}
 
+		/// <summary>
+		/// Unity's on destroy function
+		/// </summary>
+		private void OnDestroy()
+		{
+			EventManager.Local.OnZoomLevelChanged -= OnZoomLevelChanged;
+		}
+
 		/// <inheritdoc />
 		public override void ActivateEffect(IWeapon weapon, WeaponPartScript part)
 		{
@@ -43,6 +52,8 @@ namespace FiringSquad.Gameplay.Weapons
 
 			mActive = true;
 			base.ActivateEffect(weapon, part);
+
+			mZoomLevel = 15.0f;
 
 			mQuickfade = CreateInstance<Quickfade>();
 			mQuickfade.enabled.Override(true);
@@ -63,7 +74,7 @@ namespace FiringSquad.Gameplay.Weapons
 				mVignette.roundness.Override(1.0f);
 
 				mTemporaryVolume.profile.AddSettings(mVignette);
-				EventManager.Notify(() => EventManager.LocalGUI.RequestNewFieldOfView(mTargetFieldOfView, -1.0f));
+				EventManager.Notify(() => EventManager.LocalGUI.RequestNewFieldOfView(mZoomLevel, -1.0f));
 
 				mQuickfade.Deactivate(part, () => EventManager.Notify(() => EventManager.LocalGUI.SetCrosshairVisible(true)));
 			});
@@ -76,6 +87,9 @@ namespace FiringSquad.Gameplay.Weapons
 				return;
 
 			mActive = false;
+
+			mZoomLevel = 15.0f;
+
 
 			if (immediate)
 			{
@@ -115,19 +129,25 @@ namespace FiringSquad.Gameplay.Weapons
 		private void OnZoomLevelChanged(float val, CltPlayer player)
 		{
 			// If the part is attached to a player's weapon
-			
-			if (val < 0)
+			if(mActive)
 			{
-				mZoomLevel += 0.5f;
+				if (val < 0)
+				{
+					mZoomLevel += 1.0f;
 
-				EventManager.Notify(() => EventManager.LocalGUI.RequestNewFieldOfView(mZoomLevel, -1.0f));
-			}
-			else if (val > 0)
-			{
-				mZoomLevel -= 0.5f;
+					mZoomLevel = Mathf.Clamp(mZoomLevel, mMinZoom, mMaxZoom);
 
-				EventManager.Notify(() => EventManager.LocalGUI.RequestNewFieldOfView(mZoomLevel, -1.0f));
-			}
+					EventManager.Notify(() => EventManager.LocalGUI.RequestNewFieldOfView(mZoomLevel, -1.0f));
+				}
+				else if (val > 0)
+				{
+					mZoomLevel -= 1.0f;
+
+					mZoomLevel = Mathf.Clamp(mZoomLevel, mMinZoom, mMaxZoom);
+
+					EventManager.Notify(() => EventManager.LocalGUI.RequestNewFieldOfView(mZoomLevel, -1.0f));
+				}
+			} 
 		}
 	}
 }
