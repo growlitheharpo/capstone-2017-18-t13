@@ -449,6 +449,28 @@ public partial class EventManager
 		{
 			OnStageTimedOut(stage);
 		}
+
+		public static event Action<PlayerHealthPack> OnHealthPickedUp = a => { LogEvent(); };
+
+		/// <summary>
+		/// Event called when a player picks up a healthpack
+		/// </summary>
+		/// <param name="pack"></param>
+		public static void HealthPickedUp(PlayerHealthPack pack)
+		{
+			OnHealthPickedUp(pack);
+		}
+
+		public static event Action<WeaponPartPad> OnPartPickedUp = a => { LogEvent(); };
+
+		/// <summary>
+		/// Event called when a player picks up a part from a pad
+		/// </summary>
+		/// <param name="pad"></param>
+		public static void PartPickedUp(WeaponPartPad pad)
+		{
+			OnPartPickedUp(pad);
+		}
 	}
 
 	/// <summary>

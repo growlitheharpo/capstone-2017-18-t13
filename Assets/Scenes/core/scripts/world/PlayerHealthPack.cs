@@ -83,8 +83,14 @@ namespace FiringSquad.Gameplay
 				return;
 
 			player.HealDamage(mProvidedHealth);
+
+			// Send Event to the Analytics Object
+			EventManager.Notify(() => EventManager.Server.HealthPickedUp(this));
+
 			mVisible = false;
 			StartCoroutine(WaitAndReappear());
+
+			
 		}
 
 		/// <summary>
