@@ -14,6 +14,8 @@ namespace FiringSquad.Gameplay.UI
 		/// Inspector variables
 		[SerializeField] private Image mLeftImage;
 		[SerializeField] private Image mRightImage;
+		[SerializeField] private Image mTopImage;
+		[SerializeField] private Image mBottomImage;
 		[SerializeField] private RectTransform mImageHolder;
 		[SerializeField] private float mFadeTime;
 
@@ -146,7 +148,7 @@ namespace FiringSquad.Gameplay.UI
 
 			WeaponPartScriptBarrel realPart = part as WeaponPartScriptBarrel;
 			if (realPart != null)
-				mLeftImage.sprite = mRightImage.sprite = realPart.crosshairSprite;
+				mLeftImage.sprite = mRightImage.sprite = mTopImage.sprite = mBottomImage.sprite = realPart.crosshairSprite;
 		}
 	}
 }
