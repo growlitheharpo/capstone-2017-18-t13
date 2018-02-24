@@ -9,6 +9,7 @@ using FiringSquad.Core.Weapons;
 using FiringSquad.Data;
 using FiringSquad.Gameplay.UI;
 using FiringSquad.Gameplay.Weapons;
+using JetBrains.Annotations;
 using KeatsLib.Unity;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -98,7 +99,12 @@ namespace FiringSquad.Gameplay
 		/// </summary>
 		public string playerName { get { return mPlayerName; } }
 
-		#region Unity Callbacks
+		/// <summary>
+		/// A reference directly to the local player, if available.
+		/// </summary>
+		[CanBeNull] public static CltPlayer localPlayerReference { get; private set; }
+
+		#region Unity Callbacks and Initialization
 
 		/// <summary>
 		/// Unity's server-side start event.
@@ -168,6 +174,7 @@ namespace FiringSquad.Gameplay
 			StartCoroutine(AdjustToLocalView());
 
 			// Send the "spawned" event.
+			localPlayerReference = this;
 			EventManager.Notify(() => EventManager.Local.LocalPlayerSpawned(this));
 		}
 
@@ -255,6 +262,8 @@ namespace FiringSquad.Gameplay
 
 		#endregion
 
+		#region Interaction
+
 		/// <summary>
 		/// Activate the "interact" input command on the server.
 		/// </summary>
@@ -306,6 +315,8 @@ namespace FiringSquad.Gameplay
 
 			interactable.Interact(this);
 		}
+
+		#endregion
 
 		#region Animations
 
@@ -595,7 +606,7 @@ namespace FiringSquad.Gameplay
 				EventManager.Notify(() => EventManager.Local.LocalPlayerCausedDamage(amount));
 				ServiceLocator.Get<IAudioManager>().CreateSound(AudioEvent.LocalDealDamage, realSource.transform);
 			}
-			else if (this.isCurrentPlayer)
+			else if (isCurrentPlayer)
 			{
 				// else notify the camera it should shake
 				Camera cameraRef = GetComponentInChildren<Camera>();

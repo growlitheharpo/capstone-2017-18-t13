@@ -115,7 +115,7 @@ namespace FiringSquad.Gameplay.UI
 			if (mPlayerRef != null)
 				return;
 
-			mPlayerRef = FindObjectsOfType<CltPlayer>().FirstOrDefault(x => x.isCurrentPlayer);
+			mPlayerRef = CltPlayer.localPlayerReference;
 		}
 
 		/// <summary>
