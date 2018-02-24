@@ -79,6 +79,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4574042693045664}
+  - component: {fileID: 114917473913825702}
   m_Layer: 9
   m_Name: ThirdPerson
   m_TagString: Untagged
@@ -1976,6 +1977,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mDisplayText: {fileID: 114636539893831638}
+--- !u!114 &114917473913825702
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1188512907585922}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 45ee9201d7ba56b4b9f0b1d1b10e037c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mTargetRenderer: {fileID: 137707576271856452}
 --- !u!114 &114947892312046232
 MonoBehaviour:
   m_ObjectHideFlags: 1
