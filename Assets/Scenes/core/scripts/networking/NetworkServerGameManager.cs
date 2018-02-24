@@ -284,7 +284,24 @@ namespace FiringSquad.Networking
 					if (mMachine.data.currentType == GameData.MatchType.Deathmatch)
 						SpawnPlayersDeathmatch();
 					else
+					{
+						ForceUpdatePlayerTeams();
 						SpawnPlayersTeam();
+					}
+				}
+
+				/// <summary>
+				/// Force Unity's networking to re-send the player's team so that it is reflected
+				/// on all clients. Do so by forcing the dirty-bit to be set by using a tmp trash value.
+				/// </summary>
+				private void ForceUpdatePlayerTeams()
+				{
+					foreach (CltPlayer player in mMachine.mPlayerList)
+					{
+						GameData.PlayerTeam team = player.playerTeam;
+						player.AssignPlayerTeam(GameData.PlayerTeam.Deathmatch);
+						player.AssignPlayerTeam(team);
+					}
 				}
 
 				/// <summary>

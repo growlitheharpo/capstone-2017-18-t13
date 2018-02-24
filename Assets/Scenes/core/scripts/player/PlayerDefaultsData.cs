@@ -19,6 +19,9 @@ namespace FiringSquad.Data
 		[SerializeField] private GameObject mFirstPersonView;
 		[SerializeField] private Transform mFirstPersonWeaponBone;
 
+		[SerializeField] private Color mBlueTeamColor;
+		[SerializeField] private Color mOrangeTeamColor;
+
 		/// <summary> The default collection of parts for this player. </summary>
 		public WeaponPartCollection defaultWeaponParts { get { return mDefaultWeaponParts; } }
 
@@ -45,5 +48,15 @@ namespace FiringSquad.Data
 		/// The Transform bone under which the weapon view will be moved.
 		/// </summary>
 		public Transform firstPersonWeaponBone { get { return mFirstPersonWeaponBone; } }
+
+		/// <summary>
+		/// The color to apply if we are a member of the blue team.
+		/// </summary>
+		public Color blueTeamColor { get { return mBlueTeamColor; } }
+
+		/// <summary>
+		/// The color to apply if we are a member of the orange team.
+		/// </summary>
+		public Color orangeTeamColor { get { return mOrangeTeamColor; } }
 	}
 }

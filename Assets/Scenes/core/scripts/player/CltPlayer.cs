@@ -763,6 +763,13 @@ namespace FiringSquad.Gameplay
 		private void OnPlayerTeamUpdate(GameData.PlayerTeam value)
 		{
 			Logger.Info("Reflecting player color: " + value);
+
+			// Update all of our child renderers
+			Color myColor = value == GameData.PlayerTeam.Orange ? defaultData.orangeTeamColor : defaultData.blueTeamColor;
+			var components = GetComponentsInChildren<ColormaskUpdateUtility>();
+			foreach (ColormaskUpdateUtility updater in components)
+				updater.UpdateDisplayedColor(myColor);
+
 			mTeam = value;
 		}
 
