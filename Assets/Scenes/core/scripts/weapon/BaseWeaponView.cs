@@ -364,12 +364,25 @@ namespace FiringSquad.Gameplay.Weapons
 
 		private void PlayWeaponFireAnimations()
 		{
-			if (mWeaponScript.currentParts.mechanism == null || mWeaponScript.currentParts.mechanism.attachedAnimator == null)
-				return;
+			if (mWeaponScript.currentParts.mechanism != null)
+			{
+				Animator anim = mWeaponScript.currentParts.mechanism.attachedAnimator;
+				if (anim != null)
+				{
+					anim.SetFloat("FireRate", mWeaponScript.currentData.fireRate);
+					anim.SetTrigger("Fire");
+				}
+			}
 
-			Animator anim = mWeaponScript.currentParts.mechanism.attachedAnimator;
-			anim.SetFloat("FireRate", mWeaponScript.currentData.fireRate);
-			anim.SetTrigger("Fire");
+			if (mWeaponScript.currentParts.barrel != null)
+			{
+				Animator anim = mWeaponScript.currentParts.barrel.attachedAnimator;
+				if (anim != null)
+				{
+					anim.SetFloat("FireRate", mWeaponScript.currentData.fireRate);
+					anim.SetTrigger("Fire");
+				}
+			}
 		}
 
 		#endregion
