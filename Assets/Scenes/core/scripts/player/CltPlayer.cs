@@ -550,6 +550,13 @@ namespace FiringSquad.Gameplay
 		{
 			if (ReferenceEquals(cause.source, this))
 				amount *= 0.5f;
+			else if (cause.source is IWeaponBearer)
+			{
+				// Reject any damage from teammates
+				IWeaponBearer b = (IWeaponBearer)cause.source;
+				if (b.playerTeam != GameData.PlayerTeam.Deathmatch && b.playerTeam == mTeam)
+					return;
+			}
 
 			NetworkInstanceId id = cause.source != null ? cause.source.netId : NetworkInstanceId.Invalid;
 			Vector3 pos = cause.source != null ? cause.source.transform.position : transform.position;
