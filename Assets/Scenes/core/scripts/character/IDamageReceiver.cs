@@ -32,10 +32,5 @@ namespace FiringSquad.Gameplay
 		/// The current health value of this damage receiver.
 		/// </summary>
 		float currentHealth { get; }
-
-		/// <summary>
-		/// Get the team that this damage receiver is currently attached to.
-		/// </summary>
-		GameData.PlayerTeam playerTeam { get; }
 	}
 }
