@@ -770,6 +770,9 @@ namespace FiringSquad.Gameplay
 			foreach (ColormaskUpdateUtility updater in components)
 				updater.UpdateDisplayedColor(myColor);
 
+			if (isCurrentPlayer)
+				EventManager.Notify(() => EventManager.LocalGUI.LocalPlayerAssignedTeam(this));
+
 			mTeam = value;
 		}
 

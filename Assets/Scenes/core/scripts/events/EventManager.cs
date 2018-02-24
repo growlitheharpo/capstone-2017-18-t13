@@ -277,6 +277,21 @@ public partial class EventManager
 		public static event Action<CrosshairHintText.Hint, bool> OnSetHintState = (h, b) => { LogEvent(); };
 
 		/// <summary>
+		/// Event called to update all UI elements when the player has been assigned a team.
+		/// PARAMETER 1: A reference to the local player.
+		/// </summary>
+		public static event Action<CltPlayer> OnLocalPlayerAssignedTeam = p => { LogEvent(); };
+
+		/// <summary>
+		/// Event called to update all UI elements when the player has been assigned a team.
+		/// </summary>
+		/// <param name="localPlayer">A reference to the local player.</param>
+		public static void LocalPlayerAssignedTeam(CltPlayer localPlayer)
+		{
+			OnLocalPlayerAssignedTeam(localPlayer);
+		}
+
+		/// <summary>
 		/// Event called to push a UI hint onto the hint stack.
 		/// </summary>
 		/// <param name="hint">Which hint to push.</param>
