@@ -772,6 +772,14 @@ namespace FiringSquad.Gameplay
 
 			if (isCurrentPlayer)
 				EventManager.Notify(() => EventManager.LocalGUI.LocalPlayerAssignedTeam(this));
+			else
+			{
+				bool isEnemy = value == GameData.PlayerTeam.Deathmatch || (localPlayerReference != null && localPlayerReference.mTeam != value);
+				PlayerNameWorldCanvas display = GetComponentInChildren<PlayerNameWorldCanvas>();
+				if (display != null)
+					display.SetIsEnemyPlayer(isEnemy);
+			}
+			
 
 			mTeam = value;
 		}
