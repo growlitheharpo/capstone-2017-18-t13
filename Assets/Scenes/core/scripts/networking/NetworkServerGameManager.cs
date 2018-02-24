@@ -23,13 +23,8 @@ namespace FiringSquad.Networking
 	/// </summary>
 	public class NetworkServerGameManager : NetworkBehaviour
 	{
-		/// Inspector variables // TODO: This class's variables should be a struct
-		[SerializeField] private List<WeaponPartScript> mStageCaptureParts;
-		[SerializeField] private float mMinStageWaitTime;
-		[SerializeField] private float mMaxStageWaitTime;
-		[SerializeField] private int mRoundTime;
-		[SerializeField] private int mLobbyTime;
-		[SerializeField] private int mGoalPlayerCount;
+		/// Inspector variables
+		[SerializeField] private ServerGameDefaultData mData;
 
 		/// Private variables
 		private ServerStateMachine mStateMachine;
@@ -115,6 +110,9 @@ namespace FiringSquad.Networking
 			private CltPlayer[] mPlayerList;
 			private Dictionary<NetworkInstanceId, PlayerScore> mPlayerScores;
 
+			// Shortcut to the script's data
+			private ServerGameDefaultData data { get { return mScript.mData; } }
+
 			/// <summary>
 			/// Force an immediate transition into a non-waiting state.
 			/// </summary>
@@ -145,6 +143,7 @@ namespace FiringSquad.Networking
 				/// </summary>
 				public WaitingForConnectionState(ServerStateMachine machine) : base(machine) { }
 
+				private GameData.PlayerTeam mPreviousTeam;
 				private bool mReady;
 
 				/// <inheritdoc />
@@ -156,6 +155,8 @@ namespace FiringSquad.Networking
 
 					EventManager.Server.OnPlayerJoined += OnPlayerJoined;
 					EventManager.Server.OnPlayerHealthHitsZero += OnPlayerHealthHitsZero;
+
+					mPreviousTeam = GameData.PlayerTeam.Orange;
 				}
 
 				/// <inheritdoc />
@@ -168,12 +169,18 @@ namespace FiringSquad.Networking
 				/// <summary>
 				/// EVENT HANDLER: Server.OnPlayerJoined
 				/// </summary>
-				private void OnPlayerJoined(int newCount)
+				private void OnPlayerJoined(int newCount, CltPlayer newPlayer)
 				{
-					if (newCount > mMachine.mScript.mGoalPlayerCount)
+					if (newCount > mMachine.data.goalPlayerCount)
 						Logger.Warn("We have too many players in this session!", Logger.System.Network);
 
-					mReady = newCount >= mMachine.mScript.mGoalPlayerCount;
+					mReady = newCount >= mMachine.data.goalPlayerCount;
+
+					if (mMachine.data.currentType == GameData.MatchType.TeamDeathmatch)
+					{
+						mPreviousTeam = mPreviousTeam == GameData.PlayerTeam.Orange ? GameData.PlayerTeam.Blue : GameData.PlayerTeam.Orange;
+						newPlayer.AssignPlayerTeam(mPreviousTeam);
+					}
 				}
 
 				/// <summary>
@@ -211,7 +218,7 @@ namespace FiringSquad.Networking
 				public override void OnEnter()
 				{
 					mMachine.mPlayerList = FindObjectsOfType<CltPlayer>();
-					mEndTime = DateTime.Now.Ticks + mMachine.mScript.mLobbyTime * TimeSpan.TicksPerSecond;
+					mEndTime = DateTime.Now.Ticks + mMachine.data.lobbyTime * TimeSpan.TicksPerSecond;
 
 					foreach (CltPlayer player in mMachine.mPlayerList)
 						player.TargetStartLobbyCountdown(player.connectionToClient, mEndTime);
@@ -319,7 +326,7 @@ namespace FiringSquad.Networking
 				/// <inheritdoc />
 				public override void OnEnter()
 				{
-					mEndTime = DateTime.Now.Ticks + mMachine.mScript.mRoundTime * TimeSpan.TicksPerSecond;
+					mEndTime = DateTime.Now.Ticks + mMachine.data.roundTime * TimeSpan.TicksPerSecond;
 					EventManager.Server.OnPlayerHealthHitsZero += OnPlayerHealthHitsZero;
 					EventManager.Server.OnPlayerCapturedStage += OnPlayerCapturedStage;
 					EventManager.Server.OnStageTimedOut += OnStageTimedOut;
@@ -353,12 +360,12 @@ namespace FiringSquad.Networking
 					if (player.weapon != null)
 					{
 						WeaponPartCollection currentParts = player.weapon.currentParts;
-						var allPossibilities = mMachine.mScript.mStageCaptureParts;
+						var allPossibilities = mMachine.data.stageCaptureParts;
 						var possibilities = allPossibilities.Where(x => !currentParts.Contains(x));
 						choice = possibilities.ChooseRandom();
 					}
 					else
-						choice = mMachine.mScript.mStageCaptureParts.ChooseRandom();
+						choice = mMachine.data.stageCaptureParts.ChooseRandom();
 
 					GameObject instance = choice.SpawnInWorld();
 					instance.transform.position = stage.transform.position + Vector3.up * 45.0f;
@@ -391,7 +398,7 @@ namespace FiringSquad.Networking
 				/// </summary>
 				private IEnumerator EnableStageArea(StageCaptureArea stage)
 				{
-					yield return new WaitForSeconds(Random.Range(mMachine.mScript.mMinStageWaitTime, mMachine.mScript.mMaxStageWaitTime));
+					yield return new WaitForSeconds(Random.Range(mMachine.data.minStageWaitTime, mMachine.data.maxStageWaitTime));
 					stage.Enable();
 				}
 

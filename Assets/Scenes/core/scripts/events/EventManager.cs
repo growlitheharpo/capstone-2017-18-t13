@@ -325,16 +325,18 @@ public partial class EventManager
 		/// <summary>
 		/// Event called when a player has joined.
 		/// PARAMETER 1: The new total count of players.
+		/// PARAMETER 2: A reference to the new player.
 		/// </summary>
-		public static event Action<int> OnPlayerJoined = i => { LogEvent(); };
+		public static event Action<int, CltPlayer> OnPlayerJoined = (i, p) => { LogEvent(); };
 
 		/// <summary>
 		/// Event called when a player has joined.
 		/// </summary>
 		/// <param name="newCount">The new total count of players.</param>
-		public static void PlayerJoined(int newCount)
+		/// <param name="newPlayer">A reference to the new player.</param>
+		public static void PlayerJoined(int newCount, CltPlayer newPlayer)
 		{
-			OnPlayerJoined(newCount);
+			OnPlayerJoined(newCount, newPlayer);
 		}
 
 		/// <summary>

@@ -13,6 +13,7 @@ using JetBrains.Annotations;
 using KeatsLib.Unity;
 using UnityEngine;
 using UnityEngine.Networking;
+using Logger = FiringSquad.Debug.Logger;
 using Random = UnityEngine.Random;
 
 namespace FiringSquad.Gameplay
@@ -54,6 +55,8 @@ namespace FiringSquad.Gameplay
 
 		[SyncVar(hook = "OnPlayerNameUpdate")] private string mPlayerName;
 
+		[SyncVar(hook = "OnPlayerTeamUpdate")] private GameData.PlayerTeam mTeam = GameData.PlayerTeam.Deathmatch;
+
 		/// <inheritdoc />
 		public bool isCurrentPlayer { get { return isLocalPlayer; } }
 
@@ -68,6 +71,9 @@ namespace FiringSquad.Gameplay
 
 		/// <inheritdoc />
 		public float currentHealth { get { return mHealth; } }
+
+		/// <inheritdoc />
+		public GameData.PlayerTeam playerTeam { get { return mTeam; } }
 
 		/// <summary>
 		/// The local animator for this player.
@@ -226,6 +232,14 @@ namespace FiringSquad.Gameplay
 			}
 
 			mHitIndicator = realIndicator;
+		}
+
+		/// <summary>
+		/// Assign the player to a particular team.
+		/// </summary>
+		public void AssignPlayerTeam(GameData.PlayerTeam newTeam)
+		{
+			mTeam = newTeam;
 		}
 
 		/// <summary>
@@ -740,6 +754,16 @@ namespace FiringSquad.Gameplay
 				display.SetPlayerName(value);
 
 			mPlayerName = value;
+		}
+
+		/// <summary>
+		/// Sync the player's assigned team.
+		/// </summary>
+		[Client]
+		private void OnPlayerTeamUpdate(GameData.PlayerTeam value)
+		{
+			Logger.Info("Reflecting player color: " + value);
+			mTeam = value;
 		}
 
 		#endregion
