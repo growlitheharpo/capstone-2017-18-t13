@@ -15,6 +15,13 @@ ModelImporter:
     100014: slideGrip_low
     100016: slidePlate_low
     100018: slideRail_low
+    100020: bn_rocket
+    100022: bn_root
+    100024: bn_slide
+    100026: ctrl_rocket
+    100028: ctrl_root
+    100030: ctrl_slide
+    100032: mesh_rocketMechanism
     400000: //RootNode
     400002: rocket_low
     400004: rocketMount_low
@@ -25,6 +32,13 @@ ModelImporter:
     400014: slideGrip_low
     400016: slidePlate_low
     400018: slideRail_low
+    400020: bn_rocket
+    400022: bn_root
+    400024: bn_slide
+    400026: ctrl_rocket
+    400028: ctrl_root
+    400030: ctrl_slide
+    400032: mesh_rocketMechanism
     2300000: rocket_low
     2300002: rocketMount_low
     2300004: rocketSlide_low
@@ -34,6 +48,7 @@ ModelImporter:
     2300012: slideGrip_low
     2300014: slidePlate_low
     2300016: slideRail_low
+    2300018: mesh_rocketMechanism
     3300000: rocket_low
     3300002: rocketMount_low
     3300004: rocketSlide_low
@@ -43,6 +58,7 @@ ModelImporter:
     3300012: slideGrip_low
     3300014: slidePlate_low
     3300016: slideRail_low
+    3300018: mesh_rocketMechanism
     4300000: slideClamp_low
     4300002: slideRail_low
     4300004: rocketSlide_low
@@ -52,6 +68,9 @@ ModelImporter:
     4300012: slideGrip_low
     4300014: slidePlate_low
     4300016: rocket_low
+    4300018: mesh_rocketMechanism
+    9500000: //RootNode
+    13700000: mesh_rocketMechanism
   materials:
     importMaterials: 0
     materialName: 0
@@ -68,7 +87,7 @@ ModelImporter:
     animationImportWarnings: 
     animationRetargetingWarnings: 
     animationDoRetargetingWarnings: 0
-    animationCompression: 1
+    animationCompression: 3
     animationRotationError: 0.5
     animationPositionError: 0.5
     animationScaleError: 0.5
@@ -118,10 +137,10 @@ ModelImporter:
     rootMotionBoneName: 
     rootMotionBoneRotation: {x: 0, y: 0, z: 0, w: 1}
     hasTranslationDoF: 0
-    hasExtraRoot: 0
+    hasExtraRoot: 1
     skeletonHasParents: 1
   lastHumanDescriptionAvatarSource: {instanceID: 0}
-  animationType: 0
+  animationType: 2
   humanoidOversampling: 1
   additionalBone: 0
   userData: 
