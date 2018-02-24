@@ -24,7 +24,7 @@ namespace FiringSquad.Gameplay.Weapons
 		/// <inheritdoc />
 		protected override void Start()
 		{
-			mMaterialInstances = GetComponent<MeshRenderer>().materials;
+			mMaterialInstances = GetComponent<Renderer>().materials;
 			base.Start();
 		}
 
