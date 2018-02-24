@@ -243,6 +243,15 @@ namespace FiringSquad.Gameplay
 		}
 
 		/// <summary>
+		/// Debug assign the player team from a local command.
+		/// </summary>
+		/// <param name="team">Which team to change to.</param>
+		public void CmdDebugSetTeam(GameData.PlayerTeam team)
+		{
+			AssignPlayerTeam(team);
+		}
+
+		/// <summary>
 		/// Cleanup all listeners and event handlers, and spawned items.
 		/// </summary>
 		private void OnDestroy()
@@ -769,14 +778,13 @@ namespace FiringSquad.Gameplay
 		[Client]
 		private void OnPlayerTeamUpdate(GameData.PlayerTeam value)
 		{
-			Logger.Info("Reflecting player color: " + value);
-
 			// Update all of our child renderers
 			Color myColor = value == GameData.PlayerTeam.Orange ? defaultData.orangeTeamColor : defaultData.blueTeamColor;
 			var components = GetComponentsInChildren<ColormaskUpdateUtility>();
 			foreach (ColormaskUpdateUtility updater in components)
 				updater.UpdateDisplayedColor(myColor);
 
+			// Update the UI appropriately
 			if (isCurrentPlayer)
 				EventManager.Notify(() => EventManager.LocalGUI.LocalPlayerAssignedTeam(this));
 			else
