@@ -44,5 +44,27 @@ namespace FiringSquad.Gameplay.UI
 			foreach (UIShadow s in mShadows)
 				s.effectColor = new Color(shadow.r, shadow.g, shadow.b, s.effectColor.a);
 		}
+
+#if UNITY_EDITOR
+
+		/// <summary>
+		/// EDITOR ONLY
+		/// Set the list of UI Graphics elements that this updater affects.
+		/// </summary>
+		public void EditorSetGraphicsArray(UIGraphic[] newArray)
+		{
+			mGraphics = newArray;
+		}
+		
+		/// <summary>
+		/// EDITOR ONLY
+		/// Set the list of UI Shadow elements that this updater affects.
+		/// </summary>
+		public void EditorSetShadowsArray(UIShadow[] newArray)
+		{
+			mShadows = newArray;
+		}
+
+#endif
 	}
 }

@@ -1,5 +1,7 @@
-﻿using FiringSquad.Gameplay.UI;
+﻿using System.Linq;
+using FiringSquad.Gameplay.UI;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace UnityEditor
 {
@@ -22,13 +24,35 @@ namespace UnityEditor
 
 		private void DrawFindObjectsButtons()
 		{
+			UIColorUpdater t = target as UIColorUpdater;
+			if (t == null)
+				return;
+
 			CustomEditorGUIUtility.HorizontalLayout(() =>
 			{
-				if (GUILayout.Button(""))
+				if (GUILayout.Button("Find All Child Images"))
 				{
-
+					Undo.RecordObject(target, "Find All Image Children");
+					t.EditorSetGraphicsArray(t.GetComponentsInChildren<Image>().Select(x => x as Graphic).ToArray());
+				}
+				if (GUILayout.Button("Find All Text Children"))
+				{
+					Undo.RecordObject(target, "Find All Children");
+					t.EditorSetGraphicsArray(t.GetComponentsInChildren<Text>().Select(x => x as Graphic).ToArray());
+				}
+				if (GUILayout.Button("Find All Shadow Children"))
+				{
+					Undo.RecordObject(target, "Find All Children");
+					t.EditorSetShadowsArray(t.GetComponentsInChildren<Shadow>());
 				}
 			});
+
+			if (GUILayout.Button("Find ALL Possible Children"))
+			{
+				Undo.RecordObject(target, "Find All Children");
+				t.EditorSetGraphicsArray(t.GetComponentsInChildren<Graphic>());
+				t.EditorSetShadowsArray(t.GetComponentsInChildren<Shadow>());
+			}
 		}
 	}
 }
