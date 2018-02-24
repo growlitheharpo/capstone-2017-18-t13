@@ -98,14 +98,13 @@ namespace FiringSquad.Networking
 			public ServerStateMachine(NetworkServerGameManager script)
 			{
 				mScript = script;
-				mInGameStartPositions = GameObject.FindGameObjectsWithTag("matchspawn").Select(x => x.transform).ToArray();
 				mLobbyStartPositions = FindObjectsOfType<NetworkStartPosition>().Select(x => x.transform).ToArray();
 				TransitionStates(new WaitingForConnectionState(this));
 			}
 
 			// Private shared data
 			private readonly NetworkServerGameManager mScript;
-			private readonly Transform[] mInGameStartPositions, mLobbyStartPositions;
+			private readonly Transform[] mLobbyStartPositions;
 			private StageCaptureArea[] mCaptureAreas;
 			private CltPlayer[] mPlayerList;
 			private Dictionary<NetworkInstanceId, PlayerScore> mPlayerScores;
@@ -279,16 +278,44 @@ namespace FiringSquad.Networking
 				{
 					mMachine.mPlayerList = FindObjectsOfType<CltPlayer>();
 
-					if (mMachine.mPlayerList.Length > mMachine.mInGameStartPositions.Length)
+					if (mMachine.mPlayerList.Length > PlayerSpawnPosition.GetAll().Count)
 						Logger.Warn("We have too many players for the number of spawn positions!", Logger.System.Network);
 
-					var spawnCopy = mMachine.mInGameStartPositions.Select(x => x.transform).ToList();
+					if (mMachine.data.currentType == GameData.MatchType.Deathmatch)
+						SpawnPlayersDeathmatch();
+					else
+						SpawnPlayersTeam();
+				}
+
+				/// <summary>
+				/// Spawn all players in random positions on the map.
+				/// </summary>
+				private void SpawnPlayersDeathmatch()
+				{
+					var spawnCopy = PlayerSpawnPosition.GetAll().Select(x => x.transform).ToList();
 					spawnCopy.Shuffle();
 
 					foreach (CltPlayer player in mMachine.mPlayerList)
 					{
 						Transform target = spawnCopy[spawnCopy.Count - 1];
 						spawnCopy.RemoveAt(spawnCopy.Count - 1);
+
+						player.MoveToStartPosition(target.position, target.rotation);
+					}
+				}
+
+				/// <summary>
+				/// Spawn all players in locations appropriate for their assigned team.
+				/// </summary>
+				private void SpawnPlayersTeam()
+				{
+					var blue = new Queue<PlayerSpawnPosition>(PlayerSpawnPosition.GetAll(GameData.PlayerTeam.Blue).Shuffle());
+					var orange = new Queue<PlayerSpawnPosition>(PlayerSpawnPosition.GetAll(GameData.PlayerTeam.Orange).Shuffle());
+
+					foreach (CltPlayer player in mMachine.mPlayerList)
+					{
+						var list = player.playerTeam == GameData.PlayerTeam.Blue ? blue : orange;
+						Transform target = list.Dequeue().transform;
 
 						player.MoveToStartPosition(target.position, target.rotation);
 					}
@@ -407,7 +434,13 @@ namespace FiringSquad.Networking
 				/// </summary>
 				private void OnPlayerHealthHitsZero(CltPlayer dead, IDamageSource damage)
 				{
-					Transform newPosition = ChooseSafestSpawnPosition(mMachine.mPlayerList, dead, mMachine.mInGameStartPositions);
+					List<Transform> spawnList;
+					if (mMachine.data.currentType == GameData.MatchType.Deathmatch)
+						spawnList = PlayerSpawnPosition.GetAll().Select(x => x.transform).ToList();
+					else
+						spawnList = PlayerSpawnPosition.GetAll(dead.playerTeam).Select(x => x.transform).ToList();
+
+					Transform newPosition = ChooseSafestSpawnPosition(mMachine.mPlayerList, dead, spawnList);
 
 					if (damage.source is CltPlayer)
 					{
