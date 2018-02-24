@@ -18,7 +18,7 @@ namespace FiringSquad.Gameplay.UI
 
 		/// Private variables
 		private UIImage mImage;
-		private Color mImageFarColor, mImageCloseColor;
+		//private Color mImageFarColor, mImageCloseColor;
 		private RectTransform mRealTransform;
 		private StageCaptureArea mTarget;
 
@@ -29,8 +29,6 @@ namespace FiringSquad.Gameplay.UI
 		{
 			mRealTransform = GetComponent<RectTransform>();
 			mImage = GetComponent<UIImage>();
-			mImageFarColor = mImage.color;
-			mImageCloseColor = new Color(mImageFarColor.r, mImageFarColor.g, mImageFarColor.b, 0.0f);
 		}
 
 		/// <summary>
@@ -105,7 +103,7 @@ namespace FiringSquad.Gameplay.UI
 			mRealTransform.localRotation = Quaternion.AngleAxis(angle, Vector3.forward);
 
 			mImage.sprite = mOffscreenSprite;
-			mImage.color = mImageFarColor;
+			//mImage.color = mImageFarColor;
 
 			mLabelText.enabled = true;
 			mLabelText.transform.localRotation = Quaternion.AngleAxis(-angle, Vector3.forward);
@@ -125,7 +123,6 @@ namespace FiringSquad.Gameplay.UI
 			mRealTransform.localRotation = Quaternion.identity;
 
 			mImage.sprite = mOnscreenSprite;
-			mImage.color = Color.Lerp(mImageCloseColor, mImageFarColor, Vector3.Distance(worldPos, Camera.main.transform.position) / 3.0f - 5.0f);
 			
 			mLabelText.enabled = false;
 		}
