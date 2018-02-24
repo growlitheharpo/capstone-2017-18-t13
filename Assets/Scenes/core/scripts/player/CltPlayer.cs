@@ -42,6 +42,7 @@ namespace FiringSquad.Gameplay
 		private IPlayerHitIndicator mHitIndicator;
 		private CharacterController mCharacterController;
 		private CltPlayerLocal mLocalPlayerScript;
+		private PlayerThirdPersonView mThirdPersonView;
 
 		/// Private syncvars
 		[SyncVar(hook = "OnHealthUpdate")] private float mHealth;
@@ -155,6 +156,7 @@ namespace FiringSquad.Gameplay
 
 			mLocalHealthVar = new BoundProperty<float>(mInformation.defaultHealth);
 			defaultData.firstPersonView.SetActive(false);
+			mThirdPersonView = GetComponentInChildren<PlayerThirdPersonView>();
 		}
 
 		/// <summary>
@@ -648,12 +650,14 @@ namespace FiringSquad.Gameplay
 				}
 			}
 
+			if (mThirdPersonView != null)
+				mThirdPersonView.ReflectTookDamage(mHealth);
+
 			mHitIndicator.NotifyHit(this, origin, point, normal, amount);
 			ServiceLocator.Get<IAudioManager>()
 				.CreateSound(AudioEvent.PlayerDamagedGrunt, transform)
 				.SetParameter("IsCurrentPlayer", Convert.ToSingle(isCurrentPlayer))
 				.AttachToRigidbody(GetComponent<Rigidbody>());
-
 		}
 
 		/// <summary>
@@ -666,16 +670,21 @@ namespace FiringSquad.Gameplay
 		[ClientRpc]
 		private void RpcHandleDeath(Vector3 deathPosition, Vector3 spawnPos, Quaternion spawnRot, NetworkInstanceId killer)
 		{
+			// Grab information about the killer
+			IWeaponBearer killerObj = killer == NetworkInstanceId.Invalid ? null : ClientScene.FindLocalObject(killer).GetComponent<IWeaponBearer>();
+
+			// If the killer is the local player, they get an event. Otherwise, we show it on the third person view.
+			if (killerObj != null && killerObj.isCurrentPlayer)
+				EventManager.Notify(() => EventManager.Local.LocalPlayerGotKill(this, killerObj.weapon));
+			else if (killerObj is CltPlayer)
+				((CltPlayer)killerObj).mThirdPersonView.ReflectGotKill();
+
+			// Show our death particles
 			ParticleSystem particles = Instantiate(mAssets.deathParticlesPrefab, deathPosition, Quaternion.identity).GetComponent<ParticleSystem>();
 			particles.Play();
 			StartCoroutine(Coroutines.WaitAndDestroyParticleSystem(particles));
 
-			IWeaponBearer killerObj = killer == NetworkInstanceId.Invalid ? null : ClientScene.FindLocalObject(killer).GetComponent<IWeaponBearer>();
-
-			if (killerObj != null && killerObj.isCurrentPlayer)
-				EventManager.Notify(() => EventManager.Local.LocalPlayerGotKill(this, killerObj.weapon));
-
-			// If we died, we get removed from any potential highlight list.
+			// If we died, we should get removed from any potential highlight list.
 			if (ObjectHighlight.instance != null)
 			{
 				var renderers = GetComponentsInChildren<Renderer>();
@@ -683,11 +692,12 @@ namespace FiringSquad.Gameplay
 					ObjectHighlight.instance.RemoveRendererFromHighlightList(r);
 			}
 
-			if (!isLocalPlayer)
-				return;
-
-			mLocalHealthVar.value = 0.0f;
-			EventManager.Local.LocalPlayerDied(spawnPos, spawnRot, killerObj);
+			// If the dead player is the local player, they get an event.
+			if (isLocalPlayer)
+			{
+				mLocalHealthVar.value = 0.0f;
+				EventManager.Local.LocalPlayerDied(spawnPos, spawnRot, killerObj);
+			}
 		}
 
 		/// <summary>
@@ -732,6 +742,9 @@ namespace FiringSquad.Gameplay
 			mHealth = value;
 			if (mLocalHealthVar != null)
 				mLocalHealthVar.value = value;
+
+			if (mThirdPersonView != null)
+				mThirdPersonView.UpdateHealthAmount(value);
 		}
 
 		/// <summary>
