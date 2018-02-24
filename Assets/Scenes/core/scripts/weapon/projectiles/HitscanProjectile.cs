@@ -88,9 +88,6 @@ namespace FiringSquad.Gameplay.Weapons
 				// Check if each hit has hit a damage receiver and break if so.
 				foreach (RaycastHit hit in hits)
 				{
-					if (hit.collider.gameObject == weapon.bearer.gameObject)
-						continue;
-
 					endPoint = hit.point;
 					float damage = GetDamage(data, Vector3.Distance(weapon.transform.position, endPoint));
 
@@ -103,7 +100,7 @@ namespace FiringSquad.Gameplay.Weapons
 					else
 						hitObject = hit.GetDamageReceiver();
 
-					if (hitObject != null)
+					if (hitObject != null && hitObject != weapon.bearer)
 					{
 						hitObject.ApplyDamage(damage, endPoint, hit.normal, this);
 						--hitObjectCount;

@@ -277,6 +277,21 @@ public partial class EventManager
 		public static event Action<CrosshairHintText.Hint, bool> OnSetHintState = (h, b) => { LogEvent(); };
 
 		/// <summary>
+		/// Event called to update all UI elements when the player has been assigned a team.
+		/// PARAMETER 1: A reference to the local player.
+		/// </summary>
+		public static event Action<CltPlayer> OnLocalPlayerAssignedTeam = p => { LogEvent(); };
+
+		/// <summary>
+		/// Event called to update all UI elements when the player has been assigned a team.
+		/// </summary>
+		/// <param name="localPlayer">A reference to the local player.</param>
+		public static void LocalPlayerAssignedTeam(CltPlayer localPlayer)
+		{
+			OnLocalPlayerAssignedTeam(localPlayer);
+		}
+
+		/// <summary>
 		/// Event called to push a UI hint onto the hint stack.
 		/// </summary>
 		/// <param name="hint">Which hint to push.</param>
@@ -325,16 +340,18 @@ public partial class EventManager
 		/// <summary>
 		/// Event called when a player has joined.
 		/// PARAMETER 1: The new total count of players.
+		/// PARAMETER 2: A reference to the new player.
 		/// </summary>
-		public static event Action<int> OnPlayerJoined = i => { LogEvent(); };
+		public static event Action<int, CltPlayer> OnPlayerJoined = (i, p) => { LogEvent(); };
 
 		/// <summary>
 		/// Event called when a player has joined.
 		/// </summary>
 		/// <param name="newCount">The new total count of players.</param>
-		public static void PlayerJoined(int newCount)
+		/// <param name="newPlayer">A reference to the new player.</param>
+		public static void PlayerJoined(int newCount, CltPlayer newPlayer)
 		{
-			OnPlayerJoined(newCount);
+			OnPlayerJoined(newCount, newPlayer);
 		}
 
 		/// <summary>

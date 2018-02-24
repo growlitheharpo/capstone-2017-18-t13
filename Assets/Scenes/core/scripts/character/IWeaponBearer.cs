@@ -32,5 +32,10 @@ namespace FiringSquad.Gameplay
 		/// <param name="wep">The weapon to bind.</param>
 		/// <param name="bindUI">Whether or not the local UI should be bound to this weapon.</param>
 		void BindWeaponToBearer(IModifiableWeapon wep, bool bindUI = false);
+
+		/// <summary>
+		/// Get the team that this bearer belongs to.
+		/// </summary>
+		GameData.PlayerTeam playerTeam { get; }
 	}
 }

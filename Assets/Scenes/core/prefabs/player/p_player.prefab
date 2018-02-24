@@ -110,6 +110,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4550313080495358}
   - component: {fileID: 137067740133668572}
+  - component: {fileID: 114576101875495732}
   m_Layer: 0
   m_Name: mesh_firstPersonArm
   m_TagString: Untagged
@@ -733,6 +734,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4672834794302962}
   - component: {fileID: 137707576271856452}
+  - component: {fileID: 114599229711015684}
   m_Layer: 0
   m_Name: mesh_bot
   m_TagString: Untagged
@@ -1871,11 +1873,24 @@ MonoBehaviour:
     mThirdPersonView: {fileID: 1188512907585922}
     mFirstPersonView: {fileID: 1856272431269518}
     mFirstPersonWeaponBone: {fileID: 4201176128061190}
+    mBlueTeamColor: {r: 0, g: 0.64705884, b: 1, a: 1}
+    mOrangeTeamColor: {r: 1, g: 0.43529412, b: 0, a: 1}
   mCameraOffset: {fileID: 4999094504190870}
   mGun1Offset: {fileID: 4098957100354382}
   mGun2Offset: {fileID: 4883558922381024}
   mAnimator: {fileID: 95247950511577994}
   mNetworkAnimator: {fileID: 114113183744137726}
+--- !u!114 &114576101875495732
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1215363089375248}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 945ac7219aeaae941a1245d224216262, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &114580933818604392
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1903,6 +1918,17 @@ MonoBehaviour:
   m_FillAmount: 1
   m_FillClockwise: 1
   m_FillOrigin: 0
+--- !u!114 &114599229711015684
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1809633533058036}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 945ac7219aeaae941a1245d224216262, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &114636539893831638
 MonoBehaviour:
   m_ObjectHideFlags: 1

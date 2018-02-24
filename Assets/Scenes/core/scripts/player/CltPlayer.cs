@@ -9,9 +9,11 @@ using FiringSquad.Core.Weapons;
 using FiringSquad.Data;
 using FiringSquad.Gameplay.UI;
 using FiringSquad.Gameplay.Weapons;
+using JetBrains.Annotations;
 using KeatsLib.Unity;
 using UnityEngine;
 using UnityEngine.Networking;
+using Logger = FiringSquad.Debug.Logger;
 using Random = UnityEngine.Random;
 
 namespace FiringSquad.Gameplay
@@ -53,6 +55,8 @@ namespace FiringSquad.Gameplay
 
 		[SyncVar(hook = "OnPlayerNameUpdate")] private string mPlayerName;
 
+		[SyncVar(hook = "OnPlayerTeamUpdate")] private GameData.PlayerTeam mTeam = GameData.PlayerTeam.Deathmatch;
+
 		/// <inheritdoc />
 		public bool isCurrentPlayer { get { return isLocalPlayer; } }
 
@@ -67,6 +71,9 @@ namespace FiringSquad.Gameplay
 
 		/// <inheritdoc />
 		public float currentHealth { get { return mHealth; } }
+
+		/// <inheritdoc />
+		public GameData.PlayerTeam playerTeam { get { return mTeam; } }
 
 		/// <summary>
 		/// The local animator for this player.
@@ -98,7 +105,12 @@ namespace FiringSquad.Gameplay
 		/// </summary>
 		public string playerName { get { return mPlayerName; } }
 
-		#region Unity Callbacks
+		/// <summary>
+		/// A reference directly to the local player, if available.
+		/// </summary>
+		[CanBeNull] public static CltPlayer localPlayerReference { get; private set; }
+
+		#region Unity Callbacks and Initialization
 
 		/// <summary>
 		/// Unity's server-side start event.
@@ -168,6 +180,7 @@ namespace FiringSquad.Gameplay
 			StartCoroutine(AdjustToLocalView());
 
 			// Send the "spawned" event.
+			localPlayerReference = this;
 			EventManager.Notify(() => EventManager.Local.LocalPlayerSpawned(this));
 		}
 
@@ -222,6 +235,14 @@ namespace FiringSquad.Gameplay
 		}
 
 		/// <summary>
+		/// Assign the player to a particular team.
+		/// </summary>
+		public void AssignPlayerTeam(GameData.PlayerTeam newTeam)
+		{
+			mTeam = newTeam;
+		}
+
+		/// <summary>
 		/// Cleanup all listeners and event handlers, and spawned items.
 		/// </summary>
 		private void OnDestroy()
@@ -254,6 +275,8 @@ namespace FiringSquad.Gameplay
 		}
 
 		#endregion
+
+		#region Interaction
 
 		/// <summary>
 		/// Activate the "interact" input command on the server.
@@ -306,6 +329,8 @@ namespace FiringSquad.Gameplay
 
 			interactable.Interact(this);
 		}
+
+		#endregion
 
 		#region Animations
 
@@ -525,6 +550,13 @@ namespace FiringSquad.Gameplay
 		{
 			if (ReferenceEquals(cause.source, this))
 				amount *= 0.5f;
+			else if (cause.source is IWeaponBearer)
+			{
+				// Reject any damage from teammates
+				IWeaponBearer b = (IWeaponBearer)cause.source;
+				if (b.playerTeam != GameData.PlayerTeam.Deathmatch && b.playerTeam == mTeam)
+					return;
+			}
 
 			NetworkInstanceId id = cause.source != null ? cause.source.netId : NetworkInstanceId.Invalid;
 			Vector3 pos = cause.source != null ? cause.source.transform.position : transform.position;
@@ -595,7 +627,7 @@ namespace FiringSquad.Gameplay
 				EventManager.Notify(() => EventManager.Local.LocalPlayerCausedDamage(amount));
 				ServiceLocator.Get<IAudioManager>().CreateSound(AudioEvent.LocalDealDamage, realSource.transform);
 			}
-			else if (this.isCurrentPlayer)
+			else if (isCurrentPlayer)
 			{
 				// else notify the camera it should shake
 				Camera cameraRef = GetComponentInChildren<Camera>();
@@ -729,6 +761,34 @@ namespace FiringSquad.Gameplay
 				display.SetPlayerName(value);
 
 			mPlayerName = value;
+		}
+
+		/// <summary>
+		/// Sync the player's assigned team.
+		/// </summary>
+		[Client]
+		private void OnPlayerTeamUpdate(GameData.PlayerTeam value)
+		{
+			Logger.Info("Reflecting player color: " + value);
+
+			// Update all of our child renderers
+			Color myColor = value == GameData.PlayerTeam.Orange ? defaultData.orangeTeamColor : defaultData.blueTeamColor;
+			var components = GetComponentsInChildren<ColormaskUpdateUtility>();
+			foreach (ColormaskUpdateUtility updater in components)
+				updater.UpdateDisplayedColor(myColor);
+
+			if (isCurrentPlayer)
+				EventManager.Notify(() => EventManager.LocalGUI.LocalPlayerAssignedTeam(this));
+			else
+			{
+				bool isEnemy = value == GameData.PlayerTeam.Deathmatch || (localPlayerReference != null && localPlayerReference.mTeam != value);
+				PlayerNameWorldCanvas display = GetComponentInChildren<PlayerNameWorldCanvas>();
+				if (display != null)
+					display.SetIsEnemyPlayer(isEnemy);
+			}
+			
+
+			mTeam = value;
 		}
 
 		#endregion
