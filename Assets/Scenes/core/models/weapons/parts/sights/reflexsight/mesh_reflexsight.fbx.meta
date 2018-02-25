@@ -1,6 +1,6 @@
 fileFormatVersion: 2
-guid: f5ebc3554b199487882c0d9c0704e685
-timeCreated: 1517942622
+guid: cfe8165c7855ec54b9e7e63227028b3d
+timeCreated: 1519539179
 licenseType: Free
 ModelImporter:
   serializedVersion: 21
@@ -9,9 +9,7 @@ ModelImporter:
     400000: //RootNode
     2300000: //RootNode
     3300000: //RootNode
-    4300000: Architecture_Wall_3x3_2
-    4300002: Architecture_WallDoor_3x3_2
-    9500000: //RootNode
+    4300000: mesh_reflexsight
   materials:
     importMaterials: 0
     materialName: 0
@@ -42,10 +40,10 @@ ModelImporter:
     globalScale: 1
     meshCompression: 0
     addColliders: 0
-    importVisibility: 0
+    importVisibility: 1
     importBlendShapes: 1
-    importCameras: 0
-    importLights: 0
+    importCameras: 1
+    importLights: 1
     swapUVChannels: 0
     generateSecondaryUV: 0
     useFileUnits: 1
@@ -61,7 +59,7 @@ ModelImporter:
     normalSmoothAngle: 60
     normalImportMode: 0
     tangentImportMode: 3
-    normalCalculationMode: 0
+    normalCalculationMode: 4
   importAnimation: 1
   copyAvatar: 0
   humanDescription:
@@ -81,7 +79,7 @@ ModelImporter:
     hasExtraRoot: 0
     skeletonHasParents: 1
   lastHumanDescriptionAvatarSource: {instanceID: 0}
-  animationType: 2
+  animationType: 0
   humanoidOversampling: 1
   additionalBone: 0
   userData: 
