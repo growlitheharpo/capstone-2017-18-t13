@@ -6,7 +6,7 @@ Material:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_Name: mat_rocketMechanism
+  m_Name: mat_assaultbarrel
   m_Shader: {fileID: 46, guid: 0000000000000000f000000000000000, type: 0}
   m_ShaderKeywords: _EMISSION _METALLICGLOSSMAP _NORMALMAP
   m_LightmapFlags: 1
@@ -19,7 +19,7 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _BumpMap:
-        m_Texture: {fileID: 2800000, guid: 4f7f154f521007948abb2da1b7a26e6b, type: 3}
+        m_Texture: {fileID: 2800000, guid: ad56feffde9d3384693b767862a62d0f, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _DetailAlbedoMap:
@@ -35,15 +35,15 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _EmissionMap:
-        m_Texture: {fileID: 2800000, guid: 996c0dff1301cd64a88b39fd0c15274e, type: 3}
+        m_Texture: {fileID: 2800000, guid: ccc13f604f1668e4791b7b15b4f8f529, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: 0db982d47cc8aef4a85361e4e1f30001, type: 3}
+        m_Texture: {fileID: 2800000, guid: 545f44e9d8fd70d49a4e944014c4b5d3, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
-        m_Texture: {fileID: 2800000, guid: 6f9f591c04b134b4c823bf88fab1d509, type: 3}
+        m_Texture: {fileID: 2800000, guid: b5ec46038547b304b87f7487ae00cf78, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _OcclusionMap:
@@ -72,5 +72,5 @@ Material:
     - _UVSec: 0
     - _ZWrite: 1
     m_Colors:
-    - _Color: {r: 0.62352943, g: 0.62352943, b: 0.62352943, a: 1}
+    - _Color: {r: 0.625, g: 0.625, b: 0.625, a: 1}
     - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}

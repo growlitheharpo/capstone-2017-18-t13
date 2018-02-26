@@ -6,20 +6,21 @@ Material:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_Name: mat_rocketMechanism
+  m_Name: mat_reflexsight
   m_Shader: {fileID: 46, guid: 0000000000000000f000000000000000, type: 0}
-  m_ShaderKeywords: _EMISSION _METALLICGLOSSMAP _NORMALMAP
+  m_ShaderKeywords: _ALPHATEST_ON _EMISSION _METALLICGLOSSMAP _NORMALMAP
   m_LightmapFlags: 1
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
-  m_CustomRenderQueue: -1
-  stringTagMap: {}
+  m_CustomRenderQueue: 2450
+  stringTagMap:
+    RenderType: TransparentCutout
   disabledShaderPasses: []
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
     - _BumpMap:
-        m_Texture: {fileID: 2800000, guid: 4f7f154f521007948abb2da1b7a26e6b, type: 3}
+        m_Texture: {fileID: 2800000, guid: cd1d08808d4b6b64b8c29dbc96b43a3e, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _DetailAlbedoMap:
@@ -35,15 +36,15 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _EmissionMap:
-        m_Texture: {fileID: 2800000, guid: 996c0dff1301cd64a88b39fd0c15274e, type: 3}
+        m_Texture: {fileID: 2800000, guid: 34523112d779bcb41a0f8bf22fadca7e, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: 0db982d47cc8aef4a85361e4e1f30001, type: 3}
+        m_Texture: {fileID: 2800000, guid: ea3a7b535e09eef4f98eb562d111df7a, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
-        m_Texture: {fileID: 2800000, guid: 6f9f591c04b134b4c823bf88fab1d509, type: 3}
+        m_Texture: {fileID: 2800000, guid: bba00c1e8cf11df4db73e7acb940165c, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _OcclusionMap:
@@ -63,7 +64,7 @@ Material:
     - _Glossiness: 0.5
     - _GlossyReflections: 1
     - _Metallic: 0
-    - _Mode: 0
+    - _Mode: 1
     - _OcclusionStrength: 1
     - _Parallax: 0.02
     - _SmoothnessTextureChannel: 0
