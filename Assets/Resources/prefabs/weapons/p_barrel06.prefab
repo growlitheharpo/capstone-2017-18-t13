@@ -21,6 +21,7 @@ GameObject:
   - component: {fileID: 4985866170885152}
   - component: {fileID: 33711416558970264}
   - component: {fileID: 23711501845100986}
+  - component: {fileID: 114173442282458384}
   m_Layer: 0
   m_Name: mesh_assaultbarrel
   m_TagString: Untagged
@@ -346,6 +347,23 @@ MonoBehaviour:
     type: 2}
   mPickupLifetimeMin: 20
   mPickupLifetimeMax: 40
+--- !u!114 &114173442282458384
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1185967123033884}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b6a79cc8387fa540af19169480e81c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mBoundProperty: player_part_durability_barrel
+  mEmissiveProperty: _EmissionColor
+  mStartColor: {r: 0.2629758, g: 0.9411765, b: 0.6630674, a: 1}
+  mEndColor: {r: 1, g: 0, b: 0, a: 1}
+  mBlinkingThreshold: 0.15
+  mBlinkingRate: 0.15
 --- !u!114 &114194717887081172
 MonoBehaviour:
   m_ObjectHideFlags: 1

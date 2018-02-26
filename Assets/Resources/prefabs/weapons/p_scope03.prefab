@@ -89,6 +89,7 @@ GameObject:
   - component: {fileID: 4913936730111396}
   - component: {fileID: 33228134334906784}
   - component: {fileID: 23098282850001582}
+  - component: {fileID: 114937695268217624}
   m_Layer: 0
   m_Name: mesh_reflexsight
   m_TagString: Untagged
@@ -189,7 +190,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1756146268043284}
   m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0, y: 0, z: 0}
+  m_LocalPosition: {x: -0, y: -0.025, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 4700089280887214}
@@ -432,3 +433,20 @@ MonoBehaviour:
   mDurability: 40
   mAimDownSightsEffects:
   - {fileID: 11400000, guid: 6fe81614cb3258040bbfdd67fe7a5885, type: 2}
+--- !u!114 &114937695268217624
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1756146268043284}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b6a79cc8387fa540af19169480e81c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mBoundProperty: player_part_durability_scope
+  mEmissiveProperty: _EmissionColor
+  mStartColor: {r: 0.2629758, g: 0.9411765, b: 0.6630674, a: 1}
+  mEndColor: {r: 1, g: 0, b: 0, a: 1}
+  mBlinkingThreshold: 0.15
+  mBlinkingRate: 0.15
