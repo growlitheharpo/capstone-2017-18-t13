@@ -208,7 +208,7 @@ namespace FiringSquad.Gameplay
 		[ClientCallback]
 		private void Update()
 		{
-			if (bearer.isCurrentPlayer)
+			if (bearer != null && bearer.isCurrentPlayer)
 				UpdateCrosshairHints();
 		}
 

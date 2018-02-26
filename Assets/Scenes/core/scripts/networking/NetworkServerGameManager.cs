@@ -142,7 +142,6 @@ namespace FiringSquad.Networking
 				/// </summary>
 				public WaitingForConnectionState(ServerStateMachine machine) : base(machine) { }
 
-				private GameData.PlayerTeam mPreviousTeam;
 				private bool mReady;
 
 				/// <inheritdoc />
@@ -154,8 +153,6 @@ namespace FiringSquad.Networking
 
 					EventManager.Server.OnPlayerJoined += OnPlayerJoined;
 					EventManager.Server.OnPlayerHealthHitsZero += OnPlayerHealthHitsZero;
-
-					mPreviousTeam = GameData.PlayerTeam.Orange;
 				}
 
 				/// <inheritdoc />
@@ -177,8 +174,9 @@ namespace FiringSquad.Networking
 
 					if (mMachine.data.currentType == GameData.MatchType.TeamDeathmatch)
 					{
-						mPreviousTeam = mPreviousTeam == GameData.PlayerTeam.Orange ? GameData.PlayerTeam.Blue : GameData.PlayerTeam.Orange;
-						newPlayer.AssignPlayerTeam(mPreviousTeam);
+						//mPreviousTeam = mPreviousTeam == GameData.PlayerTeam.Orange ? GameData.PlayerTeam.Blue : GameData.PlayerTeam.Orange;
+						GameData.PlayerTeam team = newCount > mMachine.data.goalPlayerCount / 2 ? GameData.PlayerTeam.Blue : GameData.PlayerTeam.Orange;
+						newPlayer.AssignPlayerTeam(team);
 					}
 				}
 
