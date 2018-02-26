@@ -47,7 +47,8 @@ namespace FiringSquad.Gameplay.UI
 		/// <param name="scores">The array of scores that will be displayed.</param>
 		public void SetDisplayScores(PlayerScore[] scores)
 		{
-			NetworkInstanceId localPlayerId = FindObjectsOfType<CltPlayer>().First(x => x.isCurrentPlayer).netId;
+			//NetworkInstanceId localPlayerId = FindObjectsOfType<CltPlayer>().First(x => x.isCurrentPlayer).netId;
+			NetworkInstanceId localPlayerId = CltPlayer.localPlayerReference != null ? CltPlayer.localPlayerReference.netId : NetworkInstanceId.Invalid;
 
 			gameObject.SetActive(true);
 			foreach (PlayerScore score in scores)

@@ -2,6 +2,7 @@
 using FiringSquad.Core.Input;
 using FiringSquad.Core.UI;
 using FiringSquad.Data;
+using FiringSquad.Debug;
 using FiringSquad.Gameplay.Weapons;
 using KeatsLib.Unity;
 using UnityEngine;
@@ -57,11 +58,15 @@ namespace FiringSquad.Gameplay
 				.RegisterInput(Input.GetButtonUp, inputMap.activateADSButton, INPUT_ExitAimDownSights, InputLevel.Gameplay)
 				.RegisterInput(Input.GetButtonDown, inputMap.pauseButton, INPUT_TogglePause, InputLevel.PauseMenu)
 				.RegisterInput(Input.GetKeyDown, KeyCode.J, INPUT_ActivateGunPanic, InputLevel.Gameplay)
+				.RegisterAxis(Input.GetAxis, inputMap.zoomAxis, INPUT_ZoomLevel, InputLevel.Gameplay)
 
 				// input levels
 				.EnableInputLevel(InputLevel.Gameplay)
 				.EnableInputLevel(InputLevel.HideCursor)
 				.EnableInputLevel(InputLevel.PauseMenu);
+
+			ServiceLocator.Get<IGameConsole>()
+				.RegisterCommand("set-team", CONSOLE_SetPlayerTeam);
 
 			SetupCamera();
 
@@ -91,6 +96,7 @@ namespace FiringSquad.Gameplay
 				.UnregisterInput(INPUT_MagnetArmDown)
 				.UnregisterInput(INPUT_MagnetArmHeld)
 				.UnregisterInput(INPUT_MagnetArmUp)
+				.UnregisterAxis(INPUT_ZoomLevel)
 
 				// local
 				.UnregisterInput(INPUT_EnterAimDownSights)
@@ -253,7 +259,31 @@ namespace FiringSquad.Gameplay
 			weapon.positionOffset = playerRoot.eye.InverseTransformPoint(offset.position);
 			weapon.transform.SetParent(playerRoot.transform);
 		}
-		
+
+		private void INPUT_ZoomLevel(float val)
+		{
+			if (inAimDownSightsMode)
+			{
+				EventManager.Local.ZoomLevelChanged(val, playerRoot);
+			}
+		}
+
+		/// <summary>
+		/// CONSOLE COMMAND: Change the local player's team.
+		/// </summary>
+		private void CONSOLE_SetPlayerTeam(string[] args)
+		{
+			if (args.Length < 1)
+				throw new System.ArgumentException("Invalid arguments for command: set-team");
+
+			string teamName = args[0].ToLower();
+
+			if (teamName == "blue")
+				playerRoot.CmdDebugSetTeam(GameData.PlayerTeam.Blue);
+			else if (teamName == "orange")
+				playerRoot.CmdDebugSetTeam(GameData.PlayerTeam.Orange);
+		}
+
 		/// <summary>
 		/// EVENT HANDLER: Local.OnApplyOptionsData
 		/// </summary>

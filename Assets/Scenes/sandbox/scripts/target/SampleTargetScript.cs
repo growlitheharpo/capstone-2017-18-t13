@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using FiringSquad.Core;
+using FiringSquad.Data;
 using FiringSquad.Debug;
 using FiringSquad.Gameplay;
 using UnityEngine;
@@ -25,6 +26,8 @@ namespace FiringSquad.Prototyping
 
 		/// <inheritdoc />
 		public float currentHealth { get { return mHealth.value; } }
+
+		public GameData.PlayerTeam playerTeam { get { return GameData.PlayerTeam.Deathmatch; } }
 
 		/// <summary>
 		/// The health of this target.

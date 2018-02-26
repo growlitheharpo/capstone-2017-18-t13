@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using System.Globalization;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -33,7 +32,7 @@ namespace FiringSquad.Gameplay.UI
 			while (mLocalPlayerRef == null)
 			{
 				yield return null;
-				CltPlayer script = FindObjectsOfType<CltPlayer>().FirstOrDefault(x => x.isCurrentPlayer);
+				CltPlayer script = CltPlayer.localPlayerReference;
 
 				if (script == null)
 					continue;
@@ -50,22 +49,7 @@ namespace FiringSquad.Gameplay.UI
 			if (mLocalPlayerRef == null)
 				return;
 
-			DoAlpha();
 			DoRotate();
-		}
-
-		/// <summary>
-		/// Lerp the color between transparent and visible based on if the player is looking at us.
-		/// TODO: Evaluate if we want this.
-		/// </summary>
-		private void DoAlpha()
-		{
-			// TODO: Reevaluate if we want this?
-			/*Vector3 direction = transform.position - mLocalPlayerRef.position;
-			float dot = Vector3.Dot(direction.normalized, mLocalPlayerRef.forward);
-			dot = (Mathf.Pow(dot, 10.0f) - 0.6f) * 2.5f;
-
-			mCanvasGroup.alpha = dot;*/
 		}
 
 		/// <summary>
@@ -85,6 +69,15 @@ namespace FiringSquad.Gameplay.UI
 		public void SetPlayerName(string newName)
 		{
 			mDisplayText.text = CultureInfo.InvariantCulture.TextInfo.ToTitleCase(newName);
+		}
+
+		/// <summary>
+		/// Set whether this canvas is on a teammate or an enemy.
+		/// </summary>
+		/// <param name="isEnemy">True if this is attached to an enemy.</param>
+		public void SetIsEnemyPlayer(bool isEnemy)
+		{
+			mDisplayText.color = isEnemy ? Color.red : Color.grey;
 		}
 	}
 }

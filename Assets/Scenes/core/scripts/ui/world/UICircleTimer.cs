@@ -38,7 +38,7 @@ namespace FiringSquad.Gameplay.UI
 			while (kPlayerRef == null)
 			{
 				yield return null;
-				CltPlayer script = FindObjectsOfType<CltPlayer>().FirstOrDefault(x => x.isCurrentPlayer);
+				CltPlayer script = CltPlayer.localPlayerReference;
 				if (script != null)
 					kPlayerRef = script.eye.transform;
 			}

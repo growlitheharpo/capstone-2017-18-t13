@@ -161,10 +161,11 @@ namespace KeatsLib.Collections
 		/// Extension to randomly rearrange the items in an IList.
 		/// </summary>
 		/// <param name="list">The list to rearrange.</param>
-		public static void Shuffle<T>(this IList<T> list)
+		public static IList<T> Shuffle<T>(this IList<T> list)
 		{
 			for (int i = 0; i < list.Count; i++)
 				list.SwapElement(i, Random.Range(i, list.Count));
+			return list;
 		}
 
 		/// <summary>

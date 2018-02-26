@@ -1,5 +1,7 @@
-﻿using FiringSquad.Core;
+﻿using System;
+using FiringSquad.Core;
 using FiringSquad.Debug;
+using FiringSquad.Gameplay;
 using UnityEngine;
 using UnityEngine.Networking;
 using Logger = FiringSquad.Debug.Logger;
@@ -50,7 +52,16 @@ namespace FiringSquad.Networking
 			base.OnServerAddPlayer(conn, playerControllerId);
 			mPlayerCount += 1;
 
-			EventManager.Notify(() => EventManager.Server.PlayerJoined(mPlayerCount));
+			try
+			{
+				GameObject go = conn.playerControllers[playerControllerId].gameObject;
+				EventManager.Notify(() => EventManager.Server.PlayerJoined(mPlayerCount, go.GetComponent<CltPlayer>()));
+			}
+			catch (Exception e)
+			{
+				UnityEngine.Debug.LogException(e);
+				Logger.Warn("Couldn't notify about a new player!");
+			}
 		}
 
 		/// <summary>

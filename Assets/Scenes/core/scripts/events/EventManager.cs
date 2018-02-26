@@ -223,7 +223,7 @@ public partial class EventManager
 		/// PARAMETER 2: The end time (in ticks) of the lobby.
 		/// </summary>
 		public static event Action<CltPlayer, long> OnReceiveLobbyEndTime = (p, t) => { LogEvent(); };
-		
+
 		/// <summary>
 		/// Event called when the local player has received an "enter lobby" event from the server.
 		/// </summary>
@@ -250,6 +250,18 @@ public partial class EventManager
 		{
 			OnInputLevelChanged(level, state);
 		}
+
+		public static event Action<float,CltPlayer> OnZoomLevelChanged = (a,b) => { LogEvent(); };
+
+		/// <summary>
+		/// Event called when the player changes their zoom level in the variable sight
+		/// </summary>
+		/// <param name="zoom"></param>
+		/// <param name="player"></param>
+		public static void ZoomLevelChanged(float zoom, CltPlayer player)
+		{
+			OnZoomLevelChanged(zoom, player);
+		}
 	}
 
 	/// <summary>
@@ -263,6 +275,21 @@ public partial class EventManager
 		/// PARAMETER 2: Whether to push or pop the given state.
 		/// </summary>
 		public static event Action<CrosshairHintText.Hint, bool> OnSetHintState = (h, b) => { LogEvent(); };
+
+		/// <summary>
+		/// Event called to update all UI elements when the player has been assigned a team.
+		/// PARAMETER 1: A reference to the local player.
+		/// </summary>
+		public static event Action<CltPlayer> OnLocalPlayerAssignedTeam = p => { LogEvent(); };
+
+		/// <summary>
+		/// Event called to update all UI elements when the player has been assigned a team.
+		/// </summary>
+		/// <param name="localPlayer">A reference to the local player.</param>
+		public static void LocalPlayerAssignedTeam(CltPlayer localPlayer)
+		{
+			OnLocalPlayerAssignedTeam(localPlayer);
+		}
 
 		/// <summary>
 		/// Event called to push a UI hint onto the hint stack.
@@ -313,16 +340,18 @@ public partial class EventManager
 		/// <summary>
 		/// Event called when a player has joined.
 		/// PARAMETER 1: The new total count of players.
+		/// PARAMETER 2: A reference to the new player.
 		/// </summary>
-		public static event Action<int> OnPlayerJoined = i => { LogEvent(); };
+		public static event Action<int, CltPlayer> OnPlayerJoined = (i, p) => { LogEvent(); };
 
 		/// <summary>
 		/// Event called when a player has joined.
 		/// </summary>
 		/// <param name="newCount">The new total count of players.</param>
-		public static void PlayerJoined(int newCount)
+		/// <param name="newPlayer">A reference to the new player.</param>
+		public static void PlayerJoined(int newCount, CltPlayer newPlayer)
 		{
-			OnPlayerJoined(newCount);
+			OnPlayerJoined(newCount, newPlayer);
 		}
 
 		/// <summary>
@@ -436,6 +465,28 @@ public partial class EventManager
 		public static void StageTimedOut(StageCaptureArea stage)
 		{
 			OnStageTimedOut(stage);
+		}
+
+		public static event Action<PlayerHealthPack> OnHealthPickedUp = a => { LogEvent(); };
+
+		/// <summary>
+		/// Event called when a player picks up a healthpack
+		/// </summary>
+		/// <param name="pack"></param>
+		public static void HealthPickedUp(PlayerHealthPack pack)
+		{
+			OnHealthPickedUp(pack);
+		}
+
+		public static event Action<WeaponPartPad> OnPartPickedUp = a => { LogEvent(); };
+
+		/// <summary>
+		/// Event called when a player picks up a part from a pad
+		/// </summary>
+		/// <param name="pad"></param>
+		public static void PartPickedUp(WeaponPartPad pad)
+		{
+			OnPartPickedUp(pad);
 		}
 	}
 

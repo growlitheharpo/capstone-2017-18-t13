@@ -23,13 +23,8 @@ namespace FiringSquad.Networking
 	/// </summary>
 	public class NetworkServerGameManager : NetworkBehaviour
 	{
-		/// Inspector variables // TODO: This class's variables should be a struct
-		[SerializeField] private List<WeaponPartScript> mStageCaptureParts;
-		[SerializeField] private float mMinStageWaitTime;
-		[SerializeField] private float mMaxStageWaitTime;
-		[SerializeField] private int mRoundTime;
-		[SerializeField] private int mLobbyTime;
-		[SerializeField] private int mGoalPlayerCount;
+		/// Inspector variables
+		[SerializeField] private ServerGameDefaultData mData;
 
 		/// Private variables
 		private ServerStateMachine mStateMachine;
@@ -103,17 +98,19 @@ namespace FiringSquad.Networking
 			public ServerStateMachine(NetworkServerGameManager script)
 			{
 				mScript = script;
-				mInGameStartPositions = GameObject.FindGameObjectsWithTag("matchspawn").Select(x => x.transform).ToArray();
 				mLobbyStartPositions = FindObjectsOfType<NetworkStartPosition>().Select(x => x.transform).ToArray();
 				TransitionStates(new WaitingForConnectionState(this));
 			}
 
 			// Private shared data
 			private readonly NetworkServerGameManager mScript;
-			private readonly Transform[] mInGameStartPositions, mLobbyStartPositions;
+			private readonly Transform[] mLobbyStartPositions;
 			private StageCaptureArea[] mCaptureAreas;
 			private CltPlayer[] mPlayerList;
 			private Dictionary<NetworkInstanceId, PlayerScore> mPlayerScores;
+
+			// Shortcut to the script's data
+			private ServerGameDefaultData data { get { return mScript.mData; } }
 
 			/// <summary>
 			/// Force an immediate transition into a non-waiting state.
@@ -145,6 +142,7 @@ namespace FiringSquad.Networking
 				/// </summary>
 				public WaitingForConnectionState(ServerStateMachine machine) : base(machine) { }
 
+				private GameData.PlayerTeam mPreviousTeam;
 				private bool mReady;
 
 				/// <inheritdoc />
@@ -156,6 +154,8 @@ namespace FiringSquad.Networking
 
 					EventManager.Server.OnPlayerJoined += OnPlayerJoined;
 					EventManager.Server.OnPlayerHealthHitsZero += OnPlayerHealthHitsZero;
+
+					mPreviousTeam = GameData.PlayerTeam.Orange;
 				}
 
 				/// <inheritdoc />
@@ -168,12 +168,18 @@ namespace FiringSquad.Networking
 				/// <summary>
 				/// EVENT HANDLER: Server.OnPlayerJoined
 				/// </summary>
-				private void OnPlayerJoined(int newCount)
+				private void OnPlayerJoined(int newCount, CltPlayer newPlayer)
 				{
-					if (newCount > mMachine.mScript.mGoalPlayerCount)
+					if (newCount > mMachine.data.goalPlayerCount)
 						Logger.Warn("We have too many players in this session!", Logger.System.Network);
 
-					mReady = newCount >= mMachine.mScript.mGoalPlayerCount;
+					mReady = newCount >= mMachine.data.goalPlayerCount;
+
+					if (mMachine.data.currentType == GameData.MatchType.TeamDeathmatch)
+					{
+						mPreviousTeam = mPreviousTeam == GameData.PlayerTeam.Orange ? GameData.PlayerTeam.Blue : GameData.PlayerTeam.Orange;
+						newPlayer.AssignPlayerTeam(mPreviousTeam);
+					}
 				}
 
 				/// <summary>
@@ -211,7 +217,7 @@ namespace FiringSquad.Networking
 				public override void OnEnter()
 				{
 					mMachine.mPlayerList = FindObjectsOfType<CltPlayer>();
-					mEndTime = DateTime.Now.Ticks + mMachine.mScript.mLobbyTime * TimeSpan.TicksPerSecond;
+					mEndTime = DateTime.Now.Ticks + mMachine.data.lobbyTime * TimeSpan.TicksPerSecond;
 
 					foreach (CltPlayer player in mMachine.mPlayerList)
 						player.TargetStartLobbyCountdown(player.connectionToClient, mEndTime);
@@ -272,16 +278,61 @@ namespace FiringSquad.Networking
 				{
 					mMachine.mPlayerList = FindObjectsOfType<CltPlayer>();
 
-					if (mMachine.mPlayerList.Length > mMachine.mInGameStartPositions.Length)
+					if (mMachine.mPlayerList.Length > PlayerSpawnPosition.GetAll().Count)
 						Logger.Warn("We have too many players for the number of spawn positions!", Logger.System.Network);
 
-					var spawnCopy = mMachine.mInGameStartPositions.Select(x => x.transform).ToList();
+					if (mMachine.data.currentType == GameData.MatchType.Deathmatch)
+						SpawnPlayersDeathmatch();
+					else
+					{
+						ForceUpdatePlayerTeams();
+						SpawnPlayersTeam();
+					}
+				}
+
+				/// <summary>
+				/// Force Unity's networking to re-send the player's team so that it is reflected
+				/// on all clients. Do so by forcing the dirty-bit to be set by using a tmp trash value.
+				/// </summary>
+				private void ForceUpdatePlayerTeams()
+				{
+					foreach (CltPlayer player in mMachine.mPlayerList)
+					{
+						GameData.PlayerTeam team = player.playerTeam;
+						player.AssignPlayerTeam(GameData.PlayerTeam.Deathmatch);
+						player.AssignPlayerTeam(team);
+					}
+				}
+
+				/// <summary>
+				/// Spawn all players in random positions on the map.
+				/// </summary>
+				private void SpawnPlayersDeathmatch()
+				{
+					var spawnCopy = PlayerSpawnPosition.GetAll().Select(x => x.transform).ToList();
 					spawnCopy.Shuffle();
 
 					foreach (CltPlayer player in mMachine.mPlayerList)
 					{
 						Transform target = spawnCopy[spawnCopy.Count - 1];
 						spawnCopy.RemoveAt(spawnCopy.Count - 1);
+
+						player.MoveToStartPosition(target.position, target.rotation);
+					}
+				}
+
+				/// <summary>
+				/// Spawn all players in locations appropriate for their assigned team.
+				/// </summary>
+				private void SpawnPlayersTeam()
+				{
+					var blue = new Queue<PlayerSpawnPosition>(PlayerSpawnPosition.GetAll(GameData.PlayerTeam.Blue).Shuffle());
+					var orange = new Queue<PlayerSpawnPosition>(PlayerSpawnPosition.GetAll(GameData.PlayerTeam.Orange).Shuffle());
+
+					foreach (CltPlayer player in mMachine.mPlayerList)
+					{
+						var list = player.playerTeam == GameData.PlayerTeam.Blue ? blue : orange;
+						Transform target = list.Dequeue().transform;
 
 						player.MoveToStartPosition(target.position, target.rotation);
 					}
@@ -319,7 +370,7 @@ namespace FiringSquad.Networking
 				/// <inheritdoc />
 				public override void OnEnter()
 				{
-					mEndTime = DateTime.Now.Ticks + mMachine.mScript.mRoundTime * TimeSpan.TicksPerSecond;
+					mEndTime = DateTime.Now.Ticks + mMachine.data.roundTime * TimeSpan.TicksPerSecond;
 					EventManager.Server.OnPlayerHealthHitsZero += OnPlayerHealthHitsZero;
 					EventManager.Server.OnPlayerCapturedStage += OnPlayerCapturedStage;
 					EventManager.Server.OnStageTimedOut += OnStageTimedOut;
@@ -353,12 +404,12 @@ namespace FiringSquad.Networking
 					if (player.weapon != null)
 					{
 						WeaponPartCollection currentParts = player.weapon.currentParts;
-						var allPossibilities = mMachine.mScript.mStageCaptureParts;
+						var allPossibilities = mMachine.data.stageCaptureParts;
 						var possibilities = allPossibilities.Where(x => !currentParts.Contains(x));
 						choice = possibilities.ChooseRandom();
 					}
 					else
-						choice = mMachine.mScript.mStageCaptureParts.ChooseRandom();
+						choice = mMachine.data.stageCaptureParts.ChooseRandom();
 
 					GameObject instance = choice.SpawnInWorld();
 					instance.transform.position = stage.transform.position + Vector3.up * 45.0f;
@@ -391,7 +442,7 @@ namespace FiringSquad.Networking
 				/// </summary>
 				private IEnumerator EnableStageArea(StageCaptureArea stage)
 				{
-					yield return new WaitForSeconds(Random.Range(mMachine.mScript.mMinStageWaitTime, mMachine.mScript.mMaxStageWaitTime));
+					yield return new WaitForSeconds(Random.Range(mMachine.data.minStageWaitTime, mMachine.data.maxStageWaitTime));
 					stage.Enable();
 				}
 
@@ -400,7 +451,13 @@ namespace FiringSquad.Networking
 				/// </summary>
 				private void OnPlayerHealthHitsZero(CltPlayer dead, IDamageSource damage)
 				{
-					Transform newPosition = ChooseSafestSpawnPosition(mMachine.mPlayerList, dead, mMachine.mInGameStartPositions);
+					List<Transform> spawnList;
+					if (mMachine.data.currentType == GameData.MatchType.Deathmatch)
+						spawnList = PlayerSpawnPosition.GetAll().Select(x => x.transform).ToList();
+					else
+						spawnList = PlayerSpawnPosition.GetAll(dead.playerTeam).Select(x => x.transform).ToList();
+
+					Transform newPosition = ChooseSafestSpawnPosition(mMachine.mPlayerList, dead, spawnList);
 
 					if (damage.source is CltPlayer)
 					{

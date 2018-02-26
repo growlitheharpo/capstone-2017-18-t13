@@ -387,7 +387,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mUniqueId: 5
   mPrettyName: Burst Barrel
-  mDescription: a 3-shot burst fire rifle
+  mDescription: 'A true workhorse of the re[mod] arena, the burst barrel fires 3 shots
+    in quick suggession when the trigger is held down, this barrel is perfect for
+    your next mid-range encounter. '
   mData:
     mMinDispersionModifier:
       mAmount: 0
@@ -399,13 +401,13 @@ MonoBehaviour:
       mAmount: 0
       mType: 0
     mRecoilAmountModifier:
-      mAmount: 3
+      mAmount: 2
       mType: 3
     mRecoilTimeModifier:
-      mAmount: 1.5
+      mAmount: 0.25
       mType: 3
     mDamageModifier:
-      mAmount: -0.1
+      mAmount: 0.3
       mType: 2
     mDamageFalloffDistanceModifier:
       mAmount: 10
@@ -485,6 +487,8 @@ MonoBehaviour:
   mEmissiveProperty: _EmissionColor
   mStartColor: {r: 0.2629758, g: 0.9411765, b: 0.6630674, a: 1}
   mEndColor: {r: 1, g: 0, b: 0, a: 1}
+  mBlinkingThreshold: 0.15
+  mBlinkingRate: 0.15
 --- !u!114 &114815965328033236
 MonoBehaviour:
   m_ObjectHideFlags: 1

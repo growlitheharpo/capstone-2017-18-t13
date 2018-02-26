@@ -102,8 +102,7 @@ namespace FiringSquad.Debug
 
 				if (GUILayout.Button(label, GUILayout.MaxHeight(100.0f)))
 				{
-					CltPlayer player = FindObjectsOfType<CltPlayer>()
-						.FirstOrDefault(x => x.isCurrentPlayer);
+					CltPlayer player = CltPlayer.localPlayerReference;
 					if (player != null)
 						player.CmdDebugEquipWeaponPart(part.partId);
 				}

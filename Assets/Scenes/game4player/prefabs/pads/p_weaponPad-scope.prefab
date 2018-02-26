@@ -81,8 +81,8 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1044795996218704}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 3, y: 0, z: 4}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -13.5, y: 8, z: 73.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4239983107945314}
@@ -164,8 +164,8 @@ Light:
   serializedVersion: 8
   m_Type: 2
   m_Color: {r: 0.16862746, g: 0.43137255, b: 1, a: 1}
-  m_Intensity: 3
-  m_Range: 1.75
+  m_Intensity: 2
+  m_Range: 1.3
   m_SpotAngle: 30
   m_CookieSize: 10
   m_Shadows:
@@ -249,14 +249,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mParts:
   - mPrefab: {fileID: 1289196357881978, guid: 363ec9baf39beb0458b6c51a5e07d379, type: 2}
-    mWeight: 0.10784221
+    mWeight: 0.0856531
   - mPrefab: {fileID: 1967676427755860, guid: 90411c74ce32c4d45b8fdd979d2001a4, type: 2}
-    mWeight: 0.25739172
+    mWeight: 0.20443198
   - mPrefab: {fileID: 1684750797811508, guid: 2da09d6eba657934da16a40462961939, type: 2}
-    mWeight: 0.40663585
+    mWeight: 0.32296842
   - mPrefab: {fileID: 1684750797811508, guid: 0f12e1d53f922bc449d749da0a48db7c, type: 2}
-    mWeight: 0.22813024
+    mWeight: 0.18119122
+  - mPrefab: {fileID: 1843689085080828, guid: 8b7a9fe33c2106149bea283b7422e2fe, type: 2}
+    mWeight: 0.20575532
   mRespawnTimePlayerGrabbedMin: 15
-  mRespawnTimePlayerGrabbedMax: 25
-  mRespawnTimeTimeoutMin: 5
-  mRespawnTimeTimeoutMax: 10
+  mRespawnTimePlayerGrabbedMax: 30
+  mRespawnTimeTimeoutMin: 15
+  mRespawnTimeTimeoutMax: 30

@@ -74,7 +74,7 @@ namespace FiringSquad.Gameplay
 		[ServerCallback]
 		private void OnTriggerEnter(Collider other)
 		{
-			IDamageReceiver player = other.GetComponent<IDamageReceiver>();
+			IDamageReceiver player = other.GetComponentInParent<IDamageReceiver>();
 			if (player == null)
 				return;
 
@@ -83,8 +83,14 @@ namespace FiringSquad.Gameplay
 				return;
 
 			player.HealDamage(mProvidedHealth);
+
+			// Send Event to the Analytics Object
+			EventManager.Notify(() => EventManager.Server.HealthPickedUp(this));
+
 			mVisible = false;
 			StartCoroutine(WaitAndReappear());
+
+			
 		}
 
 		/// <summary>

@@ -52,6 +52,9 @@ namespace FiringSquad.Gameplay.NPC
 		/// <inheritdoc />
 		public float currentHealth { get { return mHealth; } }
 
+		/// <inheritdoc />
+		public GameData.PlayerTeam playerTeam { get { return GameData.PlayerTeam.Deathmatch; } }
+
 		#region Unity Callbacks
 
 		/// <summary>
@@ -62,8 +65,8 @@ namespace FiringSquad.Gameplay.NPC
 			mBrain = new NpcTurretBrain(this);
 			mHealth = mData.defaultHealth;
 
-			EventManager.Server.OnPlayerJoined += HandlePlayerCountChanged;
-			EventManager.Server.OnPlayerLeft += HandlePlayerCountChanged;
+			EventManager.Server.OnPlayerJoined += OnPlayerJoined;
+			EventManager.Server.OnPlayerLeft += OnPlayerLeft;
 
 			// create our weapon & bind
 			BaseWeaponScript wep = Instantiate(mBaseWeaponPrefab).GetComponent<BaseWeaponScript>();
@@ -93,8 +96,8 @@ namespace FiringSquad.Gameplay.NPC
 		/// </summary>
 		private void OnDestroy()
 		{
-			EventManager.Server.OnPlayerJoined -= HandlePlayerCountChanged;
-			EventManager.Server.OnPlayerLeft -= HandlePlayerCountChanged;
+			EventManager.Server.OnPlayerJoined -= OnPlayerJoined;
+			EventManager.Server.OnPlayerLeft -= OnPlayerLeft;
 		}
 
 		/// <summary>
@@ -112,11 +115,21 @@ namespace FiringSquad.Gameplay.NPC
 		#endregion
 
 		/// <summary>
-		/// EVENT HANDLER: Server.OnPlayerJoined && Server.OnPlayerLeft
+		/// EVENT HANDLER: Server.OnPlayerJoined
 		/// </summary>
 		[Server]
 		[EventHandler]
-		private void HandlePlayerCountChanged(int playerCount)
+		private void OnPlayerJoined(int playerCount, CltPlayer newPlayer)
+		{
+			mBrain.UpdateTargetList(FindObjectsOfType<CltPlayer>().Select(x => x as ICharacter).ToArray());
+		}
+
+		/// <summary>
+		/// EVENT HANDLER: Server.OnPlayerLeft
+		/// </summary>
+		[Server]
+		[EventHandler]
+		private void OnPlayerLeft(int playerCount)
 		{
 			mBrain.UpdateTargetList(FindObjectsOfType<CltPlayer>().Select(x => x as ICharacter).ToArray());
 		}
