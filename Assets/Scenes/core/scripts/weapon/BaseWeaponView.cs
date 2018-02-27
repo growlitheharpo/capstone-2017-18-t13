@@ -353,7 +353,7 @@ namespace FiringSquad.Gameplay.Weapons
 				return;
 			
 			if (mWeaponScript.currentParts.barrel != null)
-				mArmAnimator.SetBool("WeaponIsAuto", mWeaponScript.currentParts.barrel.shotsPerClick <= 0);
+				mArmAnimator.SetBool("WeaponIsAuto", mWeaponScript.currentData.fireRate >= 3.5f);
 			mArmAnimator.SetFloat("RecoilAmount", mWeaponScript.currentData.recoilAmount);
 			mArmAnimator.SetFloat("FireRate", mWeaponScript.currentData.fireRate * 1.1f);
 
