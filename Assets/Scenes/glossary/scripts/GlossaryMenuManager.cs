@@ -1,10 +1,14 @@
-﻿using FiringSquad.Core;
+﻿using System.Linq;
+using FiringSquad.Core;
 using FiringSquad.Core.State;
 using FiringSquad.Core.Weapons;
 using FiringSquad.Gameplay.Weapons;
 using FiringSquad.Data;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UIButton = UnityEngine.UI.Button;
+using UIText = UnityEngine.UI.Text;
+using UILayoutGroup = UnityEngine.UI.LayoutGroup;
 
 namespace FiringSquad.Gameplay.UI
 {
@@ -15,43 +19,31 @@ namespace FiringSquad.Gameplay.UI
 	{
 		/// Inspector variables
 		[SerializeField] private GameObject mMainElementHolder;
-		[SerializeField] private GameObject mScrollRectContent;
-		[SerializeField] private ActionProvider mReturnToMainButton;
+		[SerializeField] private UIButton mReturnToMainButton;
+		[SerializeField] private UIText mDescriptionText;
+		[SerializeField] private UILayoutGroup mSubMenuGroup;
 		[SerializeField] private GameObject mButtonPrefab;
-		[SerializeField] private UnityEngine.UI.Text mDescriptionText;
-		[SerializeField] private GameObject mPartShowcase;
 
-		/// Var for the number of parts
-		private int mPartCount;
+		[SerializeField] private UIButton mMechanismButton;
+		[SerializeField] private UIButton mSightsButton;
+		[SerializeField] private UIButton mBarrelButton;
+		[SerializeField] private UIButton mUnderbarrelButton;
+
+		[SerializeField] private MenuDemoWeaponScript mWeapon;
+
+		private Attachment mCurrentMode;
 
 		/// <summary>
 		/// Unity's Start function
 		/// </summary>
-		void Start()
+		private void Start()
 		{
-			mReturnToMainButton.OnClick += ReturnToMenu;
-			// Get the number of weapon parts for list purposes
-			mPartCount = ServiceLocator.Get<IWeaponPartManager>()
-				.GetAllPrefabs(false).Count;
+			mReturnToMainButton.onClick.AddListener(ReturnToMenu);
 
-			// Set the content rectangle to be the size of the list
-			mScrollRectContent.GetComponent<RectTransform>().sizeDelta 
-				= new Vector2(mScrollRectContent.GetComponent<RectTransform>().sizeDelta.x, 
-				mScrollRectContent.GetComponent<RectTransform>().sizeDelta.y + (100 * (mPartCount - 7)));
-
-			// Populate the list and hope for the best
-			PopulateList();
-
-			mPartShowcase.SetActive(true);
-		}
-
-		/// <summary>
-		/// Unity's update function
-		/// </summary>
-		private void Update()
-		{
-			// Slowly rotate the weapon around
-			mPartShowcase.transform.Rotate(0, Time.deltaTime * 35, 0, Space.World);
+			mMechanismButton.onClick.AddListener(() => HandleClickedCategory(Attachment.Mechanism));
+			mSightsButton.onClick.AddListener(() => HandleClickedCategory(Attachment.Scope));
+			mBarrelButton.onClick.AddListener(() => HandleClickedCategory(Attachment.Barrel));
+			mUnderbarrelButton.onClick.AddListener(() => HandleClickedCategory(Attachment.Grip));
 		}
 
 		/// <summary>
@@ -65,51 +57,53 @@ namespace FiringSquad.Gameplay.UI
 				.RequestSceneChange(GamestateManager.MENU_SCENE);
 		}
 
-		/// <summary>
-		/// Populates the list with weapon part buttons
-		/// </summary>
-		private void PopulateList()
+		private void HandleClickedCategory(Attachment category)
 		{
-			// Iterator for moving the buttons down
-			int i = 1;
-
-			foreach(System.Collections.Generic.KeyValuePair<byte, GameObject> item in ServiceLocator.Get<IWeaponPartManager>().GetAllPrefabs(false))
+			if (mCurrentMode == category)
 			{
-				// Instantiate the button for the weapon part
-				GameObject tmpButton = Instantiate(mButtonPrefab, mScrollRectContent.transform);
+				mCurrentMode = (Attachment)(1 << 5);
+				mSubMenuGroup.transform.parent.gameObject.SetActive(false);
+			}
+			else
+			{
+				mCurrentMode = category;
 
-				// Set the text of the button
-				tmpButton.GetComponentInChildren<UnityEngine.UI.Text>().text
-					= item.Value.GetComponent<WeaponPartScript>().prettyName;
-
-				// Get the description of the item
-				string itemDesc = item.Value.GetComponent<WeaponPartScript>().description;
-
-				// Set local position to a new location
-				tmpButton.transform.localPosition = new Vector3(tmpButton.transform.localPosition.x, -(100 * i), tmpButton.transform.localPosition.z);
-
-				// Add a the changetext function to the onclick
-				tmpButton.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(delegate { ChangeText(itemDesc);});
-				tmpButton.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(delegate { ChangePart(item.Value); });
-
-				++i;
+				// Someday, we could add an animation.
+				mSubMenuGroup.transform.parent.gameObject.SetActive(true);
+				PopulateList(category);
 			}
 		}
 
 		/// <summary>
-		/// Changes the text of the description field
+		/// Populates the list with weapon part buttons
 		/// </summary>
-		private void ChangeText(string newText)
+		private void PopulateList(Attachment slot)
 		{
-			mDescriptionText.text = newText;
+			// Clean the previous list
+			foreach (Transform t in mSubMenuGroup.transform)
+				Destroy(t.gameObject);
+
+			var parts = ServiceLocator.Get<IWeaponPartManager>().GetAllPrefabScripts(false).Where(x => x.Value.attachPoint == slot);
+			foreach (var part in parts)
+			{
+				UIButton newButton = Instantiate(mButtonPrefab, mSubMenuGroup.transform).GetComponent<UIButton>();
+				UIText text = newButton.GetComponentInChildren<UIText>();
+				text.text = part.Value.prettyName;
+
+				byte id = part.Value.partId;
+				newButton.onClick.AddListener(() => ChangePart(id));
+			}
 		}
 
 		/// <summary>
 		/// Changes the current attached part to the model gun
 		/// </summary>
-		private void ChangePart(GameObject item)
+		private void ChangePart(byte partId)
 		{
-			mPartShowcase.GetComponent<BaseWeaponScript>().AttachNewPart(item.GetComponent<WeaponPartScript>().partId);
+			WeaponPartScript part = ServiceLocator.Get<IWeaponPartManager>().GetPrefabScript(partId);
+			mDescriptionText.text = part.description;
+			mWeapon.AttachNewPart(partId);
+			//mPartShowcase.GetComponent<BaseWeaponScript>().AttachNewPart(item.GetComponent<WeaponPartScript>().partId);
 		}
 	}
 }

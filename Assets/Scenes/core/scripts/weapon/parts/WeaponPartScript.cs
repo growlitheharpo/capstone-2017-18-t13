@@ -99,7 +99,7 @@ namespace FiringSquad.Gameplay.Weapons
 		/// Returns an instantiated copy of this part, intended to immediately be attached to a weapon.
 		/// </summary>
 		/// <param name="weapon">The weapon this part will be attached to.</param>
-		public WeaponPartScript SpawnForWeapon(BaseWeaponScript weapon)
+		public WeaponPartScript SpawnForWeapon(IWeapon weapon)
 		{
 			GameObject copy = Instantiate(gameObject);
 			copy.name = name;
