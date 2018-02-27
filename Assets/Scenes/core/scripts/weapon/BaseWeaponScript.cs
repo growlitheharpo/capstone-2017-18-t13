@@ -50,10 +50,10 @@ namespace FiringSquad.Gameplay.Weapons
 		private int mShotsSinceRelease;
 		private bool mReloading, mAimDownSightsActive;
 
-		/// <inheritdoc />
+		/// <inheritdoc cref="IModifiableWeapon" />
 		public Transform aimRoot { get; set; }
 
-		/// <inheritdoc />
+		/// <inheritdoc cref="IModifiableWeapon" />
 		public Vector3 positionOffset { get; set; }
 
 		/// <inheritdoc />
@@ -103,11 +103,9 @@ namespace FiringSquad.Gameplay.Weapons
 			mCurrentData = new WeaponData(baseData);
 			mRecentShotTimes = new List<float>();
 			mCurrentParts = new WeaponPartCollection();
-
-
 			mShotsInClip = new BoundProperty<int>();
 			mTotalClipSize = new BoundProperty<int>();
-			GetComponent<Animator>();
+
 			mWeaponView = GetComponent<BaseWeaponView>();
 		}
 		

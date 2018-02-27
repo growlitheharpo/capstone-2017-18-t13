@@ -74,6 +74,11 @@ namespace FiringSquad.Gameplay.Weapons
 		Transform aimRoot { get; }
 
 		/// <summary>
+		/// The position offset of this weapon to the character's eye.
+		/// </summary>
+		Vector3 positionOffset { get; }
+
+		/// <summary>
 		/// Get the current set of parts on this weapon
 		/// </summary>
 		WeaponPartCollection currentParts { get; }

@@ -16,19 +16,27 @@ namespace FiringSquad.Gameplay
 	{
 		private enum ShaderPasses
 		{
-			GlowPass = 0,
-			OcclusionPass = 1,
-			DepthFilterPass = 2,
+			SimpleGlowPass = 0,
+			AlphaGlowPass = 1,
+			AlphaBlendedGlowPass = 2,
+			OcclusionPass = 3,
+			DepthFilterPass = 4,
 		}
 
+		/// Inspector variables
 		[SerializeField] private Color mColor;
+		[SerializeField] private ShaderPasses mGlowPass;
 
+		/// Private variables
 		private List<Renderer> mOcclusionRenderers;
 		private List<Renderer> mOutlineRenderers;
 
 		private CommandBuffer mCommand;
 		private BlurOptimized mBlur;
 		private Material mMaterial;
+
+		/// <inheritdoc />
+		protected override bool dontDestroyOnLoad { get { return false; } }
 
 		/// <inheritdoc />
 		protected override void Awake()
@@ -81,7 +89,7 @@ namespace FiringSquad.Gameplay
 			// Finally, blit the outline onto the main texture
 			mMaterial.SetTexture("_OccludeMap", occludedTex);
 			mMaterial.SetColor("_Color", mColor);
-			Graphics.Blit(src, dest, mMaterial, (int)ShaderPasses.GlowPass);
+			Graphics.Blit(src, dest, mMaterial, (int)mGlowPass);
 
 			// Release all our temporary rendertextures
 			RenderTexture.ReleaseTemporary(occludedTex);

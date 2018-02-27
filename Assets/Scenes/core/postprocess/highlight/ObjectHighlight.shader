@@ -44,6 +44,71 @@ Shader "Hidden/Custom/Highlight" {
 			ENDCG
 		}
 
+		// ADDITIVE OVERLAY GLOW		
+		Pass 
+		{
+			CGPROGRAM
+				#pragma vertex vert_img
+				#pragma fragment frag
+				#pragma fragmentoption ARB_precision_hint_fastest
+				#include "UnityCG.cginc"
+
+				sampler2D _MainTex;
+				sampler2D _OccludeMap;
+
+				fixed4 _Color;
+
+				fixed4 frag(v2f_img IN) : COLOR
+				{
+					// invert for OPENGL
+					#if !UNITY_UV_STARTS_AT_TOP
+						IN.uv.y = 1.0 - IN.uv.y;
+					#endif
+
+					fixed4 mCol = tex2D(_MainTex, IN.uv);
+					fixed3 overCol = tex2D(_OccludeMap, IN.uv).r * _Color.rgb * _Color.a;
+
+					// Additive: (overCol × Blend.One) + (mCol × Blend.One)
+					return mCol + fixed4(overCol.rgb, length(overCol));
+				}
+			ENDCG
+		}
+					
+		// ALPHA-BLENDED OVERLAY GLOW		
+		Pass 
+		{
+			CGPROGRAM
+				#pragma vertex vert_img
+				#pragma fragment frag
+				#pragma fragmentoption ARB_precision_hint_fastest
+				#include "UnityCG.cginc"
+
+				sampler2D _MainTex;
+				sampler2D _OccludeMap;
+
+				fixed4 _Color;
+
+				fixed4 frag(v2f_img IN) : COLOR
+				{
+					// invert for OPENGL
+					#if !UNITY_UV_STARTS_AT_TOP
+						IN.uv.y = 1.0 - IN.uv.y;
+					#endif
+
+					fixed4 mCol = tex2D(_MainTex, IN.uv);
+					fixed3 s = tex2D(_OccludeMap, IN.uv).r * _Color.rgb * _Color.a;
+					fixed4 overCol = fixed4(s.rgb, length(s));
+					//return mCol + fixed4(overCol, mCol.a + length(overCol));
+
+					// (overCol × Blend.SourceAlpha) + (mCol × Blend.InvSourceAlpha)
+					fixed sourceAlpha = overCol.a;
+					fixed4 invSourceAlpha = fixed4(1.0f,1,1,1) * (1.0f - sourceAlpha);
+					
+					return overCol  + mCol * invSourceAlpha;
+				}
+			ENDCG
+		}
+
 
 		// OCCLUSION	
 		Pass 

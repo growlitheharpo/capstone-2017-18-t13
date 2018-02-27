@@ -19,7 +19,7 @@ namespace FiringSquad.Gameplay.Weapons
 		[SerializeField] private WeaponMovementData mAimDownSightsMovementData;
 
 		/// Private variables
-		private BaseWeaponScript mWeaponScript;
+		private IWeapon mWeaponScript;
 
 		private Dictionary<Attachment, Transform> mAttachPoints;
 		private Animator mAnimator, mArmAnimator;
@@ -39,7 +39,7 @@ namespace FiringSquad.Gameplay.Weapons
 		private void Awake()
 		{
 			mAnimator = GetComponent<Animator>();
-			mWeaponScript = GetComponent<BaseWeaponScript>();
+			mWeaponScript = GetComponent<IWeapon>();
 			mShotParticles = transform.Find("shot_particles").GetComponent<ParticleSystem>();
 			mPartBreakPrefab = Resources.Load<GameObject>("prefabs/weapons/effects/p_vfx_partBreak").GetComponent<ParticleSystem>();
 
@@ -274,13 +274,12 @@ namespace FiringSquad.Gameplay.Weapons
 			newPart.transform.SetParent(mAttachPoints[place]);
 			newPart.transform.ResetLocalValues();
 
-			if (ObjectHighlight.instance == null)
+			if (ObjectHighlight.instance == null || mWeaponScript.bearer == null || !mWeaponScript.bearer.isCurrentPlayer)
 				return;
 
 			var renderers = newPart.GetComponentsInChildren<Renderer>();
 			foreach (Renderer r in renderers)
 				ObjectHighlight.instance.AddOccluder(r);
-
 		}
 
 		#endregion
