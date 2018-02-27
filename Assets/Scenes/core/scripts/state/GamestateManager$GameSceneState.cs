@@ -1,4 +1,5 @@
 ﻿using System;
+using FiringSquad.Core.Audio;
 using FiringSquad.Core.Input;
 using FiringSquad.Core.UI;
 using FiringSquad.Data;
@@ -118,6 +119,7 @@ namespace FiringSquad.Core.State
 				public InGameState(GameSceneState machine) : base(machine) { }
 
 				/// Private variables
+				private bool mPlayedSound;
 				private long mRoundEndTime;
 				private BoundProperty<float> mRemainingTime;
 
@@ -193,6 +195,13 @@ namespace FiringSquad.Core.State
 						return;
 
 					mRemainingTime.value = Mathf.Clamp(CalculateRemainingTime(), 0.0f, float.MaxValue);
+
+					if (mRemainingTime.value < 30 & !mPlayedSound)
+					{
+						ServiceLocator.Get<IAudioManager>()
+							.CreateSound(AudioEvent.AnnouncerTimeWarning, null);
+						mPlayedSound = true;
+					}
 				}
 
 				/// <summary>

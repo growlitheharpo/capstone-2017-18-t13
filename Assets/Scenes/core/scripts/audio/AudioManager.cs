@@ -35,6 +35,19 @@ namespace FiringSquad.Core.Audio
 		AnnouncerStageAreaSpawns = 90,
 		AnnouncerStageAreaCaptured = 95,
 		PlayerDamagedGrunt = 100,
+		AnnouncerGetsLegendary = 105,
+		AnnouncerGetsKillstreak = 110,
+		AnnouncerGetsDeathstreak = 115,
+		AnnouncerKingslayer = 120,
+		AnnouncerEnvironmentKill = 125,
+		AnnouncerHeadshot = 130,
+		AnnouncerLull = 135,
+		AnnouncerNewLeader = 140,
+		AnnouncerSponsor = 145,
+		AnnouncerTimeWarning = 150,
+		AnnouncerPlayerDeath = 155,
+		AnnouncerBreaksCamera = 160,
+		AnnouncerMultiKill = 165,
 	}
 
 	/// <inheritdoc cref="IAudioManager"/>
