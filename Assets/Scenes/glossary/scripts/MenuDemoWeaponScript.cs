@@ -66,6 +66,9 @@ namespace FiringSquad.Gameplay.UI
 			instance.durability = durability == WeaponPartScript.USE_DEFAULT_DURABILITY ? prefab.durability : durability;
 
 			currentData = WeaponData.ActivatePartEffects(baseData, currentParts);
+
+			foreach (var r in GetComponentsInChildren<Renderer>())
+				ObjectHighlight.instance.AddRendererToHighlightList(r);
 		}
 
 		/// <inheritdoc />

@@ -11,6 +11,12 @@ namespace FiringSquad.Core
 		// ReSharper disable once StaticMemberInGenericType (this is the desired behavior)
 		private static readonly object LOCK = new object();
 
+		/// <summary>
+		/// Determines whether this MonoSingleton should persist through scene loads. Can be
+		/// overridden in a child class to return false, in which case the singleton will not persist.
+		/// </summary>
+		protected virtual bool dontDestroyOnLoad { get { return true; } }
+
 		public static T instance { get; private set; }
 
 		/// <summary>
@@ -56,8 +62,11 @@ namespace FiringSquad.Core
 		private void SetupInstance(T inst)
 		{
 			instance = inst;
-			instance.transform.SetParent(null);
-			DontDestroyOnLoad(instance.gameObject);
+			if (dontDestroyOnLoad)
+			{
+				instance.transform.SetParent(null);
+				DontDestroyOnLoad(instance.gameObject);
+			}
 		}
 	}
 }

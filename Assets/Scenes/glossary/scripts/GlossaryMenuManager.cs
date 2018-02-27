@@ -31,6 +31,7 @@ namespace FiringSquad.Gameplay.UI
 
 		[SerializeField] private MenuDemoWeaponScript mWeapon;
 
+		private string mDefaultDescription;
 		private Attachment mCurrentMode;
 
 		/// <summary>
@@ -44,6 +45,8 @@ namespace FiringSquad.Gameplay.UI
 			mSightsButton.onClick.AddListener(() => HandleClickedCategory(Attachment.Scope));
 			mBarrelButton.onClick.AddListener(() => HandleClickedCategory(Attachment.Barrel));
 			mUnderbarrelButton.onClick.AddListener(() => HandleClickedCategory(Attachment.Grip));
+
+			mDefaultDescription = mDescriptionText.text;
 		}
 
 		/// <summary>
@@ -57,12 +60,17 @@ namespace FiringSquad.Gameplay.UI
 				.RequestSceneChange(GamestateManager.MENU_SCENE);
 		}
 
+		/// <summary>
+		/// Handle the player clicking on a specific category.
+		/// </summary>
+		/// <param name="category"></param>
 		private void HandleClickedCategory(Attachment category)
 		{
 			if (mCurrentMode == category)
 			{
-				mCurrentMode = (Attachment)(1 << 5);
+				mCurrentMode = (Attachment)(1 << 5); // we do this because there isn't an Attachment.None
 				mSubMenuGroup.transform.parent.gameObject.SetActive(false);
+				mDescriptionText.text = mDefaultDescription;
 			}
 			else
 			{
