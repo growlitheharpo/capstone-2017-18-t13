@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using JetBrains.Annotations;
+using UnityEngine;
 using UnityEngine.Serialization;
 
 namespace FiringSquad.Gameplay.Weapons
@@ -13,6 +14,7 @@ namespace FiringSquad.Gameplay.Weapons
 				"for aiming. Instead, it will shoot directly from the end of the weapon.")]
 		[SerializeField] private bool mFireFromBarrelTip;
 		[FormerlySerializedAs("mDurabilitySprite")][SerializeField] private Sprite mAmmoTypeSprite;
+		[SerializeField] private Animator mAnimator;
 
 		/// <inheritdoc />
 		public override Attachment attachPoint { get { return Attachment.Mechanism; } }
@@ -36,5 +38,13 @@ namespace FiringSquad.Gameplay.Weapons
 		/// The UI image to attach to the HUD when this mechanism is active.
 		/// </summary>
 		public Sprite ammoTypeSprite {get { return mAmmoTypeSprite; }}
+
+		/// <summary>
+		/// The animator for this mechanism.
+		/// Has FireRate parameter and Fire trigger.
+		/// Can be null if not assigned in editor.
+		/// </summary>
+		[CanBeNull]
+		public Animator attachedAnimator { get { return mAnimator; } }
 	}
 }

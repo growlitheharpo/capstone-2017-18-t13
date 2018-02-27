@@ -18,13 +18,13 @@ namespace FiringSquad.Gameplay.Weapons
 		[SerializeField] private float mBlinkingRate = 0.15f;
 
 		/// Private variables
-		private Material mMaterialInstance;
+		private Material[] mMaterialInstances;
 		private Coroutine mBlinkRoutine;
 
 		/// <inheritdoc />
 		protected override void Start()
 		{
-			mMaterialInstance = GetComponent<MeshRenderer>().material;
+			mMaterialInstances = GetComponent<Renderer>().materials;
 			base.Start();
 		}
 
@@ -38,7 +38,9 @@ namespace FiringSquad.Gameplay.Weapons
 
 				float percent = property.value.Rescale(mBlinkingThreshold, 1.0f);
 				Color val = Color.Lerp(mEndColor, mStartColor, percent);
-				mMaterialInstance.SetColor(mEmissiveProperty, val);
+
+				foreach (Material m in mMaterialInstances)
+					m.SetColor(mEmissiveProperty, val);
 			}
 			else if (mBlinkRoutine == null)
 				mBlinkRoutine = StartCoroutine(BlinkValue());
@@ -52,7 +54,9 @@ namespace FiringSquad.Gameplay.Weapons
 			{
 				float currentPercent = Mathf.PingPong(currentTime, mBlinkingRate) / mBlinkingRate;
 				Color val = Color.Lerp(mEndColor, black, currentPercent);
-				mMaterialInstance.SetColor(mEmissiveProperty, val);
+
+				foreach (Material m in mMaterialInstances)
+					m.SetColor(mEmissiveProperty, val);
 
 				currentTime += Time.deltaTime;
 				yield return null;

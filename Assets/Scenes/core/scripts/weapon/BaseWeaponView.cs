@@ -327,10 +327,13 @@ namespace FiringSquad.Gameplay.Weapons
 		/// </summary>
 		public void PlayFireEffect()
 		{
-			UpdateShootingAnimation(true, true);
+			UpdateArmRecoilAnimation(true, true);
+			PlayWeaponFireAnimations();
+
 			mWeaponScript.bearer.PlayFireAnimation();
 			if (mWeaponScript.currentParts.barrel != null)
 				mShotParticles.transform.position = mWeaponScript.currentParts.barrel.barrelTip.position;
+
 
 			mShotParticles.Play();
 
@@ -344,7 +347,7 @@ namespace FiringSquad.Gameplay.Weapons
 		/// <summary>
 		/// Update the "IsFiring" state of our animator based on the current data.
 		/// </summary>
-		public void UpdateShootingAnimation(bool isFiring, bool fireNow)
+		public void UpdateArmRecoilAnimation(bool isFiring, bool fireNow)
 		{
 			if (mArmAnimator == null)
 				return;
@@ -357,6 +360,29 @@ namespace FiringSquad.Gameplay.Weapons
 			mArmAnimator.SetBool("IsFiring", isFiring);
 			if (fireNow)
 				mArmAnimator.SetTrigger("Fire");
+		}
+
+		private void PlayWeaponFireAnimations()
+		{
+			if (mWeaponScript.currentParts.mechanism != null)
+			{
+				Animator anim = mWeaponScript.currentParts.mechanism.attachedAnimator;
+				if (anim != null)
+				{
+					anim.SetFloat("FireRate", mWeaponScript.currentData.fireRate);
+					anim.SetTrigger("Fire");
+				}
+			}
+
+			if (mWeaponScript.currentParts.barrel != null)
+			{
+				Animator anim = mWeaponScript.currentParts.barrel.attachedAnimator;
+				if (anim != null)
+				{
+					anim.SetFloat("FireRate", mWeaponScript.currentData.fireRate);
+					anim.SetTrigger("Fire");
+				}
+			}
 		}
 
 		#endregion
