@@ -4,6 +4,9 @@
         <property name="name">
             <value>Deathstreak</value>
         </property>
+        <property name="note">
+            <value>Player who has died a lot consecutivley without getting any kills themselves</value>
+        </property>
         <property name="outputFormat">
             <value>1</value>
         </property>
@@ -56,7 +59,11 @@
             <destination>{b08538a1-0dc6-4abb-870b-a4343b55ad56}</destination>
         </relationship>
     </object>
-    <object class="EventAutomatableProperties" id="{fa737204-c438-47a3-8f19-82da1d0d90f1}"/>
+    <object class="EventAutomatableProperties" id="{fa737204-c438-47a3-8f19-82da1d0d90f1}">
+        <property name="priority">
+            <value>1</value>
+        </property>
+    </object>
     <object class="MarkerTrack" id="{3a005759-0ab3-4b25-9889-c66e95660ed7}"/>
     <object class="GroupTrack" id="{64dbec84-21ea-4562-8b73-76b05f6f6270}">
         <relationship name="modules">

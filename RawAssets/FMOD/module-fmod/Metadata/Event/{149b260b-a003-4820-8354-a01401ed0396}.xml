@@ -4,6 +4,9 @@
         <property name="name">
             <value>Sponsor</value>
         </property>
+        <property name="note">
+            <value>Everyone</value>
+        </property>
         <property name="outputFormat">
             <value>1</value>
         </property>
@@ -56,7 +59,11 @@
             <destination>{b08538a1-0dc6-4abb-870b-a4343b55ad56}</destination>
         </relationship>
     </object>
-    <object class="EventAutomatableProperties" id="{f4d99d58-22e6-424d-8bd4-a2393562badc}"/>
+    <object class="EventAutomatableProperties" id="{f4d99d58-22e6-424d-8bd4-a2393562badc}">
+        <property name="priority">
+            <value>1</value>
+        </property>
+    </object>
     <object class="MarkerTrack" id="{1347affa-3f22-458e-be36-24a5da9930b8}"/>
     <object class="GroupTrack" id="{41104f4a-cb79-435e-a97f-8d70672922e9}">
         <relationship name="modules">

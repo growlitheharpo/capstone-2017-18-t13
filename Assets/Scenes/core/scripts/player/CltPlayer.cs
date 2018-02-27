@@ -697,6 +697,9 @@ namespace FiringSquad.Gameplay
 			{
 				mLocalHealthVar.value = 0.0f;
 				EventManager.Local.LocalPlayerDied(spawnPos, spawnRot, killerObj);
+
+				ServiceLocator.Get<IAudioManager>()
+					.CreateSound(AudioEvent.AnnouncerPlayerDeath, null);
 			}
 		}
 

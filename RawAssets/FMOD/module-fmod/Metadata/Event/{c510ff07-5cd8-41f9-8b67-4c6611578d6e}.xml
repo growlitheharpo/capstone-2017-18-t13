@@ -4,6 +4,9 @@
         <property name="name">
             <value>MultiKill</value>
         </property>
+        <property name="note">
+            <value>Player who got the multi-kill and everyone who died because of it</value>
+        </property>
         <property name="outputFormat">
             <value>1</value>
         </property>
@@ -56,7 +59,11 @@
             <destination>{b08538a1-0dc6-4abb-870b-a4343b55ad56}</destination>
         </relationship>
     </object>
-    <object class="EventAutomatableProperties" id="{a52ba557-30c4-40d7-8449-a8f5dd56eb51}"/>
+    <object class="EventAutomatableProperties" id="{a52ba557-30c4-40d7-8449-a8f5dd56eb51}">
+        <property name="priority">
+            <value>1</value>
+        </property>
+    </object>
     <object class="MarkerTrack" id="{6e473fc9-08a7-425f-9bf7-8a08f42248bb}"/>
     <object class="GroupTrack" id="{4d99a2b0-cbf6-4c10-8a02-45fa91c0c3ff}">
         <relationship name="modules">

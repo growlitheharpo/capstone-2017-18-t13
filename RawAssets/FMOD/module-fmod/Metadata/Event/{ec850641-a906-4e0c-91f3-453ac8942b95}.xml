@@ -4,6 +4,9 @@
         <property name="name">
             <value>GetsLegendary</value>
         </property>
+        <property name="note">
+            <value>Player who gets the legendary part</value>
+        </property>
         <property name="outputFormat">
             <value>1</value>
         </property>
@@ -56,7 +59,11 @@
             <destination>{b08538a1-0dc6-4abb-870b-a4343b55ad56}</destination>
         </relationship>
     </object>
-    <object class="EventAutomatableProperties" id="{52b5635d-e396-474b-ac0f-dbe42cf8f20f}"/>
+    <object class="EventAutomatableProperties" id="{52b5635d-e396-474b-ac0f-dbe42cf8f20f}">
+        <property name="priority">
+            <value>1</value>
+        </property>
+    </object>
     <object class="MarkerTrack" id="{f3764732-7f72-448c-83b4-786501a226e3}"/>
     <object class="GroupTrack" id="{f42b0169-48ca-47b3-b5de-3da068b9783f}">
         <relationship name="modules">

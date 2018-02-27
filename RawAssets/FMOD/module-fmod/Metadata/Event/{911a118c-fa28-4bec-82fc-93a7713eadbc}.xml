@@ -4,6 +4,9 @@
         <property name="name">
             <value>EnvironmentKill</value>
         </property>
+        <property name="note">
+            <value>Player who died</value>
+        </property>
         <property name="outputFormat">
             <value>1</value>
         </property>
@@ -56,7 +59,11 @@
             <destination>{b08538a1-0dc6-4abb-870b-a4343b55ad56}</destination>
         </relationship>
     </object>
-    <object class="EventAutomatableProperties" id="{724cf744-3abd-4c88-809c-77efd58d1f3a}"/>
+    <object class="EventAutomatableProperties" id="{724cf744-3abd-4c88-809c-77efd58d1f3a}">
+        <property name="priority">
+            <value>1</value>
+        </property>
+    </object>
     <object class="MarkerTrack" id="{bb1ab4b6-4aa1-4b16-a13d-05cb0804f21f}"/>
     <object class="GroupTrack" id="{6276bbaa-0dc5-4429-9dc5-da42ad277aa1}">
         <relationship name="modules">
