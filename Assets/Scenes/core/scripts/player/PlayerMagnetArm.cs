@@ -27,7 +27,6 @@ namespace FiringSquad.Gameplay
 		}
 
 		/// Inspector variables
-		[SerializeField] private float mClickHoldThreshold = 0.2f;
 		[SerializeField] private float mPullRate;
 		[SerializeField] private float mPullRadius;
 		[SerializeField] private LayerMask mGrabLayers;
@@ -36,7 +35,7 @@ namespace FiringSquad.Gameplay
 		private CltPlayer mBearer;
 		private IAudioReference mGrabSound;
 		private WeaponPickupScript mReelingObject;
-		private float mInputTime, mReelingTime;
+		private float mReelingTime;
 		private bool mPushedCrosshairHint;
 
 		private const float SNAP_THRESHOLD_DISTANCE = 2.5f;
@@ -230,7 +229,6 @@ namespace FiringSquad.Gameplay
 			{
 				EventManager.LocalGUI.SetHintState(CrosshairHintText.Hint.MagnetArmGrab, false);
 				mPushedCrosshairHint = false;
-
 			}
 		}
 
@@ -249,19 +247,17 @@ namespace FiringSquad.Gameplay
 
 			reelingObject = TryFindGrabCandidate();
 
-			if (reelingObject == null)
-			{
-				// TODO: We need a sound event to play when the player tries to grab with nothing there.
-				mInputTime = 0.0f;
-			}
-			else 
+			if (reelingObject != null)
 			{
 				// start to grab this object
 				reelingObject.LockToPlayerReel(bearer);
 				CmdAssignClientAuthority(reelingObject.netId);
-				mInputTime = float.NegativeInfinity;
 				mReelingTime = 0.0f;
 				UpdateReelingSound(true);
+			}
+			else 
+			{
+				// TODO: We need to play a sound when there is no object available
 			}
 		}
 
@@ -279,8 +275,7 @@ namespace FiringSquad.Gameplay
 
 			if (reelingObject.transform.parent == transform)
 			{
-				// the object already snapped into place, we just need to tick that timer.
-				mInputTime += Time.deltaTime;
+				// the object already snapped into place
 				return;
 			}
 
@@ -310,7 +305,7 @@ namespace FiringSquad.Gameplay
 			if (!bearer.isCurrentPlayer)
 				return;
 
-			if (mInputTime < 0.0f)
+			if (mReelingTime > 0.0f)
 			{
 				// if the input was less than zero seconds, we were in our "pull" button cycle.
 				// Check if we successfully grabbed it. If not, let it go.
@@ -320,7 +315,7 @@ namespace FiringSquad.Gameplay
 					reelingObject = null;
 				}
 			}
-			else if (mInputTime < mClickHoldThreshold)
+			else
 			{
 				// This counts as a press. Equip the item.
 				if (reelingObject != null)
@@ -332,23 +327,28 @@ namespace FiringSquad.Gameplay
 				EventManager.LocalGUI.SetHintState(CrosshairHintText.Hint.ItemEquipOrDrop, false);
 				mPushedCrosshairHint = false;
 			}
-			else
+
+			UpdateReelingSound(false);
+			mReelingTime = -1.0f;
+		}
+
+		/// <summary>
+		/// INPUT_HANDLER: Handle the player's "magnet arm drop" button being released.
+		/// </summary>
+		[Client]
+		public void DropItemDown()
+		{
+			// The player hit the throw button. Throw it.
+			if (reelingObject != null)
 			{
-				// this counts as a throw. Throw it.
-				if (reelingObject != null)
-				{
-					reelingObject.UnlockAndThrow(bearer.eye.forward * 30.0f);
-					CmdThrowHeldItem(bearer.eye.forward, reelingObject.netId);
-					reelingObject = null;
-				}
+				reelingObject.UnlockAndThrow(bearer.eye.forward * 30.0f);
+				CmdThrowHeldItem(bearer.eye.forward, reelingObject.netId);
+				reelingObject = null;
 
 				// Hide the "throw" hint
 				EventManager.LocalGUI.SetHintState(CrosshairHintText.Hint.ItemEquipOrDrop, false);
 				mPushedCrosshairHint = false;
 			}
-
-			UpdateReelingSound(false);
-			mInputTime = 0.0f;
 		}
 
 		/// <summary>

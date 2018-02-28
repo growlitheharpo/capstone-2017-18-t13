@@ -49,9 +49,10 @@ namespace FiringSquad.Gameplay
 				.RegisterInput(Input.GetButton, inputMap.fireWeaponButton, INPUT_WeaponFireHold, InputLevel.Gameplay)
 				.RegisterInput(Input.GetButtonUp, inputMap.fireWeaponButton, INPUT_WeaponFireUp, InputLevel.Gameplay)
 				.RegisterInput(Input.GetButtonDown, inputMap.reloadButton, INPUT_WeaponReload, InputLevel.Gameplay)
-				.RegisterInput(Input.GetButtonDown, inputMap.fireMagnetArmButton, INPUT_MagnetArmDown, InputLevel.Gameplay)
-				.RegisterInput(Input.GetButton, inputMap.fireMagnetArmButton, INPUT_MagnetArmHeld, InputLevel.Gameplay)
-				.RegisterInput(Input.GetButtonUp, inputMap.fireMagnetArmButton, INPUT_MagnetArmUp, InputLevel.Gameplay)
+				.RegisterInput(Input.GetButtonDown, inputMap.fireMagnetArmButton, INPUT_Interact1Down, InputLevel.Gameplay)
+				.RegisterInput(Input.GetButton, inputMap.fireMagnetArmButton, INPUT_Interact1Held, InputLevel.Gameplay)
+				.RegisterInput(Input.GetButtonUp, inputMap.fireMagnetArmButton, INPUT_Interact1Up, InputLevel.Gameplay)
+				.RegisterInput(Input.GetButtonDown, inputMap.dropMagnetArmButton, INPUT_Interact2Down, InputLevel.Gameplay)
 
 				// local
 				.RegisterInput(Input.GetButtonDown, inputMap.activateADSButton, INPUT_EnterAimDownSights, InputLevel.Gameplay)
@@ -93,9 +94,9 @@ namespace FiringSquad.Gameplay
 				.UnregisterInput(INPUT_WeaponFireHold)
 				.UnregisterInput(INPUT_WeaponFireUp)
 				.UnregisterInput(INPUT_WeaponReload)
-				.UnregisterInput(INPUT_MagnetArmDown)
-				.UnregisterInput(INPUT_MagnetArmHeld)
-				.UnregisterInput(INPUT_MagnetArmUp)
+				.UnregisterInput(INPUT_Interact1Down)
+				.UnregisterInput(INPUT_Interact1Held)
+				.UnregisterInput(INPUT_Interact1Up)
 				.UnregisterAxis(INPUT_ZoomLevel)
 
 				// local
@@ -175,7 +176,7 @@ namespace FiringSquad.Gameplay
 		/// <summary>
 		/// INPUT HANDLER: Pressed down the trigger of our magnet arm.
 		/// </summary>
-		private void INPUT_MagnetArmDown()
+		private void INPUT_Interact1Down()
 		{
 			if (inAimDownSightsMode)
 				return;
@@ -186,7 +187,7 @@ namespace FiringSquad.Gameplay
 		/// <summary>
 		/// INPUT HANDLER: Hold down the trigger of our magnet arm.
 		/// </summary>
-		private void INPUT_MagnetArmHeld()
+		private void INPUT_Interact1Held()
 		{
 			if (inAimDownSightsMode)
 				return;
@@ -197,11 +198,22 @@ namespace FiringSquad.Gameplay
 		/// <summary>
 		/// INPUT HANDLER: Release the trigger of our magnet arm.
 		/// </summary>
-		private void INPUT_MagnetArmUp()
+		private void INPUT_Interact1Up()
 		{
 			playerRoot.magnetArm.FireUp();
 		}
-		
+
+		/// <summary>
+		/// INPUT HANDLER: Pressed down the drop part button of our magnet arm.
+		/// </summary>
+		private void INPUT_Interact2Down()
+		{
+			if (inAimDownSightsMode)
+				return;
+
+			playerRoot.magnetArm.DropItemDown();
+		}
+
 		/// <summary>
 		/// INPUT HANDLER: Toggle the game's pause menu.
 		/// </summary>
@@ -263,9 +275,7 @@ namespace FiringSquad.Gameplay
 		private void INPUT_ZoomLevel(float val)
 		{
 			if (inAimDownSightsMode)
-			{
 				EventManager.Local.ZoomLevelChanged(val, playerRoot);
-			}
 		}
 
 		/// <summary>
