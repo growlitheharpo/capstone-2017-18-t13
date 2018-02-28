@@ -28,25 +28,25 @@ namespace FiringSquad.Gameplay.Weapons
 		/// Start our "flash" bullet effect.
 		/// </summary>
 		/// <param name="end">The end position of the effect..</param>
-		/// <param name="time">How long to flash over.</param>
 		/// <param name="endSpace">Whether the end space is in local or world space. Defaults to world.</param>
 		/// <returns>The Coroutine that runs the effect.</returns>
-		public Coroutine PlayEffect(Vector3 end, Space endSpace = Space.World)
+		public void PlayEffect(Vector3 end, Space endSpace = Space.World)
 		{
-			if (mEffectRoutine == null)
-				mEffectRoutine = StartCoroutine(Flash(end, endSpace));
+			// Don't change the signature of this function, or this next line here:
+			Vector3 realEnd = endSpace == Space.World ? end : transform.TransformPoint(end);
 
-			return mEffectRoutine;
+			// TODO: Everything after here can be changed for the new hitscan effect!
+
+			if (mEffectRoutine == null)
+				mEffectRoutine = StartCoroutine(Flash(realEnd));
 		}
 
 		/// <summary>
 		/// Actually perform the flash effect by lerping values across our line renderer.
 		/// </summary>
-		/// <param name="end">The end position of the effect..</param>
-		/// <param name="endSpace">Whether the end space is in local or world space. Defaults to world.</param>
-		private IEnumerator Flash(Vector3 end, Space endSpace = Space.World)
+		/// <param name="realEnd">The world-space end position of the effect</param>
+		private IEnumerator Flash(Vector3 realEnd)
 		{
-			Vector3 realEnd = endSpace == Space.World ? end : transform.TransformPoint(end);
 			Vector3 start = transform.position;
 
 			mRenderer.positionCount = 2;
