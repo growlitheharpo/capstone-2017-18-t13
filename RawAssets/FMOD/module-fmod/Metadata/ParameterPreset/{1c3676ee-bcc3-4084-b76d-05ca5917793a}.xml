@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.01.10.00">
+    <object class="ParameterPreset" id="{1c3676ee-bcc3-4084-b76d-05ca5917793a}">
+        <property name="name">
+            <value>BarrelType</value>
+        </property>
+        <relationship name="folder">
+            <destination>{ba583e1d-5b61-4535-819d-0ffcbe8ad33b}</destination>
+        </relationship>
+        <relationship name="parameter">
+            <destination>{38ba7f37-a4ac-4023-a991-25a92d230673}</destination>
+        </relationship>
+    </object>
+    <object class="GameParameter" id="{38ba7f37-a4ac-4023-a991-25a92d230673}">
+        <property name="maximum">
+            <value>5</value>
+        </property>
+        <property name="initialValue">
+            <value>0</value>
+        </property>
+    </object>
+</objects>

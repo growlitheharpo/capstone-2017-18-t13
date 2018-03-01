@@ -24,6 +24,7 @@ namespace FiringSquad.Core.Audio
 		// Weapons
 		Reload = 15,
 		Shoot = 20,
+		BarrelLayer = 25,
 		ImpactWall = 60,
 		ImpactOtherPlayer = 65,
 		ImpactCurrentPlayer = 70,
@@ -132,6 +133,9 @@ namespace FiringSquad.Core.Audio
 
 			/// <inheritdoc />
 			public float weaponType { get { return GetParameter("WeaponType"); } set { SetParameter("WeaponType", value); } }
+
+			/// <inheritdoc />
+			public float barrelType { get { return GetParameter("BarrelType"); } set { SetParameter("BarrelType", value); } }
 
 			/// <inheritdoc />
 			public float isCurrentPlayer { get { return GetParameter("IsCurrentPlayer"); } set { SetParameter("IsCurrentPlayer", value); } }

@@ -8,6 +8,7 @@ namespace FiringSquad.Gameplay.Weapons
 	{
 		/// Inspector variables
 		[SerializeField] private Transform mTip;
+		[SerializeField] private float mAudioOverrideBarrelType;
 		[SerializeField] private int mProjectileCount = 1;
 		[SerializeField] private int mShotsPerClick = -1;
 		[SerializeField] private Sprite mCrosshairSprite;
@@ -18,6 +19,11 @@ namespace FiringSquad.Gameplay.Weapons
 
 		/// <inheritdoc />
 		public override Attachment attachPoint { get { return Attachment.Barrel; } }
+
+		/// <summary>
+		/// Which audio weapon type to use for this mechanism.
+		/// </summary>
+		public float audioOverrideBarrelType { get { return mAudioOverrideBarrelType; } }
 
 		/// <summary>
 		/// The Transform of the tip of this barrel, where effects should originate from.
