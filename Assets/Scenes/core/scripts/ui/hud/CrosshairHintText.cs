@@ -25,7 +25,7 @@ namespace FiringSquad.Gameplay.UI
 		private readonly Dictionary<Hint, string> mHintTextMap = new Dictionary<Hint, string>
 		{
 			{ Hint.MagnetArmGrab, "Hold E to pull" },
-			{ Hint.ItemEquipOrDrop, "Press E to equip or hold E to drop" },
+			{ Hint.ItemEquipOrDrop, "Press E to equip or Q to drop" },
 		};
 
 		private UnityEngine.UI.Text mUIText;
