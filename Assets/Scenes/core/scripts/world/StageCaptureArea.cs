@@ -217,7 +217,7 @@ namespace FiringSquad.Gameplay
 			{
 				if (player.playerTeam == GameData.PlayerTeam.Deathmatch || player.playerTeam != currentCapturingPlayer.playerTeam)
 					mBlockingPlayers.Add(player);
-				else
+				else if (player.playerTeam != GameData.PlayerTeam.Deathmatch)
 					mTeamPlayers.Add(player);
 			}
 		}
