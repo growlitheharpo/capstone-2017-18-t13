@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using FiringSquad.Core;
 using FiringSquad.Core.Audio;
+using FiringSquad.Data;
 using FiringSquad.Gameplay.UI;
 using KeatsLib.Unity;
 using UnityEngine;
@@ -32,7 +33,7 @@ namespace FiringSquad.Gameplay
 		/// Private variables
 		private static StageCaptureUI kUIManager;
 		private CltPlayer mCapturingPlayer;
-		private List<CltPlayer> mBlockingPlayers;
+		private List<CltPlayer> mBlockingPlayers, mTeamPlayers;
 		private List<GameObject> mChildren;
 
 		/// <summary>
@@ -98,6 +99,7 @@ namespace FiringSquad.Gameplay
 			mTimeoutTimer = 0.0f;
 			mCapturePercentageTimer = 0.0f;
 			mBlockingPlayers = new List<CltPlayer>(4);
+			mTeamPlayers = new List<CltPlayer>(4);
 			currentCapturingPlayer = null;
 			mCapturable = true;
 		}
@@ -131,10 +133,22 @@ namespace FiringSquad.Gameplay
 		[Server]
 		private void UpdateCapturingPlayer()
 		{
-			if (currentCapturingPlayer == null && mBlockingPlayers.Count > 0)
+			// If the current capturer left or died...
+			if (currentCapturingPlayer == null)
 			{
-				currentCapturingPlayer = mBlockingPlayers[0];
-				mBlockingPlayers.RemoveAt(0);
+				// First check for a teammate
+				if (mTeamPlayers.Count > 0)
+				{
+					// Transfer to them if found
+					currentCapturingPlayer = mTeamPlayers[0];
+					mTeamPlayers.RemoveAt(0);
+				}
+				else if (mBlockingPlayers.Count > 0)
+				{
+					// If no teammate was found but there are blocking players, transfer to them
+					currentCapturingPlayer = mBlockingPlayers[0];
+					mBlockingPlayers.RemoveAt(0);
+				}
 			}
 		}
 
@@ -144,9 +158,11 @@ namespace FiringSquad.Gameplay
 		[Server]
 		private void UpdateCapturePercent()
 		{
+			// If we have a capturer and no blockers...
 			if (currentCapturingPlayer != null && mBlockingPlayers.Count == 0)
 			{
-				mCapturePercentageTimer += Time.deltaTime;
+				float increase = Time.deltaTime + mTeamPlayers.Count * Time.deltaTime;
+				mCapturePercentageTimer += increase;
 
 				if (mCapturePercentageTimer >= mCaptureTime)
 				{
@@ -178,11 +194,9 @@ namespace FiringSquad.Gameplay
 		/// Handle the trigger being entered.
 		/// Will only run on server.
 		/// </summary>
+		[ServerCallback]
 		private void OnTriggerEnter(Collider other)
 		{
-			if (!isServer)
-				return;
-
 			CltPlayer player = other.GetComponent<CltPlayer>();
 			if (player == null)
 				return;
@@ -193,18 +207,21 @@ namespace FiringSquad.Gameplay
 			if (currentCapturingPlayer == null)
 				currentCapturingPlayer = player;
 			else
-				mBlockingPlayers.Add(player);
+			{
+				if (player.playerTeam == GameData.PlayerTeam.Deathmatch || player.playerTeam != currentCapturingPlayer.playerTeam)
+					mBlockingPlayers.Add(player);
+				else
+					mTeamPlayers.Add(player);
+			}
 		}
 
 		/// <summary>
 		/// Handle the trigger being exited.
 		/// Will only run on server.
 		/// </summary>
+		[ServerCallback]
 		private void OnTriggerExit(Collider other)
 		{
-			if (!isServer)
-				return;
-
 			CltPlayer player = other.GetComponent<CltPlayer>();
 			if (player == null)
 				return;
@@ -212,7 +229,10 @@ namespace FiringSquad.Gameplay
 			if (currentCapturingPlayer == player)
 				currentCapturingPlayer = null;
 			else
+			{
 				mBlockingPlayers.Remove(player);
+				mTeamPlayers.Remove(player);
+			}
 		}
 
 		/// <summary>
