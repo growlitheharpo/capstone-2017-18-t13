@@ -6,6 +6,7 @@ using FiringSquad.Core.Audio;
 using FiringSquad.Gameplay.UI;
 using FiringSquad.Gameplay.Weapons;
 using UnityEngine;
+using UnityEngine.Assertions;
 using UnityEngine.Networking;
 using Logger = FiringSquad.Debug.Logger;
 
@@ -209,6 +210,28 @@ namespace FiringSquad.Gameplay
 		{
 			Transform view = transform.Find("View");
 			mViewAnimator = view.GetChild(0).GetComponent<Animator>();
+		}
+
+		/// <summary>
+		/// Public callback for the magnet arm after it has been bound to its owner, client-side or server-side.
+		/// </summary>
+		/// <param name="forceLocalPlayer">Force this magnet arm to act like the local player.</param>
+		public void OnPostBind(bool forceLocalPlayer = false)
+		{
+			Assert.IsTrue(bearer != null, "PlayerMagnetArm.OnPostBind called but bearer is null!");
+			if (bearer.isCurrentPlayer || forceLocalPlayer)
+				return;
+
+			// If our bearer is NOT the current player, destroy our view.
+			transform.Find("View").gameObject.SetActive(false);
+		}
+
+		/// <summary>
+		/// Force the view to be visible on the server.
+		/// </summary>
+		public void SetViewVisible()
+		{
+			transform.Find("View").gameObject.SetActive(true);
 		}
 
 		/// <summary>
