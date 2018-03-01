@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using FiringSquad.Core;
 using FiringSquad.Core.Audio;
 using FiringSquad.Data;
@@ -148,6 +149,12 @@ namespace FiringSquad.Gameplay
 					// If no teammate was found but there are blocking players, transfer to them
 					currentCapturingPlayer = mBlockingPlayers[0];
 					mBlockingPlayers.RemoveAt(0);
+
+					// the "capture team" swapped, so we need to swap the arrays.
+					mTeamPlayers = new List<CltPlayer>(mBlockingPlayers);
+
+					// We know there are no players on the other team (the previous if), so clear the blocking list.
+					mBlockingPlayers.Clear();
 				}
 			}
 		}
