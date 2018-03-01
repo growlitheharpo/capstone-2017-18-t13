@@ -2,6 +2,7 @@
 using FiringSquad.Core.State;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UIButton = UnityEngine.UI.Button;
 
 namespace FiringSquad.Gameplay.UI
 {
@@ -12,32 +13,18 @@ namespace FiringSquad.Gameplay.UI
 	{
 		/// Inspector variables
 		[SerializeField] private GameObject mMainElementHolder;
-		[SerializeField] private ActionProvider mTwoPlayerButton;
-		[SerializeField] private ActionProvider mFourPlayerButton;
-		[SerializeField] private ActionProvider mQuitButton;
-		[SerializeField] private ActionProvider mGunGlossaryButton;
+		[SerializeField] private UIButton mFourPlayerButton;
+		[SerializeField] private UIButton mQuitButton;
+		[SerializeField] private UIButton mGunGlossaryButton;
 
 		/// <summary>
 		/// Unity's Start function
 		/// </summary>
 		private void Start()
 		{
-			mTwoPlayerButton.OnClick += LaunchOldLevel;
-			mFourPlayerButton.OnClick += LaunchNewLevel;
-			mQuitButton.OnClick += ClickQuit;
-			mGunGlossaryButton.OnClick += LaunchGlossary;
-
-		}
-
-		/// <summary>
-		/// Launch the two player game.
-		/// </summary>
-		private void LaunchOldLevel()
-		{
-			mMainElementHolder.SetActive(false);
-
-			ServiceLocator.Get<IGamestateManager>()
-				.RequestSceneChange(GamestateManager.FOURPLAYER_GAMEPLAY);
+			mFourPlayerButton.onClick.AddListener(LaunchNewLevel);
+			mQuitButton.onClick.AddListener(ClickQuit);
+			mGunGlossaryButton.onClick.AddListener(LaunchGlossary);
 		}
 
 		/// <summary>
