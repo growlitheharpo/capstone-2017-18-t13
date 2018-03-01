@@ -350,7 +350,11 @@ namespace FiringSquad.Gameplay.Weapons
 			IAudioReference effect = ServiceLocator.Get<IAudioManager>().CreateSound(AudioEvent.Shoot, transform, false);
 			if (mWeaponScript.currentParts.mechanism != null)
 				effect.weaponType = mWeaponScript.currentParts.mechanism.audioOverrideWeaponType;
+			effect.Start();
 
+			effect = ServiceLocator.Get<IAudioManager>().CreateSound(AudioEvent.BarrelLayer, transform, false);
+			if (mWeaponScript.currentParts.barrel != null)
+				effect.barrelType = mWeaponScript.currentParts.barrel.audioOverrideBarrelType;
 			effect.Start();
 		}
 

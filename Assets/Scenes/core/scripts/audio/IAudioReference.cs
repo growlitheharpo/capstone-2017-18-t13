@@ -45,6 +45,11 @@ namespace FiringSquad.Core.Audio
 		float weaponType { get; set; }
 
 		/// <summary>
+		/// FMOD PARAMETER "barrelType"
+		/// </summary>
+		float barrelType { get; set; }
+
+		/// <summary>
 		/// FMOD PARAMETER "IsCurrentPlayer"
 		/// </summary>
 		float isCurrentPlayer { get; set; }
