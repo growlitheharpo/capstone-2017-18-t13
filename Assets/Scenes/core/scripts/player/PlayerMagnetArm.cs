@@ -37,6 +37,7 @@ namespace FiringSquad.Gameplay
 		private WeaponPickupScript mReelingObject;
 		private float mReelingTime;
 		private bool mPushedCrosshairHint;
+		private Animator mViewAnimator;
 
 		private const float SNAP_THRESHOLD_DISTANCE = 2.5f;
 
@@ -202,6 +203,15 @@ namespace FiringSquad.Gameplay
 		#endregion
 
 		/// <summary>
+		/// Unity's Start function
+		/// </summary>
+		private void Start()
+		{
+			Transform view = transform.Find("View");
+			mViewAnimator = view.GetChild(0).GetComponent<Animator>();
+		}
+
+		/// <summary>
 		/// Unity's Update function
 		/// </summary>
 		[ClientCallback]
@@ -209,6 +219,9 @@ namespace FiringSquad.Gameplay
 		{
 			if (bearer != null && bearer.isCurrentPlayer)
 				UpdateCrosshairHints();
+
+			if (mViewAnimator != null && mViewAnimator.isActiveAndEnabled)
+				mViewAnimator.SetBool("PartInHand", reelingObject != null);
 		}
 
 		/// <summary>
