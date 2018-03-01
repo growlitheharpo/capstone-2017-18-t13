@@ -521,6 +521,10 @@ MonoBehaviour:
   mTip: {fileID: 4479562103279286}
   mProjectileCount: 10
   mShotsPerClick: 1
+  mCrosshairSprite: {fileID: 21300000, guid: 455aba421ab8eb84e9f031519019321e, type: 3}
+  mAnimator: {fileID: 0}
+  mMuzzleFlashVfxPrefab: {fileID: 1409651286611546, guid: fc441af24ffa9da4c86e29cf21ecd6b1,
+    type: 2}
   mOverrideRecoilCurve: 0
   mRecoilCurve:
     serializedVersion: 2
@@ -546,7 +550,6 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 0
-  mCrosshairSprite: {fileID: 21300000, guid: 455aba421ab8eb84e9f031519019321e, type: 3}
 --- !u!114 &114208090456895842
 MonoBehaviour:
   m_ObjectHideFlags: 1

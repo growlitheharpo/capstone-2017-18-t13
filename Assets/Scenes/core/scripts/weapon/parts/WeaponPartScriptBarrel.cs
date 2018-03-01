@@ -10,10 +10,11 @@ namespace FiringSquad.Gameplay.Weapons
 		[SerializeField] private Transform mTip;
 		[SerializeField] private int mProjectileCount = 1;
 		[SerializeField] private int mShotsPerClick = -1;
-		[SerializeField] private bool mOverrideRecoilCurve;
-		[HideInInspector] [SerializeField] private AnimationCurve mRecoilCurve;
 		[SerializeField] private Sprite mCrosshairSprite;
 		[SerializeField] private Animator mAnimator;
+		[SerializeField] private GameObject mMuzzleFlashVfxPrefab;
+		[SerializeField] private bool mOverrideRecoilCurve;
+		[HideInInspector] [SerializeField] private AnimationCurve mRecoilCurve;
 
 		/// <inheritdoc />
 		public override Attachment attachPoint { get { return Attachment.Barrel; } }
@@ -52,5 +53,10 @@ namespace FiringSquad.Gameplay.Weapons
 		/// </summary>
 		[CanBeNull]
 		public Animator attachedAnimator { get { return mAnimator; } }
+
+		/// <summary>
+		/// The prefab for the particle system that we will use when this barrel is active.
+		/// </summary>
+		public GameObject muzzleFlashVfxPrefab {get { return mMuzzleFlashVfxPrefab; }}
 	}
 }

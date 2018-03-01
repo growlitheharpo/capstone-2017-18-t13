@@ -310,7 +310,6 @@ namespace FiringSquad.Gameplay.Weapons
 			if (partId == 0)
 				return;
 
-
 			WeaponPartScript prefab = ServiceLocator.Get<IWeaponPartManager>().GetPrefabScript(partId);
 			SetDirtyBit(syncVarDirtyBits | (uint)GetBitFromAttach(prefab.attachPoint));
 			WeaponPartScript instance = prefab.SpawnForWeapon(this);

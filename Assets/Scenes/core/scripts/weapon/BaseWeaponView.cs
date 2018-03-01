@@ -24,7 +24,7 @@ namespace FiringSquad.Gameplay.Weapons
 		private Dictionary<Attachment, Transform> mAttachPoints;
 		private Animator mAnimator, mArmAnimator;
 
-		private ParticleSystem mShotParticles, mPartBreakPrefab;
+		private ParticleSystem mPartBreakPrefab, mCurrentMuzzleFlashVfx;
 
 		private float mWeaponBobProgress;
 		private Queue<Vector3> mRecentPlayerPositions;
@@ -40,7 +40,6 @@ namespace FiringSquad.Gameplay.Weapons
 		{
 			mAnimator = GetComponent<Animator>();
 			mWeaponScript = GetComponent<IWeapon>();
-			mShotParticles = transform.Find("shot_particles").GetComponent<ParticleSystem>();
 			mPartBreakPrefab = Resources.Load<GameObject>("prefabs/weapons/effects/p_vfx_partBreak").GetComponent<ParticleSystem>();
 
 			mAttachPoints = new Dictionary<Attachment, Transform>
@@ -274,12 +273,26 @@ namespace FiringSquad.Gameplay.Weapons
 			newPart.transform.SetParent(mAttachPoints[place]);
 			newPart.transform.ResetLocalValues();
 
-			if (ObjectHighlight.instance == null || mWeaponScript.bearer == null || !mWeaponScript.bearer.isCurrentPlayer)
-				return;
+			if (ObjectHighlight.instance != null && mWeaponScript.bearer != null && mWeaponScript.bearer.isCurrentPlayer)
+			{
+				var renderers = newPart.GetComponentsInChildren<Renderer>();
+				foreach (Renderer r in renderers)
+					ObjectHighlight.instance.AddOccluder(r);
+			}
 
-			var renderers = newPart.GetComponentsInChildren<Renderer>();
-			foreach (Renderer r in renderers)
-				ObjectHighlight.instance.AddOccluder(r);
+			// Spawn the muzzle flash if this is the barrel.
+			if (newPart.attachPoint == Attachment.Barrel)
+			{
+				WeaponPartScriptBarrel realScript = (WeaponPartScriptBarrel)newPart;
+				GameObject prefab = realScript.muzzleFlashVfxPrefab;
+
+				if (prefab == null)
+					return;
+
+				GameObject instance = Instantiate(prefab, realScript.barrelTip, false);
+				mCurrentMuzzleFlashVfx = instance.GetComponent<ParticleSystem>();
+				mCurrentMuzzleFlashVfx.transform.ResetLocalValues();
+			}
 		}
 
 		#endregion
@@ -330,11 +343,9 @@ namespace FiringSquad.Gameplay.Weapons
 			PlayWeaponFireAnimations();
 
 			mWeaponScript.bearer.PlayFireAnimation();
-			if (mWeaponScript.currentParts.barrel != null)
-				mShotParticles.transform.position = mWeaponScript.currentParts.barrel.barrelTip.position;
-
-
-			mShotParticles.Play();
+			
+			if (mCurrentMuzzleFlashVfx != null)
+				mCurrentMuzzleFlashVfx .Play();
 
 			IAudioReference effect = ServiceLocator.Get<IAudioManager>().CreateSound(AudioEvent.Shoot, transform, false);
 			if (mWeaponScript.currentParts.mechanism != null)
