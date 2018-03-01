@@ -6,6 +6,7 @@ using FiringSquad.Core.Audio;
 using FiringSquad.Gameplay.UI;
 using FiringSquad.Gameplay.Weapons;
 using UnityEngine;
+using UnityEngine.Assertions;
 using UnityEngine.Networking;
 using Logger = FiringSquad.Debug.Logger;
 
@@ -27,7 +28,6 @@ namespace FiringSquad.Gameplay
 		}
 
 		/// Inspector variables
-		[SerializeField] private float mClickHoldThreshold = 0.2f;
 		[SerializeField] private float mPullRate;
 		[SerializeField] private float mPullRadius;
 		[SerializeField] private LayerMask mGrabLayers;
@@ -36,8 +36,9 @@ namespace FiringSquad.Gameplay
 		private CltPlayer mBearer;
 		private IAudioReference mGrabSound;
 		private WeaponPickupScript mReelingObject;
-		private float mInputTime, mReelingTime;
+		private float mReelingTime;
 		private bool mPushedCrosshairHint;
+		private Animator mViewAnimator;
 
 		private const float SNAP_THRESHOLD_DISTANCE = 2.5f;
 
@@ -203,6 +204,37 @@ namespace FiringSquad.Gameplay
 		#endregion
 
 		/// <summary>
+		/// Unity's Start function
+		/// </summary>
+		private void Start()
+		{
+			Transform view = transform.Find("View");
+			mViewAnimator = view.GetChild(0).GetComponent<Animator>();
+		}
+
+		/// <summary>
+		/// Public callback for the magnet arm after it has been bound to its owner, client-side or server-side.
+		/// </summary>
+		/// <param name="forceLocalPlayer">Force this magnet arm to act like the local player.</param>
+		public void OnPostBind(bool forceLocalPlayer = false)
+		{
+			Assert.IsTrue(bearer != null, "PlayerMagnetArm.OnPostBind called but bearer is null!");
+			if (bearer.isCurrentPlayer || forceLocalPlayer)
+				return;
+
+			// If our bearer is NOT the current player, destroy our view.
+			transform.Find("View").gameObject.SetActive(false);
+		}
+
+		/// <summary>
+		/// Force the view to be visible on the server.
+		/// </summary>
+		public void SetViewVisible()
+		{
+			transform.Find("View").gameObject.SetActive(true);
+		}
+
+		/// <summary>
 		/// Unity's Update function
 		/// </summary>
 		[ClientCallback]
@@ -210,6 +242,9 @@ namespace FiringSquad.Gameplay
 		{
 			if (bearer != null && bearer.isCurrentPlayer)
 				UpdateCrosshairHints();
+
+			if (mViewAnimator != null && mViewAnimator.isActiveAndEnabled)
+				mViewAnimator.SetBool("PartInHand", reelingObject != null);
 		}
 
 		/// <summary>
@@ -230,7 +265,6 @@ namespace FiringSquad.Gameplay
 			{
 				EventManager.LocalGUI.SetHintState(CrosshairHintText.Hint.MagnetArmGrab, false);
 				mPushedCrosshairHint = false;
-
 			}
 		}
 
@@ -249,19 +283,17 @@ namespace FiringSquad.Gameplay
 
 			reelingObject = TryFindGrabCandidate();
 
-			if (reelingObject == null)
-			{
-				// TODO: We need a sound event to play when the player tries to grab with nothing there.
-				mInputTime = 0.0f;
-			}
-			else 
+			if (reelingObject != null)
 			{
 				// start to grab this object
 				reelingObject.LockToPlayerReel(bearer);
 				CmdAssignClientAuthority(reelingObject.netId);
-				mInputTime = float.NegativeInfinity;
 				mReelingTime = 0.0f;
 				UpdateReelingSound(true);
+			}
+			else 
+			{
+				// TODO: We need to play a sound when there is no object available
 			}
 		}
 
@@ -279,8 +311,7 @@ namespace FiringSquad.Gameplay
 
 			if (reelingObject.transform.parent == transform)
 			{
-				// the object already snapped into place, we just need to tick that timer.
-				mInputTime += Time.deltaTime;
+				// the object already snapped into place
 				return;
 			}
 
@@ -310,7 +341,7 @@ namespace FiringSquad.Gameplay
 			if (!bearer.isCurrentPlayer)
 				return;
 
-			if (mInputTime < 0.0f)
+			if (mReelingTime > 0.0f)
 			{
 				// if the input was less than zero seconds, we were in our "pull" button cycle.
 				// Check if we successfully grabbed it. If not, let it go.
@@ -320,7 +351,7 @@ namespace FiringSquad.Gameplay
 					reelingObject = null;
 				}
 			}
-			else if (mInputTime < mClickHoldThreshold)
+			else
 			{
 				// This counts as a press. Equip the item.
 				if (reelingObject != null)
@@ -332,23 +363,28 @@ namespace FiringSquad.Gameplay
 				EventManager.LocalGUI.SetHintState(CrosshairHintText.Hint.ItemEquipOrDrop, false);
 				mPushedCrosshairHint = false;
 			}
-			else
+
+			UpdateReelingSound(false);
+			mReelingTime = -1.0f;
+		}
+
+		/// <summary>
+		/// INPUT_HANDLER: Handle the player's "magnet arm drop" button being released.
+		/// </summary>
+		[Client]
+		public void DropItemDown()
+		{
+			// The player hit the throw button. Throw it.
+			if (reelingObject != null)
 			{
-				// this counts as a throw. Throw it.
-				if (reelingObject != null)
-				{
-					reelingObject.UnlockAndThrow(bearer.eye.forward * 30.0f);
-					CmdThrowHeldItem(bearer.eye.forward, reelingObject.netId);
-					reelingObject = null;
-				}
+				reelingObject.UnlockAndThrow(bearer.eye.forward * 30.0f);
+				CmdThrowHeldItem(bearer.eye.forward, reelingObject.netId);
+				reelingObject = null;
 
 				// Hide the "throw" hint
 				EventManager.LocalGUI.SetHintState(CrosshairHintText.Hint.ItemEquipOrDrop, false);
 				mPushedCrosshairHint = false;
 			}
-
-			UpdateReelingSound(false);
-			mInputTime = 0.0f;
 		}
 
 		/// <summary>

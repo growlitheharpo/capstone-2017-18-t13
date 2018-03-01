@@ -181,6 +181,10 @@ namespace FiringSquad.Gameplay
 			// Disable the renderers for the local player.
 			StartCoroutine(AdjustToLocalView());
 
+			// Enable the magnet arm view
+			if (magnetArm != null)
+				magnetArm.SetViewVisible();
+
 			// Send the "spawned" event.
 			localPlayerReference = this;
 			EventManager.Notify(() => EventManager.Local.LocalPlayerSpawned(this));
@@ -406,6 +410,7 @@ namespace FiringSquad.Gameplay
 			arm.bearer = this;
 
 			magnetArm = arm;
+			magnetArm.OnPostBind();
 		}
 
 		/// <summary>

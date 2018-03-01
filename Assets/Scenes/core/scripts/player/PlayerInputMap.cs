@@ -12,6 +12,7 @@ namespace FiringSquad.Data
 		[Header("Weapons and Interactions")] [SerializeField] private string mToggleMenuButton;
 		[SerializeField] private string mFireWeaponButton;
 		[SerializeField] private string mFireMagnetArmButton;
+		[SerializeField] private string mDropMagnetArmButton;
 		[SerializeField] private string mActivateADSButton;
 		[SerializeField] private string mReloadButton;
 		[SerializeField] private string mPauseButton;
@@ -29,6 +30,7 @@ namespace FiringSquad.Data
 		public string toggleMenuButton { get { return mToggleMenuButton; } }
 		public string fireWeaponButton { get { return mFireWeaponButton; } }
 		public string fireMagnetArmButton { get { return mFireMagnetArmButton; } }
+		public string dropMagnetArmButton { get { return mDropMagnetArmButton; } }
 		public string activateADSButton { get { return mActivateADSButton; } }
 		public string reloadButton { get { return mReloadButton; } }
 		public string pauseButton { get { return mPauseButton; } }
