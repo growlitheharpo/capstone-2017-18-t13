@@ -29,7 +29,8 @@ namespace FiringSquad.Gameplay.Weapons
 		/// </summary>
 		private void OnDestroy()
 		{
-			NetworkManager.singleton.client.UnregisterHandler(HitscanProjectile.HITSCAN_MESSAGE_TYPE);
+			if (NetworkManager.singleton != null && NetworkManager.singleton.client != null)
+				NetworkManager.singleton.client.UnregisterHandler(HitscanProjectile.HITSCAN_MESSAGE_TYPE);
 		}
 
 		/// <summary>
