@@ -1,10 +1,5 @@
 ﻿using UnityEngine;
 using UnityEngine.Rendering.PostProcessing;
-using KeatsLib.Unity;
-using FiringSquad.Core;
-using FiringSquad.Core.Input;
-using FiringSquad.Core.UI;
-using FiringSquad.Data;
 
 namespace FiringSquad.Gameplay.Weapons
 {
@@ -12,13 +7,10 @@ namespace FiringSquad.Gameplay.Weapons
 	[CreateAssetMenu(menuName = "reMod Data/ADS Effect - Variable Overlay")]
 	public class VariableScreenOverlayAimDownSightsEffect : AimDownSightsEffect
 	{
-		/// Inspector variables
-		[SerializeField] private float mTargetFieldOfView = 15.0f;
 		[SerializeField] private float mFadeTime;
 		[SerializeField] private float mVignetteIntensity = 1.0f;
 		[SerializeField] private float mMinZoom = 1.0f;
 		[SerializeField] private float mMaxZoom = 3.0f;
-		[SerializeField] private float mZoomStep = 0.5f;
 
 		private float mZoomLevel = 15.0f;
 
@@ -87,9 +79,7 @@ namespace FiringSquad.Gameplay.Weapons
 				return;
 
 			mActive = false;
-
 			mZoomLevel = 15.0f;
-
 
 			if (immediate)
 			{
@@ -126,6 +116,7 @@ namespace FiringSquad.Gameplay.Weapons
 		/// Change zoom level based on scroll wheel
 		/// </summary>
 		/// <param name="val"></param>
+		/// <param name="player">The player that provided this input.</param>
 		private void OnZoomLevelChanged(float val, CltPlayer player)
 		{
 			// If the part is attached to a player's weapon
@@ -134,17 +125,13 @@ namespace FiringSquad.Gameplay.Weapons
 				if (val < 0)
 				{
 					mZoomLevel += 1.0f;
-
 					mZoomLevel = Mathf.Clamp(mZoomLevel, mMinZoom, mMaxZoom);
-
 					EventManager.Notify(() => EventManager.LocalGUI.RequestNewFieldOfView(mZoomLevel, -1.0f));
 				}
 				else if (val > 0)
 				{
 					mZoomLevel -= 1.0f;
-
 					mZoomLevel = Mathf.Clamp(mZoomLevel, mMinZoom, mMaxZoom);
-
 					EventManager.Notify(() => EventManager.LocalGUI.RequestNewFieldOfView(mZoomLevel, -1.0f));
 				}
 			} 
