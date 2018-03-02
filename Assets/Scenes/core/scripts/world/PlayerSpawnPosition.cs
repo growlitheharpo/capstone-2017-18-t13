@@ -33,6 +33,14 @@ namespace FiringSquad.Gameplay
 		}
 
 		/// <summary>
+		/// Unity's OnDestroy function
+		/// </summary>
+		private void OnDestroy()
+		{
+			kAllPositions.Remove(this);
+		}
+
+		/// <summary>
 		/// Get a list of all the spawn positions available.
 		/// </summary>
 		public static List<PlayerSpawnPosition> GetAll()

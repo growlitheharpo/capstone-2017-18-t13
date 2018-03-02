@@ -31,6 +31,14 @@ namespace FiringSquad.Gameplay.UI
 		}
 
 		/// <summary>
+		/// Unity's OnDestroy function
+		/// </summary>
+		private void OnDestroy()
+		{
+			EventManager.LocalGUI.OnLocalPlayerAssignedTeam -= OnLocalPlayerAssignedTeam;
+		}
+
+		/// <summary>
 		/// Event Handler: EventManager.LocalGUI.OnLocalPlayerAssignedTeam
 		/// </summary>
 		private void OnLocalPlayerAssignedTeam(CltPlayer localPlayer)
