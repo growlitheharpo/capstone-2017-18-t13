@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.Rendering.PostProcessing;
+using Logger = FiringSquad.Debug.Logger;
 
 namespace FiringSquad.Gameplay.Weapons
 {
@@ -14,9 +15,23 @@ namespace FiringSquad.Gameplay.Weapons
 
 		/// Private variables
 		private bool mActive;
-		private Quickfade mQuickfade;
-		private Vignette mVignette;
 		private PostProcessVolume mTemporaryVolume;
+
+		/// <summary>
+		/// Unity's OnEnable function
+		/// </summary>
+		private void OnEnable()
+		{
+			mTemporaryVolume = PostProcessManager.instance.QuickVolume(LayerMask.NameToLayer("postprocessing"), 100);
+		}
+
+		/// <summary>
+		/// Unity's OnDisable function
+		/// </summary>
+		private void OnDestroy()
+		{
+			RuntimeUtilities.DestroyVolume(mTemporaryVolume, true);
+		}
 
 		/// <inheritdoc />
 		public override void ActivateEffect(IWeapon weapon, WeaponPartScript part)
@@ -27,28 +42,45 @@ namespace FiringSquad.Gameplay.Weapons
 			mActive = true;
 			base.ActivateEffect(weapon, part);
 
-			mQuickfade = CreateInstance<Quickfade>();
-			mQuickfade.enabled.Override(true);
-			mQuickfade.time.Override(mFadeTime);
-			mTemporaryVolume = PostProcessManager.instance.QuickVolume(LayerMask.NameToLayer("postprocessing"), 100, mQuickfade);
+			Logger.Info("Activate 1");
+
+			Quickfade quickfade = CreateInstance<Quickfade>();
+			quickfade.enabled.Override(true);
+			quickfade.time.Override(mFadeTime);
 			mTemporaryVolume.weight = 1.0f;
+			mTemporaryVolume.profile.AddSettings(quickfade);
 
 			EventManager.Notify(() => EventManager.LocalGUI.SetCrosshairVisible(false));
 
-			mQuickfade.Activate(part, false, () =>
+			quickfade.Activate(part, false, () =>
 			{
-				// called once we are faded to black
-				mVignette = CreateInstance<Vignette>();
-				mVignette.enabled.Override(true);
-				mVignette.intensity.Override(mVignetteIntensity);
-				mVignette.smoothness.Override(0.15f);
-				mVignette.rounded.Override(true);
-				mVignette.roundness.Override(1.0f);
+				if (!mActive)
+					return;
 
-				mTemporaryVolume.profile.AddSettings(mVignette);
+				Logger.Info("Activate 2");
+
+				// called once we are faded to black
+				Vignette vignette = CreateInstance<Vignette>();
+				vignette.enabled.Override(true);
+				vignette.intensity.Override(mVignetteIntensity);
+				vignette.smoothness.Override(0.15f);
+				vignette.rounded.Override(true);
+				vignette.roundness.Override(1.0f);
+
+				mTemporaryVolume.profile.AddSettings(vignette);
 				EventManager.Notify(() => EventManager.LocalGUI.RequestNewFieldOfView(mTargetFieldOfView, -1.0f));
 
-				mQuickfade.Deactivate(part, () => EventManager.Notify(() => EventManager.LocalGUI.SetCrosshairVisible(true)));
+				quickfade.Deactivate(part, () =>
+				{
+					if (!mActive)
+						return;
+
+					Logger.Info("Activate 3");
+
+					EventManager.Notify(() => EventManager.LocalGUI.SetCrosshairVisible(true));
+					if (mTemporaryVolume.profile.HasSettings<Quickfade>())
+						mTemporaryVolume.profile.RemoveSettings<Quickfade>();
+				});
 			});
 		}
 
@@ -60,19 +92,28 @@ namespace FiringSquad.Gameplay.Weapons
 
 			mActive = false;
 
-			if (immediate)
+			//if (immediate)
 			{
+				Logger.Info("Deactivate");
+				
 				// Do this immediately so the new scope can do its effect if necessary
 				EventManager.LocalGUI.RequestNewFieldOfView(-1.0f, -1.0f);
-				RuntimeUtilities.DestroyVolume(mTemporaryVolume, false);
-				Destroy(mQuickfade);
-				Destroy(mVignette);
+				foreach (PostProcessEffectSettings e in mTemporaryVolume.profile.settings)
+				{
+					if (e != null)
+						Destroy(e);
+				}
+				mTemporaryVolume.profile.settings.Clear();
+				mTemporaryVolume.profile.Reset();
+
+				//Destroy(mQuickfade);
+				//Destroy(mVignette);
 				return;
 			}
 
 			// not immediate
 			EventManager.Notify(() => EventManager.LocalGUI.SetCrosshairVisible(false));
-			mQuickfade.Activate(part, false, () =>
+			/*mQuickfade.Activate(part, false, () =>
 			{
 				//called once we are faded to black
 				mVignette.enabled.Override(false);
@@ -88,7 +129,7 @@ namespace FiringSquad.Gameplay.Weapons
 					Destroy(mQuickfade);
 					Destroy(mVignette);
 				});
-			});
+			});*/
 		}
 	}
 }
