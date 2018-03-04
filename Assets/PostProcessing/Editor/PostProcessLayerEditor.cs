@@ -23,7 +23,8 @@ namespace UnityEditor.Rendering.PostProcessing
         SerializedProperty m_TaaSharpness;
         SerializedProperty m_TaaStationaryBlending;
         SerializedProperty m_TaaMotionBlending;
-        SerializedProperty m_FxaaMobileOptimized;
+        SerializedProperty m_SmaaQuality;
+        SerializedProperty m_FxaaFastMode;
         SerializedProperty m_FxaaKeepAlpha;
 
         SerializedProperty m_FogEnabled;
@@ -61,7 +62,8 @@ namespace UnityEditor.Rendering.PostProcessing
             m_TaaSharpness = FindProperty(x => x.temporalAntialiasing.sharpness);
             m_TaaStationaryBlending = FindProperty(x => x.temporalAntialiasing.stationaryBlending);
             m_TaaMotionBlending = FindProperty(x => x.temporalAntialiasing.motionBlending);
-            m_FxaaMobileOptimized = FindProperty(x => x.fastApproximateAntialiasing.mobileOptimized);
+            m_SmaaQuality = FindProperty(x => x.subpixelMorphologicalAntialiasing.quality);
+            m_FxaaFastMode = FindProperty(x => x.fastApproximateAntialiasing.fastMode);
             m_FxaaKeepAlpha = FindProperty(x => x.fastApproximateAntialiasing.keepAlpha);
 
             m_FogEnabled = FindProperty(x => x.fog.enabled);
@@ -69,40 +71,6 @@ namespace UnityEditor.Rendering.PostProcessing
 
             m_ShowToolkit = serializedObject.FindProperty("m_ShowToolkit");
             m_ShowCustomSorter = serializedObject.FindProperty("m_ShowCustomSorter");
-
-            // In case of domain reload, if the inspector is opened on a disabled PostProcessLayer
-            // component it won't go through its OnEnable() and thus will miss bundle initialization
-            // so force it there - also for some reason, an editor's OnEnable() can be called before
-            // the component's so this will fix that as well.
-            m_Target.InitBundles();
-
-            // Create a reorderable list for each injection event
-            m_CustomLists = new Dictionary<PostProcessEvent, ReorderableList>();
-            foreach (var evt in Enum.GetValues(typeof(PostProcessEvent)).Cast<PostProcessEvent>())
-            {
-                var bundles = m_Target.sortedBundles[evt];
-                var listName = ObjectNames.NicifyVariableName(evt.ToString());
-
-                var list = new ReorderableList(bundles, typeof(SerializedBundleRef), true, true, false, false);
-
-                list.drawHeaderCallback = (rect) =>
-                {
-                    EditorGUI.LabelField(rect, listName);
-                };
-
-                list.drawElementCallback = (rect, index, isActive, isFocused) =>
-                {
-                    var sbr = (SerializedBundleRef)list.list[index];
-                    EditorGUI.LabelField(rect, sbr.bundle.attribute.menuItem);
-                };
-
-                list.onReorderCallback = (l) =>
-                {
-                    EditorUtility.SetDirty(m_Target);
-                };
-
-                m_CustomLists.Add(evt, list);
-            }
         }
 
         void OnDisable()
@@ -115,6 +83,11 @@ namespace UnityEditor.Rendering.PostProcessing
             serializedObject.Update();
 
             var camera = m_Target.GetComponent<Camera>();
+
+            #if !UNITY_2017_2_OR_NEWER
+            if (RuntimeUtilities.isSinglePassStereoSelected)
+                EditorGUILayout.HelpBox("Unity 2017.2+ required for full Single-pass stereo rendering support.", MessageType.Warning);
+            #endif
 
             DoVolumeBlending();
             DoAntialiasing();
@@ -175,8 +148,10 @@ namespace UnityEditor.Rendering.PostProcessing
 
                 if (m_AntialiasingMode.intValue == (int)PostProcessLayer.Antialiasing.TemporalAntialiasing)
                 {
-                    if (RuntimeUtilities.isSinglePassStereoEnabled)
+                    #if !UNITY_2017_3_OR_NEWER
+                    if (RuntimeUtilities.isSinglePassStereoSelected)
                         EditorGUILayout.HelpBox("TAA requires Unity 2017.3+ for Single-pass stereo rendering support.", MessageType.Warning);
+                    #endif
 
                     EditorGUILayout.PropertyField(m_TaaJitterSpread);
                     EditorGUILayout.PropertyField(m_TaaStationaryBlending);
@@ -185,13 +160,21 @@ namespace UnityEditor.Rendering.PostProcessing
                 }
                 else if (m_AntialiasingMode.intValue == (int)PostProcessLayer.Antialiasing.SubpixelMorphologicalAntialiasing)
                 {
-                    if (RuntimeUtilities.isSinglePassStereoEnabled)
+                    if (RuntimeUtilities.isSinglePassStereoSelected)
                         EditorGUILayout.HelpBox("SMAA doesn't work with Single-pass stereo rendering.", MessageType.Warning);
+
+                    EditorGUILayout.PropertyField(m_SmaaQuality);
+
+                    if (m_SmaaQuality.intValue != (int)SubpixelMorphologicalAntialiasing.Quality.Low && EditorUtilities.isTargetingConsolesOrMobiles)
+                        EditorGUILayout.HelpBox("For performance reasons it is recommended to use Low Quality on mobile and console platforms.", MessageType.Warning);
                 }
                 else if (m_AntialiasingMode.intValue == (int)PostProcessLayer.Antialiasing.FastApproximateAntialiasing)
                 {
-                    EditorGUILayout.PropertyField(m_FxaaMobileOptimized);
+                    EditorGUILayout.PropertyField(m_FxaaFastMode);
                     EditorGUILayout.PropertyField(m_FxaaKeepAlpha);
+
+                    if (!m_FxaaFastMode.boolValue && EditorUtilities.isTargetingConsolesOrMobiles)
+                        EditorGUILayout.HelpBox("For performance reasons it is recommended to use Fast Mode on mobile and console platforms.", MessageType.Warning);
                 }
             }
             EditorGUI.indentLevel--;
@@ -276,7 +259,65 @@ namespace UnityEditor.Rendering.PostProcessing
 
             if (m_ShowCustomSorter.boolValue)
             {
+                bool isInPrefab = false;
+
+                // Init lists if needed
+                if (m_CustomLists == null)
+                {
+                    // In some cases the editor will refresh before components which means
+                    // components might not have been fully initialized yet. In this case we also
+                    // need to make sure that we're not in a prefab as sorteBundles isn't a
+                    // serializable object and won't exist until put on a scene.
+                    if (m_Target.sortedBundles == null)
+                    {
+                        isInPrefab = string.IsNullOrEmpty(m_Target.gameObject.scene.name);
+
+                        if (!isInPrefab)
+                        {
+                            // sortedBundles will be initialized and ready to use on the next frame
+                            Repaint();
+                        }
+                    }
+                    else
+                    {
+                        // Create a reorderable list for each injection event
+                        m_CustomLists = new Dictionary<PostProcessEvent, ReorderableList>();
+                        foreach (var evt in Enum.GetValues(typeof(PostProcessEvent)).Cast<PostProcessEvent>())
+                        {
+                            var bundles = m_Target.sortedBundles[evt];
+                            var listName = ObjectNames.NicifyVariableName(evt.ToString());
+
+                            var list = new ReorderableList(bundles, typeof(SerializedBundleRef), true, true, false, false);
+
+                            list.drawHeaderCallback = (rect) =>
+                            {
+                                EditorGUI.LabelField(rect, listName);
+                            };
+
+                            list.drawElementCallback = (rect, index, isActive, isFocused) =>
+                            {
+                                var sbr = (SerializedBundleRef)list.list[index];
+                                EditorGUI.LabelField(rect, sbr.bundle.attribute.menuItem);
+                            };
+
+                            list.onReorderCallback = (l) =>
+                            {
+                                EditorUtility.SetDirty(m_Target);
+                            };
+
+                            m_CustomLists.Add(evt, list);
+                        }
+                    }
+                }
+
                 GUILayout.Space(5);
+
+                if (isInPrefab)
+                {
+                    EditorGUILayout.HelpBox("Not supported in prefabs.", MessageType.Info);
+                    GUILayout.Space(3);
+                    return;
+                }
 
                 bool anyList = false;
                 if (m_CustomLists != null)
