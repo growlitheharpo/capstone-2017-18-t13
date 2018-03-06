@@ -15,6 +15,7 @@ namespace FiringSquad.Core.Audio
 	{
 		EquipItem = 50,
 		LoopWalking = 30,
+		Jump = 35,
 		LoopGravGun = 40,
 		MagnetArmGrab = 45,
 		LocalDealDamage = 48,
@@ -31,6 +32,7 @@ namespace FiringSquad.Core.Audio
 		EnterAimDownSights = 75,
 
 		// VO
+		AmbientCrowd = 78,
 		AnnouncerMatchStarts = 80,
 		AnnouncerMatchEnds = 85,
 		AnnouncerStageAreaSpawns = 90,
