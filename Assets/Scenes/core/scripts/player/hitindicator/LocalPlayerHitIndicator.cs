@@ -92,7 +92,6 @@ namespace FiringSquad.Gameplay.UI
 			// Clamp between scale of .25 and .5
 			float yScale = newObj.transform.Find("Hit Spike").transform.localScale.y + ((dis / 2) / 100);
 			Mathf.Clamp(yScale, .25f, .5f);
-			print(yScale);
 			newObj.transform.Find("Hit Spike").transform.localScale.Set(newObj.transform.Find("Hit Spike").transform.localScale.x, yScale, newObj.transform.Find("Hit Spike").transform.localScale.z);
  
 			// "Flatten" the direction along the vertical axis.
