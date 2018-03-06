@@ -1,11 +1,13 @@
-﻿Shader "Custom/StandardCustomColormask"
+﻿Shader "Custom/Standard Custom Colormask"
 {
 	Properties
 	{
 		_MainTex("Albedo (RGB), Alpha (A)", 2D) = "white" {}
+		_Color("Color Overlay", Color) = (1,1,1)
 		_ColorMask("Color Mask (RGB), Alpha (A)", 2D) = "black" {}
-		_ColorMaskColor("Color", Color) = (0,0,0)
-		_MetallicGlossMap("Metallic (R), Smoothness (A)", 2D) = "black" {}
+		_ColorMaskColor("Color Mask Color", Color) = (0,0,0)
+		_MetallicGlossMap("Metallic (R), Smoothness (A)", 2D) = "(0,0,0,1)" {}
+		_GlossMapScale("Smoothness Scale", Range(0.0, 1.0)) = 1.0
 		_BumpMap("Normal (RGB)", 2D) = "bump" {}
 		_EmissionMap("Emissive Map (RGB)", 2D) = "white" {}
         _EmissionColor("Color", Color) = (0,0,0)
@@ -39,12 +41,16 @@
 			sampler2D _ColorMask;
 			sampler2D _MetallicGlossMap;
 			sampler2D _EmissionMap;
+			fixed _GlossMapScale;
 			half4 _EmissionColor;
 			fixed3 _ColorMaskColor;
+			fixed3 _Color;
 
 			void surf(Input IN, inout SurfaceOutputStandard o)
 			{
 				fixed4 albedo = tex2D(_MainTex, IN.uv_MainTex);
+				albedo.rgb *= _Color.rgb;
+
 				fixed4 metallic = tex2D(_MetallicGlossMap, IN.uv_MainTex);
 				fixed4 emission = tex2D(_EmissionMap, IN.uv_MainTex);
 				fixed3 normal = UnpackScaleNormal(tex2D(_BumpMap, IN.uv_MainTex), 1);
@@ -64,7 +70,7 @@
 				o.Normal = normal;
 				o.Emission = emission.rgb * _EmissionColor.rgb;
 				o.Metallic = metallic.r;
-				o.Smoothness = metallic.a;
+				o.Smoothness = metallic.a * _GlossMapScale;
 				o.Alpha = albedo.a;
 				//o.Occlusion = metallic.g;
 			}
@@ -72,4 +78,5 @@
 	}
 
 	FallBack "Diffuse"
+	CustomEditor "CustomColormaskMaterialEditor"
 }
