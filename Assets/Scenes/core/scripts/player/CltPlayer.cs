@@ -77,6 +77,17 @@ namespace FiringSquad.Gameplay
 		public GameData.PlayerTeam playerTeam { get { return mTeam; } }
 
 		/// <summary>
+		/// The correct color for this player based on their team.
+		/// </summary>
+		private Color teamColor
+		{
+			get 
+			{
+				return mTeam == GameData.PlayerTeam.Orange ? defaultData.orangeTeamColor : defaultData.blueTeamColor;
+			}
+		}
+
+		/// <summary>
 		/// The local animator for this player.
 		/// </summary>
 		public Animator localAnimator { get { return mAnimator; } }
@@ -689,6 +700,10 @@ namespace FiringSquad.Gameplay
 			particles.Play();
 			StartCoroutine(Coroutines.WaitAndDestroyParticleSystem(particles));
 
+			// Show our corpse
+			GameObject corpse = Instantiate(mAssets.corpsePrefab, deathPosition, transform.rotation);
+			corpse.GetComponent<PlayerCorpseView>().UpdateColor(mTeam == GameData.PlayerTeam.Orange ? defaultData.orangeTeamColor : defaultData.blueTeamColor);
+
 			// If we died, we should get removed from any potential highlight list.
 			if (ObjectHighlight.instance != null)
 			{
@@ -799,11 +814,12 @@ namespace FiringSquad.Gameplay
 		[Client]
 		private void OnPlayerTeamUpdate(GameData.PlayerTeam value)
 		{
+			mTeam = value;
+
 			// Update all of our child renderers
-			Color myColor = value == GameData.PlayerTeam.Orange ? defaultData.orangeTeamColor : defaultData.blueTeamColor;
 			var components = GetComponentsInChildren<ColormaskUpdateUtility>();
 			foreach (ColormaskUpdateUtility updater in components)
-				updater.UpdateDisplayedColor(myColor);
+				updater.UpdateDisplayedColor(teamColor);
 
 			// Update the UI appropriately
 			if (isCurrentPlayer)
@@ -815,9 +831,6 @@ namespace FiringSquad.Gameplay
 				if (display != null)
 					display.SetIsEnemyPlayer(isEnemy);
 			}
-			
-
-			mTeam = value;
 		}
 
 		#endregion
