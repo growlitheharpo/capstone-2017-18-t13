@@ -689,6 +689,9 @@ namespace FiringSquad.Gameplay
 			particles.Play();
 			StartCoroutine(Coroutines.WaitAndDestroyParticleSystem(particles));
 
+			// Show our corpse
+			GameObject corpse = Instantiate(mAssets.corpsePrefab, deathPosition, transform.rotation);
+
 			// If we died, we should get removed from any potential highlight list.
 			if (ObjectHighlight.instance != null)
 			{
