@@ -59,5 +59,33 @@ namespace KeatsLib.Collections
 			}
 			return Mathf.Clamp(angle, min, max);
 		}
+
+		/// <summary>
+		/// Convert a number to an ordinal representation (1 -> 1st, 2 -> 2nd, etc.)
+		/// Thanks to: https://stackoverflow.com/a/20175
+		/// </summary>
+		/// <param name="val">The number to convert.</param>
+		public static string ToStringOrdinal(this uint val)
+		{
+			switch (val % 100)
+			{
+				case 11:
+				case 12:
+				case 13:
+					return val + "th";
+				default:
+					switch (val % 10)
+					{
+						case 1:
+							return val + "st";
+						case 2:
+							return val + "nd";
+						case 3:
+							return val + "rd";
+						default:
+							return val + "th";
+					}
+			}
+		}
 	}
 }
