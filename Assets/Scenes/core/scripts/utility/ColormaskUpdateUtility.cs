@@ -12,7 +12,6 @@ namespace FiringSquad.Gameplay
 
 		/// Private variables
 		private Material[] mMaterials;
-		private Shader mCorrectShader;
 
 		/// <summary>
 		/// Unity's Awake function
@@ -20,7 +19,6 @@ namespace FiringSquad.Gameplay
 		private void Awake()
 		{
 			TryGrabMaterials();
-			mCorrectShader = Shader.Find("Custom/StandardCustomColormask");
 		}
 
 		/// <summary>
@@ -53,7 +51,7 @@ namespace FiringSquad.Gameplay
 
 			foreach (Material m in mMaterials)
 			{
-				if (m.shader != mCorrectShader && !m.HasProperty("_ColorMaskColor"))
+				if (!m.HasProperty("_ColorMaskColor"))
 					continue;
 
 				m.SetColor("_ColorMaskColor", c);

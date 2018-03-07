@@ -61,6 +61,9 @@ namespace UnityEditor
 			Texture normal = GetTexture(folder, filename, "norm") ?? GetTexture(folder, filename, "normal");
 
 			mat.SetTexture("_MainTex", color);
+			if (mat.HasProperty("_Color"))
+				mat.SetColor("_Color", Color.white);
+
 			mat.SetTexture("_MetallicGlossMap", aorm);
 			mat.SetTexture("_BumpMap", normal);
 		}

@@ -16,6 +16,8 @@ namespace FiringSquad.Data
 		[Header("View")] [SerializeField] private GameObject mLocalPlayerPrefab;
 		[SerializeField] private GameObject mDeathParticlesPrefab;
 
+		[SerializeField] private GameObject mCorpsePrefab;
+
 		/// <summary> The prefab for the player's magnet arm. </summary>
 		public GameObject magnetArmPrefab { get { return mMagnetArmPrefab; } }
 
@@ -27,5 +29,8 @@ namespace FiringSquad.Data
 
 		/// <summary> The prefab for the death particle effect. </summary>
 		public GameObject deathParticlesPrefab { get { return mDeathParticlesPrefab; } }
+
+		/// <summary> The prefab for our corpse that we spawn on depth. </summary>
+		public GameObject corpsePrefab { get { return mCorpsePrefab; } }
 	}
 }
