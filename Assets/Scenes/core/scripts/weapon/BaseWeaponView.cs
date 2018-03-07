@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using FiringSquad.Core;
 using FiringSquad.Core.Audio;
@@ -352,15 +353,22 @@ namespace FiringSquad.Gameplay.Weapons
 			if (mCurrentMuzzleFlashVfx != null)
 				mCurrentMuzzleFlashVfx .Play();
 
-			IAudioReference effect = ServiceLocator.Get<IAudioManager>().CreateSound(AudioEvent.Shoot, transform, false);
 			if (mWeaponScript.currentParts.mechanism != null)
-				effect.weaponType = mWeaponScript.currentParts.mechanism.audioOverrideWeaponType;
-			effect.Start();
+			{
+				ServiceLocator.Get<IAudioManager>()
+					.CreateSound(AudioEvent.Shoot, transform, false)
+					.SetParameter("WeaponType", mWeaponScript.currentParts.mechanism.audioOverrideWeaponType)
+					.Start();
+			}
 
-			effect = ServiceLocator.Get<IAudioManager>().CreateSound(AudioEvent.BarrelLayer, transform, false);
 			if (mWeaponScript.currentParts.barrel != null)
-				effect.barrelType = mWeaponScript.currentParts.barrel.audioOverrideBarrelType;
-			effect.Start();
+			{
+				ServiceLocator.Get<IAudioManager>()
+					.CreateSound(AudioEvent.BarrelLayer, transform, false)
+					.SetParameter("BarrelType", mWeaponScript.currentParts.barrel.audioOverrideBarrelType)
+					.SetParameter("IsCurrentPlayer", Convert.ToSingle(mWeaponScript.bearer.isCurrentPlayer))
+					.Start();
+			}
 		}
 
 		/// <summary>
