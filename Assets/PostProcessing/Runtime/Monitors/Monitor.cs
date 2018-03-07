@@ -1,4 +1,4 @@
-﻿namespace UnityEngine.Rendering.PostProcessing
+namespace UnityEngine.Rendering.PostProcessing
 {
     public enum MonitorType
     {
@@ -14,11 +14,15 @@
 
         internal bool requested = false;
 
-        public bool IsRequestedAndSupported()
+        public bool IsRequestedAndSupported(PostProcessRenderContext context)
         {
             return requested
-                && SystemInfo.supportsComputeShaders;
+                && SystemInfo.supportsComputeShaders
+                && !RuntimeUtilities.isAndroidOpenGL
+                && ShaderResourcesAvailable(context);
         }
+
+        internal abstract bool ShaderResourcesAvailable(PostProcessRenderContext context);
 
         internal virtual bool NeedsHalfRes()
         {

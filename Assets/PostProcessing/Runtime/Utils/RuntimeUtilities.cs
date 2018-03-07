@@ -6,6 +6,10 @@ using System.Reflection;
 using System.Text;
 using UnityEngine.Assertions;
 
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
 namespace UnityEngine.Rendering.PostProcessing
 {
     using SceneManagement;
@@ -226,15 +230,34 @@ namespace UnityEngine.Rendering.PostProcessing
             get { return GraphicsSettings.renderPipelineAsset != null; } // 5.6+ only
         }
 
+        public static bool supportsDeferredShading
+        {
+            get { return scriptableRenderPipelineActive || GraphicsSettings.GetShaderMode(BuiltinShaderType.DeferredShading) != BuiltinShaderMode.Disabled; }
+        }
+
+        public static bool supportsDepthNormals
+        {
+            get { return scriptableRenderPipelineActive || GraphicsSettings.GetShaderMode(BuiltinShaderType.DepthNormals) != BuiltinShaderMode.Disabled; }
+        }
+
+#if UNITY_EDITOR
+        public static bool isSinglePassStereoSelected
+        {
+            get
+            {
+                return UnityEditor.PlayerSettings.virtualRealitySupported
+                    && UnityEditor.PlayerSettings.stereoRenderingPath == UnityEditor.StereoRenderingPath.SinglePass;
+            }
+        }
+#endif
+
         // TODO: Check for SPSR support at runtime
         public static bool isSinglePassStereoEnabled
         {
             get
             {
 #if UNITY_EDITOR
-                return UnityEditor.PlayerSettings.virtualRealitySupported
-                    && UnityEditor.PlayerSettings.stereoRenderingPath == UnityEditor.StereoRenderingPath.SinglePass
-                    && Application.isPlaying;
+                return isSinglePassStereoSelected && Application.isPlaying;
 #elif UNITY_2017_2_OR_NEWER
                 return UnityEngine.XR.XRSettings.eyeTextureDesc.vrUsage == VRTextureUsage.TwoEyes;
 #else
@@ -262,6 +285,32 @@ namespace UnityEngine.Rendering.PostProcessing
         public static bool isAndroidOpenGL
         {
             get { return Application.platform == RuntimePlatform.Android && SystemInfo.graphicsDeviceType != GraphicsDeviceType.Vulkan; }
+        }
+
+        public static RenderTextureFormat defaultHDRRenderTextureFormat
+        {
+            get
+            {
+#if UNITY_ANDROID || UNITY_IPHONE || UNITY_TVOS || UNITY_SWITCH || UNITY_EDITOR
+                RenderTextureFormat format = RenderTextureFormat.RGB111110Float;
+#   if UNITY_EDITOR
+                var target = EditorUserBuildSettings.activeBuildTarget;
+                if (target != BuildTarget.Android && target != BuildTarget.iOS && target != BuildTarget.tvOS && target != BuildTarget.Switch)
+                    return RenderTextureFormat.DefaultHDR;
+#   endif // UNITY_EDITOR
+                if (format.IsSupported())
+                    return format;
+#endif // UNITY_ANDROID || UNITY_IPHONE || UNITY_TVOS || UNITY_SWITCH || UNITY_EDITOR
+                return RenderTextureFormat.DefaultHDR;
+            }
+        }
+
+        public static bool isFloatingPointFormat(RenderTextureFormat format)
+        {
+            return format == RenderTextureFormat.DefaultHDR || format == RenderTextureFormat.ARGBHalf || format == RenderTextureFormat.ARGBFloat ||
+                   format == RenderTextureFormat.RGFloat || format == RenderTextureFormat.RGHalf ||
+                   format == RenderTextureFormat.RFloat || format == RenderTextureFormat.RHalf ||
+                   format == RenderTextureFormat.RGB111110Float;
         }
 
         public static void Destroy(UnityObject obj)
@@ -294,12 +343,23 @@ namespace UnityEngine.Rendering.PostProcessing
         }
 
         public static void DestroyProfile(PostProcessProfile profile, bool destroyEffects)
-        {
+		{
+			if (profile == null)
+				return;
+
             if (destroyEffects)
             {
-                foreach (var effect in profile.settings)
-                    Destroy(effect);
-            }
+				if (profile.settings != null)
+				{
+					foreach (var effect in profile.settings)
+					{
+						if (effect != null)
+							Destroy(effect);
+					}
+
+					profile.settings.Clear();
+				}
+			}
 
             Destroy(profile);
         }
@@ -424,8 +484,8 @@ namespace UnityEngine.Rendering.PostProcessing
             float vertFov = Math.Abs(planes.top) + Math.Abs(planes.bottom);
             float horizFov = Math.Abs(planes.left) + Math.Abs(planes.right);
 
-            var planeJitter = new Vector2(jitter.x * horizFov / context.xrSingleEyeWidth,
-                                          jitter.y * vertFov / context.height);
+            var planeJitter = new Vector2(jitter.x * horizFov / context.screenWidth,
+                                          jitter.y * vertFov / context.screenHeight);
 
             planes.left += planeJitter.x;
             planes.right += planeJitter.x;
@@ -445,8 +505,8 @@ namespace UnityEngine.Rendering.PostProcessing
             float tanVertFov = Math.Abs(tTan) + Math.Abs(bTan);
             float tanHorizFov = Math.Abs(lTan) + Math.Abs(rTan);
 
-            jitter.x *= tanHorizFov / context.xrSingleEyeWidth;
-            jitter.y *= tanVertFov / context.height;
+            jitter.x *= tanHorizFov / context.screenWidth;
+            jitter.y *= tanVertFov / context.screenHeight;
 
             float left = jitter.x + lTan;
             float right = jitter.x + rTan;
@@ -482,6 +542,29 @@ namespace UnityEngine.Rendering.PostProcessing
         #endregion
 
         #region Reflection
+
+        static IEnumerable<Type> m_AssemblyTypes;
+
+        public static IEnumerable<Type> GetAllAssemblyTypes()
+        {
+            if (m_AssemblyTypes == null)
+            {
+                m_AssemblyTypes = AppDomain.CurrentDomain.GetAssemblies()
+                    .SelectMany(t =>
+                    {
+                        // Ugly hack to handle mis-versioned dlls
+                        var innerTypes = new Type[0];
+                        try
+                        {
+                            innerTypes = t.GetTypes();
+                        }
+                        catch { }
+                        return innerTypes;
+                    });
+            }
+
+            return m_AssemblyTypes;
+        }
 
         // Quick extension method to get the first attribute of type T on a given Type
         public static T GetAttribute<T>(this Type type) where T : Attribute

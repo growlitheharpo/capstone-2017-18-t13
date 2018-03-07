@@ -40,22 +40,37 @@ namespace UnityEngine.Rendering.PostProcessing
         {
             return enabled.value
                 && SystemInfo.supportsComputeShaders
-                && SystemInfo.SupportsRenderTextureFormat(RenderTextureFormat.RFloat);
+                && !RuntimeUtilities.isAndroidOpenGL
+                && RenderTextureFormat.RFloat.IsSupported()
+                && context.resources.computeShaders.autoExposure
+                && context.resources.computeShaders.exposureHistogram;
         }
     }
 
     public sealed class AutoExposureRenderer : PostProcessEffectRenderer<AutoExposure>
     {
-        readonly RenderTexture[] m_AutoExposurePool = new RenderTexture[2];
-        int m_AutoExposurePingPong;
+        const int k_NumEyes = 2;
+        const int k_NumAutoExposureTextures = 2;
+
+        readonly RenderTexture[][] m_AutoExposurePool = new RenderTexture[k_NumEyes][];
+        int[] m_AutoExposurePingPong = new int[k_NumEyes];
         RenderTexture m_CurrentAutoExposure;
 
-        void CheckTexture(int id)
+        public AutoExposureRenderer()
         {
-            if (m_AutoExposurePool[id] == null || !m_AutoExposurePool[id].IsCreated())
+            for (int eye = 0; eye < k_NumEyes; eye++)
             {
-                m_AutoExposurePool[id] = new RenderTexture(1, 1, 0, RenderTextureFormat.RFloat);
-                m_AutoExposurePool[id].Create();
+                m_AutoExposurePool[eye] = new RenderTexture[k_NumAutoExposureTextures];
+                m_AutoExposurePingPong[eye] = 0;
+            }
+        }
+
+        void CheckTexture(int eye, int id)
+        {
+            if (m_AutoExposurePool[eye][id] == null || !m_AutoExposurePool[eye][id].IsCreated())
+            {
+                m_AutoExposurePool[eye][id] = new RenderTexture(1, 1, 0, RenderTextureFormat.RFloat) { enableRandomWrite = true };
+                m_AutoExposurePool[eye][id].Create();
             }
         }
 
@@ -64,12 +79,9 @@ namespace UnityEngine.Rendering.PostProcessing
             var cmd = context.command;
             cmd.BeginSample("AutoExposureLookup");
 
-            var sheet = context.propertySheets.Get(context.resources.shaders.autoExposure);
-            sheet.ClearKeywords();
-
             // Prepare autoExpo texture pool
-            CheckTexture(0);
-            CheckTexture(1);
+            CheckTexture(context.xrActiveEye, 0);
+            CheckTexture(context.xrActiveEye, 1);
 
             // Make sure filtering values are correct to avoid apocalyptic consequences
             float lowPercent = settings.filtering.value.x;
@@ -84,35 +96,48 @@ namespace UnityEngine.Rendering.PostProcessing
             settings.minLuminance.value = Mathf.Min(minLum, maxLum);
             settings.maxLuminance.value = Mathf.Max(minLum, maxLum);
 
-            // Compute auto exposure
-            sheet.properties.SetBuffer(ShaderIDs.HistogramBuffer, context.logHistogram.data);
-            sheet.properties.SetVector(ShaderIDs.Params, new Vector4(lowPercent * 0.01f, highPercent * 0.01f, RuntimeUtilities.Exp2(settings.minLuminance.value), RuntimeUtilities.Exp2(settings.maxLuminance.value)));
-            sheet.properties.SetVector(ShaderIDs.Speed, new Vector2(settings.speedDown.value, settings.speedUp.value));
-            sheet.properties.SetVector(ShaderIDs.ScaleOffsetRes, context.logHistogram.GetHistogramScaleOffsetRes(context));
-            sheet.properties.SetFloat(ShaderIDs.ExposureCompensation, settings.keyValue.value);
+            // Compute average luminance & auto exposure
+            bool isStatic = m_ResetHistory || !Application.isPlaying;
+            string adaptation = null;
 
-            if (m_ResetHistory || !Application.isPlaying)
+            if (isStatic)
+                adaptation = "KAutoExposureAvgLuminance_fixed";
+            else if (settings.eyeAdaptation.value == EyeAdaptation.Progressive)
+                adaptation = "KAutoExposureAvgLuminance_progressive";
+
+            var compute = context.resources.computeShaders.autoExposure;
+            int kernel = compute.FindKernel(adaptation);
+            cmd.SetComputeBufferParam(compute, kernel, "_HistogramBuffer", context.logHistogram.data);
+            cmd.SetComputeVectorParam(compute, "_Params1", new Vector4(lowPercent * 0.01f, highPercent * 0.01f, RuntimeUtilities.Exp2(settings.minLuminance.value), RuntimeUtilities.Exp2(settings.maxLuminance.value)));
+            cmd.SetComputeVectorParam(compute, "_Params2", new Vector4(settings.speedDown.value, settings.speedUp.value, settings.keyValue.value, Time.deltaTime));
+            cmd.SetComputeVectorParam(compute, "_ScaleOffsetRes", context.logHistogram.GetHistogramScaleOffsetRes(context));
+
+            if (isStatic)
             {
                 // We don't want eye adaptation when not in play mode because the GameView isn't
                 // animated, thus making it harder to tweak. Just use the final audo exposure value.
-                m_CurrentAutoExposure = m_AutoExposurePool[0];
-                cmd.BlitFullscreenTriangle(BuiltinRenderTextureType.None, m_CurrentAutoExposure, sheet, (int)EyeAdaptation.Fixed);
+                m_CurrentAutoExposure = m_AutoExposurePool[context.xrActiveEye][0];
+                cmd.SetComputeTextureParam(compute, kernel, "_Destination", m_CurrentAutoExposure);
+                cmd.DispatchCompute(compute, kernel, 1, 1, 1);
 
                 // Copy current exposure to the other pingpong target to avoid adapting from black
-                RuntimeUtilities.CopyTexture(cmd, m_AutoExposurePool[0], m_AutoExposurePool[1]);
-
+                RuntimeUtilities.CopyTexture(cmd, m_AutoExposurePool[context.xrActiveEye][0], m_AutoExposurePool[context.xrActiveEye][1]);
                 m_ResetHistory = false;
             }
             else
             {
-                int pp = m_AutoExposurePingPong;
-                var src = m_AutoExposurePool[++pp % 2];
-                var dst = m_AutoExposurePool[++pp % 2];
-                cmd.BlitFullscreenTriangle(src, dst, sheet, (int)settings.eyeAdaptation.value);
-                m_AutoExposurePingPong = ++pp % 2;
+                int pp = m_AutoExposurePingPong[context.xrActiveEye];
+                var src = m_AutoExposurePool[context.xrActiveEye][++pp % 2];
+                var dst = m_AutoExposurePool[context.xrActiveEye][++pp % 2];
+                
+                cmd.SetComputeTextureParam(compute, kernel, "_Source", src);
+                cmd.SetComputeTextureParam(compute, kernel, "_Destination", dst);
+                cmd.DispatchCompute(compute, kernel, 1, 1, 1);
+
+                m_AutoExposurePingPong[context.xrActiveEye] = ++pp % 2;
                 m_CurrentAutoExposure = dst;
             }
-            
+
             cmd.EndSample("AutoExposureLookup");
 
             context.autoExposureTexture = m_CurrentAutoExposure;
@@ -121,8 +146,11 @@ namespace UnityEngine.Rendering.PostProcessing
 
         public override void Release()
         {
-            foreach (var rt in m_AutoExposurePool)
-                RuntimeUtilities.Destroy(rt);
+            foreach (var rtEyeSet in m_AutoExposurePool)
+            {
+                foreach (var rt in rtEyeSet)
+                    RuntimeUtilities.Destroy(rt);
+            }
         }
     }
 }

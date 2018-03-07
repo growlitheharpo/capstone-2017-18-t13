@@ -1,16 +1,17 @@
 using System;
 
+
 namespace UnityEngine.Rendering.PostProcessing
 {
     // This asset is used to store references to shaders and other resources we might need at
     // runtime without having to use a `Resources` folder. This allows for better memory management,
     // better dependency tracking and better interoperability with asset bundles.
+
     public sealed class PostProcessResources : ScriptableObject
     {
         [Serializable]
         public sealed class Shaders
         {
-            public Shader autoExposure;
             public Shader bloom;
             public Shader copy;
             public Shader copyStd;
@@ -33,11 +34,17 @@ namespace UnityEngine.Rendering.PostProcessing
             public Shader scalableAO;
             public Shader multiScaleAO;
             public Shader screenSpaceReflections;
+
+            public Shaders Clone()
+            {
+                return (Shaders)MemberwiseClone();
+            }
         }
 
         [Serializable]
         public sealed class ComputeShaders
         {
+            public ComputeShader autoExposure;
             public ComputeShader exposureHistogram;
             public ComputeShader lut3DBaker;
             public ComputeShader texture3dLerp;
@@ -49,6 +56,11 @@ namespace UnityEngine.Rendering.PostProcessing
             public ComputeShader multiScaleAORender;
             public ComputeShader multiScaleAOUpsample;
             public ComputeShader gaussianDownsample;
+
+            public ComputeShaders Clone()
+            {
+                return (ComputeShaders)MemberwiseClone();
+            }
         }
 
         [Serializable]
@@ -57,11 +69,23 @@ namespace UnityEngine.Rendering.PostProcessing
             public Texture2D area;
             public Texture2D search;
         }
-        
+
         public Texture2D[] blueNoise64;
         public Texture2D[] blueNoise256;
         public SMAALuts smaaLuts;
         public Shaders shaders;
         public ComputeShaders computeShaders;
+
+#if UNITY_EDITOR
+        public delegate void ChangeHandler();
+        public ChangeHandler changeHandler;
+
+        void OnValidate()
+        {
+            if (changeHandler != null)
+                changeHandler();
+        }
+
+#endif
     }
 }

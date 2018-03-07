@@ -18,7 +18,7 @@ namespace FiringSquad.Gameplay.Weapons
 		/// <summary>
 		/// Create a COPY of our effect to avoid shared-resource problems.
 		/// </summary>
-		private void Start()
+		private void Awake()
 		{
 			mEffectInstances = new List<AimDownSightsEffect>();
 			foreach (AimDownSightsEffect e in mAimDownSightsEffects)
@@ -53,8 +53,6 @@ namespace FiringSquad.Gameplay.Weapons
 			{
 				if (e == null)
 					continue;
-
-				e.DeactivateEffect(this, true);
 				Destroy(e);
 			}
 		}
