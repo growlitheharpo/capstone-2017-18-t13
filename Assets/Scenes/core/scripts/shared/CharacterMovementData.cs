@@ -19,6 +19,8 @@ namespace FiringSquad.Data
 		[SerializeField] private float mSprintMultiplier;
 		[SerializeField] private float mAimDownSightsMoveMultiplier;
 		[SerializeField] private float mAimDownSightsLookMultiplier;
+		[SerializeField] private float mAccelerationLerpSpeed;
+		[SerializeField] private float mDecelerationLerpSpeed;
 
 		/// <summary>
 		/// Lateral movement speed.
@@ -74,5 +76,15 @@ namespace FiringSquad.Data
 		/// Mouse look speed multiplier when in ADS.
 		/// </summary>
 		public float aimDownSightsLookMultiplier { get { return mAimDownSightsLookMultiplier; } }
+
+		/// <summary>
+		/// Character movement acceleration lerp speed
+		/// </summary>
+		public float accelerationLerpSpeed { get { return mAccelerationLerpSpeed; } }
+
+		/// <summary>
+		/// Character movement deceleration lerp speed
+		/// </summary>
+		public float decelerationLerpSpeed { get { return mDecelerationLerpSpeed; } }
 	}
 }

@@ -37,6 +37,11 @@ namespace FiringSquad.Gameplay
 		private float mSmoothedRecoil, mStandingHeight, mStandingRadius;
 		private bool mJump, mIsJumping, mIsRunning, mPreviouslyGrounded, mCrouching;
 
+		// Float for the speed
+		private float mCurrentSpeed;
+		// Variables to keep track of previous x and y
+		private float mPrevXInput, mPrevYInput;
+
 		private const float DEFAULT_FIELD_OF_VIEW = 60.0f;
 
 		/// <summary> Cover up Unity's "transform" component with the one of our CltPlayer. </summary>
@@ -62,6 +67,9 @@ namespace FiringSquad.Gameplay
 			mController = mPlayer.GetComponent<CharacterController>();
 			mStandingHeight = mController.height;
 			mStandingRadius = mController.radius;
+
+			// Initialize the speed
+			mCurrentSpeed = 0.0f;
 
 			// Register all of the movement input
 			mInputBindings = GetComponent<CltPlayerLocal>().inputMap;
@@ -299,14 +307,69 @@ namespace FiringSquad.Gameplay
 		{
 			Vector3 desiredMove = transform.forward * mInput.y + transform.right * mInput.x;
 
+			if (mInput.y != 0 || mInput.x != 0)
+			{
+				mPrevXInput = mInput.x;
+				mPrevYInput = mInput.y;
+			}
+
+			// Check if these are equal to 0
+			if (mInput.x == 0.0f && mInput.y == 0.0f)
+			{
+				// If there is still momentum
+				if (mCurrentSpeed > 0.0f)
+				{
+					desiredMove = transform.forward * mPrevYInput + transform.right * mPrevXInput;
+				}
+				// Else there is none
+				else
+				{
+					mPrevXInput = 0;
+					mPrevYInput = 0;
+				}
+			}
+
+			//Vector3 desiredMove = Vector3.Lerp(transform.position, transform.forward * mInput.y + transform.right * mInput.x, 0.1f);
+
 			// Cast around us to check the plane we should move on.
 			RaycastHit hitInfo;
 			Physics.SphereCast(transform.position, mController.radius, Vector3.down, out hitInfo, mController.height / 2.0f, Physics.AllLayers, QueryTriggerInteraction.Ignore);
 			desiredMove = Vector3.ProjectOnPlane(desiredMove, hitInfo.normal).normalized;
 
-			float speed = mMovementData.speed;
+			// Temp var for desired speed
+			float desiredSpeed = 0.0f;
 
-			if (mIsRunning)
+			if (mInput.y != 0 || mInput.x != 0)
+			{
+				desiredSpeed = mMovementData.speed;
+			}
+			else if (mInput.y == 0.0f && mInput.x == 0.0f)
+			{
+				desiredSpeed = 0.0f;
+			}
+
+			float speed = 0.0f;
+
+			// Check for lerp speed
+			if (desiredSpeed > 0)
+			{
+				speed = Mathf.Lerp(mCurrentSpeed, desiredSpeed, 1.0f * Time.deltaTime * mMovementData.accelerationLerpSpeed);
+			}
+			else
+			{
+				speed = Mathf.Lerp(mCurrentSpeed, desiredSpeed, 1.0f * Time.deltaTime * mMovementData.decelerationLerpSpeed);
+			}
+
+
+			if (speed > mMovementData.speed)
+			{
+				speed = mMovementData.speed;
+			}
+			UnityEngine.Debug.Log(mCurrentSpeed);
+			//float speed = mMovementData.speed;
+			//speed = Mathf.Lerp(mCurrentSpeed, mMovementData.speed, 0.1f);
+
+			if (mIsRunning && mInput.x == 0) // Also make sure they're only going forward
 				speed *= mMovementData.sprintMultiplier;
 			if (mCrouching)
 				speed *= mMovementData.crouchMoveMultiplier;
@@ -334,10 +397,19 @@ namespace FiringSquad.Gameplay
 					mIsJumping = true;
 				}
 			}
+
+			// Apply new air movement stuff
 			else
+			{
+
+
 				mMoveDirection += Physics.gravity * mMovementData.gravityMultiplier * Time.fixedDeltaTime;
 
+			}
+
 			mController.Move(mMoveDirection * Time.fixedDeltaTime);
+
+			mCurrentSpeed = speed;
 		}
 
 		/// <summary>
