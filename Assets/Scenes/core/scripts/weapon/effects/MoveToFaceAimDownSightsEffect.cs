@@ -43,15 +43,24 @@ namespace FiringSquad.Gameplay.Weapons
 
 			mActive = false;
 			EventManager.Notify(() => EventManager.LocalGUI.SetCrosshairVisible(true));
-			EventManager.Notify(() => EventManager.LocalGUI.RequestNewFieldOfView(-1.0f, 0.25f));
+			EventManager.LocalGUI.RequestNewFieldOfView(-1.0f, 0.25f);
 
-			Transform subView = mCurrentWeapon.transform.Find("View").GetChild(0);
-			if (mMoveRoutine != null)
+			if (mMoveRoutine != null && part != null)
 				part.StopCoroutine(mMoveRoutine);
 
-			if (!immediate)
+			MonoBehaviour weapon = mCurrentWeapon as MonoBehaviour;
+			if (weapon == null || mCurrentWeapon.transform == null)
+				return;
+
+			Transform subView = mCurrentWeapon.transform.Find("View");
+			if (subView == null)
+				return;
+
+			subView = subView .GetChild(0);
+
+			if (!immediate && part != null)
 				mMoveRoutine = part.StartCoroutine(Coroutines.LerpPosition(subView, Vector3.zero, 0.2f, Space.Self, Coroutines.MATHF_SMOOTHSTEP));
-			else
+			else if (subView != null)
 				subView.transform.localPosition = Vector3.zero;
 		}
 	}

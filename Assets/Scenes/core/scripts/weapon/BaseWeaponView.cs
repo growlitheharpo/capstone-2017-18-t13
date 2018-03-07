@@ -268,7 +268,12 @@ namespace FiringSquad.Gameplay.Weapons
 
 			WeaponPartScript current = mWeaponScript.currentParts[place];
 			if (current != null)
+			{
+				if (current.attachPoint == Attachment.Scope && mWeaponScript.aimDownSightsActive)
+					((WeaponPartScriptScope)current).DeactivateAimDownSightsEffect(mWeaponScript, true);
+
 				Destroy(current.gameObject);
+			}
 
 			newPart.transform.SetParent(mAttachPoints[place]);
 			newPart.transform.ResetLocalValues();

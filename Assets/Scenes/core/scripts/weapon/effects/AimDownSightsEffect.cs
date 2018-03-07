@@ -31,7 +31,7 @@ namespace FiringSquad.Gameplay.Weapons
 		/// <summary>
 		/// Unity's OnDestroy function.
 		/// </summary>
-		private void OnDestroy()
+		protected virtual void OnDestroy()
 		{
 			DeactivateEffect(null, true);
 		}

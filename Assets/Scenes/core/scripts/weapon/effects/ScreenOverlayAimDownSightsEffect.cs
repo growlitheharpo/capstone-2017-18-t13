@@ -27,7 +27,7 @@ namespace FiringSquad.Gameplay.Weapons
 		/// <summary>
 		/// Unity's OnDisable function
 		/// </summary>
-		protected virtual void OnDestroy()
+		protected override void OnDestroy()
 		{
 			RuntimeUtilities.DestroyVolume(mTemporaryVolume, true);
 		}

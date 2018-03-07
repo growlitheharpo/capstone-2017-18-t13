@@ -53,8 +53,6 @@ namespace FiringSquad.Gameplay.Weapons
 			{
 				if (e == null)
 					continue;
-
-				e.DeactivateEffect(this, true);
 				Destroy(e);
 			}
 		}
