@@ -15,8 +15,8 @@ namespace FiringSquad.Gameplay.UI
 	public class GameOverPanel : MonoBehaviour, IScreenPanel
 	{
 		/// Inspector variables
-		[SerializeField] private GameObject mScorePrefab;
-		[SerializeField] private GridLayoutGroup mScoreGrid;
+		[SerializeField] private GameOverIndividualScorePanel mScorePrefab;
+		[SerializeField] private LayoutGroup mScoreGrid;
 		[SerializeField] private ActionProvider mQuitButton;
 
 		/// <summary>
@@ -47,23 +47,23 @@ namespace FiringSquad.Gameplay.UI
 		/// <param name="scores">The array of scores that will be displayed.</param>
 		public void SetDisplayScores(PlayerScore[] scores)
 		{
-			//NetworkInstanceId localPlayerId = FindObjectsOfType<CltPlayer>().First(x => x.isCurrentPlayer).netId;
-			NetworkInstanceId localPlayerId = CltPlayer.localPlayerReference != null ? CltPlayer.localPlayerReference.netId : NetworkInstanceId.Invalid;
-
 			gameObject.SetActive(true);
-			foreach (PlayerScore score in scores)
+			scores = scores.OrderByDescending(x => (x.kills - x.deaths)).ToArray(); // TODO: Change this when we have actual scores!
+
+			for (uint i = 0; i < scores.Length; ++i)
 			{
-				GameObject go = Instantiate(mScorePrefab);
-				go.transform.SetParent(mScoreGrid.transform);
+				PlayerScore score = scores[i];
+				CltPlayer player = score.player;
 
-				Text text = go.GetComponent<Text>();
-				text.text = string.Format("{0}\n{1}\n{2}\n{3}",
-					score.playerId == localPlayerId ? "You" : "",
-					score.player.playerName,
-					score.kills,
-					score.deaths);
+				GameOverIndividualScorePanel panel = Instantiate(mScorePrefab.gameObject, mScoreGrid.transform)
+					.GetComponent<GameOverIndividualScorePanel>();
 
-				go.GetComponent<RectTransform>().position = Vector3.zero;
+				panel.ApplyTeamColor(player.teamColor);
+				panel.playerRank = i + 1;
+				panel.playerName = player.playerName;
+				panel.playerScore = 0;
+				panel.killCount = score.kills > 0 ? (uint)score.kills : 0;
+				panel.deathCount = score.deaths > 0 ? (uint)score.deaths : 0;
 			}
 		}
 
