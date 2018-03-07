@@ -3,6 +3,7 @@ using System.Collections;
 using System.Linq;
 using FiringSquad.Core;
 using FiringSquad.Core.Audio;
+using FiringSquad.Data;
 using FiringSquad.Gameplay.UI;
 using FiringSquad.Gameplay.Weapons;
 using UnityEngine;
@@ -220,7 +221,10 @@ namespace FiringSquad.Gameplay
 		{
 			Assert.IsTrue(bearer != null, "PlayerMagnetArm.OnPostBind called but bearer is null!");
 			if (bearer.isCurrentPlayer || forceLocalPlayer)
+			{
+				ApplyTeamColor();
 				return;
+			}
 
 			// If our bearer is NOT the current player, destroy our view.
 			transform.Find("View").gameObject.SetActive(false);
@@ -229,9 +233,22 @@ namespace FiringSquad.Gameplay
 		/// <summary>
 		/// Force the view to be visible on the server.
 		/// </summary>
-		public void SetViewVisible()
+		public void SetViewVisible(bool applyColor = true)
 		{
 			transform.Find("View").gameObject.SetActive(true);
+
+			if (applyColor)
+				ApplyTeamColor();
+		}
+
+		/// <summary>
+		/// Apply our bearer's team color to our model.
+		/// </summary>
+		public void ApplyTeamColor()
+		{
+			var components = GetComponentsInChildren<ColormaskUpdateUtility>();
+			foreach (ColormaskUpdateUtility updater in components)
+				updater.UpdateDisplayedColor(mBearer.teamColor);
 		}
 
 		/// <summary>

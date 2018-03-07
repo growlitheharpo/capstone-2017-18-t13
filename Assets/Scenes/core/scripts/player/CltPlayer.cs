@@ -79,7 +79,7 @@ namespace FiringSquad.Gameplay
 		/// <summary>
 		/// The correct color for this player based on their team.
 		/// </summary>
-		private Color teamColor
+		public Color teamColor
 		{
 			get 
 			{
@@ -820,6 +820,9 @@ namespace FiringSquad.Gameplay
 			var components = GetComponentsInChildren<ColormaskUpdateUtility>();
 			foreach (ColormaskUpdateUtility updater in components)
 				updater.UpdateDisplayedColor(teamColor);
+
+			if (magnetArm != null)
+				magnetArm.ApplyTeamColor();
 
 			// Update the UI appropriately
 			if (isCurrentPlayer)

@@ -35,6 +35,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4829882394994446}
   - component: {fileID: 137495693583486194}
+  - component: {fileID: 114962737889467446}
   m_Layer: 0
   m_Name: mesh_firstPersonArm
   m_TagString: Untagged
@@ -717,6 +718,18 @@ MonoBehaviour:
     i15: 212
   m_ServerOnly: 0
   m_LocalPlayerAuthority: 1
+--- !u!114 &114962737889467446
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1083612729762084}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 945ac7219aeaae941a1245d224216262, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mAlsoChangeEmissive: 1
 --- !u!137 &137495693583486194
 SkinnedMeshRenderer:
   m_ObjectHideFlags: 1
