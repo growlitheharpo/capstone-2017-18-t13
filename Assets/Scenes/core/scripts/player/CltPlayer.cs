@@ -376,12 +376,23 @@ namespace FiringSquad.Gameplay
 
 			AnimationUtility.SetVariable(mAnimator, "VelocityX", velX);
 			AnimationUtility.SetVariable(mAnimator, "VelocityY", velY);
+
+			AnimationUtility.SetVariable(mNetworkAnimator.animator, "VelocityX", velX);
+			AnimationUtility.SetVariable(mNetworkAnimator.animator, "VelocityY", velY);
+
+			// Update the third person firing animations
+			mNetworkAnimator.animator.SetBool("WeaponIsAuto", weapon.currentData.fireRate >= 3.5f);
+			// Set fire rate
+			mNetworkAnimator.animator.SetFloat("RecoilAmount", weapon.currentData.recoilAmount);
+			mNetworkAnimator.animator.SetFloat("FireRate", weapon.currentData.fireRate * 1.1f);
 		}
 
 		/// <inheritdoc />
 		public void PlayFireAnimation()
 		{
 			localAnimator.SetTrigger("Fire");
+
+			mNetworkAnimator.animator.SetFloat("FireRate", weapon.currentData.fireRate);
 			networkAnimator.SetTrigger("Fire");
 		}
 
