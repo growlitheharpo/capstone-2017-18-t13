@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using UnityEngine.Rendering.PostProcessing;
-using Logger = FiringSquad.Debug.Logger;
 
 namespace FiringSquad.Gameplay.Weapons
 {
@@ -14,13 +13,13 @@ namespace FiringSquad.Gameplay.Weapons
 		[SerializeField] private float mVignetteIntensity = 1.0f;
 
 		/// Private variables
-		private bool mActive;
+		protected bool mActive;
 		private PostProcessVolume mTemporaryVolume;
 
 		/// <summary>
 		/// Unity's OnEnable function
 		/// </summary>
-		private void OnEnable()
+		protected virtual void OnEnable()
 		{
 			mTemporaryVolume = PostProcessManager.instance.QuickVolume(LayerMask.NameToLayer("postprocessing"), 100);
 		}
@@ -28,7 +27,7 @@ namespace FiringSquad.Gameplay.Weapons
 		/// <summary>
 		/// Unity's OnDisable function
 		/// </summary>
-		private void OnDestroy()
+		protected virtual void OnDestroy()
 		{
 			RuntimeUtilities.DestroyVolume(mTemporaryVolume, true);
 		}
@@ -42,8 +41,6 @@ namespace FiringSquad.Gameplay.Weapons
 			mActive = true;
 			base.ActivateEffect(weapon, part);
 
-			Logger.Info("Activate 1");
-
 			Quickfade quickfade = CreateInstance<Quickfade>();
 			quickfade.enabled.Override(true);
 			quickfade.time.Override(mFadeTime);
@@ -52,36 +49,45 @@ namespace FiringSquad.Gameplay.Weapons
 
 			EventManager.Notify(() => EventManager.LocalGUI.SetCrosshairVisible(false));
 
-			quickfade.Activate(part, false, () =>
-			{
-				if (!mActive)
-					return;
+			quickfade.Activate(part, false, () => ActivateStep2(quickfade, part));
+		}
 
-				Logger.Info("Activate 2");
+		/// <summary>
+		/// Step 2 of activating our effect.
+		/// Called after the fade TO black has completed.
+		/// </summary>
+		protected virtual void ActivateStep2(Quickfade quickfade, WeaponPartScript part)
+		{
+			if (!mActive)
+				return;
 
-				// called once we are faded to black
-				Vignette vignette = CreateInstance<Vignette>();
-				vignette.enabled.Override(true);
-				vignette.intensity.Override(mVignetteIntensity);
-				vignette.smoothness.Override(0.15f);
-				vignette.rounded.Override(true);
-				vignette.roundness.Override(1.0f);
+			// called once we are faded to black
+			Vignette vignette = CreateInstance<Vignette>();
+			vignette.enabled.Override(true);
+			vignette.intensity.Override(mVignetteIntensity);
+			vignette.smoothness.Override(0.15f);
+			vignette.rounded.Override(true);
+			vignette.roundness.Override(1.0f);
 
-				mTemporaryVolume.profile.AddSettings(vignette);
-				EventManager.Notify(() => EventManager.LocalGUI.RequestNewFieldOfView(mTargetFieldOfView, -1.0f));
+			mTemporaryVolume.profile.AddSettings(vignette);
+			EventManager.Notify(() => EventManager.LocalGUI.RequestNewFieldOfView(mTargetFieldOfView, -1.0f));
 
-				quickfade.Deactivate(part, () =>
-				{
-					if (!mActive)
-						return;
+			quickfade.Deactivate(part, ActivateStep3);
+		}
 
-					Logger.Info("Activate 3");
+		/// <summary>
+		/// Step 3 of activating our effect.
+		/// Called after the fade FROM black has completed and our vignette is active.
+		/// </summary>
+		protected virtual void ActivateStep3()
+		{
+			if (!mActive)
+				return;
 
-					EventManager.Notify(() => EventManager.LocalGUI.SetCrosshairVisible(true));
-					if (mTemporaryVolume.profile.HasSettings<Quickfade>())
-						mTemporaryVolume.profile.RemoveSettings<Quickfade>();
-				});
-			});
+			EventManager.Notify(() => EventManager.LocalGUI.SetCrosshairVisible(true));
+
+			if (mTemporaryVolume.profile.HasSettings<Quickfade>())
+				mTemporaryVolume.profile.RemoveSettings<Quickfade>();
 		}
 
 		/// <inheritdoc />
@@ -92,44 +98,16 @@ namespace FiringSquad.Gameplay.Weapons
 
 			mActive = false;
 
-			//if (immediate)
+			// Do this immediately so the new scope can do its effect if necessary
+			EventManager.LocalGUI.RequestNewFieldOfView(-1.0f, -1.0f);
+			foreach (PostProcessEffectSettings e in mTemporaryVolume.profile.settings)
 			{
-				Logger.Info("Deactivate");
-				
-				// Do this immediately so the new scope can do its effect if necessary
-				EventManager.LocalGUI.RequestNewFieldOfView(-1.0f, -1.0f);
-				foreach (PostProcessEffectSettings e in mTemporaryVolume.profile.settings)
-				{
-					if (e != null)
-						Destroy(e);
-				}
-				mTemporaryVolume.profile.settings.Clear();
-				mTemporaryVolume.profile.Reset();
-
-				//Destroy(mQuickfade);
-				//Destroy(mVignette);
-				return;
+				if (e != null)
+					Destroy(e);
 			}
 
-			// not immediate
-			EventManager.Notify(() => EventManager.LocalGUI.SetCrosshairVisible(false));
-			/*mQuickfade.Activate(part, false, () =>
-			{
-				//called once we are faded to black
-				mVignette.enabled.Override(false);
-				Destroy(mVignette);
-
-				// Do this immediately so the new scope can do its effect if necessary
-				EventManager.LocalGUI.RequestNewFieldOfView(-1.0f, -1.0f);
-
-				mQuickfade.Deactivate(part, () =>
-				{
-					EventManager.Notify(() => EventManager.LocalGUI.SetCrosshairVisible(true));
-					RuntimeUtilities.DestroyVolume(mTemporaryVolume, false);
-					Destroy(mQuickfade);
-					Destroy(mVignette);
-				});
-			});*/
+			mTemporaryVolume.profile.settings.Clear();
+			mTemporaryVolume.profile.Reset();
 		}
 	}
 }
