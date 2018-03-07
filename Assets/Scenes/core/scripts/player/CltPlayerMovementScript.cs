@@ -365,7 +365,7 @@ namespace FiringSquad.Gameplay
 			{
 				speed = mMovementData.speed;
 			}
-			UnityEngine.Debug.Log(mCurrentSpeed);
+			//UnityEngine.Debug.Log(mCurrentSpeed);
 			//float speed = mMovementData.speed;
 			//speed = Mathf.Lerp(mCurrentSpeed, mMovementData.speed, 0.1f);
 
