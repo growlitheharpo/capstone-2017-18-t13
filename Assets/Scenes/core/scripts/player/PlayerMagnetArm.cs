@@ -211,6 +211,16 @@ namespace FiringSquad.Gameplay
 		{
 			Transform view = transform.Find("View");
 			mViewAnimator = view.GetChild(0).GetComponent<Animator>();
+
+			EventManager.Local.OnLocalPlayerDied += OnLocalPlayerDied;
+		}
+
+		/// <summary>
+		/// Unity's OnDestroy function
+		/// </summary>
+		private void OnDestroy()
+		{
+			EventManager.Local.OnLocalPlayerDied -= OnLocalPlayerDied;
 		}
 
 		/// <summary>
@@ -228,6 +238,22 @@ namespace FiringSquad.Gameplay
 
 			// If our bearer is NOT the current player, destroy our view.
 			transform.Find("View").gameObject.SetActive(false);
+		}
+
+		/// <summary>
+		/// Event handler: EventManager.Local.OnLocalPlayerDied
+		/// </summary>
+		[EventHandler]
+		private void OnLocalPlayerDied(Vector3 arg1, Quaternion arg2, ICharacter arg3)
+		{
+			// Check that this magnet arm belongs to the local player.
+			if (bearer == null || !bearer.isCurrentPlayer)
+				return;
+
+			if (reelingObject != null)
+				DropItemDown();
+
+			UpdateReelingSound(false);
 		}
 
 		/// <summary>
@@ -459,6 +485,19 @@ namespace FiringSquad.Gameplay
 		}
 
 		/// <summary>
+		/// Give this client control over an item that it is trying to reel in.
+		/// </summary>
+		/// <param name="grabCandidateNetId">The network id of object the client is reeling.</param>
+		[Command]
+		private void CmdAssignClientAuthority(NetworkInstanceId grabCandidateNetId)
+		{
+			GameObject obj = NetworkServer.FindLocalObject(grabCandidateNetId);
+			bool success = obj.GetComponent<NetworkIdentity>().AssignClientAuthority(bearer.connectionToClient);
+			if (!success)
+				Logger.Warn("PlayerMagnetArm::AssignClientAuthority was unnsuccessful!");
+		}
+
+		/// <summary>
 		/// Throw the item that we are currently holding on the server.
 		/// Requires running on the server because 
 		/// </summary>
@@ -466,6 +505,27 @@ namespace FiringSquad.Gameplay
 		/// <param name="objectId">The network instance ID of the currently held object.</param>
 		[Command]
 		private void CmdThrowHeldItem(Vector3 currentForward, NetworkInstanceId objectId)
+		{
+			ServerThrowItem(currentForward, objectId);
+		}
+		
+		/// <summary>
+		/// Immediately drop any item that this magnet arm is reeling or considering pulling.
+		/// </summary>
+		[Server]
+		public void ForceDropItem()
+		{
+			if (reelingObject == null)
+				return;
+
+			ServerThrowItem(transform.forward, reelingObject.netId);
+		}
+
+		/// <summary>
+		/// Drop an item on the server immediately.
+		/// </summary>
+		[Server]
+		private void ServerThrowItem(Vector3 forward, NetworkInstanceId objectId)
 		{
 			GameObject go = NetworkServer.FindLocalObject(objectId);
 			if (go == null)
@@ -479,35 +539,8 @@ namespace FiringSquad.Gameplay
 			if (!success)
 				Logger.Warn("PlayerMagnetArm::ReleaseClientAuthority was unnsuccessful!");
 
-			grabbable.UnlockAndThrow(currentForward * 30.0f);
+			grabbable.UnlockAndThrow(forward * 30.0f);
 
-			reelingObject = null;
-		}
-
-		/// <summary>
-		/// Give this client control over an item that it is trying to reel in.
-		/// </summary>
-		/// <param name="grabCandidateNetId">The network id of object the client is reeling.</param>
-		[Command]
-		private void CmdAssignClientAuthority(NetworkInstanceId grabCandidateNetId)
-		{
-			GameObject obj = NetworkServer.FindLocalObject(grabCandidateNetId);
-			bool success = obj.GetComponent<NetworkIdentity>().AssignClientAuthority(bearer.connectionToClient);
-			if (!success)
-				Logger.Warn("PlayerMagnetArm::AssignClientAuthority was unnsuccessful!");
-		}
-		
-		/// <summary>
-		/// Immediately drop any item that this magnet arm is reeling or considering pulling.
-		/// </summary>
-		[Server]
-		public void ForceDropItem()
-		{
-			if (reelingObject == null)
-				return;
-
-			reelingObject.UnlockFromReel();
-			reelingObject.GetComponent<NetworkIdentity>().RemoveClientAuthority(bearer.connectionToClient);
 			reelingObject = null;
 		}
 	}

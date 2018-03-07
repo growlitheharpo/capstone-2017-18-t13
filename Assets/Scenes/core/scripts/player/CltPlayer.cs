@@ -503,10 +503,10 @@ namespace FiringSquad.Gameplay
 		[Server]
 		public void MoveToStartPosition(Vector3 position, Quaternion rotation)
 		{
-			TargetResetPlayerValues(connectionToClient, position, rotation);
-
 			if (magnetArm != null)
 				magnetArm.ForceDropItem();
+
+			TargetResetPlayerValues(connectionToClient, position, rotation);
 		}
 
 		/// <summary>
@@ -516,6 +516,9 @@ namespace FiringSquad.Gameplay
 		[EventHandler]
 		private void OnStartGame(long gameEndTime)
 		{
+			if (magnetArm != null)
+				magnetArm.ForceDropItem();
+
 			TargetHandleStartGame(connectionToClient, gameEndTime);
 		}
 
@@ -525,6 +528,9 @@ namespace FiringSquad.Gameplay
 		[TargetRpc]
 		private void TargetHandleStartGame(NetworkConnection connection, long gameEndTime)
 		{
+			if (magnetArm != null)
+				magnetArm.DropItemDown();
+
 			EventManager.Notify(() => EventManager.Local.ReceiveStartEvent(gameEndTime));
 			ServiceLocator.Get<IAudioManager>()
 				.CreateSound(AudioEvent.AnnouncerMatchStarts, transform);
@@ -732,6 +738,9 @@ namespace FiringSquad.Gameplay
 		[TargetRpc]
 		private void TargetResetPlayerValues(NetworkConnection connection, Vector3 position, Quaternion rotation)
 		{
+			if (magnetArm != null)
+				magnetArm.DropItemDown();
+
 			ResetPlayerValues(position, rotation);
 		}
 
