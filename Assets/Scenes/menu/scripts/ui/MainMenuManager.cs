@@ -16,15 +16,19 @@ namespace FiringSquad.Gameplay.UI
 		[SerializeField] private UIButton mFourPlayerButton;
 		[SerializeField] private UIButton mQuitButton;
 		[SerializeField] private UIButton mGunGlossaryButton;
+		[SerializeField] private int mKioskTimerSeconds = 10;
+		private int mKioskTimerTicks;
 
 		/// <summary>
 		/// Unity's Start function
 		/// </summary>
 		private void Start()
-		{
+		{ 
 			mFourPlayerButton.onClick.AddListener(LaunchNewLevel);
 			mQuitButton.onClick.AddListener(ClickQuit);
 			mGunGlossaryButton.onClick.AddListener(LaunchGlossary);
+
+			mKioskTimerTicks = mKioskTimerSeconds * 100;
 		}
 
 		/// <summary>
@@ -56,6 +60,38 @@ namespace FiringSquad.Gameplay.UI
 
 			ServiceLocator.Get<IGamestateManager>()
 				.RequestSceneChange(GamestateManager.GUN_GLOSSARY);
+		}
+
+		/// <summary>
+		/// Launches kiosk mode
+		/// </summary>
+		private void LaunchKiosk()
+		{
+			mMainElementHolder.SetActive(false);
+
+			ServiceLocator.Get<IGamestateManager>()
+				.RequestSceneChange(GamestateManager.KIOSK_SCENE);
+		}
+
+		/// <summary>
+		/// Unity's fixed update function
+		/// </summary>
+		private void FixedUpdate()
+		{
+			// Decrement kiosk timer
+			mKioskTimerTicks--;
+
+			// If people press any key, reset the timer
+			if (Input.anyKeyDown)
+			{
+				mKioskTimerTicks = mKioskTimerSeconds * 100;
+			}
+
+			// If the timer gets below 0, go to kiosk mode scene
+			if (mKioskTimerTicks <= 0)
+			{
+				LaunchKiosk();
+			}
 		}
 	}
 }
