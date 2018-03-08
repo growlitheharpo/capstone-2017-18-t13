@@ -1,5 +1,6 @@
 ﻿using FiringSquad.Data;
 using FiringSquad.Gameplay.Weapons;
+using FiringSquad.Networking;
 using KeatsLib.Unity;
 using UnityEngine;
 using UnityEngine.UI;
@@ -43,12 +44,21 @@ namespace FiringSquad.Gameplay.UI
 		/// </summary>
 		private void OnLocalPlayerGotKill(CltPlayer deadPlayer, IWeapon currentWeapon, KillFlags killFlags)
 		{
-			string displayText = string.Format("Eliminated: {0}		+{1}",
-				deadPlayer.playerName,
-				"100" // TODO: Fetch a real score here.
-			);
+			if ((killFlags & KillFlags.Kingslayer) > 0)
+				DisplayNewMessage("KINGSLAYER!	   +" + NetworkServerGameManager.KINGSLAYER_POINTS);
+			if ((killFlags & KillFlags.Killstreak) > 0)
+				DisplayNewMessage("KILLSTREAK!	   +" + NetworkServerGameManager.KILLSTREAK_POINTS);
+			if ((killFlags & KillFlags.Revenge) > 0)
+				DisplayNewMessage("REVENGE KILL!	 +" + NetworkServerGameManager.REVENGE_KILL_POINTS);
+			if ((killFlags & KillFlags.Multikill) > 0)
+				DisplayNewMessage("M-M-M-MULTI-KILL!	 +" + NetworkServerGameManager.MULTI_KILL_POINTS);
+			if ((killFlags & KillFlags.Headshot) > 0)
+				DisplayNewMessage("HEADSHOT!	 +" + NetworkServerGameManager.HEADSHOT_KILL_POINTS);
 
-			DisplayNewMessage(displayText);
+			DisplayNewMessage(string.Format("Eliminated: {0}	 +{1}",
+				deadPlayer.playerName,
+				NetworkServerGameManager.STANDARD_KILL_POINTS
+			));
 		}
 
 		/// <summary>

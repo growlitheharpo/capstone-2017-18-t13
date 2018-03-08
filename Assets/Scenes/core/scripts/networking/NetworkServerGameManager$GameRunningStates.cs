@@ -169,18 +169,19 @@ namespace FiringSquad.Networking
 				
 				private int GetScoreForFlags(KillFlags killInfoFlags)
 				{
+					int score = STANDARD_KILL_POINTS;
 					if ((killInfoFlags & KillFlags.Kingslayer) > 0)
-						return KINGSLAYER_POINTS;
+						score += KINGSLAYER_POINTS;
 					if ((killInfoFlags & KillFlags.Multikill) > 0)
-						return MULTI_KILL_POINTS;
+						score += MULTI_KILL_POINTS;
 					if ((killInfoFlags & KillFlags.Headshot) > 0)
-						return HEADSHOT_KILL_POINTS;
+						score += HEADSHOT_KILL_POINTS;
 					if ((killInfoFlags & KillFlags.Killstreak) > 0)
-						return STANDARD_KILL_POINTS + KILLSTREAK_POINTS;
+						score += KILLSTREAK_POINTS;
 					if ((killInfoFlags & KillFlags.Revenge) > 0)
-						return STANDARD_KILL_POINTS + REVENGE_KILL_POINTS;
+						score += REVENGE_KILL_POINTS;
 
-					return STANDARD_KILL_POINTS;
+					return score;
 				}
 
 				/// <inheritdoc />
