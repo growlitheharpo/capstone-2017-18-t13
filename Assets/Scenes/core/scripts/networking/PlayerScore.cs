@@ -23,12 +23,12 @@ namespace FiringSquad.Data
 		/// <summary>
 		/// The number of other players this player has killed.
 		/// </summary>
-		public int kills { get { return mKills; } }
+		public int kills { get { return mKills; } set { mKills = value; }}
 
 		/// <summary>
 		/// The number of times this player died.
 		/// </summary>
-		public int deaths { get { return mDeaths; } }
+		public int deaths { get { return mDeaths; } set { mDeaths = value; }}
 
 		/// <summary>
 		/// The actual player associated with this score.
