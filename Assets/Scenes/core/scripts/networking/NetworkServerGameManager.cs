@@ -189,7 +189,14 @@ namespace FiringSquad.Networking
 						.OrderBy(x => Vector3.Distance(x.transform.position, deadPlayer.transform.position))
 						.FirstOrDefault();
 
-					EventManager.Server.PlayerDied(deadPlayer, null, localSpawn != null ? localSpawn.transform : deadPlayer.transform);
+					PlayerKill killInfo = new PlayerKill
+					{
+						killer = null,
+						spawnPosition = localSpawn != null ? localSpawn.transform : deadPlayer.transform,
+						mFlags = KillFlags.None
+					};
+
+					EventManager.Server.PlayerDied(deadPlayer, killInfo);
 				}
 
 				/// <inheritdoc />
@@ -231,8 +238,14 @@ namespace FiringSquad.Networking
 					Transform localSpawn = mMachine.mLobbyStartPositions
 						.OrderBy(x => Vector3.Distance(x.transform.position, deadPlayer.transform.position))
 						.FirstOrDefault();
-
-					EventManager.Server.PlayerDied(deadPlayer, null, localSpawn != null ? localSpawn.transform : deadPlayer.transform);
+					
+					PlayerKill killInfo = new PlayerKill
+					{
+						killer = null,
+						spawnPosition = localSpawn != null ? localSpawn.transform : deadPlayer.transform,
+						mFlags = KillFlags.None
+					};
+					EventManager.Server.PlayerDied(deadPlayer, killInfo);
 				}
 
 				/// <inheritdoc />
@@ -465,8 +478,14 @@ namespace FiringSquad.Networking
 
 					PlayerScore deadScore = mMachine.mPlayerScores[dead.netId];
 					mMachine.mPlayerScores[dead.netId] = new PlayerScore(deadScore.playerId, deadScore.kills, deadScore.deaths + 1);
-
-					EventManager.Notify(() => EventManager.Server.PlayerDied(dead, damage.source, newPosition));
+					
+					PlayerKill killInfo = new PlayerKill
+					{
+						killer = damage.source,
+						spawnPosition = newPosition,
+						mFlags = KillFlags.None
+					};
+					EventManager.Server.PlayerDied(dead, killInfo);
 				}
 
 				/// <inheritdoc />

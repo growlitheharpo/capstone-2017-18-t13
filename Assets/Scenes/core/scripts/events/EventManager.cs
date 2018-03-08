@@ -389,20 +389,18 @@ public partial class EventManager
 		/// <summary>
 		/// Event called when a player's death is confirmed by the server.
 		/// PARAMETER 1: The player that died.
-		/// PARAMETER 2: The character that killed the player, or null.
-		/// PARAMETER 3: The transform of the dead player's target respawn.
+		/// PARAMETER 2: The information about the kill that took place.
 		/// </summary>
-		public static event Action<CltPlayer, ICharacter, Transform> OnPlayerDied = (d, k, p) => { LogEvent(); };
+		public static event Action<CltPlayer, PlayerKill> OnPlayerDied = (dp, ki) => { LogEvent(); };
 
 		/// <summary>
 		/// Event called when a player's death is confirmed by the server.
 		/// </summary>
 		/// <param name="deadPlayer">The player that died.</param>
-		/// <param name="killer">The character that killed the player, or null.</param>
-		/// <param name="respawnPosition">The transform of the dead player's target respawn.</param>
-		public static void PlayerDied(CltPlayer deadPlayer, ICharacter killer, Transform respawnPosition)
+		/// <param name="killInfo">The information about the kill that took place.</param>
+		public static void PlayerDied(CltPlayer deadPlayer, PlayerKill killInfo)
 		{
-			OnPlayerDied(deadPlayer, killer, respawnPosition);
+			OnPlayerDied(deadPlayer, killInfo);
 		}
 
 		/// <summary>

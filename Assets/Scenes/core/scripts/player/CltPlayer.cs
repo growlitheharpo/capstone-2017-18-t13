@@ -626,19 +626,14 @@ namespace FiringSquad.Gameplay
 		/// </summary>
 		[Server]
 		[EventHandler]
-		private void OnPlayerDied(CltPlayer deadPlayer, ICharacter killer, Transform spawnPos)
+		private void OnPlayerDied(CltPlayer deadPlayer, PlayerKill killInfo)
 		{
+			ICharacter killer = killInfo.killer;
+
 			if (deadPlayer == this)
 			{
-				NetworkInstanceId killerId;
-
 				if (killer != null)
-				{
 					mDeaths++;
-					killerId = killer.netId;
-				}
-				else
-					killerId = NetworkInstanceId.Invalid;
 
 				SpawnDeathWeaponParts();
 
@@ -649,7 +644,8 @@ namespace FiringSquad.Gameplay
 				if (weapon != null)
 					weapon.ResetToDefaultParts();
 
-				RpcHandleDeath(transform.position, spawnPos.position, spawnPos.rotation, killerId);
+				killInfo.mDeathPosition = transform.position;
+				RpcHandleDeath(killInfo);
 			}
 			else if (ReferenceEquals(killer, this))
 				mKills++;
@@ -696,29 +692,26 @@ namespace FiringSquad.Gameplay
 		/// <summary>
 		/// Reflect the death of a player locally.
 		/// </summary>
-		/// <param name="deathPosition">The position where the player died.</param>
-		/// <param name="spawnPos">The new target spawn position of the player.</param>
-		/// <param name="spawnRot">The new target spawn rotation of the player.</param>
-		/// <param name="killer">The network id of the character that killed the player.</param>
+		/// <param name="killInfo">The struct collection of data about the kill, provided by the server.</param>
 		[ClientRpc]
-		private void RpcHandleDeath(Vector3 deathPosition, Vector3 spawnPos, Quaternion spawnRot, NetworkInstanceId killer)
+		private void RpcHandleDeath(PlayerKill killInfo)
 		{
-			// Grab information about the killer
-			IWeaponBearer killerObj = killer == NetworkInstanceId.Invalid ? null : ClientScene.FindLocalObject(killer).GetComponent<IWeaponBearer>();
+			ICharacter killer = killInfo.killer;
+			IWeaponBearer weaponBearer = killer as IWeaponBearer;
 
 			// If the killer is the local player, they get an event. Otherwise, we show it on the third person view.
-			if (killerObj != null && killerObj.isCurrentPlayer)
-				EventManager.Notify(() => EventManager.Local.LocalPlayerGotKill(this, killerObj.weapon));
-			else if (killerObj is CltPlayer)
-				((CltPlayer)killerObj).mThirdPersonView.ReflectGotKill();
+			if (weaponBearer != null && weaponBearer.isCurrentPlayer)
+				EventManager.Notify(() => EventManager.Local.LocalPlayerGotKill(this, weaponBearer.weapon));
+			else if (weaponBearer is CltPlayer)
+				((CltPlayer)weaponBearer).mThirdPersonView.ReflectGotKill();
 
 			// Show our death particles
-			ParticleSystem particles = Instantiate(mAssets.deathParticlesPrefab, deathPosition, Quaternion.identity).GetComponent<ParticleSystem>();
+			ParticleSystem particles = Instantiate(mAssets.deathParticlesPrefab, killInfo.mDeathPosition, Quaternion.identity).GetComponent<ParticleSystem>();
 			particles.Play();
 			StartCoroutine(Coroutines.WaitAndDestroyParticleSystem(particles));
 
 			// Show our corpse
-			GameObject corpse = Instantiate(mAssets.corpsePrefab, deathPosition, transform.rotation);
+			GameObject corpse = Instantiate(mAssets.corpsePrefab, killInfo.mDeathPosition, transform.rotation);
 			corpse.GetComponent<PlayerCorpseView>().UpdateColor(mTeam == GameData.PlayerTeam.Orange ? defaultData.orangeTeamColor : defaultData.blueTeamColor);
 
 			// If we died, we should get removed from any potential highlight list.
@@ -733,7 +726,7 @@ namespace FiringSquad.Gameplay
 			if (isLocalPlayer)
 			{
 				mLocalHealthVar.value = 0.0f;
-				EventManager.Local.LocalPlayerDied(spawnPos, spawnRot, killerObj);
+				EventManager.Local.LocalPlayerDied(killInfo.mNewSpawnPosition, killInfo.mNewSpawnRotation, killer);
 
 				ServiceLocator.Get<IAudioManager>()
 					.CreateSound(AudioEvent.AnnouncerPlayerDeath, null);
