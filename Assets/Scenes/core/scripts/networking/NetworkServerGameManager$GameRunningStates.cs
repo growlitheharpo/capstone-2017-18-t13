@@ -14,8 +14,17 @@ using Random = UnityEngine.Random;
 
 namespace FiringSquad.Networking
 {
-	public partial class NetworkServerGameManager 
+	public partial class NetworkServerGameManager
 	{
+		public const int KINGSLAYER_POINTS = 125;
+		public const int MULTI_KILL_POINTS = 120;
+		public const int HEADSHOT_KILL_POINTS = 110;
+		public const int STANDARD_KILL_POINTS = 100;
+		public const int REVENGE_KILL_POINTS = 75;
+		public const int STAGE_CAPTURE_POINTS = 50;
+		public const int LEGENDARY_PART_POINTS = 50;
+		public const int KILLSTREAK_POINTS = 25;
+
 		private partial class ServerStateMachine 
 		{
 			// Private data only used in this file:
@@ -133,18 +142,45 @@ namespace FiringSquad.Networking
 
 					Transform newPosition = ChooseSafestSpawnPosition(mMachine.mPlayerList, dead, spawnList);
 
-					if (damage.source is CltPlayer)
-						mMachine.mPlayerScores[damage.source.netId].kills++;
 
 					mMachine.mPlayerScores[dead.netId].deaths++;
-					
+
 					PlayerKill killInfo = new PlayerKill
 					{
 						killer = damage.source,
 						spawnPosition = newPosition,
 						mFlags = KillFlags.None
 					};
+					
+					if (damage.source is CltPlayer)
+					{
+						mMachine.mPlayerScores[damage.source.netId].kills++;
+						killInfo.mFlags = CalculateFlagsForKill(killInfo);
+						mMachine.mPlayerScores[damage.source.netId].score += GetScoreForFlags(killInfo.mFlags);
+					}
+
 					EventManager.Server.PlayerDied(dead, killInfo);
+				}
+
+				private KillFlags CalculateFlagsForKill(PlayerKill killInfo)
+				{
+					return KillFlags.None;
+				}
+				
+				private int GetScoreForFlags(KillFlags killInfoFlags)
+				{
+					if ((killInfoFlags & KillFlags.Kingslayer) > 0)
+						return KINGSLAYER_POINTS;
+					if ((killInfoFlags & KillFlags.Multikill) > 0)
+						return MULTI_KILL_POINTS;
+					if ((killInfoFlags & KillFlags.Headshot) > 0)
+						return HEADSHOT_KILL_POINTS;
+					if ((killInfoFlags & KillFlags.Killstreak) > 0)
+						return STANDARD_KILL_POINTS + KILLSTREAK_POINTS;
+					if ((killInfoFlags & KillFlags.Revenge) > 0)
+						return STANDARD_KILL_POINTS + REVENGE_KILL_POINTS;
+
+					return STANDARD_KILL_POINTS;
 				}
 
 				/// <inheritdoc />

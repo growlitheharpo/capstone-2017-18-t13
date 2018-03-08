@@ -49,7 +49,7 @@ namespace FiringSquad.Gameplay.UI
 		public void SetDisplayScores(IList<PlayerScore> scores)
 		{
 			gameObject.SetActive(true);
-			scores = scores.OrderByDescending(x => (x.kills - x.deaths)).ToArray(); // TODO: Change this when we have actual scores!
+			scores = scores.OrderByDescending(x => x.score).ToArray();
 
 			for (uint i = 0; i < scores.Count; ++i)
 			{
@@ -62,7 +62,7 @@ namespace FiringSquad.Gameplay.UI
 				panel.ApplyTeamColor(player.teamColor);
 				panel.playerRank = i + 1;
 				panel.playerName = player.playerName;
-				panel.playerScore = 0;
+				panel.playerScore = score.score;
 				panel.killCount = score.kills > 0 ? (uint)score.kills : 0;
 				panel.deathCount = score.deaths > 0 ? (uint)score.deaths : 0;
 			}

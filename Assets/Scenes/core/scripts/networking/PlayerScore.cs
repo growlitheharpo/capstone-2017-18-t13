@@ -14,6 +14,7 @@ namespace FiringSquad.Data
 		[SerializeField] private NetworkInstanceId mPlayerId;
 		[SerializeField] private int mKills;
 		[SerializeField] private int mDeaths;
+		[SerializeField] private int mScore;
 
 		/// <summary>
 		/// The player ID of this player.
@@ -23,22 +24,21 @@ namespace FiringSquad.Data
 		/// <summary>
 		/// The number of other players this player has killed.
 		/// </summary>
-		public int kills { get { return mKills; } set { mKills = value; }}
+		public int kills { get { return mKills; } set { mKills = value; } }
 
 		/// <summary>
 		/// The number of times this player died.
 		/// </summary>
-		public int deaths { get { return mDeaths; } set { mDeaths = value; }}
+		public int deaths { get { return mDeaths; } set { mDeaths = value; } }
+
+		public int score { get { return mScore; } set { mScore = value; } }
 
 		/// <summary>
 		/// The actual player associated with this score.
 		/// </summary>
 		public CltPlayer player
 		{
-			get
-			{
-				return ClientScene.FindLocalObject(mPlayerId).GetComponent<CltPlayer>();
-			}
+			get { return ClientScene.FindLocalObject(mPlayerId).GetComponent<CltPlayer>(); }
 			set { mPlayerId = value.netId; }
 		}
 
@@ -50,6 +50,7 @@ namespace FiringSquad.Data
 			mPlayerId = p;
 			mKills = 0;
 			mDeaths = 0;
+			mScore = 0;
 		}
 
 		/// <summary>
@@ -60,26 +61,29 @@ namespace FiringSquad.Data
 			mPlayerId = p.netId;
 			mKills = 0;
 			mDeaths = 0;
+			mScore = 0;
 		}
 
 		/// <summary>
 		/// Utility struct for storing and serializing a player's score over the network.
 		/// </summary>
-		public PlayerScore(NetworkInstanceId p, int kill, int death)
+		public PlayerScore(NetworkInstanceId p, int kill, int death, int score)
 		{
 			mPlayerId = p;
 			mKills = kill;
 			mDeaths = death;
+			mScore = score;
 		}
 
 		/// <summary>
 		/// Utility struct for storing and serializing a player's score over the network.
 		/// </summary>
-		public PlayerScore(CltPlayer p, int kill, int death)
+		public PlayerScore(CltPlayer p, int kill, int death, int score)
 		{
 			mPlayerId = p.netId;
 			mKills = kill;
 			mDeaths = death;
+			mScore = score;
 		}
 
 		private PlayerScore(NetworkReader reader)
@@ -87,6 +91,7 @@ namespace FiringSquad.Data
 			mPlayerId = reader.ReadNetworkId();
 			mKills = reader.ReadByte();
 			mDeaths = reader.ReadByte();
+			mScore = reader.ReadUInt16();
 		}
 
 		/// <inheritdoc />
@@ -95,6 +100,7 @@ namespace FiringSquad.Data
 			writer.Write(mPlayerId);
 			writer.Write((byte)mKills);
 			writer.Write((byte)mDeaths);
+			writer.Write((ushort)mScore);
 		}
 
 		/// <inheritdoc />
