@@ -701,7 +701,7 @@ namespace FiringSquad.Gameplay
 
 			// If the killer is the local player, they get an event. Otherwise, we show it on the third person view.
 			if (weaponBearer != null && weaponBearer.isCurrentPlayer)
-				EventManager.Notify(() => EventManager.Local.LocalPlayerGotKill(this, weaponBearer.weapon));
+				EventManager.Notify(() => EventManager.Local.LocalPlayerGotKill(this, weaponBearer.weapon, killInfo.mFlags));
 			else if (weaponBearer is CltPlayer)
 				((CltPlayer)weaponBearer).mThirdPersonView.ReflectGotKill();
 

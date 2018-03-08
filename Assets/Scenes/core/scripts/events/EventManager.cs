@@ -185,17 +185,19 @@ public partial class EventManager
 		/// Event called when the local player has killed another character.
 		/// PARAMETER 1: The other character that was killed.
 		/// PARAMETER 2: The player's current weapon.
+		/// PARAMETER 3: The flags tied to this kill.
 		/// </summary>
-		public static event Action<CltPlayer, IWeapon> OnLocalPlayerGotKill = (d, w) => { LogEvent(); };
+		public static event Action<CltPlayer, IWeapon, KillFlags> OnLocalPlayerGotKill = (d, w, f) => { LogEvent(); };
 
 		/// <summary>
 		/// Event called when the local player has killed another character.
 		/// </summary>
 		/// <param name="deadPlayer">The other character that was killed.</param>
 		/// <param name="currentWeapon">The player's current weapon.</param>
-		public static void LocalPlayerGotKill(CltPlayer deadPlayer, IWeapon currentWeapon)
+		/// <param name="killInfoFlags">The flags tied to this kill.</param>
+		public static void LocalPlayerGotKill(CltPlayer deadPlayer, IWeapon currentWeapon, KillFlags killInfoFlags)
 		{
-			OnLocalPlayerGotKill(deadPlayer, currentWeapon);
+			OnLocalPlayerGotKill(deadPlayer, currentWeapon, killInfoFlags);
 		}
 
 		/// <summary>

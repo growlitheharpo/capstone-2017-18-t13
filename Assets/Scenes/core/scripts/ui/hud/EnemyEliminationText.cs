@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using FiringSquad.Data;
+using UnityEngine;
 using FiringSquad.Gameplay.Weapons;
 using UnityEngine.UI;
 using KeatsLib.Unity;
@@ -47,7 +48,7 @@ namespace FiringSquad.Gameplay.UI
 		/// EVENT HANDLER: Server.OnLocalPlayerGotKill
 		/// </summary>
 		[EventHandler]
-		private void OnLocalPlayerGotKill(CltPlayer deadPlayer, IWeapon currentWeapon)
+		private void OnLocalPlayerGotKill(CltPlayer deadPlayer, IWeapon currentWeapon, KillFlags flags)
 		{
 			StopAllCoroutines();
 

@@ -1,4 +1,5 @@
-﻿using FiringSquad.Gameplay.Weapons;
+﻿using FiringSquad.Data;
+using FiringSquad.Gameplay.Weapons;
 using KeatsLib.Unity;
 using UnityEngine;
 using UnityEngine.UI;
@@ -40,7 +41,7 @@ namespace FiringSquad.Gameplay.UI
 		/// EVENT HANDLER: Local.OnLocalPlayerGotKill
 		/// Handle showing the dead player's name
 		/// </summary>
-		private void OnLocalPlayerGotKill(CltPlayer deadPlayer, IWeapon currentWeapon)
+		private void OnLocalPlayerGotKill(CltPlayer deadPlayer, IWeapon currentWeapon, KillFlags killFlags)
 		{
 			string displayText = string.Format("Eliminated: {0}		+{1}",
 				deadPlayer.playerName,
