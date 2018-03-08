@@ -78,13 +78,13 @@ public partial class EventManager
 		/// Event called when the player has received the end game event from the server.
 		/// PARAMETER 1: The list of player scores received from the server.
 		/// </summary>
-		public static event Action<PlayerScore[]> OnReceiveFinishEvent = (s) => { LogEvent(); };
+		public static event Action<IList<PlayerScore>> OnReceiveFinishEvent = (s) => { LogEvent(); };
 
 		/// <summary>
 		/// Event called when the player has received the end game event from the server.
 		/// </summary>
 		/// <param name="scores">The list of player scores received from the server.</param>
-		public static void ReceiveFinishEvent(PlayerScore[] scores)
+		public static void ReceiveFinishEvent(IList<PlayerScore> scores)
 		{
 			OnReceiveFinishEvent(scores);
 		}

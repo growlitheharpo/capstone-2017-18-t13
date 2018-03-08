@@ -1,14 +1,14 @@
-﻿using FiringSquad.Gameplay;
-using FiringSquad.Networking;
+﻿using System.Collections.Generic;
+using FiringSquad.Gameplay;
 using UnityEngine;
 using UnityEngine.Networking;
 
 namespace FiringSquad.Data
 {
 	/// <summary>
-	/// Utility struct for storing and serializing a player's score over the network.
+	/// Utility collection for storing and serializing a player's score over the network.
 	/// </summary>
-	public struct PlayerScore : INetworkable<PlayerScore>
+	public class PlayerScore
 	{
 		/// Inspector variables
 		[SerializeField] private NetworkInstanceId mPlayerId;
@@ -82,6 +82,13 @@ namespace FiringSquad.Data
 			mDeaths = death;
 		}
 
+		private PlayerScore(NetworkReader reader)
+		{
+			mPlayerId = reader.ReadNetworkId();
+			mKills = reader.ReadByte();
+			mDeaths = reader.ReadByte();
+		}
+
 		/// <inheritdoc />
 		public void Serialize(NetworkWriter writer)
 		{
@@ -93,12 +100,7 @@ namespace FiringSquad.Data
 		/// <inheritdoc />
 		public void Deserialize(NetworkReader reader, out object result)
 		{
-			result = new PlayerScore
-			{
-				mPlayerId = reader.ReadNetworkId(),
-				mKills = reader.ReadByte(),
-				mDeaths = reader.ReadByte()
-			};
+			result = new PlayerScore(reader);
 		}
 
 		/// <inheritdoc />
@@ -126,14 +128,14 @@ namespace FiringSquad.Data
 		/// <summary>
 		/// Deserialize an array of PlayerScores using the instance method in serial.
 		/// </summary>
-		public static PlayerScore[] DeserializeArray(byte[] array)
+		public static List<PlayerScore> DeserializeArray(byte[] array)
 		{
 			NetworkReader r = new NetworkReader(array);
 			int size = r.ReadInt32();
 
-			var result = new PlayerScore[size];
+			var result = new List<PlayerScore>(size);
 			for (int i = 0; i < size; i++)
-				result[i] = result[i].Deserialize(r);
+				result.Add(new PlayerScore(r));
 
 			return result;
 		}

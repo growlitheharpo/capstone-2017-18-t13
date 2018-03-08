@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using FiringSquad.Core.Audio;
 using FiringSquad.Core.Input;
 using FiringSquad.Core.UI;
@@ -169,7 +170,7 @@ namespace FiringSquad.Core.State
 				/// EVENT HANDLER: Local.OnReceiveFinishEvent
 				/// Update the UI accordingly.
 				/// </summary>
-				private void OnReceiveFinishEvent(PlayerScore[] scores)
+				private void OnReceiveFinishEvent(IList<PlayerScore> scores)
 				{
 					IScreenPanel panel = ServiceLocator.Get<IUIManager>()
 						.PushNewPanel(ScreenPanelTypes.GameOver);
