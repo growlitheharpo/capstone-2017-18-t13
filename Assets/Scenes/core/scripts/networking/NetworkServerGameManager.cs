@@ -1,19 +1,13 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using FiringSquad.Core;
 using FiringSquad.Data;
 using FiringSquad.Debug;
 using FiringSquad.Gameplay;
-using FiringSquad.Gameplay.Weapons;
-using KeatsLib.Collections;
 using KeatsLib.State;
-using KeatsLib.Unity;
 using UnityEngine;
 using UnityEngine.Networking;
-using Logger = FiringSquad.Debug.Logger;
-using Random = UnityEngine.Random;
 
 namespace FiringSquad.Networking
 {
@@ -21,7 +15,7 @@ namespace FiringSquad.Networking
 	/// The main game manager on the server. Handles the current game state
 	/// and routes different signals that inform clients of the game state.
 	/// </summary>
-	public class NetworkServerGameManager : NetworkBehaviour
+	public partial class NetworkServerGameManager : NetworkBehaviour
 	{
 		/// Inspector variables
 		[SerializeField] private ServerGameDefaultData mData;
@@ -90,8 +84,24 @@ namespace FiringSquad.Networking
 		/// <summary>
 		/// The state machine for the server's game manager
 		/// </summary>
-		private class ServerStateMachine : BaseStateMachine
+		private partial class ServerStateMachine : BaseStateMachine
 		{
+			// The states:
+			private partial class WaitingForConnectionState : BaseState<ServerStateMachine> { }
+			private partial class StartLobbyState : BaseState<ServerStateMachine> { }
+			private partial class StartGameState : BaseState<ServerStateMachine> { }
+			private partial class GameRunningState : BaseState<ServerStateMachine> { }
+			private partial class GameFinishedState	 : BaseState<ServerStateMachine> { }
+
+			// Private shared data
+			private readonly NetworkServerGameManager mScript;
+			private readonly Transform[] mLobbyStartPositions;
+			private StageCaptureArea[] mCaptureAreas;
+			private CltPlayer[] mPlayerList;
+
+			// Shortcut to the script's data
+			private ServerGameDefaultData data { get { return mScript.mData; } }
+
 			/// <summary>
 			/// The state machine for the server's game manager
 			/// </summary>
@@ -100,28 +110,6 @@ namespace FiringSquad.Networking
 				mScript = script;
 				mLobbyStartPositions = FindObjectsOfType<NetworkStartPosition>().Select(x => x.transform).ToArray();
 				TransitionStates(new WaitingForConnectionState(this));
-			}
-
-			// Private shared data
-			private readonly NetworkServerGameManager mScript;
-			private readonly Transform[] mLobbyStartPositions;
-			private StageCaptureArea[] mCaptureAreas;
-			private CltPlayer[] mPlayerList;
-			private Dictionary<NetworkInstanceId, PlayerScore> mPlayerScores;
-
-			// Shortcut to the script's data
-			private ServerGameDefaultData data { get { return mScript.mData; } }
-
-			/// <summary>
-			/// Force an immediate transition into a non-waiting state.
-			/// </summary>
-			/// <param name="lobby">True to enter the lobby, false to immediately enter the match.</param>
-			public void ForceStartGameNow(bool lobby)
-			{
-				if (lobby)
-					TransitionStates(new StartLobbyState(this));
-				else
-					TransitionStates(new StartGameState(this));
 			}
 
 			/// <summary>
@@ -133,402 +121,15 @@ namespace FiringSquad.Networking
 			}
 
 			/// <summary>
-			/// The state we hold in until we have the required number of players
+			/// Force an immediate transition into a non-waiting state.
 			/// </summary>
-			private class WaitingForConnectionState : BaseState<ServerStateMachine>
+			/// <param name="lobby">True to enter the lobby, false to immediately enter the match.</param>
+			public void ForceStartGameNow(bool lobby)
 			{
-				/// <summary>
-				/// The state we hold in until we have the required number of players
-				/// </summary>
-				public WaitingForConnectionState(ServerStateMachine machine) : base(machine) { }
-
-				private bool mReady;
-
-				/// <inheritdoc />
-				public override void OnEnter()
-				{
-					mMachine.mCaptureAreas = FindObjectsOfType<StageCaptureArea>();
-					foreach (StageCaptureArea area in mMachine.mCaptureAreas)
-						area.Disable();
-
-					EventManager.Server.OnPlayerJoined += OnPlayerJoined;
-					EventManager.Server.OnPlayerHealthHitsZero += OnPlayerHealthHitsZero;
-				}
-
-				/// <inheritdoc />
-				public override void OnExit()
-				{
-					EventManager.Server.OnPlayerJoined -= OnPlayerJoined;
-					EventManager.Server.OnPlayerHealthHitsZero -= OnPlayerHealthHitsZero;
-				}
-
-				/// <summary>
-				/// EVENT HANDLER: Server.OnPlayerJoined
-				/// </summary>
-				private void OnPlayerJoined(int newCount, CltPlayer newPlayer)
-				{
-					if (newCount > mMachine.data.goalPlayerCount)
-						Logger.Warn("We have too many players in this session!", Logger.System.Network);
-
-					mReady = newCount >= mMachine.data.goalPlayerCount;
-
-					if (mMachine.data.currentType == GameData.MatchType.TeamDeathmatch)
-					{
-						//mPreviousTeam = mPreviousTeam == GameData.PlayerTeam.Orange ? GameData.PlayerTeam.Blue : GameData.PlayerTeam.Orange;
-						GameData.PlayerTeam team = newCount > mMachine.data.goalPlayerCount / 2 ? GameData.PlayerTeam.Blue : GameData.PlayerTeam.Orange;
-						newPlayer.AssignPlayerTeam(team);
-					}
-				}
-
-				/// <summary>
-				/// EVENT HANDLER: Server.OnPlayerHealthHitsZero
-				/// </summary>
-				private void OnPlayerHealthHitsZero(CltPlayer deadPlayer, IDamageSource source)
-				{
-					Transform localSpawn = mMachine.mLobbyStartPositions
-						.OrderBy(x => Vector3.Distance(x.transform.position, deadPlayer.transform.position))
-						.FirstOrDefault();
-
-					PlayerKill killInfo = new PlayerKill
-					{
-						killer = null,
-						spawnPosition = localSpawn != null ? localSpawn.transform : deadPlayer.transform,
-						mFlags = KillFlags.None
-					};
-
-					EventManager.Server.PlayerDied(deadPlayer, killInfo);
-				}
-
-				/// <inheritdoc />
-				public override IState GetTransition()
-				{
-					return !mReady ? this : (IState)new StartLobbyState(mMachine);
-				}
-			}
-
-			/// <summary>
-			/// The state we hold in while waiting for the lobby to begin.
-			/// </summary>
-			private class StartLobbyState : BaseState<ServerStateMachine>
-			{
-				/// <summary>
-				/// The state we hold in while waiting for the lobby to begin.
-				/// </summary>
-				public StartLobbyState(ServerStateMachine machine) : base(machine) { }
-
-				private long mEndTime;
-
-				/// <inheritdoc />
-				public override void OnEnter()
-				{
-					mMachine.mPlayerList = FindObjectsOfType<CltPlayer>();
-					mEndTime = DateTime.Now.Ticks + mMachine.data.lobbyTime * TimeSpan.TicksPerSecond;
-
-					foreach (CltPlayer player in mMachine.mPlayerList)
-						player.TargetStartLobbyCountdown(player.connectionToClient, mEndTime);
-
-					EventManager.Server.OnPlayerHealthHitsZero += OnPlayerHealthHitsZero;
-				}
-
-				/// <summary>
-				/// EVENT HANDLER: Server.OnPlayerHealthHitsZero
-				/// </summary>
-				private void OnPlayerHealthHitsZero(CltPlayer deadPlayer, IDamageSource source)
-				{
-					Transform localSpawn = mMachine.mLobbyStartPositions
-						.OrderBy(x => Vector3.Distance(x.transform.position, deadPlayer.transform.position))
-						.FirstOrDefault();
-					
-					PlayerKill killInfo = new PlayerKill
-					{
-						killer = null,
-						spawnPosition = localSpawn != null ? localSpawn.transform : deadPlayer.transform,
-						mFlags = KillFlags.None
-					};
-					EventManager.Server.PlayerDied(deadPlayer, killInfo);
-				}
-
-				/// <inheritdoc />
-				public override void OnExit()
-				{
-					EventManager.Server.OnPlayerHealthHitsZero -= OnPlayerHealthHitsZero;
-				}
-
-				/// <summary>
-				/// Returns true if the waiting period for the lobby is over.
-				/// </summary>
-				private bool IsWaitingTimeOver()
-				{
-					return DateTime.Now.Ticks >= mEndTime;
-				}
-
-				/// <inheritdoc />
-				public override IState GetTransition()
-				{
-					if (IsWaitingTimeOver())
-						return new StartGameState(mMachine);
-
-					return this;
-				}
-			}
-
-			/// <summary>
-			/// The single-frame state called to set up the players for the round to start.
-			/// Resets spawn points and ensures our shared data has an accurate list of players.
-			/// </summary>
-			private class StartGameState : BaseState<ServerStateMachine>
-			{
-				/// <summary>
-				/// The single-frame state called to set up the players for the round to start.
-				/// Resets spawn points and ensures our shared data has an accurate list of players.
-				/// </summary>
-				public StartGameState(ServerStateMachine machine) : base(machine) { }
-
-				/// <inheritdoc />
-				public override void OnEnter()
-				{
-					mMachine.mPlayerList = FindObjectsOfType<CltPlayer>();
-
-					if (mMachine.mPlayerList.Length > PlayerSpawnPosition.GetAll().Count)
-						Logger.Warn("We have too many players for the number of spawn positions!", Logger.System.Network);
-
-					if (mMachine.data.currentType == GameData.MatchType.Deathmatch)
-						SpawnPlayersDeathmatch();
-					else
-					{
-						ForceUpdatePlayerTeams();
-						SpawnPlayersTeam();
-					}
-				}
-
-				/// <summary>
-				/// Force Unity's networking to re-send the player's team so that it is reflected
-				/// on all clients. Do so by forcing the dirty-bit to be set by using a tmp trash value.
-				/// </summary>
-				private void ForceUpdatePlayerTeams()
-				{
-					foreach (CltPlayer player in mMachine.mPlayerList)
-					{
-						GameData.PlayerTeam team = player.playerTeam;
-						player.AssignPlayerTeam(GameData.PlayerTeam.Deathmatch);
-						player.AssignPlayerTeam(team);
-					}
-				}
-
-				/// <summary>
-				/// Spawn all players in random positions on the map.
-				/// </summary>
-				private void SpawnPlayersDeathmatch()
-				{
-					var spawnCopy = PlayerSpawnPosition.GetAll().Select(x => x.transform).ToList();
-					spawnCopy.Shuffle();
-
-					foreach (CltPlayer player in mMachine.mPlayerList)
-					{
-						Transform target = spawnCopy[spawnCopy.Count - 1];
-						spawnCopy.RemoveAt(spawnCopy.Count - 1);
-
-						player.MoveToStartPosition(target.position, target.rotation);
-					}
-				}
-
-				/// <summary>
-				/// Spawn all players in locations appropriate for their assigned team.
-				/// </summary>
-				private void SpawnPlayersTeam()
-				{
-					var blue = new Queue<PlayerSpawnPosition>(PlayerSpawnPosition.GetAll(GameData.PlayerTeam.Blue).Shuffle());
-					var orange = new Queue<PlayerSpawnPosition>(PlayerSpawnPosition.GetAll(GameData.PlayerTeam.Orange).Shuffle());
-
-					foreach (CltPlayer player in mMachine.mPlayerList)
-					{
-						var list = player.playerTeam == GameData.PlayerTeam.Blue ? blue : orange;
-						Transform target = list.Dequeue().transform;
-
-						player.MoveToStartPosition(target.position, target.rotation);
-					}
-				}
-
-				/// <inheritdoc />
-				public override IState GetTransition()
-				{
-					return new GameRunningState(mMachine);
-				}
-			}
-
-			/// <summary>
-			/// State that runs the actual game. Ticks the timer for the game
-			/// and handles player deaths during the match by sending them to
-			/// a spawn point.
-			/// 
-			/// Also handles the StageCaptureArea enabling and disabling.
-			/// </summary>
-			private class GameRunningState : BaseState<ServerStateMachine>
-			{
-				/// <summary>
-				/// State that runs the actual game. Ticks the timer for the game
-				/// and handles player deaths during the match by sending them to
-				/// a spawn point.
-				/// 
-				/// Also handles the StageCaptureArea enabling and disabling.
-				/// </summary>
-				public GameRunningState(ServerStateMachine machine) : base(machine) { }
-
-				private Coroutine mStageEnableRoutine;
-				private long mEndTime;
-				private bool mFinished;
-
-				/// <inheritdoc />
-				public override void OnEnter()
-				{
-					mEndTime = DateTime.Now.Ticks + mMachine.data.roundTime * TimeSpan.TicksPerSecond;
-					EventManager.Server.OnPlayerHealthHitsZero += OnPlayerHealthHitsZero;
-					EventManager.Server.OnPlayerCapturedStage += OnPlayerCapturedStage;
-					EventManager.Server.OnStageTimedOut += OnStageTimedOut;
-
-					mMachine.mPlayerScores = mMachine.mPlayerList.Select(x => new PlayerScore(x)).ToDictionary(x => x.playerId);
-
-					mStageEnableRoutine = mMachine.mScript.StartCoroutine(EnableStageArea(mMachine.mCaptureAreas.ChooseRandom()));
-
-					EventManager.Notify(() => EventManager.Server.StartGame(mEndTime));
-				}
-
-				/// <summary>
-				/// EVENT HANDLER: Server.OnPlayerCapturedStage
-				/// </summary>
-				private void OnPlayerCapturedStage(StageCaptureArea stage, CltPlayer player)
-				{
-					stage.Disable();
-
-					SpawnLegendaryPart(stage, player);
-
-					StageCaptureArea nextStage = mMachine.mCaptureAreas.Where(x => x != stage).ChooseRandom();
-					mStageEnableRoutine = mMachine.mScript.StartCoroutine(EnableStageArea(nextStage));
-				}
-
-				/// <summary>
-				/// Instantiate a legendary part because a stage has been captured.
-				/// </summary>
-				private void SpawnLegendaryPart(StageCaptureArea stage, CltPlayer player)
-				{
-					WeaponPartScript choice;
-					if (player.weapon != null)
-					{
-						WeaponPartCollection currentParts = player.weapon.currentParts;
-						var allPossibilities = mMachine.data.stageCaptureParts;
-						var possibilities = allPossibilities.Where(x => !currentParts.Contains(x));
-						choice = possibilities.ChooseRandom();
-					}
-					else
-						choice = mMachine.data.stageCaptureParts.ChooseRandom();
-
-					GameObject instance = choice.SpawnInWorld();
-					instance.transform.position = stage.transform.position + Vector3.up * 45.0f;
-					instance.name = choice.name;
-
-					NetworkServer.Spawn(instance);
-					mMachine.mScript.StartCoroutine(Coroutines.InvokeAfterFrames(2, () => { instance.GetComponent<WeaponPickupScript>().RpcInitializePickupView(); }));
-				}
-
-				/// <summary>
-				/// EVENT HANDLER: Server.OnStageTimedOut
-				/// </summary>
-				private void OnStageTimedOut(StageCaptureArea stage)
-				{
-					stage.Disable();
-
-					StageCaptureArea nextStage = mMachine.mCaptureAreas.Where(x => x != stage).ChooseRandom();
-					mStageEnableRoutine = mMachine.mScript.StartCoroutine(EnableStageArea(nextStage));
-				}
-
-				/// <inheritdoc />
-				public override void Update()
-				{
-					if (!mFinished && DateTime.Now.Ticks >= mEndTime)
-						mFinished = true;
-				}
-
-				/// <summary>
-				/// Wait within a random range of seconds, then enable a stage.
-				/// </summary>
-				private IEnumerator EnableStageArea(StageCaptureArea stage)
-				{
-					yield return new WaitForSeconds(Random.Range(mMachine.data.minStageWaitTime, mMachine.data.maxStageWaitTime));
-					stage.Enable();
-				}
-
-				/// <summary>
-				/// EVENT HANDLER: Server.OnPlayerHealthHitsZero
-				/// </summary>
-				private void OnPlayerHealthHitsZero(CltPlayer dead, IDamageSource damage)
-				{
-					List<Transform> spawnList;
-					if (mMachine.data.currentType == GameData.MatchType.Deathmatch)
-						spawnList = PlayerSpawnPosition.GetAll().Select(x => x.transform).ToList();
-					else
-						spawnList = PlayerSpawnPosition.GetAll(dead.playerTeam).Select(x => x.transform).ToList();
-
-					Transform newPosition = ChooseSafestSpawnPosition(mMachine.mPlayerList, dead, spawnList);
-
-					if (damage.source is CltPlayer)
-					{
-						PlayerScore killerScore = mMachine.mPlayerScores[damage.source.netId];
-						mMachine.mPlayerScores[damage.source.netId] = new PlayerScore(killerScore.playerId, killerScore.kills + 1, killerScore.deaths);
-					}
-
-					PlayerScore deadScore = mMachine.mPlayerScores[dead.netId];
-					mMachine.mPlayerScores[dead.netId] = new PlayerScore(deadScore.playerId, deadScore.kills, deadScore.deaths + 1);
-					
-					PlayerKill killInfo = new PlayerKill
-					{
-						killer = damage.source,
-						spawnPosition = newPosition,
-						mFlags = KillFlags.None
-					};
-					EventManager.Server.PlayerDied(dead, killInfo);
-				}
-
-				/// <inheritdoc />
-				public override void OnExit()
-				{
-					EventManager.Server.OnPlayerHealthHitsZero -= OnPlayerHealthHitsZero;
-					EventManager.Server.OnPlayerCapturedStage -= OnPlayerCapturedStage;
-					EventManager.Server.OnStageTimedOut -= OnStageTimedOut;
-
-					if (mStageEnableRoutine != null)
-						mMachine.mScript.StopCoroutine(mStageEnableRoutine);
-				}
-
-				/// <inheritdoc />
-				public override IState GetTransition()
-				{
-					return mFinished ? (IState)new GameFinishedState(mMachine) : this;
-				}
-			}
-
-			/// <summary>
-			/// State to hold in after the game timer has completed and
-			/// everyone is able to disconnect.
-			/// </summary>
-			private class GameFinishedState : BaseState<ServerStateMachine>
-			{
-				/// <summary>
-				/// State to hold in after the game timer has completed and
-				/// everyone is able to disconnect.
-				/// </summary>
-				public GameFinishedState(ServerStateMachine machine) : base(machine) { }
-
-				/// <inheritdoc />
-				public override void OnEnter()
-				{
-					EventManager.Server.FinishGame(mMachine.mPlayerScores.Values.ToArray());
-				}
-
-				/// <inheritdoc />
-				public override IState GetTransition()
-				{
-					return this;
-				}
+				if (lobby)
+					TransitionStates(new StartLobbyState(this));
+				else
+					TransitionStates(new StartGameState(this));
 			}
 		}
 	}
