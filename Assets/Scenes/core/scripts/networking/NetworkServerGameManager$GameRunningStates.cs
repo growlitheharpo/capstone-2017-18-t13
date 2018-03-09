@@ -58,6 +58,7 @@ namespace FiringSquad.Networking
 					mEndTime = DateTime.Now.Ticks + mMachine.data.roundTime * TimeSpan.TicksPerSecond;
 					EventManager.Server.OnPlayerHealthHitsZero += OnPlayerHealthHitsZero;
 					EventManager.Server.OnPlayerCapturedStage += OnPlayerCapturedStage;
+					EventManager.Server.OnPlayerAttachedPart += OnPlayerAttachedPart;
 					EventManager.Server.OnStageTimedOut += OnStageTimedOut;
 
 					mMachine.mPlayerScores = mMachine.mPlayerList.Select(x => new PlayerScore(x)).ToDictionary(x => x.playerId);
@@ -82,6 +83,14 @@ namespace FiringSquad.Networking
 
 					StageCaptureArea nextStage = mMachine.mCaptureAreas.Where(x => x != stage).ChooseRandom();
 					mStageEnableRoutine = mMachine.mScript.StartCoroutine(EnableStageArea(nextStage));
+				}
+
+				/// <summary>
+				/// EVENT HANDLER: Server.OnPlayerAttachedPart
+				/// </summary>
+				private void OnPlayerAttachedPart(BaseWeaponScript weapon, WeaponPartScript partInstance)
+				{
+					
 				}
 
 				/// <summary>

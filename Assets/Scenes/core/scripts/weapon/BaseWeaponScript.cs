@@ -334,10 +334,12 @@ namespace FiringSquad.Gameplay.Weapons
 				}
 			}
 
-
 			if (bearer != null)
 			{
 				ServiceLocator.Get<IAudioManager>().CreateSound(AudioEvent.EquipItem, transform);
+
+				if (isServer)
+					EventManager.Notify(() => EventManager.Server.PlayerAttachedPart(this, instance));
 				
 				if (bearer.isCurrentPlayer)
 					EventManager.Notify(() => EventManager.Local.LocalPlayerAttachedPart(this, instance));

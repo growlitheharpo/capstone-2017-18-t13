@@ -501,6 +501,25 @@ public partial class EventManager
 		{
 			OnPartPickedUp(pad);
 		}
+
+		/// <summary>
+		/// Event called on the server when a player has attached a new part.
+		/// PARAMETER 1: The weapon that this part was attached to.
+		/// PARAMETER 2: The part instance that was attached.
+		/// PARAMETER 3: The bearer that attached the new part.
+		/// </summary>
+		public static event Action<BaseWeaponScript, WeaponPartScript> OnPlayerAttachedPart = (w, p) => { LogEvent(); };
+
+		/// <summary>
+		/// Event called on the server when a player has attached a new part.
+		/// </summary>
+		/// <param name="baseWeaponScript">The weapon that this part was attached to.</param>
+		/// <param name="weaponPartScript">The part instance that was attached.</param>
+		/// <param name="bearer">The bearer that attached the new part.</param>
+		public static void PlayerAttachedPart(BaseWeaponScript baseWeaponScript, WeaponPartScript weaponPartScript)
+		{
+			OnPlayerAttachedPart(baseWeaponScript, weaponPartScript);
+		}
 	}
 
 	/// <summary>
