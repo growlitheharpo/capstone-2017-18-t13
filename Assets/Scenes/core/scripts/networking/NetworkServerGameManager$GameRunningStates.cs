@@ -99,7 +99,8 @@ namespace FiringSquad.Networking
 				/// </summary>
 				private void OnPlayerAttachedPart(BaseWeaponScript weapon, WeaponPartScript partInstance)
 				{
-					
+					if (partInstance.isLegendary)
+						mMachine.mPlayerScores[weapon.bearer.netId].score += LEGENDARY_PART_POINTS;
 				}
 
 				/// <summary>

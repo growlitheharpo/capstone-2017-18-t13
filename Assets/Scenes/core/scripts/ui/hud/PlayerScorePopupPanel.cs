@@ -29,6 +29,7 @@ namespace FiringSquad.Gameplay.UI
 		{
 			EventManager.Local.OnLocalPlayerDied += OnLocalPlayerDied;
 			EventManager.Local.OnLocalPlayerCapturedStage += OnLocalPlayerCapturedStage;
+			EventManager.Local.OnLocalPlayerAttachedPart += OnLocalPlayerAttachedPart;
 			EventManager.Local.OnLocalPlayerGotKill += OnLocalPlayerGotKill;
 		}
 
@@ -39,6 +40,7 @@ namespace FiringSquad.Gameplay.UI
 		{
 			EventManager.Local.OnLocalPlayerDied -= OnLocalPlayerDied;
 			EventManager.Local.OnLocalPlayerCapturedStage -= OnLocalPlayerCapturedStage;
+			EventManager.Local.OnLocalPlayerAttachedPart -= OnLocalPlayerAttachedPart;
 			EventManager.Local.OnLocalPlayerGotKill -= OnLocalPlayerGotKill;
 		}
 
@@ -84,6 +86,16 @@ namespace FiringSquad.Gameplay.UI
 		private void OnLocalPlayerCapturedStage()
 		{
 			DisplayNewMessage(string.Format(BASE_MESSAGE_FORMAT, "STAGE CAPTURED!", NetworkServerGameManager.STAGE_CAPTURE_POINTS));
+		}
+
+		/// <summary>
+		/// EVENT HANDLER: Local.OnLocalPlayerAttachedPart
+		/// Handle showing if the player got a legendary part
+		/// </summary>
+		private void OnLocalPlayerAttachedPart(BaseWeaponScript weapon, WeaponPartScript partInstance)
+		{
+			if (partInstance.isLegendary)
+				DisplayNewMessage(string.Format(BASE_MESSAGE_FORMAT, "LEGENDARY PART!", NetworkServerGameManager.LEGENDARY_PART_POINTS));
 		}
 
 		/// <summary>
