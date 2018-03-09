@@ -20,12 +20,15 @@ namespace FiringSquad.Gameplay.UI
 		[SerializeField] private Graphic mPersistentColorReferenceGraphic;
 		[SerializeField] private Shadow mPersistentColorReferenceShadow;
 
+		private const string BASE_MESSAGE_FORMAT = "{0}		+{1}";
+
 		/// <summary>
 		/// Unity's Start function.
 		/// </summary>
 		private void Start()
 		{
 			EventManager.Local.OnLocalPlayerDied += OnLocalPlayerDied;
+			EventManager.Local.OnLocalPlayerCapturedStage += OnLocalPlayerCapturedStage;
 			EventManager.Local.OnLocalPlayerGotKill += OnLocalPlayerGotKill;
 		}
 
@@ -45,17 +48,17 @@ namespace FiringSquad.Gameplay.UI
 		private void OnLocalPlayerGotKill(CltPlayer deadPlayer, IWeapon currentWeapon, KillFlags killFlags)
 		{
 			if ((killFlags & KillFlags.Kingslayer) > 0)
-				DisplayNewMessage("KINGSLAYER!	   +" + NetworkServerGameManager.KINGSLAYER_POINTS);
+				DisplayNewMessage(string.Format(BASE_MESSAGE_FORMAT, "KINGSLAYER!", NetworkServerGameManager.KINGSLAYER_POINTS));
 			if ((killFlags & KillFlags.Killstreak) > 0)
-				DisplayNewMessage("KILLSTREAK!	   +" + NetworkServerGameManager.KILLSTREAK_POINTS);
+				DisplayNewMessage(string.Format(BASE_MESSAGE_FORMAT, "KILLSTREAK!", NetworkServerGameManager.KILLSTREAK_POINTS));
 			if ((killFlags & KillFlags.Revenge) > 0)
-				DisplayNewMessage("REVENGE KILL!	 +" + NetworkServerGameManager.REVENGE_KILL_POINTS);
+				DisplayNewMessage(string.Format(BASE_MESSAGE_FORMAT, "REVENGE KILL!", NetworkServerGameManager.REVENGE_KILL_POINTS));
 			if ((killFlags & KillFlags.Multikill) > 0)
-				DisplayNewMessage("M-M-M-MULTI-KILL!	 +" + NetworkServerGameManager.MULTI_KILL_POINTS);
+				DisplayNewMessage(string.Format(BASE_MESSAGE_FORMAT, "M-M-M-MULTI-KILL!", NetworkServerGameManager.MULTI_KILL_POINTS));
 			if ((killFlags & KillFlags.Headshot) > 0)
-				DisplayNewMessage("HEADSHOT!	 +" + NetworkServerGameManager.HEADSHOT_KILL_POINTS);
+				DisplayNewMessage(string.Format(BASE_MESSAGE_FORMAT, "HEADSHOT!", NetworkServerGameManager.HEADSHOT_KILL_POINTS));
 
-			DisplayNewMessage(string.Format("Eliminated: {0}	 +{1}",
+			DisplayNewMessage(string.Format("ELIMINATED: {0}	 +{1}",
 				deadPlayer.playerName,
 				NetworkServerGameManager.STANDARD_KILL_POINTS
 			));
@@ -70,12 +73,8 @@ namespace FiringSquad.Gameplay.UI
 			// Check if the player was an actual player
 			CltPlayer player = killer as CltPlayer;
 
-			string displayText = string.Format("Eliminated by: {0}	   -{1}",
-				player != null ? player.playerName : "yourself", 
-				"75" // TODO: Fetch a real score here.
-			);
+			DisplayNewMessage(string.Format("ELIMINATED BY: {0}", player != null ? player.playerName : "YOURSELF"));
 
-			DisplayNewMessage(displayText);
 		}
 
 		/// <summary>
