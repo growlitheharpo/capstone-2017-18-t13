@@ -383,8 +383,11 @@ namespace FiringSquad.Gameplay
 			AnimationUtility.SetVariable(mNetworkAnimator.animator, "VelocityY", velY);
 
 			// Update the third person firing animations
+			if (weapon == null || mNetworkAnimator.animator == null)
+				return;
+
+			// Set fire rate and auto info
 			mNetworkAnimator.animator.SetBool("WeaponIsAuto", weapon.currentData.fireRate >= 3.5f);
-			// Set fire rate
 			mNetworkAnimator.animator.SetFloat("RecoilAmount", weapon.currentData.recoilAmount);
 			mNetworkAnimator.animator.SetFloat("FireRate", weapon.currentData.fireRate * 1.1f);
 		}
