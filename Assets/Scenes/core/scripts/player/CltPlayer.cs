@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using FiringSquad.Core;
 using FiringSquad.Core.Audio;
@@ -135,6 +136,7 @@ namespace FiringSquad.Gameplay
 			EventManager.Server.OnPlayerDied += OnPlayerDied;
 			EventManager.Server.OnStartGame += OnStartGame;
 			EventManager.Server.OnFinishGame += OnFinishGame;
+			EventManager.Server.OnPlayerCapturedStage += OnPlayerCapturedStage;
 
 			// register information
 			mHitIndicator = new NullHitIndicator();
@@ -582,6 +584,27 @@ namespace FiringSquad.Gameplay
 		private void CmdSetPlayerName(string newValue)
 		{
 			mPlayerName = newValue;
+		}
+
+		/// <summary>
+		/// EVENT HANDLER: EventManager.Server.OnPlayerCapturedStage
+		/// </summary>
+		[EventHandler]
+		[Server]
+		private void OnPlayerCapturedStage(StageCaptureArea stage, IList<CltPlayer> players)
+		{
+			if (players.Contains(this))
+				TargetNotifyCapturedStage(connectionToClient);
+		}
+
+		/// <summary>
+		/// Notify the local client that the server has confirmed that we've captured a stage.
+		/// </summary>
+		/// <param name="connection"></param>
+		[TargetRpc]
+		private void TargetNotifyCapturedStage(NetworkConnection connection)
+		{
+			EventManager.Notify(EventManager.Local.LocalPlayerCapturedStage);
 		}
 
 		#endregion

@@ -173,7 +173,8 @@ namespace FiringSquad.Gameplay
 
 				if (mCapturePercentageTimer >= mCaptureTime)
 				{
-					EventManager.Notify(() => EventManager.Server.PlayerCapturedStage(this, currentCapturingPlayer));
+					mTeamPlayers.Add(currentCapturingPlayer);
+					EventManager.Notify(() => EventManager.Server.PlayerCapturedStage(this, mTeamPlayers));
 					mCapturable = false;
 				}
 			}

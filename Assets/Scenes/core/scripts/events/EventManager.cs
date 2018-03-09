@@ -264,6 +264,19 @@ public partial class EventManager
 		{
 			OnZoomLevelChanged(zoom, player);
 		}
+
+		/// <summary>
+		/// Event called when the server confirms that a local player has captured a stage.
+		/// </summary>
+		public static event Action OnLocalPlayerCapturedStage = () => { LogEvent(); };
+
+		/// <summary>
+		/// Event called when the server confirms that a local player has captured a stage.
+		/// </summary>
+		public static void LocalPlayerCapturedStage()
+		{
+			OnLocalPlayerCapturedStage();
+		}
 	}
 
 	/// <summary>
@@ -440,14 +453,14 @@ public partial class EventManager
 		/// PARAMETER 1: The stage that was captured.
 		/// PARAMETER 2: The player who captured the stage.
 		/// </summary>
-		public static event Action<StageCaptureArea, CltPlayer> OnPlayerCapturedStage = (s, p) => { LogEvent(); };
+		public static event Action<StageCaptureArea, IList<CltPlayer>> OnPlayerCapturedStage = (s, p) => { LogEvent(); };
 
 		/// <summary>
 		/// Event called when the server has determined that a player captured a stage.
 		/// </summary>
 		/// <param name="area">The stage that was captured.</param>
 		/// <param name="player">The player who captured the stage.</param>
-		public static void PlayerCapturedStage(StageCaptureArea area, CltPlayer player)
+		public static void PlayerCapturedStage(StageCaptureArea area, IList<CltPlayer> player)
 		{
 			OnPlayerCapturedStage(area, player);
 		}

@@ -16,14 +16,14 @@ namespace FiringSquad.Networking
 {
 	public partial class NetworkServerGameManager
 	{
-		public const int KINGSLAYER_POINTS = 125;
-		public const int MULTI_KILL_POINTS = 120;
-		public const int HEADSHOT_KILL_POINTS = 110;
 		public const int STANDARD_KILL_POINTS = 100;
+		public const int HEADSHOT_KILL_POINTS = 10;
+		public const int MULTI_KILL_POINTS = 20;
+		public const int KILLSTREAK_POINTS = 25;
+		public const int KINGSLAYER_POINTS = 25;
 		public const int REVENGE_KILL_POINTS = 75;
 		public const int STAGE_CAPTURE_POINTS = 50;
 		public const int LEGENDARY_PART_POINTS = 50;
-		public const int KILLSTREAK_POINTS = 25;
 
 		private partial class ServerStateMachine 
 		{
@@ -70,11 +70,15 @@ namespace FiringSquad.Networking
 				/// <summary>
 				/// EVENT HANDLER: Server.OnPlayerCapturedStage
 				/// </summary>
-				private void OnPlayerCapturedStage(StageCaptureArea stage, CltPlayer player)
+				private void OnPlayerCapturedStage(StageCaptureArea stage, IList<CltPlayer> players)
 				{
 					stage.Disable();
 
-					SpawnLegendaryPart(stage, player);
+					CltPlayer firstPlayer = players[players.Count - 1];
+					SpawnLegendaryPart(stage, firstPlayer);
+
+					foreach (CltPlayer p in players)
+						mMachine.mPlayerScores[p.netId].score += STAGE_CAPTURE_POINTS;
 
 					StageCaptureArea nextStage = mMachine.mCaptureAreas.Where(x => x != stage).ChooseRandom();
 					mStageEnableRoutine = mMachine.mScript.StartCoroutine(EnableStageArea(nextStage));
@@ -159,6 +163,8 @@ namespace FiringSquad.Networking
 						mMachine.mPlayerScores[damage.source.netId].score += GetScoreForFlags(killInfo.mFlags);
 					}
 
+					LogKill(killInfo);
+
 					EventManager.Server.PlayerDied(dead, killInfo);
 				}
 
@@ -182,6 +188,10 @@ namespace FiringSquad.Networking
 						score += REVENGE_KILL_POINTS;
 
 					return score;
+				}
+
+				private void LogKill(PlayerKill killInfo)
+				{
 				}
 
 				/// <inheritdoc />

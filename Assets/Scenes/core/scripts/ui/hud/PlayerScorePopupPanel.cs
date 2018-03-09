@@ -38,6 +38,7 @@ namespace FiringSquad.Gameplay.UI
 		private void OnDestroy()
 		{
 			EventManager.Local.OnLocalPlayerDied -= OnLocalPlayerDied;
+			EventManager.Local.OnLocalPlayerCapturedStage -= OnLocalPlayerCapturedStage;
 			EventManager.Local.OnLocalPlayerGotKill -= OnLocalPlayerGotKill;
 		}
 
@@ -74,7 +75,15 @@ namespace FiringSquad.Gameplay.UI
 			CltPlayer player = killer as CltPlayer;
 
 			DisplayNewMessage(string.Format("ELIMINATED BY: {0}", player != null ? player.playerName : "YOURSELF"));
+		}
 
+		/// <summary>
+		/// EVENT HANDLER: Local.OnLocalPlayerCapturedStage
+		/// Handle showing that the player captured a stage.
+		/// </summary>
+		private void OnLocalPlayerCapturedStage()
+		{
+			DisplayNewMessage(string.Format(BASE_MESSAGE_FORMAT, "STAGE CAPTURED!", NetworkServerGameManager.STAGE_CAPTURE_POINTS));
 		}
 
 		/// <summary>
