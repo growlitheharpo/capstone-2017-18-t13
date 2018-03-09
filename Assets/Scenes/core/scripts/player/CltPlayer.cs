@@ -459,6 +459,7 @@ namespace FiringSquad.Gameplay
 			if (weapon == null)
 				return;
 
+			EventManager.Server.PlayerCheated(this);
 			weapon.AttachNewPart(partId);
 		}
 		

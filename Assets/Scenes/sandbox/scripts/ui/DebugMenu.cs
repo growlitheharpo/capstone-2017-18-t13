@@ -4,6 +4,7 @@ using FiringSquad.Core.Input;
 using FiringSquad.Core.UI;
 using FiringSquad.Core.Weapons;
 using FiringSquad.Gameplay;
+using FiringSquad.Gameplay.UI;
 using FiringSquad.Gameplay.Weapons;
 using UnityEngine;
 using Input = UnityEngine.Input;
@@ -105,6 +106,10 @@ namespace FiringSquad.Debug
 					CltPlayer player = CltPlayer.localPlayerReference;
 					if (player != null)
 						player.CmdDebugEquipWeaponPart(part.partId);
+
+					var ui = FindObjectOfType<PlayerScorePopupPanel>();
+					if (ui != null)
+						ui.OnLocalPlayerCheated();
 				}
 			}
 			GUILayout.EndArea();

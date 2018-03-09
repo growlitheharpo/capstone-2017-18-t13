@@ -99,10 +99,19 @@ namespace FiringSquad.Gameplay.UI
 		}
 
 		/// <summary>
+		/// Called directly from the UI menu. Notify that the local player cheated.
+		/// </summary>
+		public void OnLocalPlayerCheated()
+		{
+			var instance = DisplayNewMessage("CHEATER!!!	 -" + NetworkServerGameManager.CHEATING_PENALTY_POINTS);
+			instance.color = Color.red;
+		}
+
+		/// <summary>
 		/// Display a new pop-up message on the screen.
 		/// </summary>
 		/// <param name="message">The fully-formatted message to display.</param>
-		private void DisplayNewMessage(string message)
+		private Text DisplayNewMessage(string message)
 		{
 			GameObject instance = Instantiate(mTextPrefab, transform);
 			instance.transform.SetAsFirstSibling();
@@ -124,6 +133,8 @@ namespace FiringSquad.Gameplay.UI
 			// Prep the animation and fade out time
 			Animator anim = instance.GetComponent<Animator>();
 			StartCoroutine(Coroutines.InvokeAfterSeconds(mPreFadeOutTime, () => StartFadeout(anim)));
+
+			return text;
 		}
 
 		/// <summary>

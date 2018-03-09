@@ -91,7 +91,7 @@ namespace FiringSquad.Data
 			mPlayerId = reader.ReadNetworkId();
 			mKills = reader.ReadByte();
 			mDeaths = reader.ReadByte();
-			mScore = reader.ReadUInt16();
+			mScore = reader.ReadInt16();
 		}
 
 		/// <inheritdoc />
@@ -100,7 +100,7 @@ namespace FiringSquad.Data
 			writer.Write(mPlayerId);
 			writer.Write((byte)mKills);
 			writer.Write((byte)mDeaths);
-			writer.Write((ushort)mScore);
+			writer.Write((short)mScore);
 		}
 
 		/// <inheritdoc />

@@ -520,6 +520,19 @@ public partial class EventManager
 		{
 			OnPlayerAttachedPart(baseWeaponScript, weaponPartScript);
 		}
+
+		/// <summary>
+		/// Event called when a player has cheated by using the debug menu.
+		/// </summary>
+		public static event Action<CltPlayer> OnPlayerCheated = p => { LogEvent(); };
+
+		/// <summary>
+		/// Event called when a player has cheated by using the debug menu.
+		/// </summary>
+		public static void PlayerCheated(CltPlayer player)
+		{
+			OnPlayerCheated(player);
+		}
 	}
 
 	/// <summary>

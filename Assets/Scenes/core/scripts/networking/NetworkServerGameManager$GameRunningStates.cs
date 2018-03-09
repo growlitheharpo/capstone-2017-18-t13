@@ -26,6 +26,7 @@ namespace FiringSquad.Networking
 		public const int REVENGE_KILL_POINTS = 75;
 		public const int STAGE_CAPTURE_POINTS = 50;
 		public const int LEGENDARY_PART_POINTS = 50;
+		public const int CHEATING_PENALTY_POINTS = 1000;
 
 		private partial class ServerStateMachine 
 		{
@@ -68,6 +69,7 @@ namespace FiringSquad.Networking
 					EventManager.Server.OnPlayerHealthHitsZero += OnPlayerHealthHitsZero;
 					EventManager.Server.OnPlayerCapturedStage += OnPlayerCapturedStage;
 					EventManager.Server.OnPlayerAttachedPart += OnPlayerAttachedPart;
+					EventManager.Server.OnPlayerCheated += OnPlayerCheated;
 					EventManager.Server.OnStageTimedOut += OnStageTimedOut;
 
 					mMachine.mPlayerScores = mMachine.mPlayerList.Select(x => new PlayerScore(x)).ToDictionary(x => x.playerId);
@@ -75,6 +77,19 @@ namespace FiringSquad.Networking
 					mStageEnableRoutine = mMachine.mScript.StartCoroutine(EnableStageArea(mMachine.mCaptureAreas.ChooseRandom()));
 
 					EventManager.Notify(() => EventManager.Server.StartGame(mEndTime));
+				}
+
+				/// <inheritdoc />
+				public override void OnExit()
+				{
+					EventManager.Server.OnPlayerHealthHitsZero -= OnPlayerHealthHitsZero;
+					EventManager.Server.OnPlayerCapturedStage -= OnPlayerCapturedStage;
+					EventManager.Server.OnPlayerAttachedPart -= OnPlayerAttachedPart;
+					EventManager.Server.OnPlayerCheated -= OnPlayerCheated;
+					EventManager.Server.OnStageTimedOut -= OnStageTimedOut;
+
+					if (mStageEnableRoutine != null)
+						mMachine.mScript.StopCoroutine(mStageEnableRoutine);
 				}
 
 				/// <summary>
@@ -101,6 +116,15 @@ namespace FiringSquad.Networking
 				{
 					if (partInstance.isLegendary)
 						mMachine.mPlayerScores[weapon.bearer.netId].score += LEGENDARY_PART_POINTS;
+				}
+
+				/// <summary>
+				/// EVENT HANDLER: Server.OnPlayerCheated
+				/// </summary>
+				/// <param name="obj"></param>
+				private void OnPlayerCheated(CltPlayer obj)
+				{
+					mMachine.mPlayerScores[obj.netId].score -= CHEATING_PENALTY_POINTS;
 				}
 
 				/// <summary>
@@ -211,17 +235,6 @@ namespace FiringSquad.Networking
 
 				private void LogKill(PlayerKill killInfo)
 				{
-				}
-
-				/// <inheritdoc />
-				public override void OnExit()
-				{
-					EventManager.Server.OnPlayerHealthHitsZero -= OnPlayerHealthHitsZero;
-					EventManager.Server.OnPlayerCapturedStage -= OnPlayerCapturedStage;
-					EventManager.Server.OnStageTimedOut -= OnStageTimedOut;
-
-					if (mStageEnableRoutine != null)
-						mMachine.mScript.StopCoroutine(mStageEnableRoutine);
 				}
 
 				/// <inheritdoc />
