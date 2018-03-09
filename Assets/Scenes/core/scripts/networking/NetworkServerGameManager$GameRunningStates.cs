@@ -2,6 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using FiringSquad.Core;
+using FiringSquad.Core.Weapons;
 using FiringSquad.Data;
 using FiringSquad.Gameplay;
 using FiringSquad.Gameplay.Weapons;
@@ -48,6 +50,7 @@ namespace FiringSquad.Networking
 				/// </summary>
 				public GameRunningState(ServerStateMachine machine) : base(machine) { }
 
+				private List<WeaponPartScript> mCachedLegendaryList;
 				private Coroutine mStageEnableRoutine;
 				private long mEndTime;
 				private bool mFinished;
@@ -55,6 +58,12 @@ namespace FiringSquad.Networking
 				/// <inheritdoc />
 				public override void OnEnter()
 				{
+					mCachedLegendaryList = ServiceLocator.Get<IWeaponPartManager>()
+						.GetAllPrefabScripts(false)
+						.Select(x => x.Value)
+						.Where(x => x.isLegendary)
+						.ToList();
+
 					mEndTime = DateTime.Now.Ticks + mMachine.data.roundTime * TimeSpan.TicksPerSecond;
 					EventManager.Server.OnPlayerHealthHitsZero += OnPlayerHealthHitsZero;
 					EventManager.Server.OnPlayerCapturedStage += OnPlayerCapturedStage;
@@ -102,12 +111,12 @@ namespace FiringSquad.Networking
 					if (player.weapon != null)
 					{
 						WeaponPartCollection currentParts = player.weapon.currentParts;
-						var allPossibilities = mMachine.data.stageCaptureParts;
+						var allPossibilities = mCachedLegendaryList;
 						var possibilities = allPossibilities.Where(x => !currentParts.Contains(x));
 						choice = possibilities.ChooseRandom();
 					}
 					else
-						choice = mMachine.data.stageCaptureParts.ChooseRandom();
+						choice = mCachedLegendaryList.ChooseRandom();
 
 					GameObject instance = choice.SpawnInWorld();
 					instance.transform.position = stage.transform.position + Vector3.up * 45.0f;
