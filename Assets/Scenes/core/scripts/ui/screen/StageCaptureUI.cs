@@ -18,7 +18,8 @@ namespace FiringSquad.Gameplay.UI
 		{
 			NoPoints,
 			NoCapturing,
-			WereCapturing,
+			PlayerCapturing,
+			PlayerTeamCapturing,
 			OtherCapturing,
 			PointCaptured,
 		}
@@ -27,7 +28,10 @@ namespace FiringSquad.Gameplay.UI
 		[SerializeField] private UIText mStatusLine;
 		[SerializeField] private UIText mTimerLine;
 		[SerializeField] private StageCapturePointer mPointer;
-		[SerializeField] private UIFillBarScript mTimerBar;
+		[SerializeField] private UIFillBarScript mPlayerTimerBar;
+		[SerializeField] private UIFillBarScript mEnemyTimerBar;
+
+		private Mode mCurrentMode;
 
 		/// <summary>
 		/// Unity's Awake function.
@@ -44,38 +48,73 @@ namespace FiringSquad.Gameplay.UI
 		/// <param name="area">The stage to bind to, if applicable.</param>
 		public void SetMode(Mode m, [CanBeNull] StageCaptureArea area)
 		{
+			mCurrentMode = m;
+
 			switch (m)
 			{
 				case Mode.NoPoints:
 					// No points means to hide all elements.
 					mStatusLine.text = "";
+
 					mTimerLine.gameObject.SetActive(false);
-					mTimerBar.gameObject.SetActive(false);
+
+					mPlayerTimerBar.gameObject.SetActive(false);
+					mEnemyTimerBar.gameObject.SetActive(false);
+
 					mPointer.StopPointing();
 					break;
 
 				case Mode.NoCapturing:
 					// A stage is available, but no one is capturing it.
 					mStatusLine.text = "A Stage is Available for Capture!";
+
 					mTimerLine.gameObject.SetActive(true);
-					mTimerBar.gameObject.SetActive(false);
-					mTimerBar.SetFillAmount(0.0f, true);
+
+					mPlayerTimerBar.gameObject.SetActive(true);
+					mEnemyTimerBar.gameObject.SetActive(true);
+
+					mPlayerTimerBar.SetFillAmount(0.0f, true);
+					mEnemyTimerBar.SetFillAmount(0.0f, true);
+
 					mPointer.EnableAndPoint(area);
 					break;
 
-				case Mode.WereCapturing:
+				case Mode.PlayerCapturing:
 					// A stage is available, and we're the ones capping it.
-					mTimerLine.gameObject.SetActive(false);
-					mTimerBar.gameObject.SetActive(true);
 					mStatusLine.text = "Capturing Stage...";
+
+					mTimerLine.gameObject.SetActive(false);
+
+					mPlayerTimerBar.gameObject.SetActive(true);
+					mEnemyTimerBar.gameObject.SetActive(false);
+					mEnemyTimerBar.SetFillAmount(0.0f, true);
+
+					mPointer.StopPointing();
+					break;
+
+				case Mode.PlayerTeamCapturing:
+					// A stage is available, and we're the ones capping it.
+					mStatusLine.text = "Your Team Is Capturing The Stage...";
+
+					mTimerLine.gameObject.SetActive(false);
+
+					mPlayerTimerBar.gameObject.SetActive(true);
+					mEnemyTimerBar.gameObject.SetActive(false);
+					mEnemyTimerBar.SetFillAmount(0.0f, true);
+
 					mPointer.StopPointing();
 					break;
 
 				case Mode.OtherCapturing:
 					// A stage is available, and someone else is capping.
-					mStatusLine.text = "A Stage is Being Contested!";
+					mStatusLine.text = "The Stage is Being Captured By Someone Else!";
+
 					mTimerLine.gameObject.SetActive(false);
-					mTimerBar.gameObject.SetActive(true);
+
+					mPlayerTimerBar.gameObject.SetActive(true);
+					mPlayerTimerBar.SetFillAmount(0.0f, true);
+					mEnemyTimerBar.gameObject.SetActive(true);
+
 					mPointer.EnableAndPoint(area);
 					break;
 
@@ -83,8 +122,12 @@ namespace FiringSquad.Gameplay.UI
 					// A stage was just captured.
 					mStatusLine.text = "";
 					mTimerLine.gameObject.SetActive(false);
-					mTimerBar.gameObject.SetActive(false);
-					mTimerBar.SetFillAmount(0.0f, true);
+
+					mPlayerTimerBar.gameObject.SetActive(false);
+					mPlayerTimerBar.SetFillAmount(0.0f, true);
+					mEnemyTimerBar.gameObject.SetActive(false);
+					mEnemyTimerBar.SetFillAmount(0.0f, true);
+
 					mPointer.StopPointing();
 					break;
 
@@ -98,7 +141,10 @@ namespace FiringSquad.Gameplay.UI
 		/// </summary>
 		public void SetCapturePercent(float p)
 		{
-			mTimerBar.SetFillAmount(p, !mTimerBar.gameObject.activeInHierarchy);
+			if (mCurrentMode == Mode.OtherCapturing)
+				mEnemyTimerBar.SetFillAmount(p, !mEnemyTimerBar.gameObject.activeInHierarchy);
+			else
+				mPlayerTimerBar.SetFillAmount(p, !mPlayerTimerBar.gameObject.activeInHierarchy);
 		}
 
 		/// <summary>
