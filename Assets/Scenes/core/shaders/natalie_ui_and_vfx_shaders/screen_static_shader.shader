@@ -29,7 +29,7 @@
 		Cull Off
 		Lighting Off
 		ZWrite Off
-		BlendOp Max
+		//BlendOp Max
 		Blend One OneMinusSrcAlpha
 
 		Pass
