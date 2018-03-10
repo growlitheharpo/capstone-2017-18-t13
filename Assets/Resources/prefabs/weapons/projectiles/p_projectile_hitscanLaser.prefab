@@ -21,8 +21,8 @@ GameObject:
   - component: {fileID: 4028429752590910}
   - component: {fileID: 114756075130657168}
   - component: {fileID: 114311638709930862}
-  - component: {fileID: 114765406182020964}
   - component: {fileID: 120123338783791200}
+  - component: {fileID: 114202787271835580}
   m_Layer: 12
   m_Name: p_projectile_hitscanLaser
   m_TagString: Untagged
@@ -37,12 +37,26 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1546697341052326}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0.024, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &114202787271835580
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1546697341052326}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 207bacd88e3baaa489dabd1f40ac9fc0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mEffectType: 1
+  mVelocity: 12
+  mLifetime: 0.5
 --- !u!114 &114311638709930862
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -113,18 +127,6 @@ MonoBehaviour:
     i15: 142
   m_ServerOnly: 0
   m_LocalPlayerAuthority: 0
---- !u!114 &114765406182020964
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1546697341052326}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 207bacd88e3baaa489dabd1f40ac9fc0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mVelocity: 25
 --- !u!120 &120123338783791200
 LineRenderer:
   m_ObjectHideFlags: 1
@@ -138,7 +140,7 @@ LineRenderer:
   m_LightProbeUsage: 0
   m_ReflectionProbeUsage: 0
   m_Materials:
-  - {fileID: 10306, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 9904cda1d3d53714ba9c0314b5b9330a, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -158,8 +160,9 @@ LineRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Positions:
-  - {x: 0, y: 0, z: 0}
-  - {x: 0, y: 0, z: 0}
+  - {x: 7.02, y: 1, z: 0}
+  - {x: 3.7, y: 1, z: 0}
+  - {x: -9, y: 1, z: 0}
   m_Parameters:
     serializedVersion: 2
     widthMultiplier: 0.35
@@ -168,13 +171,19 @@ LineRenderer:
       m_Curve:
       - serializedVersion: 2
         time: 0
-        value: 0.0065784454
+        value: 0.5812473
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+      - serializedVersion: 2
+        time: 0.49725515
+        value: 1
         inSlope: 0
         outSlope: 0
         tangentMode: 0
       - serializedVersion: 2
         time: 1
-        value: 0.953949
+        value: 0.5062561
         inSlope: 0
         outSlope: 0
         tangentMode: 0
@@ -183,37 +192,37 @@ LineRenderer:
       m_RotationOrder: 0
     colorGradient:
       serializedVersion: 2
-      key0: {r: 1, g: 0, b: 0, a: 1}
-      key1: {r: 0.6691177, g: 0, b: 0, a: 1}
-      key2: {r: 0, g: 0, b: 0, a: 1}
-      key3: {r: 0, g: 0, b: 0, a: 0}
-      key4: {r: 0, g: 0, b: 0, a: 0}
-      key5: {r: 0, g: 0, b: 0, a: 0}
+      key0: {r: 1, g: 0.13419478, b: 0, a: 0.5176471}
+      key1: {r: 1, g: 0.55862063, b: 0, a: 0.96862745}
+      key2: {r: 1, g: 0.13419478, b: 0, a: 1}
+      key3: {r: 1, g: 0.13419478, b: 0, a: 0.91764706}
+      key4: {r: 0, g: 0, b: 0, a: 0.54901963}
+      key5: {r: 0, g: 0, b: 0, a: 0.54901963}
       key6: {r: 0, g: 0, b: 0, a: 0}
       key7: {r: 0, g: 0, b: 0, a: 0}
       ctime0: 0
-      ctime1: 65535
-      ctime2: 0
-      ctime3: 0
+      ctime1: 31226
+      ctime2: 65535
+      ctime3: 65535
       ctime4: 0
       ctime5: 0
       ctime6: 0
       ctime7: 0
       atime0: 0
-      atime1: 65535
-      atime2: 65535
-      atime3: 0
-      atime4: 0
-      atime5: 0
+      atime1: 6746
+      atime2: 31997
+      atime3: 58403
+      atime4: 65535
+      atime5: 65535
       atime6: 0
       atime7: 0
-      m_Mode: 1
-      m_NumColorKeys: 2
-      m_NumAlphaKeys: 2
-    numCornerVertices: 0
+      m_Mode: 0
+      m_NumColorKeys: 3
+      m_NumAlphaKeys: 5
+    numCornerVertices: 3
     numCapVertices: 0
     alignment: 0
-    textureMode: 0
+    textureMode: 1
     generateLightingData: 0
   m_UseWorldSpace: 1
   m_Loop: 0
