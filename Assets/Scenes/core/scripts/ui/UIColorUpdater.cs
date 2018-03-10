@@ -21,6 +21,8 @@ namespace FiringSquad.Gameplay.UI
 
 		[SerializeField] private UIGraphic[] mGraphics;
 		[SerializeField] private UIShadow[] mShadows;
+		[SerializeField] private UIGraphic[] mEnemyGraphics;
+		[SerializeField] private UIShadow[] mEnemyShadows;
 
 		/// <summary>
 		/// Unity's Awake function
@@ -51,6 +53,18 @@ namespace FiringSquad.Gameplay.UI
 
 			foreach (UIShadow s in mShadows)
 				s.effectColor = new Color(shadow.r, shadow.g, shadow.b, s.effectColor.a);
+
+			if (localPlayer.playerTeam == GameData.PlayerTeam.Deathmatch)
+				return;
+
+			Color enemyPrimary = localPlayer.playerTeam == GameData.PlayerTeam.Orange ? mPrimaryBlueColor : mPrimaryOrangeColor;
+			Color enemyShadow = localPlayer.playerTeam == GameData.PlayerTeam.Orange ? mShadowBlueColor : mShadowOrangeColor;
+
+			foreach (UIGraphic g in mEnemyGraphics)
+				g.color = new Color(enemyPrimary.r, enemyPrimary.g, enemyPrimary.b, g.color.a);
+
+			foreach (UIShadow s in mEnemyShadows)
+				s.effectColor = new Color(enemyShadow.r, enemyShadow.g, enemyShadow.b, s.effectColor.a);
 		}
 
 #if UNITY_EDITOR

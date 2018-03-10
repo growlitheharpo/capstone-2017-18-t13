@@ -10,7 +10,6 @@ namespace KeatsLib.Unity
 	/// </summary>
 	public class UIFillBarScript : MonoBehaviour
 	{
-		[SerializeField] private UIImage mBackground;
 		[SerializeField] private UIImage mDelayBar;
 		[SerializeField] private float mDelayTime;
 		[SerializeField] private UIImage mFillBar;
@@ -19,14 +18,11 @@ namespace KeatsLib.Unity
 
 		private void Awake()
 		{
-			if (mBackground == null || mDelayBar == null || mFillBar == null)
-			{
-				Destroy(this);
-				return;
-			}
+			if (mDelayBar != null)
+				mDelayBar.fillMethod = mFillDirection;
 
-			mDelayBar.fillMethod = mFillDirection;
-			mFillBar.fillMethod = mFillDirection;
+			if (mFillBar != null)
+				mFillBar.fillMethod = mFillDirection;
 		}
 
 		/// <summary>
@@ -39,53 +35,47 @@ namespace KeatsLib.Unity
 			StopAllCoroutines();
 			if (immediate)
 			{
-				mFillBar.fillAmount = amount;
-				mDelayBar.fillAmount = amount;
+				if (mFillBar != null)
+					mFillBar.fillAmount = amount;
+
+				if (mDelayBar != null)
+					mDelayBar.fillAmount = amount;
+
 				return;
 			}
 
-			if (mFillBar.fillAmount > amount)
+			if (mFillBar != null && mFillBar.fillAmount > amount)
 			{
 				mFillBar.fillAmount = amount;
-				StartCoroutine(DrainRoutine(amount));
+
+				if (mDelayBar != null)
+					StartCoroutine(LerpRoutine(amount, mDelayBar));
 			}
 			else
 			{
-				mDelayBar.fillAmount = amount;
-				StartCoroutine(FillRoutine(amount));
+				if (mDelayBar != null)
+					mDelayBar.fillAmount = amount;
+
+				if (mFillBar != null)
+					StartCoroutine(LerpRoutine(amount, mFillBar));
 			}
 		}
 
-		private IEnumerator DrainRoutine(float newAmount)
+		private IEnumerator LerpRoutine(float newAmount, UIImage bar)
 		{
-			float startAmount = mDelayBar.fillAmount;
+
+			float startAmount = bar.fillAmount;
 			float currentTime = 0.0f;
 
 			while (currentTime < mDelayTime)
 			{
-				mDelayBar.fillAmount = Mathf.Lerp(startAmount, newAmount, Mathf.Sqrt(currentTime / mDelayTime));
+				bar.fillAmount = Mathf.Lerp(startAmount, newAmount, Mathf.Sqrt(currentTime / mDelayTime));
 
 				currentTime += Time.deltaTime;
 				yield return null;
 			}
 
-			mDelayBar.fillAmount = newAmount;
-		}
-
-		private IEnumerator FillRoutine(float newAmount)
-		{
-			float startAmount = mFillBar.fillAmount;
-			float currentTime = 0.0f;
-
-			while (currentTime < mDelayTime)
-			{
-				mFillBar.fillAmount = Mathf.Lerp(startAmount, newAmount, Mathf.Sqrt(currentTime / mDelayTime));
-
-				currentTime += Time.deltaTime;
-				yield return null;
-			}
-
-			mFillBar.fillAmount = newAmount;
+			bar.fillAmount = newAmount;
 		}
 	}
 }
