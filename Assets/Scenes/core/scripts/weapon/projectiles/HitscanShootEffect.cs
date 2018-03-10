@@ -9,9 +9,18 @@ namespace FiringSquad.Gameplay.Weapons
 	/// </summary>
 	public class HitscanShootEffect : MonoBehaviour
 	{
+		enum tEffectType { flash, fade };
 		/// Inspector variables
+		[SerializeField] private tEffectType mEffectType;
+		
+		/// <summary>
+		/// Used for Flash
+		/// </summary>
 		[SerializeField] private float mVelocity;
-
+		/// <summary>
+		/// Used for Fade
+		/// </summary>
+		[SerializeField] private float mLifetime;
 		/// Private variables
 		private LineRenderer mRenderer;
 		private Coroutine mEffectRoutine;
@@ -38,9 +47,18 @@ namespace FiringSquad.Gameplay.Weapons
 			// TODO: Everything after here can be changed for the new hitscan effect!
 
 			if (mEffectRoutine == null)
-				mEffectRoutine = StartCoroutine(Flash(realEnd));
-		}
+			{
+				if (mEffectType == 0)
+				{
+					mEffectRoutine = StartCoroutine(Flash(realEnd));
+				}
 
+				else
+				{
+					mEffectRoutine = StartCoroutine(Fade(realEnd));
+				}
+			}
+		}
 		/// <summary>
 		/// Actually perform the flash effect by lerping values across our line renderer.
 		/// </summary>
@@ -59,6 +77,38 @@ namespace FiringSquad.Gameplay.Weapons
 			while (currentTime < time)
 			{
 				mRenderer.SetPosition(0, Vector3.Lerp(start, realEnd, currentTime / time));
+				currentTime += Time.deltaTime;
+				yield return null;
+			}
+
+			mRenderer.positionCount = 0;
+			Destroy(gameObject);
+		}
+
+		private IEnumerator Fade(Vector3 realEnd)
+		{
+			Vector3 start = transform.position;
+			GradientAlphaKey[] aStart = (GradientAlphaKey[])mRenderer.colorGradient.alphaKeys.Clone();
+			GradientAlphaKey[] newA = (GradientAlphaKey[])mRenderer.colorGradient.alphaKeys.Clone();
+			Gradient gr = new Gradient();
+			mRenderer.positionCount = 3;
+			mRenderer.SetPosition(0, start);
+			mRenderer.SetPosition(1, new Vector3((start.x + realEnd.x) / 2, (start.y + realEnd.y) / 2, (start.z + realEnd.z) / 2));
+			mRenderer.SetPosition(2, realEnd);
+
+			float time = mLifetime;
+
+			float currentTime = 0.0f;
+			while (currentTime < time)
+			{
+				for (int i = 0; i < aStart.Length; i++)
+				{
+					float a = Mathf.Lerp(aStart[i].alpha, 0, currentTime / time);
+					newA[i] = new GradientAlphaKey(a, newA[i].time);
+			   
+				}
+				gr.SetKeys(mRenderer.colorGradient.colorKeys,newA);
+				mRenderer.colorGradient = gr;
 				currentTime += Time.deltaTime;
 				yield return null;
 			}
