@@ -267,7 +267,12 @@ namespace FiringSquad.Gameplay
 			}
 
 			CltPlayer player = ClientScene.FindLocalObject(mCapturingPlayerId).GetComponent<CltPlayer>();
-			kUIManager.SetMode(player.isCurrentPlayer ? StageCaptureUI.Mode.WereCapturing : StageCaptureUI.Mode.OtherCapturing, this);
+			if (player.isCurrentPlayer)
+				kUIManager.SetMode(StageCaptureUI.Mode.PlayerCapturing, this);
+			else if (player.playerTeam != GameData.PlayerTeam.Deathmatch && CltPlayer.localPlayerReference != null && player.playerTeam == CltPlayer.localPlayerReference.playerTeam)
+				kUIManager.SetMode(StageCaptureUI.Mode.PlayerTeamCapturing, this);
+			else
+				kUIManager.SetMode(StageCaptureUI.Mode.OtherCapturing, this);
 		}
 
 		/// <summary>
