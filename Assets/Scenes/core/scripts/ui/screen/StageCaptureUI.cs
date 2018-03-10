@@ -70,10 +70,9 @@ namespace FiringSquad.Gameplay.UI
 
 					mTimerLine.gameObject.SetActive(true);
 
-					mPlayerTimerBar.gameObject.SetActive(true);
-					mEnemyTimerBar.gameObject.SetActive(true);
-
+					mPlayerTimerBar.gameObject.SetActive(false);
 					mPlayerTimerBar.SetFillAmount(0.0f, true);
+					mEnemyTimerBar.gameObject.SetActive(false);
 					mEnemyTimerBar.SetFillAmount(0.0f, true);
 
 					mPointer.EnableAndPoint(area);
