@@ -15,6 +15,12 @@ namespace FiringSquad.Networking
 		private partial class ServerStateMachine 
 		{
 			/// <summary>
+			/// The amount of time we wait after starting the intro before spawning the players.
+			/// This is subtracted from the "intro length" when starting the clock.
+			/// </summary>
+			private const float INTRO_WAIT_BEFORE_SPAWN_TIME = 5.0f;
+
+			/// <summary>
 			/// The state we hold in until we have the required number of players
 			/// </summary>
 			private partial class WaitingForConnectionState
@@ -149,10 +155,49 @@ namespace FiringSquad.Networking
 				/// <inheritdoc />
 				public override IState GetTransition()
 				{
-					if (IsWaitingTimeOver())
-						return new StartGameState(mMachine);
+					if (!IsWaitingTimeOver())
+						return this;
 
-					return this;
+					if (mMachine.mForceSkipIntro)
+						return new SpawnPlayersAndStartState(mMachine);
+						
+					return new WaitForIntroState(mMachine);
+				}
+			}
+
+			/// <summary>
+			/// A state that waits between the lobby ending and spawning the players/starting the match.
+			/// </summary>
+			private partial class WaitForIntroState
+			{
+				/// <summary>
+				/// A state that waits between the lobby ending and spawning the players/starting the match.
+				/// </summary>
+				public WaitForIntroState(ServerStateMachine machine) : base(machine) { }
+
+				/// Private variables
+				private float mTimer;
+
+				/// <inheritdoc />
+				public override void OnEnter()
+				{
+					mTimer = INTRO_WAIT_BEFORE_SPAWN_TIME;
+					EventManager.Notify(EventManager.Server.StartIntroSequence);
+				}
+
+				/// <inheritdoc />
+				public override void Update()
+				{
+					mTimer -= Time.deltaTime;
+				}
+
+				/// <inheritdoc />
+				public override IState GetTransition()
+				{
+					if (mTimer > 0.0f)
+						return this;
+
+					return new SpawnPlayersAndStartState(mMachine);
 				}
 			}
 
@@ -160,13 +205,13 @@ namespace FiringSquad.Networking
 			/// The single-frame state called to set up the players for the round to start.
 			/// Resets spawn points and ensures our shared data has an accurate list of players.
 			/// </summary>
-			private partial class StartGameState
+			private partial class SpawnPlayersAndStartState
 			{
 				/// <summary>
 				/// The single-frame state called to set up the players for the round to start.
 				/// Resets spawn points and ensures our shared data has an accurate list of players.
 				/// </summary>
-				public StartGameState(ServerStateMachine machine) : base(machine) { }
+				public SpawnPlayersAndStartState(ServerStateMachine machine) : base(machine) { }
 
 				/// <inheritdoc />
 				public override void OnEnter()

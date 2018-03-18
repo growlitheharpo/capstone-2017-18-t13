@@ -65,14 +65,19 @@ namespace FiringSquad.Networking
 						.Where(x => x.isLegendary)
 						.ToList();
 
-					mEndTime = DateTime.Now.Ticks + mMachine.data.roundTime * TimeSpan.TicksPerSecond;
+					mMachine.mPlayerScores = mMachine.mPlayerList.Select(x => new PlayerScore(x)).ToDictionary(x => x.playerId);
+
 					EventManager.Server.OnPlayerHealthHitsZero += OnPlayerHealthHitsZero;
 					EventManager.Server.OnPlayerCapturedStage += OnPlayerCapturedStage;
 					EventManager.Server.OnPlayerAttachedPart += OnPlayerAttachedPart;
 					EventManager.Server.OnPlayerCheated += OnPlayerCheated;
 					EventManager.Server.OnStageTimedOut += OnStageTimedOut;
 
-					mMachine.mPlayerScores = mMachine.mPlayerList.Select(x => new PlayerScore(x)).ToDictionary(x => x.playerId);
+					int roundLength = mMachine.data.roundTime;
+					if (!mMachine.mForceSkipIntro)
+						roundLength += mMachine.data.introLength - (int)INTRO_WAIT_BEFORE_SPAWN_TIME;
+
+					mEndTime = DateTime.Now.Ticks + roundLength * TimeSpan.TicksPerSecond;
 
 					mStageEnableRoutine = mMachine.mScript.StartCoroutine(EnableStageArea(mMachine.mCaptureAreas.ChooseRandom()));
 

@@ -1,4 +1,5 @@
 ﻿using FiringSquad.Core;
+using FiringSquad.Core.Audio;
 using FiringSquad.Core.Input;
 using FiringSquad.Core.UI;
 using FiringSquad.Data;
@@ -338,6 +339,9 @@ namespace FiringSquad.Gameplay
 					.EnableInputLevel(InputLevel.Gameplay)
 					.EnableInputLevel(InputLevel.HideCursor)
 					.EnableInputLevel(InputLevel.PauseMenu);
+
+				ServiceLocator.Get<IAudioManager>()
+					.CreateSound(AudioEvent.AnnouncerMatchStarts, transform);
 
 				return true;
 			}));

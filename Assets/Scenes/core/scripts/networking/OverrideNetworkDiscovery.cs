@@ -12,7 +12,7 @@ namespace FiringSquad.Networking
 		/// </summary>
 		private void Awake()
 		{
-			EventManager.Local.OnReceiveStartEvent += OnReceiveStartEvent;
+			EventManager.Local.OnReceiveGameEndTime += OnReceiveGameEndTime;
 		}
 
 		/// <summary>
@@ -23,13 +23,13 @@ namespace FiringSquad.Networking
 			if (running)
 				StopBroadcast();
 
-			EventManager.Local.OnReceiveStartEvent -= OnReceiveStartEvent;
+			EventManager.Local.OnReceiveGameEndTime -= OnReceiveGameEndTime;
 		}
 
 		/// <summary>
-		/// EVENT HANDLER: Local.OnReceiveStartEvent
+		/// EVENT HANDLER: Local.OnReceiveGameEndTime
 		/// </summary>
-		private void OnReceiveStartEvent(long time)
+		private void OnReceiveGameEndTime(long time)
 		{
 			if (running)
 				StopBroadcast();

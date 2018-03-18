@@ -34,6 +34,7 @@ namespace FiringSquad.Data
 		[SerializeField] private float mMaxStageWaitTime;
 		[SerializeField] private int mRoundTime;
 		[SerializeField] private int mLobbyTime;
+		[SerializeField] private int mIntroLength;
 		[SerializeField] private int mGoalPlayerCount;
 
 		/// <summary>
@@ -55,6 +56,11 @@ namespace FiringSquad.Data
 		/// The length of the lobby, in seconds.
 		/// </summary>
 		public int lobbyTime { get { return mLobbyTime; } }
+
+		/// <summary>
+		/// The length of the intro sequence, in seconds.
+		/// </summary>
+		public int introLength { get { return mIntroLength; } }
 
 		/// <summary>
 		/// How many players to wait for before the match starts.

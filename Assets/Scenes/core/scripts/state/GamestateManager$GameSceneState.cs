@@ -129,7 +129,7 @@ namespace FiringSquad.Core.State
 				public override void OnEnter()
 				{
 					EventManager.Local.OnReceiveLobbyEndTime += OnReceiveLobbyEndTime;
-					EventManager.Local.OnReceiveStartEvent += OnReceiveStartEvent;
+					EventManager.Local.OnReceiveGameEndTime += OnReceiveGameEndTime;
 					EventManager.Local.OnReceiveFinishEvent += OnReceiveFinishEvent;
 					EventManager.Local.OnConfirmQuitGame += OnConfirmQuitGame;
 				}
@@ -138,7 +138,7 @@ namespace FiringSquad.Core.State
 				public override void OnExit()
 				{
 					EventManager.Local.OnReceiveLobbyEndTime -= OnReceiveLobbyEndTime;
-					EventManager.Local.OnReceiveStartEvent -= OnReceiveStartEvent;
+					EventManager.Local.OnReceiveGameEndTime -= OnReceiveGameEndTime;
 					EventManager.Local.OnReceiveFinishEvent -= OnReceiveFinishEvent;
 					EventManager.Local.OnConfirmQuitGame -= OnConfirmQuitGame;
 				}
@@ -149,14 +149,14 @@ namespace FiringSquad.Core.State
 				/// </summary>
 				private void OnReceiveLobbyEndTime(CltPlayer player, long time)
 				{
-					OnReceiveStartEvent(time);
+					OnReceiveGameEndTime(time);
 				}
 
 				/// <summary>
-				/// EVENT HANDLER: Local.OnReceiveStartEvent
+				/// EVENT HANDLER: Local.OnReceiveGameEndTime
 				/// Update the UI accordingly.
 				/// </summary>
-				private void OnReceiveStartEvent(long time)
+				private void OnReceiveGameEndTime(long time)
 				{
 					mRoundEndTime = time;
 

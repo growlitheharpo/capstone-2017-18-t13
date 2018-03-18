@@ -14,7 +14,6 @@ using JetBrains.Annotations;
 using KeatsLib.Unity;
 using UnityEngine;
 using UnityEngine.Networking;
-using Logger = FiringSquad.Debug.Logger;
 using Random = UnityEngine.Random;
 
 namespace FiringSquad.Gameplay
@@ -137,6 +136,7 @@ namespace FiringSquad.Gameplay
 			EventManager.Server.OnStartGame += OnStartGame;
 			EventManager.Server.OnFinishGame += OnFinishGame;
 			EventManager.Server.OnPlayerCapturedStage += OnPlayerCapturedStage;
+			EventManager.Server.OnStartIntroSequence += OnStartIntroSequence;
 
 			// register information
 			mHitIndicator = new NullHitIndicator();
@@ -221,6 +221,7 @@ namespace FiringSquad.Gameplay
 				Destroy(r);
 
 			//we have to do a delicate dance of changing parents now
+			// ReSharper disable once PossibleNullReferenceException
 			Transform viewHolder = weapon.transform.Find("View").Find("ViewHolder");
 			Transform gunMesh = viewHolder.GetChild(0);
 
@@ -278,6 +279,8 @@ namespace FiringSquad.Gameplay
 			EventManager.Server.OnPlayerDied -= OnPlayerDied;
 			EventManager.Server.OnStartGame -= OnStartGame;
 			EventManager.Server.OnFinishGame -= OnFinishGame;
+			EventManager.Server.OnPlayerCapturedStage -= OnPlayerCapturedStage;
+			EventManager.Server.OnStartIntroSequence -= OnStartIntroSequence;
 
 			CltPlayerLocal localPlayer = mLocalPlayerScript;
 			if (localPlayer != null)
@@ -527,6 +530,26 @@ namespace FiringSquad.Gameplay
 		}
 
 		/// <summary>
+		/// EVENT HANDLER: Server.OnStartIntroSequence
+		/// </summary>
+		[Server]
+		[EventHandler]
+		private void OnStartIntroSequence()
+		{
+			TargetHandleStartIntroSequence(connectionToClient);
+		}
+		
+		/// <summary>
+		/// Locally handle the server instructing us to start our intro sequence.
+		/// </summary>
+		/// <param name="connection"></param>
+		[TargetRpc]
+		private void TargetHandleStartIntroSequence(NetworkConnection connection)
+		{
+			EventManager.Local.ReceiveStartIntroNotice();
+		}
+
+		/// <summary>
 		/// EVENT HANDLER: Server.OnStartGame
 		/// </summary>
 		[Server]
@@ -536,21 +559,19 @@ namespace FiringSquad.Gameplay
 			if (magnetArm != null)
 				magnetArm.ForceDropItem();
 
-			TargetHandleStartGame(connectionToClient, gameEndTime);
+			TargetHandleInitialGameTime(connectionToClient, gameEndTime);
 		}
 
 		/// <summary>
 		/// Locally handle the match starting on the server by playing a sound and updating our UI.
 		/// </summary>
 		[TargetRpc]
-		private void TargetHandleStartGame(NetworkConnection connection, long gameEndTime)
+		private void TargetHandleInitialGameTime(NetworkConnection connection, long gameEndTime)
 		{
 			if (magnetArm != null)
 				magnetArm.DropItemDown();
 
-			EventManager.Notify(() => EventManager.Local.ReceiveStartEvent(gameEndTime));
-			ServiceLocator.Get<IAudioManager>()
-				.CreateSound(AudioEvent.AnnouncerMatchStarts, transform);
+			EventManager.Notify(() => EventManager.Local.ReceiveGameEndTime(gameEndTime));
 
 			// Set our name again, just in case it wasn't updated.
 			CmdSetPlayerName(ServiceLocator.Get<IGamestateManager>().currentUserName);
