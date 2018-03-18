@@ -75,6 +75,8 @@ namespace FiringSquad.Gameplay
 
 			EventManager.Local.OnApplyOptionsData += OnApplyOptionsData;
 			EventManager.Local.OnLocalPlayerDied += OnLocalPlayerDied;
+			EventManager.Local.OnIntroBegin += OnIntroBegin;
+			EventManager.Local.OnIntroEnd += OnIntroEnd;
 		}
 
 		/// <summary>
@@ -87,6 +89,9 @@ namespace FiringSquad.Gameplay
 
 			EventManager.Local.OnLocalPlayerDied -= OnLocalPlayerDied;
 			EventManager.Local.OnApplyOptionsData -= OnApplyOptionsData;
+			EventManager.Local.OnIntroBegin -= OnIntroBegin;
+			EventManager.Local.OnIntroEnd -= OnIntroEnd;
+
 			CleanupCamera();
 
 			ServiceLocator.Get<IInput>()
@@ -112,7 +117,7 @@ namespace FiringSquad.Gameplay
 		/// </summary>
 		private void SetupCamera()
 		{
-			mCameraRef = Camera.main ?? FindObjectOfType<Camera>();
+			mCameraRef = mCameraRef ?? Camera.main ?? FindObjectOfType<Camera>();
 			if (mCameraRef == null)
 			{
 				mCameraRef = Instantiate(mCameraPrefab).GetComponent<Camera>();
@@ -292,6 +297,50 @@ namespace FiringSquad.Gameplay
 				playerRoot.CmdDebugSetTeam(GameData.PlayerTeam.Blue);
 			else if (teamName == "orange")
 				playerRoot.CmdDebugSetTeam(GameData.PlayerTeam.Orange);
+		}
+
+		/// <summary>
+		/// EVENT HANDLER: Local.OnIntroBegin
+		/// </summary>
+		private void OnIntroBegin()
+		{
+			CleanupCamera();
+			
+			// Force pop the pause menu (just in case)
+			ServiceLocator.Get<IUIManager>()
+				.PopPanel(ScreenPanelTypes.Pause);
+
+			ServiceLocator.Get<IInput>()
+				.DisableInputLevel(InputLevel.Gameplay)
+				.DisableInputLevel(InputLevel.PauseMenu);
+		}
+
+		/// <summary>
+		/// EVENT HANDLER: Local.OnIntroEnd
+		/// </summary>
+		private void OnIntroEnd()
+		{
+			SetupCamera();
+
+			// Copy a trick from our respawn function
+			// to handle the start
+			StartCoroutine(Coroutines.InvokeEveryTick(time =>
+			{
+				if (time < playerRoot.defaultData.respawnTime)
+				{
+					// Update the respawn UI timer.
+					mRespawnTimer.value = Mathf.Ceil(playerRoot.defaultData.respawnTime - time);
+					return true; // signal to continue this coroutine
+				}
+
+				mRespawnTimer.value = 0.0f;
+				ServiceLocator.Get<IInput>()
+					.EnableInputLevel(InputLevel.Gameplay)
+					.EnableInputLevel(InputLevel.HideCursor)
+					.EnableInputLevel(InputLevel.PauseMenu);
+
+				return true;
+			}));
 		}
 
 		/// <summary>

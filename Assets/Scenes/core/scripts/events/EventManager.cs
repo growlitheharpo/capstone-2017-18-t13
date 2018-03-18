@@ -262,6 +262,32 @@ public partial class EventManager
 		{
 			OnZoomLevelChanged(zoom, player);
 		}
+
+		/// <summary>
+		/// Event called when Timeline has activated the intro sequence.
+		/// </summary>
+		public static event Action OnIntroBegin = () => { LogEvent(); };
+
+		/// <summary>
+		/// Event called when Timeline has activated the intro sequence.
+		/// </summary>
+		public static void IntroBegin()
+		{
+			OnIntroBegin();
+		}
+
+		/// <summary>
+		/// Event called when Timeline has completed the intro sequence.
+		/// </summary>
+		public static event Action OnIntroEnd = () => { LogEvent(); };
+
+		/// <summary>
+		/// Event called when Timeline has completed the intro sequence.
+		/// </summary>
+		public static void IntroEnd()
+		{
+			OnIntroEnd();
+		}
 	}
 
 	/// <summary>

@@ -4,6 +4,9 @@ using UIText = UnityEngine.UI.Text;
 
 namespace FiringSquad.Gameplay.UI
 {
+	/// <summary>
+	/// Utility UI class to show the player which team they've been assigned to.
+	/// </summary>
 	public class PlayerTeamNotificationPanel : MonoBehaviour
 	{
 		/// Inspector variables
@@ -36,6 +39,8 @@ namespace FiringSquad.Gameplay.UI
 			GameData.PlayerTeam team = localPlayer.playerTeam;
 			mTeamName.text = team.ToString().ToUpper();
 
+			// If we're in deathmatch mode, replace "YOU'RE ON THE (x) TEAM"
+			// with "THIS IS A DEATHMATCH GAME"
 			if (team == GameData.PlayerTeam.Deathmatch)
 			{
 				mLabel1.text = "THIS IS A";
