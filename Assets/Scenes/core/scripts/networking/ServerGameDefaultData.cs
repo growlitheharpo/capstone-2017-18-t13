@@ -18,6 +18,7 @@ namespace FiringSquad.Data
 
 		public enum PlayerTeam
 		{
+			DebugForceReset = -1,
 			Deathmatch = 0,
 			Blue = 1,
 			Orange = 2,
