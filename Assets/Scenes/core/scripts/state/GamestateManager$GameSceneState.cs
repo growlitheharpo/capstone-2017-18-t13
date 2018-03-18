@@ -131,8 +131,9 @@ namespace FiringSquad.Core.State
 				public InGameState(GameSceneState machine) : base(machine) { }
 
 				/// Private variables
-				private bool mPlayedSoundTimeWarning = false;
-				private bool mPlayedSoundSponsor = false;
+				private bool mPlayedSoundTimeWarning;
+				private bool mPlayedSoundSponsor;
+				private bool mInRealGame;
 				private long mRoundEndTime;
 				private BoundProperty<float> mRemainingTime;
 
@@ -160,6 +161,7 @@ namespace FiringSquad.Core.State
 				/// </summary>
 				private void OnReceiveLobbyEndTime(CltPlayer player, long time)
 				{
+					mInRealGame = false;
 					OnReceiveGameEndTime(time);
 				}
 
@@ -169,6 +171,7 @@ namespace FiringSquad.Core.State
 				/// </summary>
 				private void OnReceiveGameEndTime(long time)
 				{
+					mInRealGame = true;
 					mRoundEndTime = time;
 
 					if (mRemainingTime == null)
@@ -209,14 +212,14 @@ namespace FiringSquad.Core.State
 
 					mRemainingTime.value = Mathf.Clamp(CalculateRemainingTime(), 0.0f, float.MaxValue);
 
-					if (mRemainingTime.value < 120 & mPlayedSoundSponsor == false)
+					if (mInRealGame && mRemainingTime.value < 120 & mPlayedSoundSponsor == false)
 					{
 						ServiceLocator.Get<IAudioManager>()
 							.CreateSound(AudioEvent.AnnouncerSponsor, null);
 						mPlayedSoundSponsor = true;
 					}
 
-					if (mRemainingTime.value < 30 & mPlayedSoundTimeWarning == false)
+					if (mInRealGame && mRemainingTime.value < 30 & mPlayedSoundTimeWarning == false)
 					{
 						ServiceLocator.Get<IAudioManager>()
 							.CreateSound(AudioEvent.AnnouncerTimeWarning, null);
