@@ -297,7 +297,10 @@ namespace FiringSquad.Gameplay.Weapons
 
 				GameObject instance = Instantiate(prefab, realScript.barrelTip, false);
 				mCurrentMuzzleFlashVfx = instance.GetComponent<ParticleSystem>();
+
+				Vector3 scale = mCurrentMuzzleFlashVfx.transform.localScale;
 				mCurrentMuzzleFlashVfx.transform.ResetLocalValues();
+				mCurrentMuzzleFlashVfx.transform.localScale = scale;
 			}
 		}
 
