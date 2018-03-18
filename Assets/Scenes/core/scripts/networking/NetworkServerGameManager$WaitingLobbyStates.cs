@@ -60,6 +60,8 @@ namespace FiringSquad.Networking
 						GameData.PlayerTeam team = newCount > mMachine.data.goalPlayerCount / 2 ? GameData.PlayerTeam.Blue : GameData.PlayerTeam.Orange;
 						newPlayer.AssignPlayerTeam(team);
 					}
+					else
+						newPlayer.AssignPlayerTeam(GameData.PlayerTeam.Deathmatch);
 				}
 
 				/// <summary>
@@ -192,7 +194,7 @@ namespace FiringSquad.Networking
 					foreach (CltPlayer player in mMachine.mPlayerList)
 					{
 						GameData.PlayerTeam team = player.playerTeam;
-						player.AssignPlayerTeam(GameData.PlayerTeam.Deathmatch);
+						player.AssignPlayerTeam(GameData.PlayerTeam.DebugForceReset);
 						player.AssignPlayerTeam(team);
 					}
 				}
