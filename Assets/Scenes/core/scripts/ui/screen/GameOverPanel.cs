@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using FiringSquad.Core;
 using FiringSquad.Core.State;
 using FiringSquad.Core.UI;
@@ -45,14 +46,14 @@ namespace FiringSquad.Gameplay.UI
 		/// Set the scores displayed on the UI panel.
 		/// </summary>
 		/// <param name="scores">The array of scores that will be displayed.</param>
-		public void SetDisplayScores(PlayerScore[] scores)
+		public void SetDisplayScores(IList<PlayerScore> scores)
 		{
 			gameObject.SetActive(true);
-			scores = scores.OrderByDescending(x => (x.kills - x.deaths)).ToArray(); // TODO: Change this when we have actual scores!
+			scores = scores.OrderByDescending(x => x.score).ToArray();
 
-			for (uint i = 0; i < scores.Length; ++i)
+			for (uint i = 0; i < scores.Count; ++i)
 			{
-				PlayerScore score = scores[i];
+				PlayerScore score = scores[(int)i];
 				CltPlayer player = score.player;
 
 				GameOverIndividualScorePanel panel = Instantiate(mScorePrefab.gameObject, mScoreGrid.transform)
@@ -61,7 +62,7 @@ namespace FiringSquad.Gameplay.UI
 				panel.ApplyTeamColor(player.teamColor);
 				panel.playerRank = i + 1;
 				panel.playerName = player.playerName;
-				panel.playerScore = 0;
+				panel.playerScore = score.score;
 				panel.killCount = score.kills > 0 ? (uint)score.kills : 0;
 				panel.deathCount = score.deaths > 0 ? (uint)score.deaths : 0;
 			}

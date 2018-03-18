@@ -69,8 +69,10 @@ namespace FiringSquad.Data
 		/// </summary>
 		[Server]
 		[EventHandler]
-		private void OnPlayerDied(CltPlayer deadPlayer, ICharacter killer, Transform spawnPos)
+		private void OnPlayerDied(CltPlayer deadPlayer, PlayerKill killInfo)
 		{
+			ICharacter killer = killInfo.killer;
+
 			// Make sure the player was killed by another player
 			if (killer != null)
 			{
