@@ -400,7 +400,8 @@ namespace FiringSquad.Gameplay
 		{
 			localAnimator.SetTrigger("Fire");
 
-			mNetworkAnimator.animator.SetFloat("FireRate", weapon.currentData.fireRate);
+			if (weapon != null)
+				mNetworkAnimator.animator.SetFloat("FireRate", weapon.currentData.fireRate);
 			networkAnimator.SetTrigger("Fire");
 		}
 
