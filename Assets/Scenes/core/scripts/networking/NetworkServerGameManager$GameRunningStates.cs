@@ -79,7 +79,7 @@ namespace FiringSquad.Networking
 
 					mEndTime = DateTime.Now.Ticks + roundLength * TimeSpan.TicksPerSecond;
 
-					mStageEnableRoutine = mMachine.mScript.StartCoroutine(EnableStageArea(mMachine.mCaptureAreas.ChooseRandom()));
+					mStageEnableRoutine = mMachine.mScript.StartCoroutine(EnableStageArea(mMachine.mCaptureAreas.ChooseRandom(), mMachine.data.initialStageWait));
 
 					EventManager.Notify(() => EventManager.Server.StartGame(mEndTime));
 				}
