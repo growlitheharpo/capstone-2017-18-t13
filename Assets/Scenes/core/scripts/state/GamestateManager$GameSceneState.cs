@@ -32,6 +32,7 @@ namespace FiringSquad.Core.State
 				EventManager.Local.OnInputLevelChanged += OnInputLevelChanged;
 				EventManager.Local.OnTogglePause += OnTogglePause;
 				EventManager.Local.OnLocalPlayerSpawned += OnLocalPlayerSpawned;
+				EventManager.Local.OnIntroBegin += OnIntroBegin;
 				mIsPaused = false;
 			}
 
@@ -62,6 +63,15 @@ namespace FiringSquad.Core.State
 					PushState(new PausedGameState(this));
 
 				mIsPaused = !mIsPaused;
+			}
+
+			/// <summary>
+			/// EVENT HANDLER: Local.OnIntroBegin
+			/// </summary>
+			private void OnIntroBegin()
+			{
+				if (mIsPaused)
+					PopState();
 			}
 
 			/// <summary>
@@ -100,6 +110,7 @@ namespace FiringSquad.Core.State
 				EventManager.Local.OnInputLevelChanged -= OnInputLevelChanged;
 				EventManager.Local.OnTogglePause -= OnTogglePause;
 				EventManager.Local.OnLocalPlayerSpawned -= OnLocalPlayerSpawned;
+				EventManager.Local.OnIntroBegin -= OnIntroBegin;
 				SetCursorState(false);
 			}
 
