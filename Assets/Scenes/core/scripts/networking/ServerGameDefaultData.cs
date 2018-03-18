@@ -16,6 +16,7 @@ namespace FiringSquad.Data
 
 		public enum PlayerTeam
 		{
+			DebugForceReset = -1,
 			Deathmatch = 0,
 			Blue = 1,
 			Orange = 2,
@@ -33,7 +34,9 @@ namespace FiringSquad.Data
 		[SerializeField] private float mMaxStageWaitTime;
 		[SerializeField] private int mRoundTime;
 		[SerializeField] private int mLobbyTime;
+		[SerializeField] private int mIntroLength;
 		[SerializeField] private int mGoalPlayerCount;
+		[SerializeField] private float mInitialStageWait;
 
 		/// <summary>
 		/// The minimum wait for a stage to spawn.
@@ -46,6 +49,11 @@ namespace FiringSquad.Data
 		public float maxStageWaitTime { get { return mMaxStageWaitTime; } }
 
 		/// <summary>
+		/// The length of time to wait for the very first stage area
+		/// </summary>
+		public float initialStageWait { get { return mInitialStageWait; } }
+
+		/// <summary>
 		/// The length of a round, in seconds.
 		/// </summary>
 		public int roundTime { get { return mRoundTime; } }
@@ -54,6 +62,11 @@ namespace FiringSquad.Data
 		/// The length of the lobby, in seconds.
 		/// </summary>
 		public int lobbyTime { get { return mLobbyTime; } }
+
+		/// <summary>
+		/// The length of the intro sequence, in seconds.
+		/// </summary>
+		public int introLength { get { return mIntroLength; } }
 
 		/// <summary>
 		/// How many players to wait for before the match starts.

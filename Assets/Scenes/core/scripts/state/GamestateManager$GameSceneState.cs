@@ -32,6 +32,7 @@ namespace FiringSquad.Core.State
 				EventManager.Local.OnInputLevelChanged += OnInputLevelChanged;
 				EventManager.Local.OnTogglePause += OnTogglePause;
 				EventManager.Local.OnLocalPlayerSpawned += OnLocalPlayerSpawned;
+				EventManager.Local.OnIntroBegin += OnIntroBegin;
 				mIsPaused = false;
 			}
 
@@ -62,6 +63,15 @@ namespace FiringSquad.Core.State
 					PushState(new PausedGameState(this));
 
 				mIsPaused = !mIsPaused;
+			}
+
+			/// <summary>
+			/// EVENT HANDLER: Local.OnIntroBegin
+			/// </summary>
+			private void OnIntroBegin()
+			{
+				if (mIsPaused)
+					PopState();
 			}
 
 			/// <summary>
@@ -100,6 +110,7 @@ namespace FiringSquad.Core.State
 				EventManager.Local.OnInputLevelChanged -= OnInputLevelChanged;
 				EventManager.Local.OnTogglePause -= OnTogglePause;
 				EventManager.Local.OnLocalPlayerSpawned -= OnLocalPlayerSpawned;
+				EventManager.Local.OnIntroBegin -= OnIntroBegin;
 				SetCursorState(false);
 			}
 
@@ -120,8 +131,9 @@ namespace FiringSquad.Core.State
 				public InGameState(GameSceneState machine) : base(machine) { }
 
 				/// Private variables
-				private bool mPlayedSoundTimeWarning = false;
-				private bool mPlayedSoundSponsor = false;
+				private bool mPlayedSoundTimeWarning;
+				private bool mPlayedSoundSponsor;
+				private bool mInRealGame;
 				private long mRoundEndTime;
 				private BoundProperty<float> mRemainingTime;
 
@@ -129,7 +141,7 @@ namespace FiringSquad.Core.State
 				public override void OnEnter()
 				{
 					EventManager.Local.OnReceiveLobbyEndTime += OnReceiveLobbyEndTime;
-					EventManager.Local.OnReceiveStartEvent += OnReceiveStartEvent;
+					EventManager.Local.OnReceiveGameEndTime += OnReceiveGameEndTime;
 					EventManager.Local.OnReceiveFinishEvent += OnReceiveFinishEvent;
 					EventManager.Local.OnConfirmQuitGame += OnConfirmQuitGame;
 				}
@@ -138,7 +150,7 @@ namespace FiringSquad.Core.State
 				public override void OnExit()
 				{
 					EventManager.Local.OnReceiveLobbyEndTime -= OnReceiveLobbyEndTime;
-					EventManager.Local.OnReceiveStartEvent -= OnReceiveStartEvent;
+					EventManager.Local.OnReceiveGameEndTime -= OnReceiveGameEndTime;
 					EventManager.Local.OnReceiveFinishEvent -= OnReceiveFinishEvent;
 					EventManager.Local.OnConfirmQuitGame -= OnConfirmQuitGame;
 				}
@@ -149,15 +161,17 @@ namespace FiringSquad.Core.State
 				/// </summary>
 				private void OnReceiveLobbyEndTime(CltPlayer player, long time)
 				{
-					OnReceiveStartEvent(time);
+					mInRealGame = false;
+					OnReceiveGameEndTime(time);
 				}
 
 				/// <summary>
-				/// EVENT HANDLER: Local.OnReceiveStartEvent
+				/// EVENT HANDLER: Local.OnReceiveGameEndTime
 				/// Update the UI accordingly.
 				/// </summary>
-				private void OnReceiveStartEvent(long time)
+				private void OnReceiveGameEndTime(long time)
 				{
+					mInRealGame = true;
 					mRoundEndTime = time;
 
 					if (mRemainingTime == null)
@@ -198,14 +212,14 @@ namespace FiringSquad.Core.State
 
 					mRemainingTime.value = Mathf.Clamp(CalculateRemainingTime(), 0.0f, float.MaxValue);
 
-					if (mRemainingTime.value < 120 & mPlayedSoundSponsor == false)
+					if (mInRealGame && mRemainingTime.value < 120 & mPlayedSoundSponsor == false)
 					{
 						ServiceLocator.Get<IAudioManager>()
 							.CreateSound(AudioEvent.AnnouncerSponsor, null);
 						mPlayedSoundSponsor = true;
 					}
 
-					if (mRemainingTime.value < 30 & mPlayedSoundTimeWarning == false)
+					if (mInRealGame && mRemainingTime.value < 30 & mPlayedSoundTimeWarning == false)
 					{
 						ServiceLocator.Get<IAudioManager>()
 							.CreateSound(AudioEvent.AnnouncerTimeWarning, null);

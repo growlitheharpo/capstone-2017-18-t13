@@ -63,15 +63,15 @@ public partial class EventManager
 		/// Event called when this player has received a start event from the server.
 		/// PARAMETER 1: The end time in ticks that the game should end.
 		/// </summary>
-		public static event Action<long> OnReceiveStartEvent = t => { LogEvent(); };
+		public static event Action<long> OnReceiveGameEndTime = t => { LogEvent(); };
 
 		/// <summary>
 		/// Event called when this player has received a start event from the server.
 		/// </summary>
 		/// <param name="endTime">The end time in ticks that the game should end.</param>
-		public static void ReceiveStartEvent(long endTime)
+		public static void ReceiveGameEndTime(long endTime)
 		{
-			OnReceiveStartEvent(endTime);
+			OnReceiveGameEndTime(endTime);
 		}
 
 		/// <summary>
@@ -266,6 +266,45 @@ public partial class EventManager
 		}
 
 		/// <summary>
+		/// Event called when the server has notified this client to play its intro sequence
+		/// </summary>
+		public static event Action OnReceiveStartIntroNotice = () => { LogEvent(); };
+
+		/// <summary>
+		/// Event called when the server has notified this client to play its intro sequence
+		/// </summary>
+		public static void ReceiveStartIntroNotice()
+		{
+			OnReceiveStartIntroNotice();
+		}
+
+		/// <summary>
+		/// Event called when Timeline has activated the intro sequence.
+		/// </summary>
+		public static event Action OnIntroBegin = () => { LogEvent(); };
+
+		/// <summary>
+		/// Event called when Timeline has activated the intro sequence.
+		/// </summary>
+		public static void IntroBegin()
+		{
+			OnIntroBegin();
+		}
+
+		/// <summary>
+		/// Event called when Timeline has completed the intro sequence.
+		/// </summary>
+		public static event Action OnIntroEnd = () => { LogEvent(); };
+
+		/// <summary>
+		/// Event called when Timeline has completed the intro sequence.
+		/// </summary>
+		public static void IntroEnd()
+		{
+			OnIntroEnd();
+		}
+		
+		/// <summary>
 		/// Event called when the server confirms that a local player has captured a stage.
 		/// </summary>
 		public static event Action OnLocalPlayerCapturedStage = () => { LogEvent(); };
@@ -416,6 +455,19 @@ public partial class EventManager
 		public static void PlayerDied(CltPlayer deadPlayer, PlayerKill killInfo)
 		{
 			OnPlayerDied(deadPlayer, killInfo);
+		}
+
+		/// <summary>
+		/// Event called by the server to tell all clients to start their intro sequence
+		/// </summary>
+		public static event Action OnStartIntroSequence = () => { LogEvent(); };
+
+		/// <summary>
+		/// Event called by the server to tell all clients to start their intro sequence
+		/// </summary>
+		public static void StartIntroSequence()
+		{
+			OnStartIntroSequence();
 		}
 
 		/// <summary>

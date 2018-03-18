@@ -65,16 +65,21 @@ namespace FiringSquad.Networking
 						.Where(x => x.isLegendary)
 						.ToList();
 
-					mEndTime = DateTime.Now.Ticks + mMachine.data.roundTime * TimeSpan.TicksPerSecond;
+					mMachine.mPlayerScores = mMachine.mPlayerList.Select(x => new PlayerScore(x)).ToDictionary(x => x.playerId);
+
 					EventManager.Server.OnPlayerHealthHitsZero += OnPlayerHealthHitsZero;
 					EventManager.Server.OnPlayerCapturedStage += OnPlayerCapturedStage;
 					EventManager.Server.OnPlayerAttachedPart += OnPlayerAttachedPart;
 					EventManager.Server.OnPlayerCheated += OnPlayerCheated;
 					EventManager.Server.OnStageTimedOut += OnStageTimedOut;
 
-					mMachine.mPlayerScores = mMachine.mPlayerList.Select(x => new PlayerScore(x)).ToDictionary(x => x.playerId);
+					int roundLength = mMachine.data.roundTime;
+					if (!mMachine.mForceSkipIntro)
+						roundLength += (int)INTRO_BUFFER_FOR_SPAWN;
 
-					mStageEnableRoutine = mMachine.mScript.StartCoroutine(EnableStageArea(mMachine.mCaptureAreas.ChooseRandom()));
+					mEndTime = DateTime.Now.Ticks + roundLength * TimeSpan.TicksPerSecond;
+
+					mStageEnableRoutine = mMachine.mScript.StartCoroutine(EnableStageArea(mMachine.mCaptureAreas.ChooseRandom(), mMachine.data.initialStageWait));
 
 					EventManager.Notify(() => EventManager.Server.StartGame(mEndTime));
 				}
@@ -172,9 +177,10 @@ namespace FiringSquad.Networking
 				/// <summary>
 				/// Wait within a random range of seconds, then enable a stage.
 				/// </summary>
-				private IEnumerator EnableStageArea(StageCaptureArea stage)
+				private IEnumerator EnableStageArea(StageCaptureArea stage, float time = -1.0f)
 				{
-					yield return new WaitForSeconds(Random.Range(mMachine.data.minStageWaitTime, mMachine.data.maxStageWaitTime));
+					time = time > 0.0f ? time : Random.Range(mMachine.data.minStageWaitTime, mMachine.data.maxStageWaitTime);
+					yield return new WaitForSeconds(time);
 					stage.Enable();
 				}
 

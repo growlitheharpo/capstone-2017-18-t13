@@ -54,11 +54,17 @@ namespace FiringSquad.Networking
 		private void CONSOLE_ForceStartGame(string[] obj)
 		{
 			if (obj.Length == 1 && obj[0] == "1")
-				mStateMachine.ForceStartGameNow(true);
+				mStateMachine.ForceStartGameNow(true, true);
 			else if (obj.Length == 1 && obj[0] == "2")
-				mStateMachine.ForceStartGameNow(false);
+				mStateMachine.ForceStartGameNow(false, true);
+			else if (obj.Length == 1 && obj[0] == "3")
+				mStateMachine.ForceStartGameNow(false, false);
 			else
-				throw new ArgumentException("force-start called with invalid parameters.\nUse \"force-start 1\" to start with lobby, or \"force-start 2\" to start the match directly.");
+			{
+				throw new ArgumentException("force-start called with invalid parameters.\n"
+											+ "Use \"force-start 1\" to start with lobby, \"force-start 2\" to start with intro, "
+											+ "or \"force-start 3\" to start immediately.");
+			}
 		}
 
 		/// <summary>
@@ -89,7 +95,8 @@ namespace FiringSquad.Networking
 			// The states:
 			private partial class WaitingForConnectionState : BaseState<ServerStateMachine> { }
 			private partial class StartLobbyState : BaseState<ServerStateMachine> { }
-			private partial class StartGameState : BaseState<ServerStateMachine> { }
+			private partial class WaitForIntroState : BaseState<ServerStateMachine> { }
+			private partial class SpawnPlayersAndStartState : BaseState<ServerStateMachine> { }
 			private partial class GameRunningState : BaseState<ServerStateMachine> { }
 			private partial class GameFinishedState	 : BaseState<ServerStateMachine> { }
 
@@ -98,6 +105,7 @@ namespace FiringSquad.Networking
 			private readonly Transform[] mLobbyStartPositions;
 			private StageCaptureArea[] mCaptureAreas;
 			private CltPlayer[] mPlayerList;
+			private bool mForceSkipIntro;
 
 			// Shortcut to the script's data
 			private ServerGameDefaultData data { get { return mScript.mData; } }
@@ -124,12 +132,17 @@ namespace FiringSquad.Networking
 			/// Force an immediate transition into a non-waiting state.
 			/// </summary>
 			/// <param name="lobby">True to enter the lobby, false to immediately enter the match.</param>
-			public void ForceStartGameNow(bool lobby)
+			/// <param name="intro">True to play the intro, false otherwise.</param>
+			public void ForceStartGameNow(bool lobby, bool intro)
 			{
+				mForceSkipIntro = !intro;
+
 				if (lobby)
 					TransitionStates(new StartLobbyState(this));
+				else if (intro)
+					TransitionStates(new WaitForIntroState(this));
 				else
-					TransitionStates(new StartGameState(this));
+					TransitionStates(new SpawnPlayersAndStartState(this));
 			}
 		}
 	}
