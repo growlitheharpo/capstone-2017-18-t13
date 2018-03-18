@@ -18,7 +18,7 @@ namespace FiringSquad.Networking
 			/// The amount of time we wait after starting the intro before spawning the players.
 			/// This is subtracted from the "intro length" when starting the clock.
 			/// </summary>
-			private const float INTRO_WAIT_BEFORE_SPAWN_TIME = 5.0f;
+			private const float INTRO_BUFFER_FOR_SPAWN = 6.0f;
 
 			/// <summary>
 			/// The state we hold in until we have the required number of players
@@ -181,7 +181,7 @@ namespace FiringSquad.Networking
 				/// <inheritdoc />
 				public override void OnEnter()
 				{
-					mTimer = INTRO_WAIT_BEFORE_SPAWN_TIME;
+					mTimer = mMachine.data.introLength - INTRO_BUFFER_FOR_SPAWN;
 					EventManager.Notify(EventManager.Server.StartIntroSequence);
 				}
 

@@ -343,7 +343,7 @@ namespace FiringSquad.Gameplay
 				ServiceLocator.Get<IAudioManager>()
 					.CreateSound(AudioEvent.AnnouncerMatchStarts, transform);
 
-				return true;
+				return false;
 			}));
 		}
 

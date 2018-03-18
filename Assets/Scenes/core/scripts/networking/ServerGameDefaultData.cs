@@ -36,6 +36,7 @@ namespace FiringSquad.Data
 		[SerializeField] private int mLobbyTime;
 		[SerializeField] private int mIntroLength;
 		[SerializeField] private int mGoalPlayerCount;
+		[SerializeField] private float mInitialStageWait;
 
 		/// <summary>
 		/// The minimum wait for a stage to spawn.
@@ -46,6 +47,11 @@ namespace FiringSquad.Data
 		/// The maximum wait for a stage to spawn.
 		/// </summary>
 		public float maxStageWaitTime { get { return mMaxStageWaitTime; } }
+
+		/// <summary>
+		/// The length of time to wait for the very first stage area
+		/// </summary>
+		public float initialStageWait { get { return mInitialStageWait; } }
 
 		/// <summary>
 		/// The length of a round, in seconds.

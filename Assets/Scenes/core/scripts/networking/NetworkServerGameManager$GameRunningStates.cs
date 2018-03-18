@@ -75,7 +75,7 @@ namespace FiringSquad.Networking
 
 					int roundLength = mMachine.data.roundTime;
 					if (!mMachine.mForceSkipIntro)
-						roundLength += mMachine.data.introLength - (int)INTRO_WAIT_BEFORE_SPAWN_TIME;
+						roundLength += (int)INTRO_BUFFER_FOR_SPAWN;
 
 					mEndTime = DateTime.Now.Ticks + roundLength * TimeSpan.TicksPerSecond;
 
@@ -177,9 +177,10 @@ namespace FiringSquad.Networking
 				/// <summary>
 				/// Wait within a random range of seconds, then enable a stage.
 				/// </summary>
-				private IEnumerator EnableStageArea(StageCaptureArea stage)
+				private IEnumerator EnableStageArea(StageCaptureArea stage, float time = -1.0f)
 				{
-					yield return new WaitForSeconds(Random.Range(mMachine.data.minStageWaitTime, mMachine.data.maxStageWaitTime));
+					time = time > 0.0f ? time : Random.Range(mMachine.data.minStageWaitTime, mMachine.data.maxStageWaitTime);
+					yield return new WaitForSeconds(time);
 					stage.Enable();
 				}
 
