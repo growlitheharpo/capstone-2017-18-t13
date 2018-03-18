@@ -480,6 +480,14 @@ namespace FiringSquad.Gameplay.Weapons
 				return false;
 			}
 
+			Vector3 tip = barrel.barrelTip.position, eye = mBearer.eye.position;
+			RaycastHit hit;
+			if (Physics.Raycast(new Ray(eye, tip - eye), out hit, Vector3.Distance(eye, tip)))
+			{
+				if (hit.GetDamageReceiver() == null) // if we hit ourself or the gun, we'll have a damage receiver.
+					return false;
+			}
+
 			if (mShotsInClip.value <= 0)
 			{
 				Reload();
