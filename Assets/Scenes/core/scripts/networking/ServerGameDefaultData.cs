@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using FiringSquad.Gameplay.Weapons;
 using UnityEngine;
 
 namespace FiringSquad.Data
@@ -31,17 +29,11 @@ namespace FiringSquad.Data
 	public class ServerGameDefaultData
 	{
 		[SerializeField] private GameData.MatchType mCurrentType;
-		[SerializeField] private List<WeaponPartScript> mStageCaptureParts;
 		[SerializeField] private float mMinStageWaitTime;
 		[SerializeField] private float mMaxStageWaitTime;
 		[SerializeField] private int mRoundTime;
 		[SerializeField] private int mLobbyTime;
 		[SerializeField] private int mGoalPlayerCount;
-
-		/// <summary>
-		/// The list of parts that can be used for when a stage is captured.
-		/// </summary>
-		public List<WeaponPartScript> stageCaptureParts { get { return mStageCaptureParts; } }
 
 		/// <summary>
 		/// The minimum wait for a stage to spawn.

@@ -17,6 +17,7 @@ namespace FiringSquad.Gameplay.Weapons
 
 		/// Inspector variables
 		[SerializeField] private byte mUniqueId;
+		[SerializeField] private bool mIsLegendary;
 		[SerializeField] private string mPrettyName;
 		[SerializeField] private string mDescription;
 		[SerializeField] private WeaponPartData mData;
@@ -40,6 +41,11 @@ namespace FiringSquad.Gameplay.Weapons
 		/// The unique part ID of this weapon part.
 		/// </summary>
 		public byte partId { get { return mUniqueId; } }
+
+		/// <summary>
+		/// True if this part is considered a "legendary" part.
+		/// </summary>
+		public bool isLegendary { get { return mIsLegendary; } }
 
 		/// <summary>
 		/// A short text description of this part. Used for UI.

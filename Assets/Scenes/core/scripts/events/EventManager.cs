@@ -78,13 +78,13 @@ public partial class EventManager
 		/// Event called when the player has received the end game event from the server.
 		/// PARAMETER 1: The list of player scores received from the server.
 		/// </summary>
-		public static event Action<PlayerScore[]> OnReceiveFinishEvent = (s) => { LogEvent(); };
+		public static event Action<IList<PlayerScore>> OnReceiveFinishEvent = (s) => { LogEvent(); };
 
 		/// <summary>
 		/// Event called when the player has received the end game event from the server.
 		/// </summary>
 		/// <param name="scores">The list of player scores received from the server.</param>
-		public static void ReceiveFinishEvent(PlayerScore[] scores)
+		public static void ReceiveFinishEvent(IList<PlayerScore> scores)
 		{
 			OnReceiveFinishEvent(scores);
 		}
@@ -185,17 +185,19 @@ public partial class EventManager
 		/// Event called when the local player has killed another character.
 		/// PARAMETER 1: The other character that was killed.
 		/// PARAMETER 2: The player's current weapon.
+		/// PARAMETER 3: The flags tied to this kill.
 		/// </summary>
-		public static event Action<CltPlayer, IWeapon> OnLocalPlayerGotKill = (d, w) => { LogEvent(); };
+		public static event Action<CltPlayer, IWeapon, KillFlags> OnLocalPlayerGotKill = (d, w, f) => { LogEvent(); };
 
 		/// <summary>
 		/// Event called when the local player has killed another character.
 		/// </summary>
 		/// <param name="deadPlayer">The other character that was killed.</param>
 		/// <param name="currentWeapon">The player's current weapon.</param>
-		public static void LocalPlayerGotKill(CltPlayer deadPlayer, IWeapon currentWeapon)
+		/// <param name="killInfoFlags">The flags tied to this kill.</param>
+		public static void LocalPlayerGotKill(CltPlayer deadPlayer, IWeapon currentWeapon, KillFlags killInfoFlags)
 		{
-			OnLocalPlayerGotKill(deadPlayer, currentWeapon);
+			OnLocalPlayerGotKill(deadPlayer, currentWeapon, killInfoFlags);
 		}
 
 		/// <summary>
@@ -261,6 +263,19 @@ public partial class EventManager
 		public static void ZoomLevelChanged(float zoom, CltPlayer player)
 		{
 			OnZoomLevelChanged(zoom, player);
+		}
+
+		/// <summary>
+		/// Event called when the server confirms that a local player has captured a stage.
+		/// </summary>
+		public static event Action OnLocalPlayerCapturedStage = () => { LogEvent(); };
+
+		/// <summary>
+		/// Event called when the server confirms that a local player has captured a stage.
+		/// </summary>
+		public static void LocalPlayerCapturedStage()
+		{
+			OnLocalPlayerCapturedStage();
 		}
 	}
 
@@ -389,20 +404,18 @@ public partial class EventManager
 		/// <summary>
 		/// Event called when a player's death is confirmed by the server.
 		/// PARAMETER 1: The player that died.
-		/// PARAMETER 2: The character that killed the player, or null.
-		/// PARAMETER 3: The transform of the dead player's target respawn.
+		/// PARAMETER 2: The information about the kill that took place.
 		/// </summary>
-		public static event Action<CltPlayer, ICharacter, Transform> OnPlayerDied = (d, k, p) => { LogEvent(); };
+		public static event Action<CltPlayer, PlayerKill> OnPlayerDied = (dp, ki) => { LogEvent(); };
 
 		/// <summary>
 		/// Event called when a player's death is confirmed by the server.
 		/// </summary>
 		/// <param name="deadPlayer">The player that died.</param>
-		/// <param name="killer">The character that killed the player, or null.</param>
-		/// <param name="respawnPosition">The transform of the dead player's target respawn.</param>
-		public static void PlayerDied(CltPlayer deadPlayer, ICharacter killer, Transform respawnPosition)
+		/// <param name="killInfo">The information about the kill that took place.</param>
+		public static void PlayerDied(CltPlayer deadPlayer, PlayerKill killInfo)
 		{
-			OnPlayerDied(deadPlayer, killer, respawnPosition);
+			OnPlayerDied(deadPlayer, killInfo);
 		}
 
 		/// <summary>
@@ -440,14 +453,14 @@ public partial class EventManager
 		/// PARAMETER 1: The stage that was captured.
 		/// PARAMETER 2: The player who captured the stage.
 		/// </summary>
-		public static event Action<StageCaptureArea, CltPlayer> OnPlayerCapturedStage = (s, p) => { LogEvent(); };
+		public static event Action<StageCaptureArea, IList<CltPlayer>> OnPlayerCapturedStage = (s, p) => { LogEvent(); };
 
 		/// <summary>
 		/// Event called when the server has determined that a player captured a stage.
 		/// </summary>
 		/// <param name="area">The stage that was captured.</param>
 		/// <param name="player">The player who captured the stage.</param>
-		public static void PlayerCapturedStage(StageCaptureArea area, CltPlayer player)
+		public static void PlayerCapturedStage(StageCaptureArea area, IList<CltPlayer> player)
 		{
 			OnPlayerCapturedStage(area, player);
 		}
@@ -487,6 +500,38 @@ public partial class EventManager
 		public static void PartPickedUp(WeaponPartPad pad)
 		{
 			OnPartPickedUp(pad);
+		}
+
+		/// <summary>
+		/// Event called on the server when a player has attached a new part.
+		/// PARAMETER 1: The weapon that this part was attached to.
+		/// PARAMETER 2: The part instance that was attached.
+		/// PARAMETER 3: The bearer that attached the new part.
+		/// </summary>
+		public static event Action<BaseWeaponScript, WeaponPartScript> OnPlayerAttachedPart = (w, p) => { LogEvent(); };
+
+		/// <summary>
+		/// Event called on the server when a player has attached a new part.
+		/// </summary>
+		/// <param name="baseWeaponScript">The weapon that this part was attached to.</param>
+		/// <param name="weaponPartScript">The part instance that was attached.</param>
+		/// <param name="bearer">The bearer that attached the new part.</param>
+		public static void PlayerAttachedPart(BaseWeaponScript baseWeaponScript, WeaponPartScript weaponPartScript)
+		{
+			OnPlayerAttachedPart(baseWeaponScript, weaponPartScript);
+		}
+
+		/// <summary>
+		/// Event called when a player has cheated by using the debug menu.
+		/// </summary>
+		public static event Action<CltPlayer> OnPlayerCheated = p => { LogEvent(); };
+
+		/// <summary>
+		/// Event called when a player has cheated by using the debug menu.
+		/// </summary>
+		public static void PlayerCheated(CltPlayer player)
+		{
+			OnPlayerCheated(player);
 		}
 	}
 
