@@ -13,9 +13,11 @@ namespace FiringSquad.Core.Audio
 	/// </summary>
 	public enum AudioEvent
 	{
+		// Player
 		EquipItem = 50,
 		LoopWalking = 30,
 		Jump = 35,
+		Land = 38,
 		LoopGravGun = 40,
 		MagnetArmGrab = 45,
 		LocalDealDamage = 48,
@@ -51,6 +53,11 @@ namespace FiringSquad.Core.Audio
 		AnnouncerPlayerDeath = 155,
 		AnnouncerBreaksCamera = 160,
 		AnnouncerMultiKill = 165,
+
+		// UI
+		MenuButtonHover = 180,
+		MenuButtonPress = 185,
+		HypeText = 190,
 	}
 
 	/// <inheritdoc cref="IAudioManager"/>
