@@ -57,9 +57,6 @@
         </relationship>
     </object>
     <object class="EventAutomatableProperties" id="{d7eb154d-c8de-468c-af79-334db7fbbd29}">
-        <property name="priority">
-            <value>1</value>
-        </property>
         <property name="dopplerEnabled">
             <value>true</value>
         </property>
@@ -97,7 +94,10 @@
     <object class="MixerBusPanner" id="{f9adae1f-37b2-4e98-bc2f-9184fbc34b47}"/>
     <object class="SingleSound" id="{2a0f7b3e-210b-453d-833c-ff8b4a032a98}">
         <property name="length">
-            <value>2</value>
+            <value>0.39500000000000002</value>
+        </property>
+        <property name="timelockedOffset">
+            <value>0.22500000000000001</value>
         </property>
         <relationship name="audioFile">
             <destination>{88764fd3-4a98-4507-8296-fda79051e44d}</destination>
@@ -105,7 +105,7 @@
     </object>
     <object class="EventMixerGroup" id="{bf5eb3df-e8dd-43e5-b888-6fa0d5389078}">
         <property name="volume">
-            <value>-6</value>
+            <value>-11</value>
         </property>
         <property name="name">
             <value>Audio 1</value>

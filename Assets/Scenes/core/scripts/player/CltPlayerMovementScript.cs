@@ -26,6 +26,8 @@ namespace FiringSquad.Gameplay
 		private CltPlayer mPlayer;
 		private CltPlayerLocal mLocalPlayer;
 		private IAudioReference mWalkingSound;
+		private IAudioReference mJumpSound;
+		private IAudioReference mLandSound;
 		private Coroutine mZoomInRoutine;
 		private Camera mRealCameraRef;
 
@@ -225,6 +227,16 @@ namespace FiringSquad.Gameplay
 				mMoveDirection.y = 0.0f;
 
 				// play landing sound
+				IAudioManager audioService = ServiceLocator.Get<IAudioManager>();
+				mLandSound = audioService.CheckReferenceAlive(ref mLandSound);
+
+				if (mLandSound == null)
+				{
+					mLandSound = ServiceLocator.Get<IAudioManager>().CreateSound(AudioEvent.Land, mPlayer.transform, false);
+					mLandSound.AttachToRigidbody(mController.GetComponent<Rigidbody>());
+					mLandSound.Start();
+				}
+				
 				mPlayer.localAnimator.ResetTrigger("Jump");
 				mPlayer.localAnimator.SetTrigger("Land");
 				mPlayer.networkAnimator.SetTrigger("Land");
@@ -387,8 +399,17 @@ namespace FiringSquad.Gameplay
 				{
 					mMoveDirection.y = mMovementData.jumpForce;
 
-					// play jump sound ?
+					// play jump sound
+					IAudioManager audioService = ServiceLocator.Get<IAudioManager>();
+					mJumpSound = audioService.CheckReferenceAlive(ref mJumpSound);
 
+					if (mJumpSound == null)
+					{
+						mJumpSound = ServiceLocator.Get<IAudioManager>().CreateSound(AudioEvent.Jump, mPlayer.transform, false);
+						mJumpSound.AttachToRigidbody(mController.GetComponent<Rigidbody>());
+						mJumpSound.Start();
+					}
+					
 					mPlayer.localAnimator.ResetTrigger("Land");
 					mPlayer.localAnimator.SetTrigger("Jump");
 					mPlayer.networkAnimator.SetTrigger("Jump");
