@@ -341,8 +341,6 @@ namespace FiringSquad.Gameplay
 				}
 			}
 
-			//Vector3 desiredMove = Vector3.Lerp(transform.position, transform.forward * mInput.y + transform.right * mInput.x, 0.1f);
-
 			// Cast around us to check the plane we should move on.
 			RaycastHit hitInfo;
 			Physics.SphereCast(transform.position, mController.radius, Vector3.down, out hitInfo, mController.height / 2.0f, Physics.AllLayers, QueryTriggerInteraction.Ignore);
@@ -381,12 +379,12 @@ namespace FiringSquad.Gameplay
 			//float speed = mMovementData.speed;
 			//speed = Mathf.Lerp(mCurrentSpeed, mMovementData.speed, 0.1f);
 
-			if (mIsRunning && mInput.x == 0) // Also make sure they're only going forward
+			if (mIsRunning && mInput.x == 0 && mInput.y != 0) // Also make sure they're only going forward
 				speed *= mMovementData.sprintMultiplier;
 			if (mCrouching)
 				speed *= mMovementData.crouchMoveMultiplier;
 			if (mLocalPlayer.inAimDownSightsMode)
-				speed *= mMovementData.aimDownSightsMoveMultiplier;
+				speed *= 3 * mMovementData.aimDownSightsMoveMultiplier;
 
 			mMoveDirection.x = desiredMove.x * speed;
 			mMoveDirection.z = desiredMove.z * speed;
@@ -447,6 +445,10 @@ namespace FiringSquad.Gameplay
 		private void OnLocalPlayerDied(Vector3 spawnPos, Quaternion spawnRot, ICharacter killer)
 		{
 			mRotationY = 0.0f;
+			mCurrentSpeed = 0.0f;
+			mIsJumping = false;
+			mIsRunning = false;
+			mCrouching = false;
 		}
 		
 		/// <summary>
