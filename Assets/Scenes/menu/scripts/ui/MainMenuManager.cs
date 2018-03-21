@@ -16,6 +16,7 @@ namespace FiringSquad.Gameplay.UI
 		[SerializeField] private UIButton mFourPlayerButton;
 		[SerializeField] private UIButton mQuitButton;
 		[SerializeField] private UIButton mGunGlossaryButton;
+		[SerializeField] private UIButton mHowToPlayButton;
 		[SerializeField] private int mKioskTimerSeconds = 10;
 		private int mKioskTimerTicks;
 
@@ -27,6 +28,7 @@ namespace FiringSquad.Gameplay.UI
 			mFourPlayerButton.onClick.AddListener(LaunchNewLevel);
 			mQuitButton.onClick.AddListener(ClickQuit);
 			mGunGlossaryButton.onClick.AddListener(LaunchGlossary);
+			mHowToPlayButton.onClick.AddListener(LaunchHowToPlay);
 
 			mKioskTimerTicks = mKioskTimerSeconds * 100;
 		}
@@ -49,6 +51,17 @@ namespace FiringSquad.Gameplay.UI
 		{
 			ServiceLocator.Get<IGamestateManager>()
 				.RequestShutdown();
+		}
+
+		/// <summary>
+		/// Launch the gun glossary scene
+		/// </summary>
+		private void LaunchHowToPlay()
+		{
+			mMainElementHolder.SetActive(false);
+
+			ServiceLocator.Get<IGamestateManager>()
+				.RequestSceneChange(GamestateManager.HOW_TO_PLAY);
 		}
 
 		/// <summary>
