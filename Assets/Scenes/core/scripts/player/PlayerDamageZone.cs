@@ -21,11 +21,12 @@ namespace FiringSquad.Gameplay
 		public IDamageReceiver receiver { get { return mPlayer; } }
 
 		/// <summary>
-		/// Unity's Awake function
+		/// Unity's Start function
 		/// </summary>
-		private void Awake()
+		private void Start()
 		{
 			mPlayer = GetComponentInParent<CltPlayer>();
+			UnityEngine.Debug.Log("Grabbed " + mPlayer);
 		}
 	}
 }
