@@ -90,19 +90,21 @@ namespace FiringSquad.Gameplay.Weapons
 				{
 					endPoint = hit.point;
 					float damage = GetDamage(data, Vector3.Distance(weapon.transform.position, endPoint));
+					bool wasHeadshot = false;
 
 					IDamageZone hitZone = hit.GetDamageZone();
 					if (hitZone != null)
 					{
 						hitObject = hitZone.receiver;
 						damage = hitZone.damageModification.Apply(damage);
+						wasHeadshot = hitZone.isHeadshot;
 					}
 					else
 						hitObject = hit.GetDamageReceiver();
 
 					if (hitObject != null && hitObject != weapon.bearer)
 					{
-						hitObject.ApplyDamage(damage, endPoint, hit.normal, this);
+						hitObject.ApplyDamage(damage, endPoint, hit.normal, this, wasHeadshot);
 						--hitObjectCount;
 					}
 					else

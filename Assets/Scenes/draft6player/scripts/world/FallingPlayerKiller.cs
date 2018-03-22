@@ -19,7 +19,7 @@ namespace FiringSquad.Gameplay
 		{
 			IDamageReceiver damageReceiver = other.GetComponentInParent<IDamageReceiver>();
 			if (damageReceiver != null)
-				damageReceiver.ApplyDamage(damageReceiver.currentHealth + 500000.0f, other.transform.position, Vector3.up, this);
+				damageReceiver.ApplyDamage(damageReceiver.currentHealth + 500000.0f, other.transform.position, Vector3.up, this, false);
 		}
 	}
 }

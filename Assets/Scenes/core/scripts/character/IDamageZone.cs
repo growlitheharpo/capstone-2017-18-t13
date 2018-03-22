@@ -17,5 +17,10 @@ namespace FiringSquad.Gameplay
 		/// The receiver that this damage zone is attached to.
 		/// </summary>
 		IDamageReceiver receiver { get; }
+
+		/// <summary>
+		/// True if this shot counts as a special headshot
+		/// </summary>
+		bool isHeadshot { get; }
 	}
 }

@@ -73,7 +73,7 @@ namespace FiringSquad.Networking
 				/// <summary>
 				/// EVENT HANDLER: Server.OnPlayerHealthHitsZero
 				/// </summary>
-				private void OnPlayerHealthHitsZero(CltPlayer deadPlayer, IDamageSource source)
+				private void OnPlayerHealthHitsZero(CltPlayer deadPlayer, IDamageSource source, bool wasHeadshot)
 				{
 					Transform localSpawn = mMachine.mLobbyStartPositions
 						.OrderBy(x => Vector3.Distance(x.transform.position, deadPlayer.transform.position))
@@ -123,7 +123,7 @@ namespace FiringSquad.Networking
 				/// <summary>
 				/// EVENT HANDLER: Server.OnPlayerHealthHitsZero
 				/// </summary>
-				private void OnPlayerHealthHitsZero(CltPlayer deadPlayer, IDamageSource source)
+				private void OnPlayerHealthHitsZero(CltPlayer deadPlayer, IDamageSource source, bool wasHeadshot)
 				{
 					Transform localSpawn = mMachine.mLobbyStartPositions
 						.OrderBy(x => Vector3.Distance(x.transform.position, deadPlayer.transform.position))

@@ -84,7 +84,7 @@ namespace FiringSquad.Prototyping
 		}
 
 		/// <inheritdoc />
-		public void ApplyDamage(float amount, Vector3 point, Vector3 normal, IDamageSource cause = null)
+		public void ApplyDamage(float amount, Vector3 point, Vector3 normal, IDamageSource cause = null, bool wasHeadshot = false)
 		{
 			StopAllCoroutines();
 			mHealth.value = Mathf.Clamp(mHealth.value - amount, 0.0f, float.MaxValue);

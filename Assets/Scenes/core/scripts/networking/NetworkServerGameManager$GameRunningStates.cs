@@ -187,7 +187,7 @@ namespace FiringSquad.Networking
 				/// <summary>
 				/// EVENT HANDLER: Server.OnPlayerHealthHitsZero
 				/// </summary>
-				private void OnPlayerHealthHitsZero(CltPlayer dead, IDamageSource damage)
+				private void OnPlayerHealthHitsZero(CltPlayer dead, IDamageSource damage, bool wasHeadshot)
 				{
 					var spawnList = mMachine.data.currentType == GameData.MatchType.Deathmatch
 						? PlayerSpawnPosition.GetAll().Select(x => x.transform).ToList()
@@ -204,11 +204,11 @@ namespace FiringSquad.Networking
 						spawnPosition = newPosition,
 						mFlags = KillFlags.None
 					};
-					
+
 					if (damage.source is CltPlayer)
 					{
 						mMachine.mPlayerScores[damage.source.netId].kills++;
-						killInfo.mFlags = CalculateFlagsForKill(killInfo);
+						killInfo.mFlags = CalculateFlagsForKill(killInfo, wasHeadshot);
 						mMachine.mPlayerScores[damage.source.netId].score += GetScoreForFlags(killInfo.mFlags);
 					}
 
@@ -217,9 +217,13 @@ namespace FiringSquad.Networking
 					EventManager.Server.PlayerDied(dead, killInfo);
 				}
 
-				private KillFlags CalculateFlagsForKill(PlayerKill killInfo)
+				private KillFlags CalculateFlagsForKill(PlayerKill killInfo, bool wasHeadshot)
 				{
-					return KillFlags.None;
+					KillFlags result = KillFlags.None;
+					if (wasHeadshot)
+						result |= KillFlags.Headshot;
+						
+					return result;
 				}
 				
 				private int GetScoreForFlags(KillFlags killInfoFlags)
