@@ -10,6 +10,7 @@ namespace FiringSquad.Gameplay
 	{
 		/// Inspector variables
 		[SerializeField] private Modifier.Float mDamagePercentage;
+		[SerializeField] private bool mIsHeadshot;
 
 		/// Private variables
 		private CltPlayer mPlayer;
@@ -19,6 +20,9 @@ namespace FiringSquad.Gameplay
 
 		/// <inheritdoc />
 		public IDamageReceiver receiver { get { return mPlayer; } }
+
+		/// <inheritdoc />
+		public bool isHeadshot { get { return mIsHeadshot; } }
 
 		/// <summary>
 		/// Unity's Awake function

@@ -63,6 +63,7 @@ namespace FiringSquad.Gameplay.Weapons
 			
 			IDamageReceiver component = null;
 			float damage = mData.damage;
+			bool isHeadshot = false;
 
 			if (mRecognizeHeadshots)
 			{
@@ -71,6 +72,7 @@ namespace FiringSquad.Gameplay.Weapons
 				{
 					damage = zone.damageModification.Apply(mData.damage);
 					component = zone.receiver;
+					isHeadshot = zone.isHeadshot;
 				}
 			}
 			else
@@ -78,7 +80,7 @@ namespace FiringSquad.Gameplay.Weapons
 
 			if (component != null)
 			{
-				component.ApplyDamage(damage, hit.contacts[0].point, hit.contacts[0].normal, this);
+				component.ApplyDamage(damage, hit.contacts[0].point, hit.contacts[0].normal, this, isHeadshot);
 				mDirectHit = hit.transform;
 			}
 
@@ -124,7 +126,7 @@ namespace FiringSquad.Gameplay.Weapons
 				if (hitInfo.collider != col)
 					continue;
 
-				c.ApplyDamage(mData.damage * 0.5f, hitInfo.point, hitInfo.normal, this);
+				c.ApplyDamage(mData.damage * 0.5f, hitInfo.point, hitInfo.normal, this, false);
 			}
 		}
 

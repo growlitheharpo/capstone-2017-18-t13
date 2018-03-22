@@ -203,7 +203,7 @@ namespace FiringSquad.Gameplay.NPC
 
 		/// <inheritdoc />
 		[Server]
-		public void ApplyDamage(float amount, Vector3 point, Vector3 normal, IDamageSource cause)
+		public void ApplyDamage(float amount, Vector3 point, Vector3 normal, IDamageSource cause, bool wasHeadshot)
 		{
 			RpcReflectDamageLocally(point, normal, cause.source.gameObject.transform.position, amount, cause.source.netId);
 

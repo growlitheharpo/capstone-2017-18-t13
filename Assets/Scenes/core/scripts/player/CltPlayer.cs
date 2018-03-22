@@ -639,7 +639,7 @@ namespace FiringSquad.Gameplay
 
 		/// <inheritdoc />
 		[Server]
-		public void ApplyDamage(float amount, Vector3 point, Vector3 normal, IDamageSource cause)
+		public void ApplyDamage(float amount, Vector3 point, Vector3 normal, IDamageSource cause, bool wasHeadshot)
 		{
 			if (ReferenceEquals(cause.source, this))
 				amount *= 0.5f;
@@ -661,7 +661,7 @@ namespace FiringSquad.Gameplay
 			mHealth = Mathf.Clamp(mHealth - amount, 0.0f, float.MaxValue);
 
 			if (mHealth <= 0.0f)
-				EventManager.Notify(() => EventManager.Server.PlayerHealthHitZero(this, cause));
+				EventManager.Notify(() => EventManager.Server.PlayerHealthHitZero(this, cause, wasHeadshot));
 		}
 
 		/// <inheritdoc />

@@ -427,17 +427,19 @@ public partial class EventManager
 		/// Event called when a player's health has hit zero, but they have not officially "died".
 		/// PARAMETER 1: The player whose health is at zero.
 		/// PARAMETER 2: The IDamageSource that caused the player's health to reach this point.
+		/// PARAMETER 3: True if the final shot was a headshot.
 		/// </summary>
-		public static event Action<CltPlayer, IDamageSource> OnPlayerHealthHitsZero = (p, r) => { LogEvent(); };
+		public static event Action<CltPlayer, IDamageSource, bool> OnPlayerHealthHitsZero = (p, r, h) => { LogEvent(); };
 
 		/// <summary>
 		/// Event called when a player's health has hit zero, but they have not officially "died".
 		/// </summary>
 		/// <param name="player">The player whose health is at zero.</param>
 		/// <param name="reason">The IDamageSource that caused the player's health to reach this point.</param>
-		public static void PlayerHealthHitZero(CltPlayer player, IDamageSource reason)
+		/// <param name="wasHeadshot">True if the final shot was a headshot.</param>
+		public static void PlayerHealthHitZero(CltPlayer player, IDamageSource reason, bool wasHeadshot)
 		{
-			OnPlayerHealthHitsZero(player, reason);
+			OnPlayerHealthHitsZero(player, reason, wasHeadshot);
 		}
 
 		/// <summary>
