@@ -45,6 +45,48 @@ namespace FiringSquad.Networking
 			private partial class GameRunningState
 			{
 				/// <summary>
+				/// Utility struct for saving kill information through the course of each match.
+				/// </summary>
+				private class PlayerKillServerInfo
+				{
+					/// <summary>
+					/// The time at which this kill occurred.
+					/// </summary>
+					public float time { get; set; }
+
+					/// <summary>
+					/// The length of time since this kill occurred.
+					/// </summary>
+					public float age { get { return Time.time - time; } }
+				}
+
+				/// <summary>
+				/// The log of each player's kills.
+				/// </summary>
+				private class PlayerKillLog
+				{
+					/// <summary>
+					/// A list of the player's kills up to now.
+					/// </summary>
+					public List<PlayerKillServerInfo> killHistory { get; set; }
+
+					/// <summary>
+					/// A running total of this player's kills since their last death.
+					/// </summary>
+					public int killStreak { get; set; }
+
+					/// <summary>
+					/// The exact time of the player's last death
+					/// </summary>
+					public float lastDeath { get; set; }
+
+					/// <summary>
+					/// How much time has elapsed since the player's last death.
+					/// </summary>
+					public float timeSinceLastDeath { get { return Time.time - lastDeath; } }
+				}
+
+				/// <summary>
 				/// State that runs the actual game. Ticks the timer for the game
 				/// and handles player deaths during the match by sending them to
 				/// a spawn point.
@@ -53,6 +95,7 @@ namespace FiringSquad.Networking
 				/// </summary>
 				public GameRunningState(ServerStateMachine machine) : base(machine) { }
 
+				private Dictionary<CltPlayer, PlayerKillLog> mKillLogs;
 				private List<WeaponPartScript> mCachedLegendaryList;
 				private Coroutine mStageEnableRoutine;
 				private long mEndTime;
@@ -61,6 +104,19 @@ namespace FiringSquad.Networking
 				/// <inheritdoc />
 				public override void OnEnter()
 				{
+					// Set up everything we need for kill logging.
+					mKillLogs = new Dictionary<CltPlayer, PlayerKillLog>();
+					foreach (CltPlayer player in mMachine.mPlayerList)
+					{
+						PlayerKillLog newLog = new PlayerKillLog
+						{
+							killHistory = new List<PlayerKillServerInfo>(),
+							killStreak = 0,
+							lastDeath = 0.0f,
+						};
+						mKillLogs.Add(player, newLog);
+					}
+
 					mCachedLegendaryList = ServiceLocator.Get<IWeaponPartManager>()
 						.GetAllPrefabScripts(false)
 						.Select(x => x.Value)
@@ -197,7 +253,6 @@ namespace FiringSquad.Networking
 
 					Transform newPosition = ChooseSafestSpawnPosition(mMachine.mPlayerList, dead, spawnList);
 
-
 					mMachine.mPlayerScores[dead.netId].deaths++;
 
 					PlayerKill killInfo = new PlayerKill
@@ -207,27 +262,57 @@ namespace FiringSquad.Networking
 						mFlags = KillFlags.None
 					};
 
-					if (damage.source is CltPlayer)
+					CltPlayer killer = damage.source as CltPlayer;
+					if (killer != null)
 					{
 						mMachine.mPlayerScores[damage.source.netId].kills++;
-						killInfo.mFlags = CalculateFlagsForKill(killInfo, wasHeadshot);
+						killInfo.mFlags = CalculateFlagsForKill(wasHeadshot, dead, killer);
 						mMachine.mPlayerScores[damage.source.netId].score += GetScoreForFlags(killInfo.mFlags);
 					}
 
-					LogKill(killInfo);
-
+					LogKill(dead, killer);
 					EventManager.Server.PlayerDied(dead, killInfo);
 				}
 
-				private KillFlags CalculateFlagsForKill(PlayerKill killInfo, bool wasHeadshot)
+				/// <summary>
+				/// Calculate the relevant kill flags for what just happened.
+				/// </summary>
+				/// <param name="wasHeadshot">True if the player reported this to us as a headshot.</param>
+				/// <param name="victim">The victim of the kill (the player whose health just reached 0.</param>
+				/// <param name="killer">The killer of the kill.</param>
+				/// <returns>Appropriate KillFlags based on recent kill history.</returns>
+				private KillFlags CalculateFlagsForKill(bool wasHeadshot, CltPlayer victim, CltPlayer killer)
 				{
 					KillFlags result = KillFlags.None;
 					if (wasHeadshot)
 						result |= KillFlags.Headshot;
-						
+
+					// Grab all the relevant kill history that we need.
+					PlayerKillLog killerLog = mKillLogs[killer];
+
+					// Check if the killer has had more than 3 kills in a 5 second timespan
+					if (killerLog.killHistory.Count(x => x.age < 5.0f) > 3)
+						result |= KillFlags.Multikill;
+
+					// Check if the killer has had more than 4 kills since last death (+1 because this kill hasn't been logged yet)
+					if (killerLog.killStreak + 1 >= 4)
+						result |= KillFlags.Killstreak;
+
+					// Check if the killer's last death was less than the respawn timer (i.e., they are currently dead)
+					if (killerLog.timeSinceLastDeath < PLAYER_RESPAWN_TIME)
+						result |= KillFlags.Revenge;
+
+					// Check if the dead player had a kill streak happening
+					if (mKillLogs[victim].killStreak >= 4)
+						result |= KillFlags.Kingslayer;
+
 					return result;
 				}
-				
+
+				/// <summary>
+				/// Returns the score amount for the flags that have been determined.
+				/// </summary>
+				/// <param name="killInfoFlags">The relevant flags.</param>
 				private int GetScoreForFlags(KillFlags killInfoFlags)
 				{
 					int score = STANDARD_KILL_POINTS;
@@ -245,8 +330,19 @@ namespace FiringSquad.Networking
 					return score;
 				}
 
-				private void LogKill(PlayerKill killInfo)
+				/// <summary>
+				/// Log a kill into the history log.
+				/// </summary>
+				private void LogKill(CltPlayer victim, CltPlayer killer)
 				{
+					PlayerKillServerInfo serverInfo = new PlayerKillServerInfo { time = Time.time };
+
+					mKillLogs[killer].killHistory.Add(serverInfo);
+					mKillLogs[killer].killStreak++;
+
+					mKillLogs[victim].killStreak = 0;
+					mKillLogs[victim].killHistory.Clear();
+					mKillLogs[victim].lastDeath = Time.time;
 				}
 
 				/// <inheritdoc />
@@ -255,7 +351,7 @@ namespace FiringSquad.Networking
 					return mFinished ? (IState)new GameFinishedState(mMachine) : this;
 				}
 			}
-			
+
 			/// <summary>
 			/// State to hold in after the game timer has completed and
 			/// everyone is able to disconnect.
