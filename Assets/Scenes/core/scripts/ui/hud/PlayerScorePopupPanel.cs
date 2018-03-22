@@ -1,4 +1,7 @@
-﻿using FiringSquad.Data;
+﻿using System.Collections.Generic;
+using FiringSquad.Core;
+using FiringSquad.Core.Audio;
+using FiringSquad.Data;
 using FiringSquad.Gameplay.Weapons;
 using FiringSquad.Networking;
 using KeatsLib.Unity;
@@ -21,6 +24,8 @@ namespace FiringSquad.Gameplay.UI
 		[SerializeField] private Shadow mPersistentColorReferenceShadow;
 
 		private const string BASE_MESSAGE_FORMAT = "{0}		+{1}";
+
+		private IAudioReference mCurrentAnnouncerSound;
 
 		/// <summary>
 		/// Unity's Start function.
@@ -78,6 +83,7 @@ namespace FiringSquad.Gameplay.UI
 			CltPlayer player = killer as CltPlayer;
 
 			DisplayNewMessage(string.Format("DESTROYED BY: {0}", player != null ? player.playerName : "YOURSELF"));
+			CheckAndPlayAnnouncer(AudioEvent.AnnouncerPlayerDeath);
 		}
 
 		/// <summary>
@@ -87,6 +93,7 @@ namespace FiringSquad.Gameplay.UI
 		private void OnLocalPlayerCapturedStage()
 		{
 			DisplayNewMessage(string.Format(BASE_MESSAGE_FORMAT, "STAGE CAPTURED", NetworkServerGameManager.STAGE_CAPTURE_POINTS));
+			CheckAndPlayAnnouncer(AudioEvent.AnnouncerStageAreaCaptured);
 		}
 
 		/// <summary>
@@ -95,8 +102,11 @@ namespace FiringSquad.Gameplay.UI
 		/// </summary>
 		private void OnLocalPlayerAttachedPart(BaseWeaponScript weapon, WeaponPartScript partInstance)
 		{
-			if (partInstance.isLegendary)
-				DisplayNewMessage(string.Format(BASE_MESSAGE_FORMAT, "LEGENDARY PART", NetworkServerGameManager.LEGENDARY_PART_POINTS));
+			if (!partInstance.isLegendary)
+				return;
+
+			DisplayNewMessage(string.Format(BASE_MESSAGE_FORMAT, "LEGENDARY PART", NetworkServerGameManager.LEGENDARY_PART_POINTS));
+			CheckAndPlayAnnouncer(AudioEvent.AnnouncerGetsLegendary);
 		}
 
 		/// <summary>
@@ -159,6 +169,21 @@ namespace FiringSquad.Gameplay.UI
 				return;
 
 			Destroy(instance.gameObject);
+		}
+
+		/// <summary>
+		/// Play an announcer event for a pop-up, if there isn't one already playing.
+		/// </summary>
+		/// <param name="eventToPlay">The event that should play</param>
+		private void CheckAndPlayAnnouncer(AudioEvent eventToPlay)
+		{
+			IAudioManager service = ServiceLocator.Get<IAudioManager>();
+			service.CheckReferenceAlive(ref mCurrentAnnouncerSound);
+
+			if (mCurrentAnnouncerSound != null)
+				return;
+
+			mCurrentAnnouncerSound = service.CreateSound(eventToPlay, null);
 		}
 	}
 }
