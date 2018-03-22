@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using FiringSquad.Data;
 using KeatsLib.Unity;
 using UnityEngine;
@@ -107,6 +108,8 @@ namespace FiringSquad.Gameplay.Weapons
 		[Server]
 		private void ApplySplashDamage()
 		{
+			var hits = new List<IDamageReceiver>();
+
 			var colliders = Physics.OverlapSphere(transform.position, mSplashDamageRadius, mSplashDamageMask);
 			foreach (Collider col in colliders)
 			{
@@ -114,17 +117,19 @@ namespace FiringSquad.Gameplay.Weapons
 					continue;
 
 				IDamageReceiver c = col.GetComponentInParent<IDamageReceiver>();
-				if (c == null)
+				if (c == null || hits.Contains(c))
 					continue;
 
 				Ray ray = new Ray(transform.position, col.transform.position - transform.position);
 				RaycastHit hitInfo;
 				Physics.Raycast(ray, out hitInfo, mSplashDamageRadius * 1.5f, int.MaxValue, QueryTriggerInteraction.Ignore);
 
-				if (hitInfo.collider != col)
+				IDamageReceiver hitreceiver = hitInfo.GetDamageReceiver();
+				if (hitreceiver != c)
 					continue;
 
 				c.ApplyDamage(mData.damage * 0.5f, hitInfo.point, hitInfo.normal, this);
+				hits.Add(c);
 			}
 		}
 
