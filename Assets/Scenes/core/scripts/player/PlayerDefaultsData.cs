@@ -13,7 +13,6 @@ namespace FiringSquad.Data
 
 		[Header("Base Data")] [SerializeField] private float mInteractDistance;
 		[SerializeField] private float mDefaultHealth;
-		[SerializeField] private float mRespawnTime;
 
 		[SerializeField] private GameObject mThirdPersonView;
 		[SerializeField] private GameObject mFirstPersonView;
@@ -30,9 +29,6 @@ namespace FiringSquad.Data
 
 		/// <summary> The health that this player should spawn with. </summary>
 		public float defaultHealth { get { return mDefaultHealth; } }
-
-		/// <summary> The amount of time in seconds after dying before this player respawns. </summary>
-		public float respawnTime { get { return mRespawnTime; } }
 
 		/// <summary>
 		/// The GameObject holding the player's third person view.

@@ -5,6 +5,7 @@ using FiringSquad.Core.UI;
 using FiringSquad.Data;
 using FiringSquad.Debug;
 using FiringSquad.Gameplay.Weapons;
+using FiringSquad.Networking;
 using KeatsLib.Unity;
 using UnityEngine;
 using UnityEngine.Rendering.PostProcessing;
@@ -327,10 +328,10 @@ namespace FiringSquad.Gameplay
 			// to handle the start
 			StartCoroutine(Coroutines.InvokeEveryTick(time =>
 			{
-				if (time < playerRoot.defaultData.respawnTime)
+				if (time < NetworkServerGameManager.PLAYER_RESPAWN_TIME)
 				{
 					// Update the respawn UI timer.
-					mRespawnTimer.value = Mathf.Ceil(playerRoot.defaultData.respawnTime - time);
+					mRespawnTimer.value = Mathf.Ceil(NetworkServerGameManager.PLAYER_RESPAWN_TIME - time);
 					return true; // signal to continue this coroutine
 				}
 
@@ -392,10 +393,10 @@ namespace FiringSquad.Gameplay
 			// InvokeEveryTick: A "temporary" update function:
 			StartCoroutine(Coroutines.InvokeEveryTick(time =>
 			{
-				if (time < playerRoot.defaultData.respawnTime)
+				if (time < NetworkServerGameManager.PLAYER_RESPAWN_TIME)
 				{
 					// Update the respawn UI timer.
-					mRespawnTimer.value = Mathf.Ceil(playerRoot.defaultData.respawnTime - time);
+					mRespawnTimer.value = Mathf.Ceil(NetworkServerGameManager.PLAYER_RESPAWN_TIME - time);
 					return true; // signal to continue this coroutine
 				}
 

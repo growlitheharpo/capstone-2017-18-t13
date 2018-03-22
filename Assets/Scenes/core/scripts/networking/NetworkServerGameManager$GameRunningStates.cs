@@ -18,6 +18,8 @@ namespace FiringSquad.Networking
 {
 	public partial class NetworkServerGameManager
 	{
+		public const float PLAYER_RESPAWN_TIME = 4.5f;
+
 		public const int STANDARD_KILL_POINTS = 100;
 		public const int HEADSHOT_KILL_POINTS = 25;
 		public const int MULTI_KILL_POINTS = 50;
