@@ -1,6 +1,7 @@
 ﻿using FiringSquad.Data;
 using UnityEngine;
 using UnityEngine.Networking;
+using Logger = FiringSquad.Debug.Logger;
 
 namespace FiringSquad.Gameplay.Weapons
 {
@@ -17,7 +18,7 @@ namespace FiringSquad.Gameplay.Weapons
 		/// <inheritdoc />
 		public override WeaponPartScript SpawnForWeapon(IWeapon weapon)
 		{
-			WeaponPartScript result = base.SpawnForWeapon(weapon);
+			WeaponPartScriptGripRevenge result = (WeaponPartScriptGripRevenge)base.SpawnForWeapon(weapon);
 
 			BaseWeaponScript realWeapon = weapon as BaseWeaponScript;
 			if (realWeapon == null)
@@ -26,16 +27,16 @@ namespace FiringSquad.Gameplay.Weapons
 			if (!realWeapon.isServer)
 				return result;
 
-			mWeapon = weapon;
-			EventManager.Server.OnPlayerDied += OnPlayerDied;
+			result.mWeapon = weapon;
+			EventManager.Server.OnPlayerDied += result.OnPlayerDied;
 			return result;
 		}
 
 		/// <inheritdoc />
 		protected override void OnDestroy()
 		{
-			base.OnDestroy();
 			EventManager.Server.OnPlayerDied -= OnPlayerDied;
+			base.OnDestroy();
 		}
 
 		/// <summary>
@@ -44,6 +45,8 @@ namespace FiringSquad.Gameplay.Weapons
 		/// </summary>
 		private void OnPlayerDied(CltPlayer player, PlayerKill killInfo)
 		{
+			Logger.Info("REVENGE GOT MESSAGE THAT PLAYER DIED.");
+
 			// Make sure it was our player that died
 			if (player == null || mWeapon == null || !ReferenceEquals(mWeapon.bearer, player))
 				return;
@@ -52,7 +55,6 @@ namespace FiringSquad.Gameplay.Weapons
 			Ray r = new Ray(transform.position, Vector3.up);
 			GameObject instance = Instantiate(mProjectile, r.origin, Quaternion.identity);
 			IProjectile projectile = instance.GetComponent<IProjectile>();
-
 
 			// Create some fake weapon data to go along with it.
 			WeaponData tmpWeaponData = new WeaponData();
