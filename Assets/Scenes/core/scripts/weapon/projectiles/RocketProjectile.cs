@@ -14,6 +14,8 @@ namespace FiringSquad.Gameplay.Weapons
 		[SerializeField] private float mSpeed;
 		[SerializeField] private float mSplashDamageRadius;
 		[SerializeField] private bool mRecognizeHeadshots;
+		[SerializeField] private LayerMask mSplashDamageMask;
+
 
 		/// Private variables
 		private Transform mDirectHit;
@@ -82,8 +84,6 @@ namespace FiringSquad.Gameplay.Weapons
 				mDirectHit = hit.transform;
 			}
 
-
-
 			NetworkBehaviour netObject = component as NetworkBehaviour;
 			RpcPlaySound(netObject == null ? NetworkInstanceId.Invalid : netObject.netId, hit.contacts[0].point);
 
@@ -107,7 +107,7 @@ namespace FiringSquad.Gameplay.Weapons
 		[Server]
 		private void ApplySplashDamage()
 		{
-			var colliders = Physics.OverlapSphere(transform.position, mSplashDamageRadius);
+			var colliders = Physics.OverlapSphere(transform.position, mSplashDamageRadius, mSplashDamageMask);
 			foreach (Collider col in colliders)
 			{
 				if (col.transform == mDirectHit)
