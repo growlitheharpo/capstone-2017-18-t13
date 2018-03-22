@@ -45,8 +45,6 @@ namespace FiringSquad.Gameplay.Weapons
 		/// </summary>
 		private void OnPlayerDied(CltPlayer player, PlayerKill killInfo)
 		{
-			Logger.Info("REVENGE GOT MESSAGE THAT PLAYER DIED.");
-
 			// Make sure it was our player that died
 			if (player == null || mWeapon == null || !ReferenceEquals(mWeapon.bearer, player))
 				return;
