@@ -9,7 +9,7 @@ namespace FiringSquad.Gameplay.Weapons
 	{
 		/// Inspector variables
 		[SerializeField] private GameObject mProjectile;
-		[SerializeField] private WeaponData mProjectileData;
+		[SerializeField] private float mProjectileDamage;
 
 		/// Private variables
 		private IWeapon mWeapon;
@@ -53,10 +53,15 @@ namespace FiringSquad.Gameplay.Weapons
 			GameObject instance = Instantiate(mProjectile, r.origin, Quaternion.identity);
 			IProjectile projectile = instance.GetComponent<IProjectile>();
 
+
+			// Create some fake weapon data to go along with it.
+			WeaponData tmpWeaponData = new WeaponData();
+			tmpWeaponData.ForceModifyDamage(new Modifier.Float(mProjectileDamage, Modifier.ModType.SetAbsolute));
+
 			// Spawn the actual projectile
-			if (projectile.PreSpawnInitialize(mWeapon, r, mProjectileData))
+			if (projectile.PreSpawnInitialize(mWeapon, r, tmpWeaponData))
 				NetworkServer.Spawn(instance);
-			projectile.PostSpawnInitialize(mWeapon, r, mProjectileData);
+			projectile.PostSpawnInitialize(mWeapon, r, tmpWeaponData);
 		}
 	}
 }
