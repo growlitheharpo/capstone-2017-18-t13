@@ -51,17 +51,18 @@ namespace FiringSquad.Gameplay.UI
 		private void OnLocalPlayerGotKill(CltPlayer deadPlayer, IWeapon currentWeapon, KillFlags killFlags)
 		{
 			if ((killFlags & KillFlags.Kingslayer) > 0)
-				DisplayNewMessage(string.Format(BASE_MESSAGE_FORMAT, "KINGSLAYER!", NetworkServerGameManager.KINGSLAYER_POINTS));
+				DisplayNewMessage(string.Format(BASE_MESSAGE_FORMAT, "KINGSLAYER", NetworkServerGameManager.KINGSLAYER_POINTS));
 			if ((killFlags & KillFlags.Killstreak) > 0)
-				DisplayNewMessage(string.Format(BASE_MESSAGE_FORMAT, "KILLSTREAK!", NetworkServerGameManager.KILLSTREAK_POINTS));
+				DisplayNewMessage(string.Format(BASE_MESSAGE_FORMAT, "KILLSTREAK", NetworkServerGameManager.KILLSTREAK_POINTS));
 			if ((killFlags & KillFlags.Revenge) > 0)
-				DisplayNewMessage(string.Format(BASE_MESSAGE_FORMAT, "REVENGE KILL!", NetworkServerGameManager.REVENGE_KILL_POINTS));
+				DisplayNewMessage(string.Format(BASE_MESSAGE_FORMAT, "REVENGE KILL", NetworkServerGameManager.REVENGE_KILL_POINTS));
 			if ((killFlags & KillFlags.Multikill) > 0)
-				DisplayNewMessage(string.Format(BASE_MESSAGE_FORMAT, "M-M-M-MULTI-KILL!", NetworkServerGameManager.MULTI_KILL_POINTS));
+				DisplayNewMessage(string.Format(BASE_MESSAGE_FORMAT, "MULTI-KILL", NetworkServerGameManager.MULTI_KILL_POINTS));
 			if ((killFlags & KillFlags.Headshot) > 0)
-				DisplayNewMessage(string.Format(BASE_MESSAGE_FORMAT, "HEADSHOT!", NetworkServerGameManager.HEADSHOT_KILL_POINTS));
+				DisplayNewMessage(string.Format(BASE_MESSAGE_FORMAT, "HEADSHOT", NetworkServerGameManager.HEADSHOT_KILL_POINTS));
 
-			DisplayNewMessage(string.Format("ELIMINATED: {0}	 +{1}",
+
+			DisplayNewMessage(string.Format("DESTROYED: {0}		+{1}",
 				deadPlayer.playerName,
 				NetworkServerGameManager.STANDARD_KILL_POINTS
 			));
@@ -76,7 +77,7 @@ namespace FiringSquad.Gameplay.UI
 			// Check if the player was an actual player
 			CltPlayer player = killer as CltPlayer;
 
-			DisplayNewMessage(string.Format("ELIMINATED BY: {0}", player != null ? player.playerName : "YOURSELF"));
+			DisplayNewMessage(string.Format("DESTROYED BY: {0}", player != null ? player.playerName : "YOURSELF"));
 		}
 
 		/// <summary>
@@ -85,7 +86,7 @@ namespace FiringSquad.Gameplay.UI
 		/// </summary>
 		private void OnLocalPlayerCapturedStage()
 		{
-			DisplayNewMessage(string.Format(BASE_MESSAGE_FORMAT, "STAGE CAPTURED!", NetworkServerGameManager.STAGE_CAPTURE_POINTS));
+			DisplayNewMessage(string.Format(BASE_MESSAGE_FORMAT, "STAGE CAPTURED", NetworkServerGameManager.STAGE_CAPTURE_POINTS));
 		}
 
 		/// <summary>
@@ -95,7 +96,7 @@ namespace FiringSquad.Gameplay.UI
 		private void OnLocalPlayerAttachedPart(BaseWeaponScript weapon, WeaponPartScript partInstance)
 		{
 			if (partInstance.isLegendary)
-				DisplayNewMessage(string.Format(BASE_MESSAGE_FORMAT, "LEGENDARY PART!", NetworkServerGameManager.LEGENDARY_PART_POINTS));
+				DisplayNewMessage(string.Format(BASE_MESSAGE_FORMAT, "LEGENDARY PART", NetworkServerGameManager.LEGENDARY_PART_POINTS));
 		}
 
 		/// <summary>
@@ -103,7 +104,7 @@ namespace FiringSquad.Gameplay.UI
 		/// </summary>
 		public void OnLocalPlayerCheated()
 		{
-			var instance = DisplayNewMessage("CHEATER!!!	 -" + NetworkServerGameManager.CHEATING_PENALTY_POINTS);
+			var instance = DisplayNewMessage("CHEATER	  -" + NetworkServerGameManager.CHEATING_PENALTY_POINTS);
 			instance.color = Color.red;
 		}
 

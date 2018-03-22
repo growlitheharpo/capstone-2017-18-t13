@@ -423,7 +423,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mUniqueId: 1
-  mPrettyName: Pistol Barrel
+  mIsLegendary: 0
+  mPrettyName: Standard Barrel
   mDescription: 'Run of the mill barrel manufatured by Rensfield Arms. Less than average
     rate of fire, damage, and accuracy. '
   mData:
@@ -459,6 +460,7 @@ MonoBehaviour:
       mType: 0
   mDurability: -1
   mTip: {fileID: 4501483128918090}
+  mAudioOverrideBarrelType: 0
   mProjectileCount: 1
   mShotsPerClick: 1
   mCrosshairSprite: {fileID: 21300000, guid: 35c3b3b8a34346948ac7ff144fe23fa0, type: 3}
