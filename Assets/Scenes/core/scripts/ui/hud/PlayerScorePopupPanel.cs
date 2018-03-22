@@ -77,7 +77,7 @@ namespace FiringSquad.Gameplay.UI
 		/// EVENT HANDLER: Local.OnLocalPlayerDied
 		/// Handle showing the killing player's name
 		/// </summary>
-		private void OnLocalPlayerDied(Vector3 spawnPosition, Quaternion spawnRotation, ICharacter killer)
+		private void OnLocalPlayerDied(PlayerKill killInfo, ICharacter killer)
 		{
 			// Check if the player was an actual player
 			CltPlayer player = killer as CltPlayer;

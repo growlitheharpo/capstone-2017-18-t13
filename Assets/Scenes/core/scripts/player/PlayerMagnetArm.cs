@@ -244,7 +244,7 @@ namespace FiringSquad.Gameplay
 		/// Event handler: EventManager.Local.OnLocalPlayerDied
 		/// </summary>
 		[EventHandler]
-		private void OnLocalPlayerDied(Vector3 arg1, Quaternion arg2, ICharacter arg3)
+		private void OnLocalPlayerDied(PlayerKill killInfo, ICharacter killer)
 		{
 			// Check that this magnet arm belongs to the local player.
 			if (bearer == null || !bearer.isCurrentPlayer)

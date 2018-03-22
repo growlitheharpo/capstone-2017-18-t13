@@ -202,21 +202,19 @@ public partial class EventManager
 
 		/// <summary>
 		/// Event called when the local player has died according to the server.
-		/// PARAMETER 1: The target spawn location of the player.
-		/// PARAMETER 2: The target spawn rotation of the player.
-		/// PARAMETER 3: The character that killed the player. Can be null.
+		/// PARAMETER 1: The PlayerKill data related to this kill.
+		/// PARAMETER 2: The character that killed the player. Can be null.
 		/// </summary>
-		public static event Action<Vector3, Quaternion, ICharacter> OnLocalPlayerDied = (p, r, k) => { LogEvent(); };
+		public static event Action<PlayerKill, ICharacter> OnLocalPlayerDied = (ki, k) => { LogEvent(); };
 
 		/// <summary>
 		/// Event called when the local player has died according to the server.
 		/// </summary>
-		/// <param name="spawnPos">The target spawn location of the player.</param>
-		/// <param name="spawnRot">The target spawn rotation of the player.</param>
+		/// <param name="killInfo">The PlayerKill data related to this kill.</param>
 		/// <param name="killer">The character that killed the player. Can be null.</param>
-		public static void LocalPlayerDied(Vector3 spawnPos, Quaternion spawnRot, ICharacter killer)
+		public static void LocalPlayerDied(PlayerKill killInfo, ICharacter killer)
 		{
-			OnLocalPlayerDied(spawnPos, spawnRot, killer);
+			OnLocalPlayerDied(killInfo, killer);
 		}
 
 		/// <summary>

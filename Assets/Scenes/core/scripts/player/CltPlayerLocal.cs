@@ -362,8 +362,11 @@ namespace FiringSquad.Gameplay
 		/// EVENT HANDLER: Local.OnLocalPlayerDied
 		/// Starts the respawn timer and then sends this player back to their start position when time is up.
 		/// </summary>
-		private void OnLocalPlayerDied(Vector3 spawnPosition, Quaternion spawnRotation, ICharacter killer)
+		private void OnLocalPlayerDied(PlayerKill killInfo, ICharacter killer)
 		{
+			Vector3 spawnPosition = killInfo.mNewSpawnPosition;
+			Quaternion spawnRotation = killInfo.mNewSpawnRotation;
+
 			// Disable input (because we're dead).
 			ServiceLocator.Get<IInput>()
 				.DisableInputLevel(InputLevel.Gameplay)
