@@ -4,6 +4,7 @@ using FiringSquad.Core.Audio;
 using FiringSquad.Data;
 using FiringSquad.Gameplay.Weapons;
 using FiringSquad.Networking;
+using KeatsLib.Collections;
 using KeatsLib.Unity;
 using UnityEngine;
 using UnityEngine.UI;
@@ -55,22 +56,43 @@ namespace FiringSquad.Gameplay.UI
 		/// </summary>
 		private void OnLocalPlayerGotKill(CltPlayer deadPlayer, IWeapon currentWeapon, KillFlags killFlags)
 		{
+			var audioEvents = new List<AudioEvent>();
+
 			if ((killFlags & KillFlags.Kingslayer) > 0)
+			{
 				DisplayNewMessage(string.Format(BASE_MESSAGE_FORMAT, "KINGSLAYER", NetworkServerGameManager.KINGSLAYER_POINTS));
+				audioEvents.Add(AudioEvent.AnnouncerKingslayer);
+			}
+
 			if ((killFlags & KillFlags.Killstreak) > 0)
+			{
 				DisplayNewMessage(string.Format(BASE_MESSAGE_FORMAT, "KILLSTREAK", NetworkServerGameManager.KILLSTREAK_POINTS));
+				audioEvents.Add(AudioEvent.AnnouncerGetsKillstreak);
+			}
+
 			if ((killFlags & KillFlags.Revenge) > 0)
 				DisplayNewMessage(string.Format(BASE_MESSAGE_FORMAT, "REVENGE KILL", NetworkServerGameManager.REVENGE_KILL_POINTS));
+
 			if ((killFlags & KillFlags.Multikill) > 0)
+			{
 				DisplayNewMessage(string.Format(BASE_MESSAGE_FORMAT, "MULTI-KILL", NetworkServerGameManager.MULTI_KILL_POINTS));
+				audioEvents.Add(AudioEvent.AnnouncerMultiKill);
+			}
+
 			if ((killFlags & KillFlags.Headshot) > 0)
+			{
 				DisplayNewMessage(string.Format(BASE_MESSAGE_FORMAT, "HEADSHOT", NetworkServerGameManager.HEADSHOT_KILL_POINTS));
+				audioEvents.Add(AudioEvent.AnnouncerHeadshot);
+			}
 
 
 			DisplayNewMessage(string.Format("DESTROYED: {0}		+{1}",
 				deadPlayer.playerName,
 				NetworkServerGameManager.STANDARD_KILL_POINTS
 			));
+
+			if (audioEvents.Count > 0)
+				CheckAndPlayAnnouncer(audioEvents.ChooseRandom());
 		}
 
 		/// <summary>
@@ -81,9 +103,25 @@ namespace FiringSquad.Gameplay.UI
 		{
 			// Check if the player was an actual player
 			CltPlayer player = killer as CltPlayer;
-
 			DisplayNewMessage(string.Format("DESTROYED BY: {0}", player != null ? player.playerName : "YOURSELF"));
-			CheckAndPlayAnnouncer(AudioEvent.AnnouncerPlayerDeath);
+
+			KillFlags killFlags = killInfo.mFlags;
+			var audioEvents = new List<AudioEvent> { AudioEvent.AnnouncerPlayerDeath };
+
+			if ((killFlags & KillFlags.Kingslayer) > 0)
+				audioEvents.Add(AudioEvent.AnnouncerKingslayer);
+
+			if ((killFlags & KillFlags.Killstreak) > 0)
+				audioEvents.Add(AudioEvent.AnnouncerGetsKillstreak);
+
+			if ((killFlags & KillFlags.Multikill) > 0)
+				audioEvents.Add(AudioEvent.AnnouncerMultiKill);
+
+			if ((killFlags & KillFlags.Headshot) > 0)
+				audioEvents.Add(AudioEvent.AnnouncerHeadshot);
+
+			if (audioEvents.Count > 0)
+				CheckAndPlayAnnouncer(audioEvents.ChooseRandom());
 		}
 
 		/// <summary>
