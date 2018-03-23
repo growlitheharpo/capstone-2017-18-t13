@@ -154,6 +154,9 @@ namespace FiringSquad.Core
 				public float healthGained { get { return default(float); } set { } }
 
 				/// <inheritdoc />
+				public float crowdHypeLevel { get { return default(float); } set { } }
+
+				/// <inheritdoc />
 				public IAudioReference SetParameter(string name, float value)
 				{
 					return this;
