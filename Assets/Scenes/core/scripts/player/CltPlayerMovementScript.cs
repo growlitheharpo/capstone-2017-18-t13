@@ -442,7 +442,7 @@ namespace FiringSquad.Gameplay
 		/// <summary>
 		/// EVENT HANDLER: Local.OnLocalPlayerDied
 		/// </summary>
-		private void OnLocalPlayerDied(Vector3 spawnPos, Quaternion spawnRot, ICharacter killer)
+		private void OnLocalPlayerDied(PlayerKill killInfo, ICharacter killer)
 		{
 			mRotationY = 0.0f;
 			mCurrentSpeed = 0.0f;

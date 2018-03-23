@@ -1,6 +1,10 @@
-﻿using FiringSquad.Data;
+﻿using System.Collections.Generic;
+using FiringSquad.Core;
+using FiringSquad.Core.Audio;
+using FiringSquad.Data;
 using FiringSquad.Gameplay.Weapons;
 using FiringSquad.Networking;
+using KeatsLib.Collections;
 using KeatsLib.Unity;
 using UnityEngine;
 using UnityEngine.UI;
@@ -21,6 +25,8 @@ namespace FiringSquad.Gameplay.UI
 		[SerializeField] private Shadow mPersistentColorReferenceShadow;
 
 		private const string BASE_MESSAGE_FORMAT = "{0}		+{1}";
+
+		private IAudioReference mCurrentAnnouncerSound;
 
 		/// <summary>
 		/// Unity's Start function.
@@ -50,34 +56,72 @@ namespace FiringSquad.Gameplay.UI
 		/// </summary>
 		private void OnLocalPlayerGotKill(CltPlayer deadPlayer, IWeapon currentWeapon, KillFlags killFlags)
 		{
+			var audioEvents = new List<AudioEvent>();
+
 			if ((killFlags & KillFlags.Kingslayer) > 0)
+			{
 				DisplayNewMessage(string.Format(BASE_MESSAGE_FORMAT, "KINGSLAYER", NetworkServerGameManager.KINGSLAYER_POINTS));
+				audioEvents.Add(AudioEvent.AnnouncerKingslayer);
+			}
+
 			if ((killFlags & KillFlags.Killstreak) > 0)
+			{
 				DisplayNewMessage(string.Format(BASE_MESSAGE_FORMAT, "KILLSTREAK", NetworkServerGameManager.KILLSTREAK_POINTS));
+				audioEvents.Add(AudioEvent.AnnouncerGetsKillstreak);
+			}
+
 			if ((killFlags & KillFlags.Revenge) > 0)
 				DisplayNewMessage(string.Format(BASE_MESSAGE_FORMAT, "REVENGE KILL", NetworkServerGameManager.REVENGE_KILL_POINTS));
+
 			if ((killFlags & KillFlags.Multikill) > 0)
+			{
 				DisplayNewMessage(string.Format(BASE_MESSAGE_FORMAT, "MULTI-KILL", NetworkServerGameManager.MULTI_KILL_POINTS));
+				audioEvents.Add(AudioEvent.AnnouncerMultiKill);
+			}
+
 			if ((killFlags & KillFlags.Headshot) > 0)
+			{
 				DisplayNewMessage(string.Format(BASE_MESSAGE_FORMAT, "HEADSHOT", NetworkServerGameManager.HEADSHOT_KILL_POINTS));
+				audioEvents.Add(AudioEvent.AnnouncerHeadshot);
+			}
 
 
 			DisplayNewMessage(string.Format("DESTROYED: {0}		+{1}",
 				deadPlayer.playerName,
 				NetworkServerGameManager.STANDARD_KILL_POINTS
 			));
+
+			if (audioEvents.Count > 0)
+				CheckAndPlayAnnouncer(audioEvents.ChooseRandom());
 		}
 
 		/// <summary>
 		/// EVENT HANDLER: Local.OnLocalPlayerDied
 		/// Handle showing the killing player's name
 		/// </summary>
-		private void OnLocalPlayerDied(Vector3 spawnPosition, Quaternion spawnRotation, ICharacter killer)
+		private void OnLocalPlayerDied(PlayerKill killInfo, ICharacter killer)
 		{
 			// Check if the player was an actual player
 			CltPlayer player = killer as CltPlayer;
-
 			DisplayNewMessage(string.Format("DESTROYED BY: {0}", player != null ? player.playerName : "YOURSELF"));
+
+			KillFlags killFlags = killInfo.mFlags;
+			var audioEvents = new List<AudioEvent> { AudioEvent.AnnouncerPlayerDeath };
+
+			if ((killFlags & KillFlags.Kingslayer) > 0)
+				audioEvents.Add(AudioEvent.AnnouncerKingslayer);
+
+			if ((killFlags & KillFlags.Killstreak) > 0)
+				audioEvents.Add(AudioEvent.AnnouncerGetsKillstreak);
+
+			if ((killFlags & KillFlags.Multikill) > 0)
+				audioEvents.Add(AudioEvent.AnnouncerMultiKill);
+
+			if ((killFlags & KillFlags.Headshot) > 0)
+				audioEvents.Add(AudioEvent.AnnouncerHeadshot);
+
+			if (audioEvents.Count > 0)
+				CheckAndPlayAnnouncer(audioEvents.ChooseRandom());
 		}
 
 		/// <summary>
@@ -87,6 +131,7 @@ namespace FiringSquad.Gameplay.UI
 		private void OnLocalPlayerCapturedStage()
 		{
 			DisplayNewMessage(string.Format(BASE_MESSAGE_FORMAT, "STAGE CAPTURED", NetworkServerGameManager.STAGE_CAPTURE_POINTS));
+			CheckAndPlayAnnouncer(AudioEvent.AnnouncerStageAreaCaptured);
 		}
 
 		/// <summary>
@@ -95,8 +140,11 @@ namespace FiringSquad.Gameplay.UI
 		/// </summary>
 		private void OnLocalPlayerAttachedPart(BaseWeaponScript weapon, WeaponPartScript partInstance)
 		{
-			if (partInstance.isLegendary)
-				DisplayNewMessage(string.Format(BASE_MESSAGE_FORMAT, "LEGENDARY PART", NetworkServerGameManager.LEGENDARY_PART_POINTS));
+			if (!partInstance.isLegendary)
+				return;
+
+			DisplayNewMessage(string.Format(BASE_MESSAGE_FORMAT, "LEGENDARY PART", NetworkServerGameManager.LEGENDARY_PART_POINTS));
+			CheckAndPlayAnnouncer(AudioEvent.AnnouncerGetsLegendary);
 		}
 
 		/// <summary>
@@ -159,6 +207,21 @@ namespace FiringSquad.Gameplay.UI
 				return;
 
 			Destroy(instance.gameObject);
+		}
+
+		/// <summary>
+		/// Play an announcer event for a pop-up, if there isn't one already playing.
+		/// </summary>
+		/// <param name="eventToPlay">The event that should play</param>
+		private void CheckAndPlayAnnouncer(AudioEvent eventToPlay)
+		{
+			IAudioManager service = ServiceLocator.Get<IAudioManager>();
+			service.CheckReferenceAlive(ref mCurrentAnnouncerSound);
+
+			if (mCurrentAnnouncerSound != null)
+				return;
+
+			mCurrentAnnouncerSound = service.CreateSound(eventToPlay, null);
 		}
 	}
 }
