@@ -78,7 +78,8 @@ namespace FiringSquad.Gameplay.Weapons
 					isHeadshot = zone.isHeadshot;
 				}
 			}
-			else
+
+			if (component == null)
 				component = hit.GetDamageReceiver();
 
 			if (component != null)
