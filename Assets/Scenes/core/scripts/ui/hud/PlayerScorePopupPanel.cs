@@ -13,6 +13,7 @@ namespace FiringSquad.Gameplay.UI
 {
 	/// <summary>
 	/// UI script that handles displaying score-related information on the HUD
+	/// Does almost the same thing as PlayerHypeTextPanel
 	/// </summary>
 	public class PlayerScorePopupPanel : MonoBehaviour
 	{
