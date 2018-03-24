@@ -9,12 +9,11 @@ namespace FiringSquad.Data
 	[Serializable]
 	public struct CrowdAudioEventValues
 	{
-		[SerializeField] private float mMinHypeValue;
-		[SerializeField] private float mMaxHypeValue;
-		[SerializeField] private float mStandardKillGain;
-		[SerializeField] private float mEnvironmentalKillGain;
-		[SerializeField] private float mStageCaptureGain;
-		[SerializeField] private float mLegendaryPartGain;
+		[SerializeField] private int mMinHypeValue;
+		[SerializeField] private int mMaxHypeValue;
+		[SerializeField] private int mStandardDeathGain;
+		[SerializeField] private int mStageCaptureGain;
+		[SerializeField] private int mLegendaryPartGain;
 
 		[SerializeField] private float mInitialDecreaseTimerLength;
 		[SerializeField] private float mSubsequentDecreaseTimerLength;
@@ -22,32 +21,27 @@ namespace FiringSquad.Data
 		/// <summary>
 		/// Lowest value that the hype can be set to.
 		/// </summary>
-		public float minHypeValue { get { return mMinHypeValue; } }
+		public int minHypeValue { get { return mMinHypeValue; } }
 
 		/// <summary>
 		/// Highest value that the hype can be set to.
 		/// </summary>
-		public float maxHypeValue { get { return mMaxHypeValue; } }
+		public int maxHypeValue { get { return mMaxHypeValue; } }
 
 		/// <summary>
-		/// Value to gain on a kill.
+		/// Value to gain on any player's death, no matter the method.
 		/// </summary>
-		public float standardKillGain { get { return mStandardKillGain; } }
+		public int standardDeathGain { get { return mStandardDeathGain; } }
 
 		/// <summary>
 		/// Value to gain when a stage is captured.
 		/// </summary>
-		public float stageCaptureGain { get { return mStageCaptureGain; } }
+		public int stageCaptureGain { get { return mStageCaptureGain; } }
 
 		/// <summary>
 		/// Value to gain when a legendary part is equipped.
 		/// </summary>
-		public float legendaryPartGain { get { return mLegendaryPartGain; } }
-
-		/// <summary>
-		/// Value to gain when an environmental kill occurs.
-		/// </summary>
-		public float environmentalKillGain { get { return mEnvironmentalKillGain; } }
+		public int legendaryPartGain { get { return mLegendaryPartGain; } }
 
 		/// <summary>
 		/// Length of time to wait before decreasing hype after an event occurs.
