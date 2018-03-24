@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using FiringSquad.Data;
 using UnityEngine;
 
 namespace FiringSquad.Gameplay
@@ -79,7 +80,8 @@ namespace FiringSquad.Gameplay
 		/// <summary>
 		/// Reflect that the player just got a kill with the appropriate face.
 		/// </summary>
-		public void ReflectGotKill()
+		/// <param name="killInfo">The data provided by the server about the kill.</param>
+		public void ReflectGotKill(PlayerKill killInfo)
 		{
 			StopAllCoroutines();
 			StartCoroutine(ChangeFaceTemporarily(SpriteValue.GotKill, 2.5f));

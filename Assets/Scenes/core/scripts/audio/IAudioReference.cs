@@ -60,6 +60,11 @@ namespace FiringSquad.Core.Audio
 		float healthGained { get; set; }
 
 		/// <summary>
+		/// FMOD PARAMETER "CrowdHypeLevel"
+		/// </summary>
+		float crowdHypeLevel { get; set; }
+
+		/// <summary>
 		/// Directly set an FMOD parameter for this audio clip.
 		/// </summary>
 		/// <param name="name">The name of the parameter.</param>
