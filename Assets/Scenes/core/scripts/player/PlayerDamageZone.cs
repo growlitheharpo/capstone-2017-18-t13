@@ -25,11 +25,12 @@ namespace FiringSquad.Gameplay
 		public bool isHeadshot { get { return mIsHeadshot; } }
 
 		/// <summary>
-		/// Unity's Awake function
+		/// Unity's Start function
 		/// </summary>
-		private void Awake()
+		private void Start()
 		{
 			mPlayer = GetComponentInParent<CltPlayer>();
+			UnityEngine.Debug.Log("Grabbed " + mPlayer);
 		}
 	}
 }

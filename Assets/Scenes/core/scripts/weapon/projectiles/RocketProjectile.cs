@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using FiringSquad.Data;
 using KeatsLib.Unity;
 using UnityEngine;
@@ -14,6 +15,8 @@ namespace FiringSquad.Gameplay.Weapons
 		[SerializeField] private float mSpeed;
 		[SerializeField] private float mSplashDamageRadius;
 		[SerializeField] private bool mRecognizeHeadshots;
+		[SerializeField] private LayerMask mSplashDamageMask;
+
 
 		/// Private variables
 		private Transform mDirectHit;
@@ -84,8 +87,6 @@ namespace FiringSquad.Gameplay.Weapons
 				mDirectHit = hit.transform;
 			}
 
-
-
 			NetworkBehaviour netObject = component as NetworkBehaviour;
 			RpcPlaySound(netObject == null ? NetworkInstanceId.Invalid : netObject.netId, hit.contacts[0].point);
 
@@ -109,24 +110,28 @@ namespace FiringSquad.Gameplay.Weapons
 		[Server]
 		private void ApplySplashDamage()
 		{
-			var colliders = Physics.OverlapSphere(transform.position, mSplashDamageRadius);
+			var hits = new List<IDamageReceiver>();
+
+			var colliders = Physics.OverlapSphere(transform.position, mSplashDamageRadius, mSplashDamageMask);
 			foreach (Collider col in colliders)
 			{
 				if (col.transform == mDirectHit)
 					continue;
 
 				IDamageReceiver c = col.GetComponentInParent<IDamageReceiver>();
-				if (c == null)
+				if (c == null || hits.Contains(c))
 					continue;
 
 				Ray ray = new Ray(transform.position, col.transform.position - transform.position);
 				RaycastHit hitInfo;
 				Physics.Raycast(ray, out hitInfo, mSplashDamageRadius * 1.5f, int.MaxValue, QueryTriggerInteraction.Ignore);
 
-				if (hitInfo.collider != col)
+				IDamageReceiver hitreceiver = hitInfo.GetDamageReceiver();
+				if (hitreceiver != c)
 					continue;
 
 				c.ApplyDamage(mData.damage * 0.5f, hitInfo.point, hitInfo.normal, this, false);
+				hits.Add(c);
 			}
 		}
 
