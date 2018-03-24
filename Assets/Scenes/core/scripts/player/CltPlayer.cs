@@ -745,21 +745,24 @@ namespace FiringSquad.Gameplay
 		[ClientRpc]
 		private void RpcHandleDeath(PlayerKill killInfo)
 		{
-			ICharacter killer = killInfo.killer;
-			IWeaponBearer weaponBearer = killer as IWeaponBearer;
+			ReflectLocalAgnosticDeathItems(killInfo);
+			SendLocalDeathEvents(killInfo);
+		}
 
-			// If the killer is the local player, they get an event. Otherwise, we show it on the third person view.
-			if (weaponBearer != null && weaponBearer.isCurrentPlayer)
-				EventManager.Notify(() => EventManager.Local.LocalPlayerGotKill(this, weaponBearer.weapon, killInfo.mFlags));
-			else if (weaponBearer is CltPlayer)
-				((CltPlayer)weaponBearer).mThirdPersonView.ReflectGotKill();
-
-			// Show our death particles
+		/// <summary>
+		/// Displays all of the effects and runs any code that needs to happen when a player dies.
+		/// This code doesn't care if the player that died is the local player or any other player in the match,
+		/// it must be run no matter what.
+		/// </summary>
+		/// <param name="killInfo">The kill info provided by the server, explaining what happened.</param>
+		private void ReflectLocalAgnosticDeathItems(PlayerKill killInfo)
+		{
+			// Show the death particles at the death location (and destroy them after they've expired)
 			ParticleSystem particles = Instantiate(mAssets.deathParticlesPrefab, killInfo.mDeathPosition, Quaternion.identity).GetComponent<ParticleSystem>();
 			particles.Play();
 			StartCoroutine(Coroutines.WaitAndDestroyParticleSystem(particles));
 
-			// Show our corpse
+			// Show our corpse at our location.
 			GameObject corpse = Instantiate(mAssets.corpsePrefab, killInfo.mDeathPosition, transform.rotation);
 			corpse.GetComponent<PlayerCorpseView>().UpdateColor(mTeam == GameData.PlayerTeam.Orange ? defaultData.orangeTeamColor : defaultData.blueTeamColor);
 
@@ -770,13 +773,38 @@ namespace FiringSquad.Gameplay
 				foreach (Renderer r in renderers)
 					ObjectHighlight.instance.RemoveRendererFromHighlightList(r);
 			}
+		}
 
-			// If the dead player is the local player, they get an event.
-			if (isLocalPlayer)
+		/// <summary>
+		/// Send death-related events on the client based on who died and who the killer was.
+		/// </summary>
+		/// <param name="killInfo">The kill info provided by the server, explaining what happened.</param>
+		[Client]
+		private void SendLocalDeathEvents(PlayerKill killInfo)
+		{
+			ICharacter killer = killInfo.killer;
+			CltPlayer killerAsClient = killer as CltPlayer;
+			
+			// Check if the killer was an actual player
+			if (killerAsClient != null)
+			{
+				// If yes AND they're the current player, let the game know the local player got a kill.
+				// If they're not the current player, do their face animation for a kill.
+				if (killerAsClient.isCurrentPlayer)
+					EventManager.Notify(() => EventManager.Local.LocalPlayerGotKill(this, killerAsClient.weapon, killInfo.mFlags));
+				else
+					killerAsClient.mThirdPersonView.ReflectGotKill(killInfo);
+			}
+
+			// If the person who died is the local player, notify the game that the client has died.
+			if (isCurrentPlayer)
 			{
 				mLocalHealthVar.value = 0.0f;
 				EventManager.Local.LocalPlayerDied(killInfo, killer);
 			}
+
+			// No matter what, let the game know that SOMEONE has died (primarily for crowd audio).
+			EventManager.Notify(EventManager.LocalGeneric.PlayerDied);
 		}
 
 		/// <summary>

@@ -287,7 +287,10 @@ namespace FiringSquad.Gameplay
 			kUIManager.SetCapturePercent(p / mCaptureTime);
 
 			if (p / mCaptureTime >= 1.0f)
+			{
 				ServiceLocator.Get<IAudioManager>().CreateSound(AudioEvent.AnnouncerStageAreaCaptured, transform);
+				EventManager.Notify(EventManager.LocalGeneric.PlayerCapturedStage);
+			}
 		}
 
 		/// <summary>

@@ -335,18 +335,28 @@ namespace FiringSquad.Gameplay.Weapons
 			}
 
 			if (bearer != null)
-			{
-				ServiceLocator.Get<IAudioManager>().CreateSound(AudioEvent.EquipItem, transform);
-
-				if (isServer)
-					EventManager.Notify(() => EventManager.Server.PlayerAttachedPart(this, instance));
-				
-				if (bearer.isCurrentPlayer)
-					EventManager.Notify(() => EventManager.Local.LocalPlayerAttachedPart(this, instance));
-			}
+				SendAttachmentEvents(instance);
 
 			if (instance.attachPoint == Attachment.Scope && mAimDownSightsActive && currentParts.scope != null)
 				currentParts.scope.ActivateAimDownSightsEffect(this);
+		}
+
+		/// <summary>
+		/// Notify the event system of a myriad of events that occur upon a part being equipped
+		/// </summary>
+		/// <param name="newPartInstance">The instance of the new part that was equipped.</param>
+		private void SendAttachmentEvents(WeaponPartScript newPartInstance)
+		{
+			ServiceLocator.Get<IAudioManager>().CreateSound(AudioEvent.EquipItem, transform);
+
+			if (isServer)
+				EventManager.Notify(() => EventManager.Server.PlayerAttachedPart(this, newPartInstance));
+				
+			if (bearer.isCurrentPlayer)
+				EventManager.Notify(() => EventManager.Local.LocalPlayerAttachedPart(this, newPartInstance));
+
+			if (bearer is CltPlayer && newPartInstance.isLegendary)
+				EventManager.Notify(EventManager.LocalGeneric.PlayerEquippedLegendaryPart);
 		}
 
 		#endregion
