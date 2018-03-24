@@ -45,6 +45,13 @@ namespace FiringSquad.Gameplay
 		/// </summary>
 		private void OnDestroy()
 		{
+			IAudioManager service = ServiceLocator.Get<IAudioManager>();
+			if (service == null)
+				return;
+
+			if (service.CheckReferenceAlive(ref mCrowdSound) != null)
+				mCrowdSound.Kill();
+
 			EventManager.LocalGeneric.OnPlayerCapturedStage -= OnPlayerCapturedStage;
 			EventManager.LocalGeneric.OnPlayerDied -= OnPlayerDied;
 			EventManager.LocalGeneric.OnPlayerEquippedLegendaryPart -= OnPlayerEquippedLegendaryPart;
