@@ -385,6 +385,52 @@ public partial class EventManager
 	}
 
 	/// <summary>
+	/// Event called to notify different parts of the game that an event happened to ANY player,
+	/// not necessarily the local one.
+	/// </summary>
+	public static class LocalGeneric
+	{
+		/// <summary>
+		/// Event called when ANY player has captured a stage area.
+		/// </summary>
+		public static event Action OnPlayerCapturedStage = () => { LogEvent(); };
+		
+		/// <summary>
+		/// Event called when ANY player has captured a stage area.
+		/// </summary>
+		public static void PlayerCapturedStage()
+		{
+			OnPlayerCapturedStage();
+		}
+
+		/// <summary>
+		/// Event called when ANY player has died.
+		/// </summary>
+		public static event Action OnPlayerDied = () => { LogEvent(); };
+		
+		/// <summary>
+		/// Event called when ANY player has died.
+		/// </summary>
+		public static void PlayerDied()
+		{
+			OnPlayerDied();
+		}
+
+		/// <summary>
+		/// Event called when ANY player has equipped a legendary part.
+		/// </summary>
+		public static event Action OnPlayerEquippedLegendaryPart = () => { LogEvent(); };
+		
+		/// <summary>
+		/// Event called when ANY player has equipped a legendary part.
+		/// </summary>
+		public static void PlayerEquippedLegendaryPart()
+		{
+			OnPlayerEquippedLegendaryPart();
+		}
+	}
+
+	/// <summary>
 	/// Holder class for all events that are only designed to occur on the server.
 	/// </summary>
 	public static class Server
