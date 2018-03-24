@@ -7,6 +7,7 @@ using FiringSquad.Core.Weapons;
 using FiringSquad.Data;
 using FiringSquad.Gameplay;
 using FiringSquad.Gameplay.Weapons;
+using JetBrains.Annotations;
 using KeatsLib.Collections;
 using KeatsLib.State;
 using KeatsLib.Unity;
@@ -30,7 +31,7 @@ namespace FiringSquad.Networking
 		public const int LEGENDARY_PART_POINTS = 50;
 		public const int CHEATING_PENALTY_POINTS = 100;
 
-		private partial class ServerStateMachine 
+		private partial class ServerStateMachine
 		{
 			// Private data only used in this file:
 			private Dictionary<NetworkInstanceId, PlayerScore> mPlayerScores;
@@ -281,7 +282,7 @@ namespace FiringSquad.Networking
 				/// <param name="victim">The victim of the kill (the player whose health just reached 0.</param>
 				/// <param name="killer">The killer of the kill.</param>
 				/// <returns>Appropriate KillFlags based on recent kill history.</returns>
-				private KillFlags CalculateFlagsForKill(bool wasHeadshot, CltPlayer victim, CltPlayer killer)
+				private KillFlags CalculateFlagsForKill(bool wasHeadshot, CltPlayer victim, [NotNull] CltPlayer killer)
 				{
 					KillFlags result = KillFlags.None;
 					if (wasHeadshot)
@@ -337,12 +338,18 @@ namespace FiringSquad.Networking
 				{
 					PlayerKillServerInfo serverInfo = new PlayerKillServerInfo { time = Time.time };
 
-					mKillLogs[killer].killHistory.Add(serverInfo);
-					mKillLogs[killer].killStreak++;
+					if (killer != null)
+					{
+						mKillLogs[killer].killHistory.Add(serverInfo);
+						mKillLogs[killer].killStreak++;
+					}
 
-					mKillLogs[victim].killStreak = 0;
-					mKillLogs[victim].killHistory.Clear();
-					mKillLogs[victim].lastDeath = Time.time;
+					if (victim != null)
+					{
+						mKillLogs[victim].killStreak = 0;
+						mKillLogs[victim].killHistory.Clear();
+						mKillLogs[victim].lastDeath = Time.time;
+					}
 				}
 
 				/// <inheritdoc />
