@@ -4,6 +4,7 @@ using FiringSquad.Core;
 using FiringSquad.Core.State;
 using FiringSquad.Debug;
 using FiringSquad.Networking;
+using FiringSquad.Data;
 using UnityEngine;
 using UnityEngine.Networking.Match;
 using UnityEngine.UI;
@@ -17,20 +18,31 @@ namespace FiringSquad.Gameplay.UI
 		[SerializeField] private InputField mNameEntryField;
 		[SerializeField] private Button mCancelButton;
 		[SerializeField] private Button mConfirmButton;
+		[SerializeField] private Dropdown mPlayerCountDropdown;
+		[SerializeField] private Dropdown mGameModeDropdown;
 
 		/// Private variables
 		private NetworkGameManager mNetworkManager;
 		private JoinGamePanel mJoinGamePanel;
+
+		// Info for starting the game
+		int mPlayerCount;
+		GameData.MatchType mMatchType;
 
 		/// <summary>
 		/// Unity's Awake signal.
 		/// </summary>
 		private void Awake()
 		{
+			mPlayerCount = 4;
+			mMatchType = GameData.MatchType.Deathmatch;
 			mNetworkManager = FindObjectOfType<NetworkGameManager>();
 
 			mCancelButton.onClick.AddListener(OnClickCancelButton);
 			mConfirmButton.onClick.AddListener(OnClickConfirmButton);
+
+			mPlayerCountDropdown.onValueChanged.AddListener(delegate { OnChangePlayerCount(); });
+			mGameModeDropdown.onValueChanged.AddListener(delegate { OnChangeGameType(); });
 
 			mJoinGamePanel = GetComponentInParent<JoinGamePanel>();
 		}
@@ -42,6 +54,8 @@ namespace FiringSquad.Gameplay.UI
 		{
 			mCancelButton.onClick.RemoveListener(OnClickCancelButton);
 			mConfirmButton.onClick.RemoveListener(OnClickConfirmButton);
+			mPlayerCountDropdown.onValueChanged.RemoveListener(delegate { OnChangePlayerCount(); });
+			mGameModeDropdown.onValueChanged.RemoveListener(delegate { OnChangeGameType(); });
 		}
 
 		/// <summary>
@@ -76,6 +90,42 @@ namespace FiringSquad.Gameplay.UI
 		}
 
 		/// <summary>
+		/// Value change handler for the player count dropdown
+		/// </summary>
+		private void OnChangePlayerCount()
+		{
+			// Check the value of the player count
+			int dropVal = mPlayerCountDropdown.value;
+
+			if (dropVal == 0)
+			{
+				mPlayerCount = 4;
+			}
+			else if (dropVal == 1)
+			{
+				mPlayerCount = 6;
+			}
+		}
+
+		/// <summary>
+		/// Value change handler for the player's match type
+		/// </summary>
+		private void OnChangeGameType()
+		{
+			// Check the value of the player count
+			int dropVal = mGameModeDropdown.value;
+
+			if (dropVal == 0)
+			{
+				mMatchType = GameData.MatchType.Deathmatch;
+			}
+			else if (dropVal == 1)
+			{
+				mMatchType = GameData.MatchType.TeamDeathmatch;
+			}
+		}
+
+		/// <summary>
 		/// Async handler for creating a new match.
 		/// </summary>
 		private void OnMatchCreate(bool success, string extendedinfo, MatchInfo responsedata)
@@ -91,5 +141,8 @@ namespace FiringSquad.Gameplay.UI
 			mNetworkManager.StartHost();
 			mJoinGamePanel.FinishConnection();
 		}
+
+		public int playerCount() { return mPlayerCount; }
+		public GameData.MatchType GetMatchType() { return mMatchType; }
 	}
 }
