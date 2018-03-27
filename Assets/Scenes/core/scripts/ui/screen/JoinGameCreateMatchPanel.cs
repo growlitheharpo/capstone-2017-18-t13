@@ -143,6 +143,6 @@ namespace FiringSquad.Gameplay.UI
 		}
 
 		public int playerCount() { return mPlayerCount; }
-		public GameData.MatchType GetMatchType() { return mMatchType; }
+		public GameData.MatchType matchType() { return mMatchType; }
 	}
 }

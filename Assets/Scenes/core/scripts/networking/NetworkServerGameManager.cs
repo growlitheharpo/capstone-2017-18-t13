@@ -30,13 +30,13 @@ namespace FiringSquad.Networking
 		/// </summary>
 		public override void OnStartServer()
 		{
-			//GameObject createGamePanel = GameObject.Find("CreateMatchPanel");
-			//FiringSquad.Gameplay.UI.JoinGameCreateMatchPanel panel = createGamePanel.GetComponent<FiringSquad.Gameplay.UI.JoinGameCreateMatchPanel>();
+			GameObject createGamePanel = GameObject.Find("CreateMatchPanel");
+			FiringSquad.Gameplay.UI.JoinGameCreateMatchPanel panel = createGamePanel.GetComponent<FiringSquad.Gameplay.UI.JoinGameCreateMatchPanel>();
 
 			mStateMachine = new ServerStateMachine(this);
 			ServiceLocator.Get<IGameConsole>().RegisterCommand("force-start", CONSOLE_ForceStartGame);
-			//mData.goalPlayerCount = panel.GetPlayerCount();
-			//mData.currentType = panel.GetMatchType();
+			mData.goalPlayerCount = panel.playerCount();
+			mData.currentType = panel.matchType();
 		}
 
 		/// <summary>
