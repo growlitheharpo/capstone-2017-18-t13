@@ -71,11 +71,11 @@ namespace FiringSquad.Data
 		/// <summary>
 		/// How many players to wait for before the match starts.
 		/// </summary>
-		public int goalPlayerCount { get { return mGoalPlayerCount; } }
+		public int goalPlayerCount { get { return mGoalPlayerCount; } set { mGoalPlayerCount = value; }}
 
 		/// <summary>
 		/// Which gametype we are currently playing.
 		/// </summary>
-		public GameData.MatchType currentType { get { return mCurrentType; } }
+		public GameData.MatchType currentType { get { return mCurrentType; } set { mCurrentType = value; } }
 	}
 }
