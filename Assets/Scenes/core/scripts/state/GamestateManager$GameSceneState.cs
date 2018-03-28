@@ -144,6 +144,8 @@ namespace FiringSquad.Core.State
 					EventManager.Local.OnReceiveGameEndTime += OnReceiveGameEndTime;
 					EventManager.Local.OnReceiveFinishEvent += OnReceiveFinishEvent;
 					EventManager.Local.OnConfirmQuitGame += OnConfirmQuitGame;
+					EventManager.Local.OnTeamVictoryScreen += OnTeamVictoryScreen;
+
 				}
 
 				/// <inheritdoc />
@@ -153,6 +155,8 @@ namespace FiringSquad.Core.State
 					EventManager.Local.OnReceiveGameEndTime -= OnReceiveGameEndTime;
 					EventManager.Local.OnReceiveFinishEvent -= OnReceiveFinishEvent;
 					EventManager.Local.OnConfirmQuitGame -= OnConfirmQuitGame;
+					EventManager.Local.OnTeamVictoryScreen -= OnTeamVictoryScreen;
+
 				}
 
 				/// <summary>
@@ -178,6 +182,17 @@ namespace FiringSquad.Core.State
 						mRemainingTime = new BoundProperty<float>(CalculateRemainingTime(), UIManager.ARENA_ROUND_TIME);
 					else
 						mRemainingTime.value = CalculateRemainingTime();
+				}
+
+				/// <summary>
+				/// 
+				/// </summary>
+				private void OnTeamVictoryScreen(IList<PlayerScore> scores)
+				{
+					IScreenPanel panel = ServiceLocator.Get<IUIManager>()
+						.PushNewPanel(ScreenPanelTypes.TeamVictory);
+					((TeamVictoryPanel)panel).TallyScores(scores);
+
 				}
 
 				/// <summary>
