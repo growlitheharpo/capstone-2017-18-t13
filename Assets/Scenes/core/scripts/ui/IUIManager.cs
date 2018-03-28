@@ -13,7 +13,8 @@ namespace FiringSquad.Core.UI
 		GameOver,
 		Console,
 		DebugMenu,
-		HandleConnection
+		HandleConnection,
+		TeamVictory
 	}
 
 	/// <summary>

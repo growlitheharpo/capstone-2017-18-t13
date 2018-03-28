@@ -251,7 +251,7 @@ public partial class EventManager
 			OnInputLevelChanged(level, state);
 		}
 
-		public static event Action<float,CltPlayer> OnZoomLevelChanged = (a,b) => { LogEvent(); };
+		public static event Action<float, CltPlayer> OnZoomLevelChanged = (a, b) => { LogEvent(); };
 
 		/// <summary>
 		/// Event called when the player changes their zoom level in the variable sight
@@ -301,7 +301,7 @@ public partial class EventManager
 		{
 			OnIntroEnd();
 		}
-		
+
 		/// <summary>
 		/// Event called when the server confirms that a local player has captured a stage.
 		/// </summary>
@@ -313,6 +313,12 @@ public partial class EventManager
 		public static void LocalPlayerCapturedStage()
 		{
 			OnLocalPlayerCapturedStage();
+		}
+		public static event Action<IList<PlayerScore>> OnTeamVictoryScreen = (s) => { LogEvent(); };
+
+		public static void TeamVictoryScreen(IList<PlayerScore> score)
+		{
+			OnTeamVictoryScreen(score);
 		}
 	}
 
