@@ -420,6 +420,10 @@ MonoBehaviour:
     mFmodVal: event:/SFX/UI/HypeText
   - mEnumVal: 38
     mFmodVal: event:/SFX/Player/Land
+  - mEnumVal: 200
+    mFmodVal: event:/Music/Menu/MenuMusic
+  - mEnumVal: 205
+    mFmodVal: event:/Music/Intro/IntroMusic
 --- !u!114 &114395789350535634
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -454,7 +458,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mConsoleView: {fileID: 114395789350535634}
-  mEnabledLogSystems: -23
+  mEnabledLogSystems: -19
 --- !u!114 &114681866083542778
 MonoBehaviour:
   m_ObjectHideFlags: 1

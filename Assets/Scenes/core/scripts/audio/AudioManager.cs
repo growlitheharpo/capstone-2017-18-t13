@@ -58,6 +58,10 @@ namespace FiringSquad.Core.Audio
 		MenuButtonHover = 180,
 		MenuButtonPress = 185,
 		HypeText = 190,
+
+		// Music
+		MenuMusic = 200,
+		IntroMusic = 205,
 	}
 
 	/// <inheritdoc cref="IAudioManager"/>
