@@ -14,7 +14,8 @@ namespace FiringSquad.Gameplay.UI
 		/// Inspector variables
 		[SerializeField] private Sprite mOffscreenSprite;
 		[SerializeField] private Sprite mOnscreenSprite;
-		[SerializeField] private UIText mLabelText;
+		[SerializeField] private UIText mOffscreenText;
+		[SerializeField] private UIText mOnScreenText;
 
 		/// Private variables
 		private UIImage mImage;
@@ -49,7 +50,7 @@ namespace FiringSquad.Gameplay.UI
 		{
 			// take the viewport -0.5, * 2.0f, the magnitude should be 1
 			gameObject.SetActive(true);
-			mLabelText.gameObject.SetActive(true);
+			mOffscreenText.gameObject.SetActive(true);
 			mTarget = target;
 			MoveAndFaceTarget();
 		}
@@ -60,7 +61,7 @@ namespace FiringSquad.Gameplay.UI
 		public void StopPointing()
 		{
 			gameObject.SetActive(false);
-			mLabelText.gameObject.SetActive(false);
+			mOffscreenText.gameObject.SetActive(false);
 			mTarget = null;
 		}
 
@@ -105,8 +106,9 @@ namespace FiringSquad.Gameplay.UI
 			mImage.sprite = mOffscreenSprite;
 			//mImage.color = mImageFarColor;
 
-			mLabelText.enabled = true;
-			mLabelText.transform.localRotation = Quaternion.AngleAxis(-angle, Vector3.forward);
+			mOnScreenText.enabled = false;
+			mOffscreenText.enabled = true;
+			mOffscreenText.transform.localRotation = Quaternion.AngleAxis(-angle, Vector3.forward);
 		}
 
 		/// <summary>
@@ -124,7 +126,8 @@ namespace FiringSquad.Gameplay.UI
 
 			mImage.sprite = mOnscreenSprite;
 			
-			mLabelText.enabled = false;
+			mOffscreenText.enabled = false;
+			mOnScreenText.enabled = true;
 		}
 	}
 }
