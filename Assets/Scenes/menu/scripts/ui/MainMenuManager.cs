@@ -1,4 +1,5 @@
 ﻿using FiringSquad.Core;
+using FiringSquad.Core.Audio;
 using FiringSquad.Core.State;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -23,7 +24,9 @@ namespace FiringSquad.Gameplay.UI
 		[SerializeField] private GameObject mMainMenuAssets;
 		[SerializeField] private GameObject mCreditAssets;
 
+		/// Private variables
 		private int mKioskTimerTicks;
+		private IAudioReference mMenuMusic;
 
 		/// <summary>
 		/// Unity's Start function
@@ -40,6 +43,16 @@ namespace FiringSquad.Gameplay.UI
 			mMainMenuButton.onClick.AddListener(ReturnToMenu);
 
 			mKioskTimerTicks = mKioskTimerSeconds * 100;
+
+			// play music
+			IAudioManager audioService = ServiceLocator.Get<IAudioManager>();
+			mMenuMusic = audioService.CheckReferenceAlive(ref mMenuMusic);
+
+			if (mMenuMusic == null)
+			{
+				mMenuMusic = ServiceLocator.Get<IAudioManager>().CreateSound(AudioEvent.MenuMusic, gameObject.transform, false);
+				mMenuMusic.Start();
+			}
 		}
 
 		/// <summary>
@@ -51,6 +64,8 @@ namespace FiringSquad.Gameplay.UI
 
 			ServiceLocator.Get<IGamestateManager>()
 				.RequestSceneChange(GamestateManager.DRAFT_GAMEPLAY);
+
+			mMenuMusic.Kill(true);
 		}
 
 		/// <summary>
@@ -123,6 +138,8 @@ namespace FiringSquad.Gameplay.UI
 
 			ServiceLocator.Get<IGamestateManager>()
 				.RequestSceneChange(GamestateManager.KIOSK_SCENE);
+
+			mMenuMusic.Kill(false);
 		}
 
 		/// <summary>
