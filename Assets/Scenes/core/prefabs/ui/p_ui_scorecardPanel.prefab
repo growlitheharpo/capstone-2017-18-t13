@@ -68,7 +68,6 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 224693793521859058}
-  - component: {fileID: 114850308997643410}
   - component: {fileID: 114409613277957018}
   m_Layer: 5
   m_Name: p_ui_scorecardPanel
@@ -597,21 +596,6 @@ MonoBehaviour:
     m_VerticalOverflow: 0
     m_LineSpacing: 1
   m_Text: ']'
---- !u!114 &114850308997643410
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1236694687591962}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2e1690b4f248f054b966176b953b1a46, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mScorePrefab: {fileID: 114141836363294822, guid: ce0befe02a5cf984cb1a94b99a08a803,
-    type: 2}
-  mScoreGrid: {fileID: 114245201307824416}
-  mQuitButton: {fileID: 114530191737112282}
 --- !u!114 &114879516075466626
 MonoBehaviour:
   m_ObjectHideFlags: 1
