@@ -11,12 +11,11 @@ namespace FiringSquad.Gameplay.UI
 	/// <summary>
 	/// UI class to manage the gameover panel.
 	/// </summary>
-	public class GameOverPanel : MonoBehaviour, IScreenPanel
+	public class ScorecardPanel : MonoBehaviour, IScreenPanel
 	{
 		/// Inspector variables
 		[SerializeField] private GameOverIndividualScorePanel mScorePrefab;
 		[SerializeField] private LayoutGroup mScoreGrid;
-		[SerializeField] private ActionProvider mQuitButton;
 
 		/// <inheritdoc />
 		public bool disablesInput { get { return true; } }
@@ -26,10 +25,8 @@ namespace FiringSquad.Gameplay.UI
 		/// </summary>
 		private void Start()
 		{
-			mQuitButton.OnClick += HandleQuit;
-
 			ServiceLocator.Get<IUIManager>()
-				.RegisterPanel(this, ScreenPanelTypes.GameOver);
+				.RegisterPanel(this, ScreenPanelTypes.Scorecard);
 		}
 
 		/// <summary>
@@ -37,8 +34,6 @@ namespace FiringSquad.Gameplay.UI
 		/// </summary>
 		private void OnDestroy()
 		{
-			mQuitButton.OnClick -= HandleQuit;
-
 			ServiceLocator.Get<IUIManager>()
 				.UnregisterPanel(this);
 		}
@@ -67,15 +62,6 @@ namespace FiringSquad.Gameplay.UI
 				panel.killCount = score.kills > 0 ? (uint)score.kills : 0;
 				panel.deathCount = score.deaths > 0 ? (uint)score.deaths : 0;
 			}
-		}
-
-		/// <summary>
-		/// Handle the player clicking the Quit button.
-		/// Transition back to menu.
-		/// </summary>
-		private void HandleQuit()
-		{
-			EventManager.Notify(EventManager.Local.ConfirmQuitGame);
 		}
 
 		/// <inheritdoc />
