@@ -60,6 +60,8 @@ namespace FiringSquad.Gameplay
 				.RegisterInput(Input.GetButtonDown, inputMap.activateADSButton, INPUT_EnterAimDownSights, InputLevel.Gameplay)
 				.RegisterInput(Input.GetButtonUp, inputMap.activateADSButton, INPUT_ExitAimDownSights, InputLevel.Gameplay)
 				.RegisterInput(Input.GetButtonDown, inputMap.pauseButton, INPUT_TogglePause, InputLevel.PauseMenu)
+				.RegisterInput(Input.GetButtonDown, inputMap.statusButton, INPUT_ShowScorecard, InputLevel.Gameplay)
+				.RegisterInput(Input.GetButtonUp, inputMap.statusButton, INPUT_HideScorecard, InputLevel.Gameplay)
 				.RegisterInput(Input.GetKeyDown, KeyCode.J, INPUT_ActivateGunPanic, InputLevel.Gameplay)
 				.RegisterAxis(Input.GetAxis, inputMap.zoomAxis, INPUT_ZoomLevel, InputLevel.Gameplay)
 
@@ -230,6 +232,22 @@ namespace FiringSquad.Gameplay
 				return;
 
 			EventManager.Local.TogglePause();
+		}
+
+		/// <summary>
+		/// INPUT HANDLER: Show the scorecard to the player.
+		/// </summary>
+		private void INPUT_ShowScorecard()
+		{
+
+		}
+
+		/// <summary>
+		/// INPUT HANDLER: Hide the scorecard from the player.
+		/// </summary>
+		private void INPUT_HideScorecard()
+		{
+
 		}
 
 		/// <summary>
