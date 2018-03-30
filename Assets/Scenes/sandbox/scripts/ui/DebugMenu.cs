@@ -42,7 +42,7 @@ namespace FiringSquad.Debug
 		{
 			RefreshWeaponList();
 			ServiceLocator.Get<IInput>()
-				.RegisterInput(Input.GetKeyDown, KeyCode.Tab, ToggleUI, InputLevel.None);
+				.RegisterInput(Input.GetKeyDown, KeyCode.F2, ToggleUI, InputLevel.None);
 
 			ServiceLocator.Get<IUIManager>()
 				.RegisterPanel(this, ScreenPanelTypes.DebugMenu);
