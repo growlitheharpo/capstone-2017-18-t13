@@ -10,6 +10,11 @@ namespace FiringSquad.Core.UI
 		GameObject gameObject { get; }
 
 		/// <summary>
+		/// True if this panel type should turn off input when enabled.
+		/// </summary>
+		bool disablesInput { get; }
+
+		/// <summary>
 		/// Automatically called by the UIManager when a panel is pushed onto the stack.
 		/// </summary>
 		void OnEnablePanel();

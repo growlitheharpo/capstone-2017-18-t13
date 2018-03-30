@@ -26,6 +26,9 @@ namespace FiringSquad.Gameplay.UI
 		/// Private variables
 		private NetworkGameManager mNetworkManager;
 
+		/// <inheritdoc />
+		public bool disablesInput { get { return true; } }
+
 		/// <summary>
 		/// Unity's Awake function.
 		/// </summary>

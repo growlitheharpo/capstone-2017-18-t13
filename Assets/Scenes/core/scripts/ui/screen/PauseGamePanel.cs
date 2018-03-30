@@ -1,9 +1,7 @@
 ﻿using FiringSquad.Core;
-using FiringSquad.Core.State;
 using FiringSquad.Core.UI;
 using FiringSquad.Data;
 using UnityEngine;
-using UnityEngine.Networking;
 
 namespace FiringSquad.Gameplay.UI
 {
@@ -13,10 +11,6 @@ namespace FiringSquad.Gameplay.UI
 	public class PauseGamePanel : MonoBehaviour, IScreenPanel
 	{
 		/// Inspector variables
-		[SerializeField] private float mDefaultFieldOfView;
-		[SerializeField] private float mDefaultMouseSensitivity;
-
-		[SerializeField] private float mDefaultVolume;
 		[SerializeField] private BaseFloatProvider mFieldOfViewProvider;
 		[SerializeField] private BaseFloatProvider mMouseSensitivityProvider;
 		[SerializeField] private BaseFloatProvider mVolumeProvider;
@@ -30,6 +24,9 @@ namespace FiringSquad.Gameplay.UI
 
 		/// Private variables
 		private IOptionsData mData;
+
+		/// <inheritdoc />
+		public bool disablesInput { get { return true; } }
 
 		/// <summary>
 		/// Unity's Awake function

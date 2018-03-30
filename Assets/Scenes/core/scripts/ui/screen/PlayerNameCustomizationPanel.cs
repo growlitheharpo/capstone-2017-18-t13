@@ -15,6 +15,9 @@ namespace FiringSquad.Gameplay.UI
 		[SerializeField] private InputField mInputField;
 		[SerializeField] private ActionProvider mConfirmButton;
 
+		/// <inheritdoc />
+		public bool disablesInput { get { return true; } }
+
 		/// <summary>
 		/// Unity's Start function.
 		/// </summary>

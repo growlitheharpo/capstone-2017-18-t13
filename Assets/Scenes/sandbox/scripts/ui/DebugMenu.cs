@@ -22,6 +22,9 @@ namespace FiringSquad.Debug
 		[SerializeField] private WeaponPartScript[] mScopes;
 		[SerializeField] private WeaponPartScript[] mGrips;
 
+		/// <inheritdoc />
+		public bool disablesInput { get { return true; } }
+
 		/// <summary>
 		/// Update our WeaponList from the service.
 		/// </summary>

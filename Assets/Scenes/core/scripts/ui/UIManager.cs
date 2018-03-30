@@ -23,7 +23,7 @@ namespace FiringSquad.Core.UI
 		private Dictionary<int, WeakReference> mPropertyMap;
 		private Dictionary<ScreenPanelTypes, IScreenPanel> mPanelTypeToObjectMap;
 		private Dictionary<IScreenPanel, ScreenPanelTypes> mPanelObjectToTypeMap;
-		private UniqueStack<GameObject> mActivePanels;
+		private UniqueStack<IScreenPanel> mActivePanels;
 
 		/// <summary>
 		/// Unity's Awake function
@@ -34,7 +34,7 @@ namespace FiringSquad.Core.UI
 			mPropertyMap = new Dictionary<int, WeakReference>();
 			mPanelObjectToTypeMap = new Dictionary<IScreenPanel, ScreenPanelTypes>();
 			mPanelTypeToObjectMap = new Dictionary<ScreenPanelTypes, IScreenPanel>();
-			mActivePanels = new UniqueStack<GameObject>();
+			mActivePanels = new UniqueStack<IScreenPanel>();
 		}
 
 		#region Bound Properties
@@ -87,11 +87,14 @@ namespace FiringSquad.Core.UI
 			go.SetActive(true);
 			panel.OnEnablePanel();
 
-			ServiceLocator.Get<IInput>()
-				.DisableInputLevel(InputLevel.Gameplay)
-				.DisableInputLevel(InputLevel.HideCursor);
-			
-			mActivePanels.Push(go);
+			if (panel.disablesInput)
+			{
+				ServiceLocator.Get<IInput>()
+					.DisableInputLevel(InputLevel.Gameplay)
+					.DisableInputLevel(InputLevel.HideCursor);
+			}
+
+			mActivePanels.Push(panel);
 			go.transform.SetAsLastSibling();
 
 			return panel;
@@ -108,9 +111,9 @@ namespace FiringSquad.Core.UI
 
 			panel.OnDisablePanel();
 			go.SetActive(false);
-			mActivePanels.Remove(go);
+			mActivePanels.Remove(panel);
 
-			if (mActivePanels.Count == 0)
+			if (!mActivePanels.Any(x => x.disablesInput)) // no active panels that disable input
 			{
 				ServiceLocator.Get<IInput>()
 					.EnableInputLevel(InputLevel.Gameplay)
@@ -126,7 +129,7 @@ namespace FiringSquad.Core.UI
 				return null;
 
 			IScreenPanel panel = mPanelTypeToObjectMap[type];
-			if (!mActivePanels.Contains(panel.gameObject))
+			if (!mActivePanels.Contains(panel))
 				return PushNewPanel(type);
 
 			PopPanel(type);
@@ -160,7 +163,7 @@ namespace FiringSquad.Core.UI
 			mPanelTypeToObjectMap.Remove(type);
 
 			GameObject go = panelObject.gameObject;
-			mActivePanels.Remove(go);
+			mActivePanels.Remove(panelObject);
 
 			return this;
 		}
