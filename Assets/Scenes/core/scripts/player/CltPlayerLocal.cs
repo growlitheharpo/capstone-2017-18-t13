@@ -239,7 +239,11 @@ namespace FiringSquad.Gameplay
 		/// </summary>
 		private void INPUT_ShowScorecard()
 		{
+			ServiceLocator.Get<IInput>()
+				.DisableInputLevel(InputLevel.PauseMenu);
 
+			ServiceLocator.Get<IUIManager>()
+				.PushNewPanel(ScreenPanelTypes.Scorecard);
 		}
 
 		/// <summary>
@@ -247,7 +251,11 @@ namespace FiringSquad.Gameplay
 		/// </summary>
 		private void INPUT_HideScorecard()
 		{
+			ServiceLocator.Get<IInput>()
+				.EnableInputLevel(InputLevel.PauseMenu);
 
+			ServiceLocator.Get<IUIManager>()
+				.PopPanel(ScreenPanelTypes.Scorecard);
 		}
 
 		/// <summary>
