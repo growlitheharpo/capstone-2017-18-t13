@@ -34,8 +34,8 @@ namespace FiringSquad.Gameplay.UI
 
 			mScores = new Dictionary<CltPlayer, GameOverIndividualScorePanel>();
 
-			mBlueTeamScore = new BoundProperty<int>(UIManager.BLUE_TEAM_SCORE);
-			mOrangeTeamScore = new BoundProperty<int>(UIManager.ORANGE_TEAM_SCORE);
+			mBlueTeamScore = new BoundProperty<int>(0, UIManager.BLUE_TEAM_SCORE);
+			mOrangeTeamScore = new BoundProperty<int>(0, UIManager.ORANGE_TEAM_SCORE);
 
 			EventManager.Local.OnReceiveLobbyEndTime += OnReceiveLobbyEndTime;
 			EventManager.Local.OnReceiveGameEndTime += OnReceiveGameEndTime;
@@ -110,7 +110,6 @@ namespace FiringSquad.Gameplay.UI
 		private void OnPlayerScoreChanged(CltPlayer player, int scoreChange, int killChange, int deathChange)
 		{
 			GameOverIndividualScorePanel score;
-
 			if (!mScores.TryGetValue(player, out score))
 			{
 				score = Instantiate(mScorePrefab.gameObject, mScoreGrid.transform)
