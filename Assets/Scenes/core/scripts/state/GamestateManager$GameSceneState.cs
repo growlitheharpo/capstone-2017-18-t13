@@ -201,8 +201,12 @@ namespace FiringSquad.Core.State
 				/// </summary>
 				private void OnReceiveFinishEvent(IList<PlayerScore> scores)
 				{
-					IScreenPanel panel = ServiceLocator.Get<IUIManager>()
-						.PushNewPanel(ScreenPanelTypes.GameOver);
+					IUIManager ui = ServiceLocator.Get<IUIManager>();
+					ui.PopPanel(ScreenPanelTypes.Scorecard);
+					ServiceLocator.Get<IInput>()
+						.DisableInputLevel(InputLevel.Scorecard);
+
+					IScreenPanel panel = ui.PushNewPanel(ScreenPanelTypes.GameOver);
 					((GameOverPanel)panel).SetDisplayScores(scores);
 				}
 
