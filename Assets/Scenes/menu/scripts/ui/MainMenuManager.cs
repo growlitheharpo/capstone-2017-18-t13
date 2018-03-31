@@ -20,6 +20,8 @@ namespace FiringSquad.Gameplay.UI
 		[SerializeField] private UIButton mHowToPlayButton;
 		[SerializeField] private UIButton mCreditsButton;
 		[SerializeField] private UIButton mQuitButton;
+		[SerializeField] private UIButton mArenaBattleButton;
+		[SerializeField] private UIButton mDualModeButton;
 
 		[Header("Return Buttons")]
 		[SerializeField] private UIButton mSubPlayReturnButton;
@@ -51,6 +53,8 @@ namespace FiringSquad.Gameplay.UI
 			mHowToPlayButton.onClick.AddListener(SwitchTo_HowToPlay);
 			mCreditsButton.onClick.AddListener(SwitchTo_Credits);
 			mQuitButton.onClick.AddListener(ClickQuit);
+			mArenaBattleButton.onClick.AddListener(Launch_ArenaBattle);
+			mDualModeButton.onClick.AddListener(Launch_DualMode);
 
 			mSubPlayReturnButton.onClick.AddListener(() => ReturnToMainMenu(mSubPlayAnimator));
 			mGunGlossaryReturnButton.onClick.AddListener(() => ReturnToMainMenu(mGunGlossaryAnimator));
@@ -125,6 +129,23 @@ namespace FiringSquad.Gameplay.UI
 			mMainMenuAnimator.SetTrigger("Exit");
 			mCreditsAnimator.SetTrigger("Enter");
 			mCreditsAnimator.transform.SetAsLastSibling();
+		}
+
+	   
+		private void Launch_ArenaBattle()
+		{
+			ServiceLocator.Get<IGamestateManager>()
+				.RequestSceneChange(GamestateManager.DRAFT_GAMEPLAY);
+
+			mMenuMusic.Kill(true);
+		}
+
+		private void Launch_DualMode()
+		{ 
+			//TODO: set up 1v1 scene
+			UnityEngine.Debug.Log("Dual Mode Coming Soon");
+
+			//mMenuMusic.Kill(true);
 		}
 
 		/// <summary>
