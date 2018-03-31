@@ -621,17 +621,21 @@ namespace FiringSquad.Gameplay
 		private void OnPlayerCapturedStage(StageCaptureArea stage, IList<CltPlayer> players)
 		{
 			if (players.Contains(this))
-				TargetNotifyCapturedStage(connectionToClient);
+				RpcNotifyCapturedStage();
 		}
 
 		/// <summary>
-		/// Notify the local client that the server has confirmed that we've captured a stage.
+		/// Notify the client that the server has confirmed that we've captured a stage.
 		/// </summary>
-		/// <param name="connection"></param>
-		[TargetRpc]
-		private void TargetNotifyCapturedStage(NetworkConnection connection)
+		/// <para>
+		/// NOTE: This used to be a TargetRPC but we've converted it to a broadcast so that everyone
+		/// can keep their scorecards accurate.
+		/// </para>
+		[ClientRpc]
+		private void RpcNotifyCapturedStage()
 		{
-			EventManager.Notify(EventManager.Local.LocalPlayerCapturedStage);
+			if (isCurrentPlayer)
+				EventManager.Notify(EventManager.Local.LocalPlayerCapturedStage);
 		}
 
 		#endregion
