@@ -17,7 +17,8 @@ namespace FiringSquad.Gameplay.UI
 		[SerializeField] private GameOverIndividualScorePanel mScorePrefab;
 		[SerializeField] private LayoutGroup mScoreGrid;
 		[SerializeField] private ActionProvider mQuitButton;
-		[SerializeField] private GameObject mTeamScores;
+		[SerializeField] private Text mBlueScore;
+		[SerializeField] private Text mOrangeScore;
 
 		/// <inheritdoc />
 		public bool disablesInput { get { return true; } }
@@ -53,6 +54,8 @@ namespace FiringSquad.Gameplay.UI
 			gameObject.SetActive(true);
 			scores = scores.OrderByDescending(x => x.score).ToArray();
 
+			int blue = 0, orange = 0;
+
 			for (uint i = 0; i < scores.Count; ++i)
 			{
 				PlayerScore score = scores[(int)i];
@@ -62,7 +65,10 @@ namespace FiringSquad.Gameplay.UI
 					.GetComponent<GameOverIndividualScorePanel>();
 
 				if (player.playerTeam == GameData.PlayerTeam.Deathmatch)
-					mTeamScores.SetActive(false);
+				{
+					mOrangeScore.gameObject.SetActive(false);
+					mBlueScore.gameObject.SetActive(false);
+				}
 
 				panel.ApplyTeamColor(player.teamColor);
 				panel.playerRank = i + 1;
@@ -70,7 +76,15 @@ namespace FiringSquad.Gameplay.UI
 				panel.playerScore = score.score;
 				panel.killCount = score.kills > 0 ? (uint)score.kills : 0;
 				panel.deathCount = score.deaths > 0 ? (uint)score.deaths : 0;
+
+				if (player.playerTeam == GameData.PlayerTeam.Blue)
+					blue += score.score;
+				else if (player.playerTeam == GameData.PlayerTeam.Orange)
+					orange += score.score;
 			}
+
+			mBlueScore.text = "BLUE: " + blue.ToString("0000");
+			mOrangeScore.text = "ORANGE: " + orange.ToString("0000");
 		}
 
 		/// <summary>

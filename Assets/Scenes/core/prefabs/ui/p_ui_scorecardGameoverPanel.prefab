@@ -155,7 +155,6 @@ GameObject:
   - component: {fileID: 224052386929876528}
   - component: {fileID: 222323637716716280}
   - component: {fileID: 114082933338859576}
-  - component: {fileID: 114287462221347134}
   m_Layer: 5
   m_Name: ORANGE
   m_TagString: Untagged
@@ -334,7 +333,6 @@ GameObject:
   - component: {fileID: 224046691142323740}
   - component: {fileID: 222849657403575110}
   - component: {fileID: 114459598301197406}
-  - component: {fileID: 114702905587686146}
   m_Layer: 5
   m_Name: BLUE
   m_TagString: Untagged
@@ -440,19 +438,6 @@ MonoBehaviour:
   m_FillAmount: 1
   m_FillClockwise: 1
   m_FillOrigin: 0
---- !u!114 &114287462221347134
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1388612483565186}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8546d7e176e527a4ca7aa3768670560e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mBoundProperty: orange_team_current_score
-  mDisplayFormat: 'ORANGE: 0000'
 --- !u!114 &114459598301197406
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -752,19 +737,6 @@ MonoBehaviour:
   m_FillAmount: 1
   m_FillClockwise: 1
   m_FillOrigin: 0
---- !u!114 &114702905587686146
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1998763110715618}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8546d7e176e527a4ca7aa3768670560e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mBoundProperty: blue_team_current_score
-  mDisplayFormat: 'ORANGE: 0000'
 --- !u!114 &114715322907463958
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -780,7 +752,8 @@ MonoBehaviour:
     type: 2}
   mScoreGrid: {fileID: 114626786785920348}
   mQuitButton: {fileID: 114138804434311040}
-  mTeamScores: {fileID: 1606003938018116}
+  mBlueScore: {fileID: 114459598301197406}
+  mOrangeScore: {fileID: 114082933338859576}
 --- !u!114 &114764851042055580
 MonoBehaviour:
   m_ObjectHideFlags: 1
