@@ -71,6 +71,7 @@ namespace FiringSquad.Data
 		public PlayerScore(CltPlayer p)
 		{
 			mPlayerId = p.netId;
+			mPlayer = p;
 			mKills = 0;
 			mDeaths = 0;
 			mScore = 0;
@@ -93,6 +94,7 @@ namespace FiringSquad.Data
 		public PlayerScore(CltPlayer p, int kill, int death, int score)
 		{
 			mPlayerId = p.netId;
+			mPlayer = p;
 			mKills = kill;
 			mDeaths = death;
 			mScore = score;

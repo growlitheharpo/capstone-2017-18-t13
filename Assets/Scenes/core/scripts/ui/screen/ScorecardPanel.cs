@@ -17,6 +17,8 @@ namespace FiringSquad.Gameplay.UI
 		[SerializeField] private GameOverIndividualScorePanel mScorePrefab;
 		[SerializeField] private LayoutGroup mScoreGrid;
 
+		private Dictionary<CltPlayer, GameOverIndividualScorePanel> mScores;
+
 		/// <inheritdoc />
 		public bool disablesInput { get { return false; } }
 
@@ -27,6 +29,9 @@ namespace FiringSquad.Gameplay.UI
 		{
 			ServiceLocator.Get<IUIManager>()
 				.RegisterPanel(this, ScreenPanelTypes.Scorecard);
+
+			mScores = new Dictionary<CltPlayer, GameOverIndividualScorePanel>();
+			EventManager.LocalGeneric.OnPlayerScoreChanged += OnPlayerScoreChanged;
 		}
 
 		/// <summary>
@@ -34,33 +39,40 @@ namespace FiringSquad.Gameplay.UI
 		/// </summary>
 		private void OnDestroy()
 		{
+			EventManager.LocalGeneric.OnPlayerScoreChanged -= OnPlayerScoreChanged;
+
 			ServiceLocator.Get<IUIManager>()
 				.UnregisterPanel(this);
 		}
 
 		/// <summary>
-		/// Set the scores displayed on the UI panel.
+		/// EVENT HANDLER: LocalGeneric.OnPlayerScoreChanged
 		/// </summary>
-		/// <param name="scores">The array of scores that will be displayed.</param>
-		public void SetDisplayScores(IList<PlayerScore> scores)
+		private void OnPlayerScoreChanged(CltPlayer player, int scoreChange, int killChange, int deathChange)
 		{
-			gameObject.SetActive(true);
-			scores = scores.OrderByDescending(x => x.score).ToArray();
+			GameOverIndividualScorePanel score;
 
-			for (uint i = 0; i < scores.Count; ++i)
+			if (!mScores.TryGetValue(player, out score))
 			{
-				PlayerScore score = scores[(int)i];
-				CltPlayer player = score.player;
-
-				GameOverIndividualScorePanel panel = Instantiate(mScorePrefab.gameObject, mScoreGrid.transform)
+				score = Instantiate(mScorePrefab.gameObject, mScoreGrid.transform)
 					.GetComponent<GameOverIndividualScorePanel>();
 
-				panel.ApplyTeamColor(player.teamColor);
-				panel.playerRank = i + 1;
-				panel.playerName = player.playerName;
-				panel.playerScore = score.score;
-				panel.killCount = score.kills > 0 ? (uint)score.kills : 0;
-				panel.deathCount = score.deaths > 0 ? (uint)score.deaths : 0;
+				mScores[player] = score;
+			}
+
+			if (score.playerName != player.playerName)
+				score.playerName = player.playerName;
+
+			score.killCount = killChange > 0 ? (uint)killChange : 0;
+			score.deathCount = deathChange > 0 ? (uint)deathChange : 0;
+			score.playerScore += scoreChange;
+
+			// SET RANK
+			var scores = mScores.Values.OrderByDescending(x => x.playerScore).ToList();
+			for (int i = 0; i < scores.Count; ++i)
+			{
+				scores[i].playerRank = (uint)i + 1;
+				scores[i].transform.SetAsLastSibling();
 			}
 		}
 
