@@ -18,9 +18,9 @@ namespace FiringSquad.Gameplay.UI
 	public class GlossaryMenuManager : MonoBehaviour
 	{
 		/// Inspector variables
-		[SerializeField] private UIButton mReturnToMainButton;
 		[SerializeField] private UIText mDescriptionText;
 		[SerializeField] private UILayoutGroup mSubMenuGroup;
+		[SerializeField] private Animator mSubMenuAnimator;
 		[SerializeField] private GameObject mButtonPrefab;
 
 		[SerializeField] private UIButton mMechanismButton;
@@ -38,23 +38,24 @@ namespace FiringSquad.Gameplay.UI
 		/// </summary>
 		private void Start()
 		{
-			mReturnToMainButton.onClick.AddListener(ReturnToMenu);
-
 			mMechanismButton.onClick.AddListener(() => HandleClickedCategory(Attachment.Mechanism));
 			mSightsButton.onClick.AddListener(() => HandleClickedCategory(Attachment.Scope));
 			mBarrelButton.onClick.AddListener(() => HandleClickedCategory(Attachment.Barrel));
 			mUnderbarrelButton.onClick.AddListener(() => HandleClickedCategory(Attachment.Grip));
 
 			mDefaultDescription = mDescriptionText.text;
+			ResetToDefault();
 		}
 
 		/// <summary>
-		/// Return to the main menu
+		/// Reset the glossary to its default state.
 		/// </summary>
-		private void ReturnToMenu()
+		public void ResetToDefault()
 		{
-			ServiceLocator.Get<IGamestateManager>()
-				.RequestSceneChange(GamestateManager.MENU_SCENE);
+			mSubMenuAnimator.SetBool("Enabled", false);
+			mWeapon.ResetToDefaultParts();
+
+			mDescriptionText.text = mDefaultDescription;
 		}
 
 		/// <summary>
@@ -66,7 +67,7 @@ namespace FiringSquad.Gameplay.UI
 			if (mCurrentMode == category)
 			{
 				mCurrentMode = (Attachment)(1 << 5); // we do this because there isn't an Attachment.None
-				mSubMenuGroup.transform.parent.gameObject.SetActive(false);
+				mSubMenuAnimator.SetBool("Enabled", false);
 				mDescriptionText.text = mDefaultDescription;
 			}
 			else
@@ -74,7 +75,7 @@ namespace FiringSquad.Gameplay.UI
 				mCurrentMode = category;
 
 				// Someday, we could add an animation.
-				mSubMenuGroup.transform.parent.gameObject.SetActive(true);
+				mSubMenuAnimator.SetBool("Enabled", true);
 				PopulateList(category);
 			}
 		}

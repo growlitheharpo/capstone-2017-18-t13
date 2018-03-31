@@ -101,6 +101,7 @@ namespace FiringSquad.Gameplay.UI
 		private void SwitchTo_GunGlossary()
 		{
 			mMainMenuAnimator.SetTrigger("Exit");
+			mGunGlossaryAnimator.GetComponent<GlossaryMenuManager>().ResetToDefault();
 			mGunGlossaryAnimator.SetTrigger("Enter");
 			mGunGlossaryAnimator.transform.SetAsLastSibling();
 		}
