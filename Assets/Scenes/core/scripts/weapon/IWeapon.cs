@@ -42,6 +42,11 @@ namespace FiringSquad.Gameplay.Weapons
 		bool aimDownSightsActive { get; }
 
 		/// <summary>
+		/// The number of shots left in the weapon's clip before reloading.
+		/// </summary>
+		int shotsLeftInClip { get; }
+
+		/// <summary>
 		/// Attach a new part to this weapon.
 		/// </summary>
 		/// <param name="partId">The part to be attached.</param>

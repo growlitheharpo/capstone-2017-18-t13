@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using KeatsLib.Collections;
 using UnityEngine;
 
 namespace FiringSquad.Gameplay.UI
@@ -17,6 +18,8 @@ namespace FiringSquad.Gameplay.UI
 		{
 			MagnetArmGrab,
 			ItemEquipOrDrop,
+			LowHealth,
+			LowClip,
 		}
 
 		/// <summary>
@@ -26,8 +29,14 @@ namespace FiringSquad.Gameplay.UI
 		{
 			{ Hint.MagnetArmGrab, "Hold E to pull" },
 			{ Hint.ItemEquipOrDrop, "Press E to equip or Q to drop" },
+			{ Hint.LowHealth, "LOW HEALTH" },
+			{ Hint.LowClip, "RELOAD" },
 		};
 
+		[SerializeField] private Color mRegularColor;
+		[SerializeField] private Color mDangerColor;
+
+		private UnityEngine.UI.Shadow mShadow;
 		private UnityEngine.UI.Text mUIText;
 		private List<Hint> mActiveHints;
 
@@ -37,6 +46,8 @@ namespace FiringSquad.Gameplay.UI
 		private void Awake()
 		{
 			mUIText = GetComponent<UnityEngine.UI.Text>();
+			mShadow = GetComponent<UnityEngine.UI.Shadow>();
+
 			EventManager.LocalGUI.OnSetHintState += OnSetHintState;
 			mActiveHints = new List<Hint>();
 
@@ -56,12 +67,45 @@ namespace FiringSquad.Gameplay.UI
 		/// </summary>
 		private void OnSetHintState(Hint hint, bool state)
 		{
-			if (state && !mActiveHints.Contains(hint))
-				mActiveHints.Add(hint);
-			if (!state)
-				mActiveHints = mActiveHints.Where(x => x != hint).ToList();
+			if (state)
+			{
+				int index = mActiveHints.IndexOf(hint);
+				if (index >= 0)
+					mActiveHints.SwapElement(index, mActiveHints.Count - 1);
+				else
+					mActiveHints.Add(hint);
+
+				PrioritizeList();
+			}
+			else
+				mActiveHints.RemoveAll(x => x == hint);
 
 			UpdateText();
+		}
+
+		/// <summary>
+		/// Reorder the list based on priority
+		/// </summary>
+		private void PrioritizeList()
+		{
+			mActiveHints = mActiveHints
+				.OrderBy(x =>
+				{
+					switch (x)
+					{
+						case Hint.MagnetArmGrab:
+							return 5;
+						case Hint.ItemEquipOrDrop:
+							return 5;
+						case Hint.LowHealth:
+							return 10;
+						case Hint.LowClip:
+							return 10;
+						default:
+							return 0;
+					}
+				})
+				.ToList();
 		}
 
 		/// <summary>
@@ -69,7 +113,24 @@ namespace FiringSquad.Gameplay.UI
 		/// </summary>
 		private void UpdateText()
 		{
-			mUIText.text = mActiveHints.Count <= 0 ? "" : mHintTextMap[mActiveHints.Last()];
+			if (mActiveHints.Count > 0)
+			{
+				Hint hint = mActiveHints.Last();
+				if (hint == Hint.LowClip || hint == Hint.LowHealth)
+				{
+					mUIText.color = mDangerColor;
+					mShadow.enabled = false;
+				}
+				else
+				{
+					mUIText.color = mRegularColor;
+					mShadow.enabled = true;
+				}
+
+				mUIText.text = mHintTextMap[hint];
+			}
+			else
+				mUIText.text = "";
 		}
 	}
 }
