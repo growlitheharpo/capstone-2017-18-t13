@@ -2,7 +2,6 @@
 using System.Linq;
 using FiringSquad.Core;
 using FiringSquad.Core.UI;
-using FiringSquad.Data;
 using UnityEngine;
 using UnityEngine.UI;
 
