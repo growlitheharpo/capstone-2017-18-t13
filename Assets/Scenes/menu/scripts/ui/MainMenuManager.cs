@@ -15,29 +15,36 @@ namespace FiringSquad.Gameplay.UI
 	{
 		/// Inspector variables
 		[Header("Main Buttons")]
-		[SerializeField] private UIButton mSubPlayButton;
+		[SerializeField]
+		private UIButton mSubPlayButton;
 		[SerializeField] private UIButton mGunGlossaryButton;
 		[SerializeField] private UIButton mHowToPlayButton;
 		[SerializeField] private UIButton mCreditsButton;
 		[SerializeField] private UIButton mQuitButton;
-		[SerializeField] private UIButton mArenaBattleButton;
+
+		[Header("Play Game Buttons")]
+		[SerializeField]
+		private UIButton mArenaBattleButton;
 		[SerializeField] private UIButton mDualModeButton;
 
 		[Header("Return Buttons")]
-		[SerializeField] private UIButton mSubPlayReturnButton;
+		[SerializeField]
+		private UIButton mSubPlayReturnButton;
 		[SerializeField] private UIButton mGunGlossaryReturnButton;
 		[SerializeField] private UIButton mHowToPlayReturnButton;
 		[SerializeField] private UIButton mCreditsReturnButton;
 
 		[Header("Section Animators")]
-		[SerializeField] private Animator mMainMenuAnimator;
+		[SerializeField]
+		private Animator mMainMenuAnimator;
 		[SerializeField] private Animator mSubPlayAnimator;
 		[SerializeField] private Animator mGunGlossaryAnimator;
 		[SerializeField] private Animator mHowToPlayAnimator;
 		[SerializeField] private Animator mCreditsAnimator;
 
 		[Header("Other")]
-		[SerializeField] private float mKioskTimerLength = 30;
+		[SerializeField]
+		private float mKioskTimerLength = 30;
 
 		/// Private variables
 		private float mKioskTimer;
@@ -57,7 +64,11 @@ namespace FiringSquad.Gameplay.UI
 			mDualModeButton.onClick.AddListener(Launch_DualMode);
 
 			mSubPlayReturnButton.onClick.AddListener(() => ReturnToMainMenu(mSubPlayAnimator));
-			mGunGlossaryReturnButton.onClick.AddListener(() => ReturnToMainMenu(mGunGlossaryAnimator));
+			mGunGlossaryReturnButton.onClick.AddListener(() =>
+			{
+				mGunGlossaryAnimator.GetComponent<GlossaryMenuManager>().ResetToDefault(false);
+				ReturnToMainMenu(mGunGlossaryAnimator);
+			});
 			mHowToPlayReturnButton.onClick.AddListener(() => ReturnToMainMenu(mHowToPlayAnimator));
 			mCreditsReturnButton.onClick.AddListener(() => ReturnToMainMenu(mCreditsAnimator));
 
@@ -131,17 +142,20 @@ namespace FiringSquad.Gameplay.UI
 			mCreditsAnimator.transform.SetAsLastSibling();
 		}
 
-	   
+		/// <summary>
+		/// 
+		/// </summary>
 		private void Launch_ArenaBattle()
 		{
+			mSubPlayAnimator.SetTrigger("Exit");
 			ServiceLocator.Get<IGamestateManager>()
 				.RequestSceneChange(GamestateManager.DRAFT_GAMEPLAY);
 
-			mMenuMusic.Kill(true);
+			mMenuMusic.Kill();
 		}
 
 		private void Launch_DualMode()
-		{ 
+		{
 			//TODO: set up 1v1 scene
 			UnityEngine.Debug.Log("Dual Mode Coming Soon");
 

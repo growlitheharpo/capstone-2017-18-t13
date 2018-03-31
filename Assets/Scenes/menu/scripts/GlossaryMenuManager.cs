@@ -50,12 +50,18 @@ namespace FiringSquad.Gameplay.UI
 		/// <summary>
 		/// Reset the glossary to its default state.
 		/// </summary>
-		public void ResetToDefault()
+		public void ResetToDefault(bool resetWeapon = true)
 		{
 			mSubMenuAnimator.SetBool("Enabled", false);
-			mWeapon.ResetToDefaultParts();
-
+			mCurrentMode = (Attachment)(1 << 5); // we do this because there isn't an Attachment.None
 			mDescriptionText.text = mDefaultDescription;
+
+
+			if (resetWeapon)
+			{
+				mWeapon.ResetToDefaultParts();
+				mWeapon.transform.rotation = Quaternion.AngleAxis(90.0f, Vector3.up);
+			}
 		}
 
 		/// <summary>
@@ -65,11 +71,7 @@ namespace FiringSquad.Gameplay.UI
 		private void HandleClickedCategory(Attachment category)
 		{
 			if (mCurrentMode == category)
-			{
-				mCurrentMode = (Attachment)(1 << 5); // we do this because there isn't an Attachment.None
-				mSubMenuAnimator.SetBool("Enabled", false);
-				mDescriptionText.text = mDefaultDescription;
-			}
+				ResetToDefault(false);
 			else
 			{
 				mCurrentMode = category;
