@@ -55,7 +55,9 @@ GameObject:
   - component: {fileID: 224572242224563180}
   - component: {fileID: 222382022638084592}
   - component: {fileID: 114831933006906730}
+  - component: {fileID: 114015100759981358}
   - component: {fileID: 95851266716008022}
+  - component: {fileID: 114402617888560634}
   m_Layer: 5
   m_Name: ArenaBattle
   m_TagString: Untagged
@@ -78,7 +80,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!1 &1190569854100492
 GameObject:
   m_ObjectHideFlags: 1
@@ -89,7 +91,9 @@ GameObject:
   - component: {fileID: 224757845519608486}
   - component: {fileID: 222641307876981652}
   - component: {fileID: 114571515267666772}
+  - component: {fileID: 114564297875474380}
   - component: {fileID: 95650919841620774}
+  - component: {fileID: 114973643317065102}
   m_Layer: 5
   m_Name: DualMode
   m_TagString: Untagged
@@ -275,7 +279,9 @@ GameObject:
   - component: {fileID: 224663404181572948}
   - component: {fileID: 222699776873693186}
   - component: {fileID: 114027413308799862}
+  - component: {fileID: 114747759460894290}
   - component: {fileID: 95956408791385144}
+  - component: {fileID: 114920309162910686}
   m_Layer: 5
   m_Name: Return
   m_TagString: Untagged
@@ -552,6 +558,36 @@ MonoBehaviour:
     m_VerticalOverflow: 1
     m_LineSpacing: 1
   m_Text: DUAL MODE
+--- !u!114 &114015100759981358
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1105900962314464}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1862395651, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Delegates:
+  - eventID: 0
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 114402617888560634}
+          m_MethodName: PlayHoverSound
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+      m_TypeName: UnityEngine.EventSystems.EventTrigger+TriggerEvent, UnityEngine.UI,
+        Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  delegates: []
 --- !u!114 &114027413308799862
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -591,12 +627,12 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_MethodName: 
+      - m_Target: {fileID: 114920309162910686}
+        m_MethodName: PlayPressSound
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: 
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -763,6 +799,18 @@ MonoBehaviour:
     m_VerticalOverflow: 1
     m_LineSpacing: 1
   m_Text: RETURN
+--- !u!114 &114402617888560634
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1105900962314464}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1f6d3fb179902cd4783eafd983e19eeb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playButton: 1
 --- !u!114 &114472695139443346
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -862,6 +910,36 @@ MonoBehaviour:
     m_VerticalOverflow: 1
     m_LineSpacing: 1
   m_Text: ']'
+--- !u!114 &114564297875474380
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1190569854100492}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1862395651, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Delegates:
+  - eventID: 0
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 114973643317065102}
+          m_MethodName: PlayHoverSound
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+      m_TypeName: UnityEngine.EventSystems.EventTrigger+TriggerEvent, UnityEngine.UI,
+        Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  delegates: []
 --- !u!114 &114571515267666772
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -901,12 +979,12 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_MethodName: 
+      - m_Target: {fileID: 114973643317065102}
+        m_MethodName: PlayPressSound
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: 
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -980,6 +1058,36 @@ MonoBehaviour:
     m_VerticalOverflow: 1
     m_LineSpacing: 1
   m_Text: '['
+--- !u!114 &114747759460894290
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1777350950045260}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1862395651, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Delegates:
+  - eventID: 0
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 114920309162910686}
+          m_MethodName: PlayHoverSound
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+      m_TypeName: UnityEngine.EventSystems.EventTrigger+TriggerEvent, UnityEngine.UI,
+        Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  delegates: []
 --- !u!114 &114778261043043738
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1046,12 +1154,12 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_MethodName: 
+      - m_Target: {fileID: 114402617888560634}
+        m_MethodName: PlayPressSound
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: 
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -1119,6 +1227,18 @@ MonoBehaviour:
   m_FillAmount: 1
   m_FillClockwise: 1
   m_FillOrigin: 0
+--- !u!114 &114920309162910686
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1777350950045260}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1f6d3fb179902cd4783eafd983e19eeb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playButton: 0
 --- !u!114 &114956391698960230
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1185,6 +1305,18 @@ MonoBehaviour:
     m_VerticalOverflow: 1
     m_LineSpacing: 1
   m_Text: (4-6 Players)
+--- !u!114 &114973643317065102
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1190569854100492}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1f6d3fb179902cd4783eafd983e19eeb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playButton: 1
 --- !u!114 &114986413997781988
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1506,8 +1638,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 322.1, y: 48.612}
-  m_SizeDelta: {x: -296.5, y: -69.525}
+  m_AnchoredPosition: {x: 377.3, y: 48.612}
+  m_SizeDelta: {x: -406.8, y: -69.5}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!224 &224559555711047766
 RectTransform:
@@ -1796,8 +1928,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 282.1, y: 44.125004}
-  m_SizeDelta: {x: -216.3, y: -72.7}
+  m_AnchoredPosition: {x: 345, y: 44.125004}
+  m_SizeDelta: {x: -342, y: -72.7}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!225 &225692626720634364
 CanvasGroup:
