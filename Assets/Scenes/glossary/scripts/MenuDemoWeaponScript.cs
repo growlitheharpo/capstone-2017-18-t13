@@ -28,10 +28,19 @@ namespace FiringSquad.Gameplay.UI
 		/// <inheritdoc cref="IModifiableWeapon" />
 		public Vector3 positionOffset { get { return Vector3.zero; } set { } }
 
+		/// <inheritdoc />
 		public bool aimDownSightsActive { get { return false; } }
 
+		/// <inheritdoc />
+		public int shotsLeftInClip { get { return 0; } }
+
+		/// <inheritdoc />
 		public WeaponData baseData { get { return mDefaultData; } }
+
+		/// <inheritdoc />
 		public WeaponData currentData { get; private set; }
+
+		/// <inheritdoc />
 		public WeaponPartCollection currentParts { get; private set; }
 
 		/// <summary>

@@ -67,6 +67,9 @@ namespace FiringSquad.Gameplay.Weapons
 		public bool aimDownSightsActive {get { return mAimDownSightsActive; }}
 
 		/// <inheritdoc />
+		public int shotsLeftInClip { get { return mShotsInClip != null ? mShotsInClip.value : 0; } }
+
+		/// <inheritdoc />
 		public WeaponData currentData
 		{
 			get
