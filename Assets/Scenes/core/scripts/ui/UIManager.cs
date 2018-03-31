@@ -19,6 +19,9 @@ namespace FiringSquad.Core.UI
 		public static readonly int PLAYER_DEATHS = "player_current_deaths".GetHashCode();
 		public static readonly int ARENA_ROUND_TIME = "arena_current_time".GetHashCode();
 
+		public static readonly int BLUE_TEAM_SCORE = "blue_team_current_score".GetHashCode();
+		public static readonly int ORANGE_TEAM_SCORE = "orange_team_current_score".GetHashCode();
+
 		/// Private variables
 		private Dictionary<int, WeakReference> mPropertyMap;
 		private Dictionary<ScreenPanelTypes, IScreenPanel> mPanelTypeToObjectMap;
