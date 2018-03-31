@@ -18,7 +18,6 @@ namespace FiringSquad.Gameplay.UI
 	public class GlossaryMenuManager : MonoBehaviour
 	{
 		/// Inspector variables
-		[SerializeField] private GameObject mMainElementHolder;
 		[SerializeField] private UIButton mReturnToMainButton;
 		[SerializeField] private UIText mDescriptionText;
 		[SerializeField] private UILayoutGroup mSubMenuGroup;
@@ -54,8 +53,6 @@ namespace FiringSquad.Gameplay.UI
 		/// </summary>
 		private void ReturnToMenu()
 		{
-			mMainElementHolder.SetActive(false);
-
 			ServiceLocator.Get<IGamestateManager>()
 				.RequestSceneChange(GamestateManager.MENU_SCENE);
 		}
@@ -111,7 +108,6 @@ namespace FiringSquad.Gameplay.UI
 			WeaponPartScript part = ServiceLocator.Get<IWeaponPartManager>().GetPrefabScript(partId);
 			mDescriptionText.text = part.description;
 			mWeapon.AttachNewPart(partId);
-			//mPartShowcase.GetComponent<BaseWeaponScript>().AttachNewPart(item.GetComponent<WeaponPartScript>().partId);
 		}
 	}
 }
