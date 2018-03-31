@@ -42,7 +42,8 @@ namespace FiringSquad.Gameplay.UI
 		/// </summary>
 		private void OnLocalPlayerAssignedTeam(CltPlayer player)
 		{
-			mFullColor = player.teamColor;
+			Color t = player.teamColor;
+			mFullColor = new Color(t.r, t.g, t.b, mFullColor.a);
 		}
 
 		/// <inheritdoc />
