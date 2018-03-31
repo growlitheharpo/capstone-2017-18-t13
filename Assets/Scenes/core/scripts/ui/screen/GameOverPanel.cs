@@ -17,6 +17,7 @@ namespace FiringSquad.Gameplay.UI
 		[SerializeField] private GameOverIndividualScorePanel mScorePrefab;
 		[SerializeField] private LayoutGroup mScoreGrid;
 		[SerializeField] private ActionProvider mQuitButton;
+		[SerializeField] private GameObject mTeamScores;
 
 		/// <inheritdoc />
 		public bool disablesInput { get { return true; } }
@@ -59,6 +60,9 @@ namespace FiringSquad.Gameplay.UI
 
 				GameOverIndividualScorePanel panel = Instantiate(mScorePrefab.gameObject, mScoreGrid.transform)
 					.GetComponent<GameOverIndividualScorePanel>();
+
+				if (player.playerTeam == GameData.PlayerTeam.Deathmatch)
+					mTeamScores.SetActive(false);
 
 				panel.ApplyTeamColor(player.teamColor);
 				panel.playerRank = i + 1;

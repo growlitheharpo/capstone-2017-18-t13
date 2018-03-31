@@ -2,6 +2,7 @@
 using System.Linq;
 using FiringSquad.Core;
 using FiringSquad.Core.UI;
+using FiringSquad.Data;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -15,8 +16,10 @@ namespace FiringSquad.Gameplay.UI
 		/// Inspector variables
 		[SerializeField] private GameOverIndividualScorePanel mScorePrefab;
 		[SerializeField] private LayoutGroup mScoreGrid;
+		[SerializeField] private GameObject mTeamScores;
 
 		private Dictionary<CltPlayer, GameOverIndividualScorePanel> mScores;
+		private BoundProperty<int> mBlueTeamScore, mOrangeTeamScore;
 
 		/// <inheritdoc />
 		public bool disablesInput { get { return false; } }
@@ -31,6 +34,9 @@ namespace FiringSquad.Gameplay.UI
 
 			mScores = new Dictionary<CltPlayer, GameOverIndividualScorePanel>();
 
+			mBlueTeamScore = new BoundProperty<int>(UIManager.BLUE_TEAM_SCORE);
+			mOrangeTeamScore = new BoundProperty<int>(UIManager.ORANGE_TEAM_SCORE);
+
 			EventManager.Local.OnReceiveLobbyEndTime += OnReceiveLobbyEndTime;
 			EventManager.Local.OnReceiveGameEndTime += OnReceiveGameEndTime;
 			EventManager.LocalGeneric.OnPlayerScoreChanged += OnPlayerScoreChanged;
@@ -41,6 +47,9 @@ namespace FiringSquad.Gameplay.UI
 		/// </summary>
 		private void OnDestroy()
 		{
+			mBlueTeamScore.Cleanup();
+			mOrangeTeamScore.Cleanup();
+
 			EventManager.Local.OnReceiveLobbyEndTime -= OnReceiveLobbyEndTime;
 			EventManager.Local.OnReceiveGameEndTime -= OnReceiveGameEndTime;
 			EventManager.LocalGeneric.OnPlayerScoreChanged -= OnPlayerScoreChanged;
@@ -91,6 +100,8 @@ namespace FiringSquad.Gameplay.UI
 
 				mScores.Add(player, score);
 			}
+
+			mTeamScores.SetActive(allPlayers.All(x => x.playerTeam != GameData.PlayerTeam.Deathmatch));
 		}
 
 		/// <summary>
@@ -123,6 +134,12 @@ namespace FiringSquad.Gameplay.UI
 				scores[i].playerRank = (uint)i + 1;
 				scores[i].transform.SetAsLastSibling();
 			}
+
+			// UPDATE TEAM
+			if (player.playerTeam == GameData.PlayerTeam.Blue)
+				mBlueTeamScore.value += scoreChange;
+			else if (player.playerTeam == GameData.PlayerTeam.Orange)
+				mOrangeTeamScore.value += scoreChange;
 		}
 
 		/// <inheritdoc />
