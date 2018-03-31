@@ -112,6 +112,7 @@ namespace FiringSquad.Gameplay.UI
 		private void SwitchTo_HowToPlay()
 		{
 			mMainMenuAnimator.SetTrigger("Exit");
+			mHowToPlayAnimator.GetComponent<HowToPlayManager>().ResetEverything();
 			mHowToPlayAnimator.SetTrigger("Enter");
 			mHowToPlayAnimator.transform.SetAsLastSibling();
 		}
