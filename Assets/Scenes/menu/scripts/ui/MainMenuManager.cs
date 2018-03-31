@@ -1,6 +1,7 @@
 ﻿using FiringSquad.Core;
 using FiringSquad.Core.Audio;
 using FiringSquad.Core.State;
+using KeatsLib.Unity;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UIButton = UnityEngine.UI.Button;
@@ -18,11 +19,11 @@ namespace FiringSquad.Gameplay.UI
 		[SerializeField] private UIButton mQuitButton;
 		[SerializeField] private UIButton mGunGlossaryButton;
 		[SerializeField] private UIButton mHowToPlayButton;
-		[SerializeField] private UIButton mCreditsButton;
-		[SerializeField] private UIButton mMainMenuButton;
+		[SerializeField] private UIButton mGoToCreditsButton;
+		[SerializeField] private UIButton mCreditsReturnButton;
 		[SerializeField] private int mKioskTimerSeconds = 10;
-		[SerializeField] private GameObject mMainMenuAssets;
-		[SerializeField] private GameObject mCreditAssets;
+		[SerializeField] private Animator mMainMenuAnimator;
+		[SerializeField] private Animator mCreditsAnimator;
 
 		/// Private variables
 		private int mKioskTimerTicks;
@@ -33,14 +34,23 @@ namespace FiringSquad.Gameplay.UI
 		/// </summary>
 		private void Start()
 		{
-			ReturnToMenu();
-
 			mFourPlayerButton.onClick.AddListener(LaunchNewLevel);
 			mQuitButton.onClick.AddListener(ClickQuit);
 			mGunGlossaryButton.onClick.AddListener(LaunchGlossary);
 			mHowToPlayButton.onClick.AddListener(LaunchHowToPlay);
-			mCreditsButton.onClick.AddListener(LaunchCredits);
-			mMainMenuButton.onClick.AddListener(ReturnToMenu);
+			mGoToCreditsButton.onClick.AddListener(LaunchCredits);
+			mCreditsReturnButton.onClick.AddListener(ReturnToMenu);
+
+			// Ensure everything is enabled
+			mMainMenuAnimator.gameObject.SetActive(true);
+			mCreditsAnimator.gameObject.SetActive(true);
+
+
+			StartCoroutine(Coroutines.InvokeAfterSeconds(0.1f, () =>
+			{
+				mMainMenuAnimator.SetTrigger("Enter");
+				mMainMenuAnimator.transform.SetAsLastSibling();
+			}));
 
 			mKioskTimerTicks = mKioskTimerSeconds * 100;
 
@@ -104,13 +114,9 @@ namespace FiringSquad.Gameplay.UI
 		/// </summary>
 		private void LaunchCredits()
 		{
-
-			if (mMainMenuAssets != null)
-			{
-				mMainMenuAssets.gameObject.SetActive(false);
-				mCreditAssets.gameObject.SetActive(true);
-				mMainMenuButton.gameObject.SetActive(true);
-			}
+			mMainMenuAnimator.SetTrigger("Exit");
+			mCreditsAnimator.SetTrigger("Enter");
+			mCreditsAnimator.transform.SetAsLastSibling();
 		}
 
 		/// <summary>
@@ -118,15 +124,9 @@ namespace FiringSquad.Gameplay.UI
 		/// </summary>
 		private void ReturnToMenu()
 		{
-			UnityEngine.Debug.Log("Open Main Menu");
-			if (mMainMenuButton != null)
-			{
-				mCreditAssets.gameObject.SetActive(false);
-				mMainMenuButton.gameObject.SetActive(false);
-				//Gun Glossary Assets should deactivate
-				//How To Play Assets should deactivate
-				mMainMenuAssets.gameObject.SetActive(true);
-			}
+			mCreditsAnimator.SetTrigger("Exit");
+			mMainMenuAnimator.SetTrigger("Enter");
+			mMainMenuAnimator.transform.SetAsLastSibling();
 		}
 
 		/// <summary>

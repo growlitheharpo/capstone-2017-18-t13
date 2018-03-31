@@ -31,6 +31,27 @@ namespace FiringSquad.Networking
 		public const int LEGENDARY_PART_POINTS = 50;
 		public const int CHEATING_PENALTY_POINTS = 100;
 
+		/// <summary>
+		/// Returns the score amount for the flags that have been determined.
+		/// </summary>
+		/// <param name="killInfoFlags">The relevant flags.</param>
+		public static int GetScoreForKillFlags(KillFlags killInfoFlags)
+		{
+			int score = STANDARD_KILL_POINTS;
+			if ((killInfoFlags & KillFlags.Kingslayer) > 0)
+				score += KINGSLAYER_POINTS;
+			if ((killInfoFlags & KillFlags.Multikill) > 0)
+				score += MULTI_KILL_POINTS;
+			if ((killInfoFlags & KillFlags.Headshot) > 0)
+				score += HEADSHOT_KILL_POINTS;
+			if ((killInfoFlags & KillFlags.Killstreak) > 0)
+				score += KILLSTREAK_POINTS;
+			if ((killInfoFlags & KillFlags.Revenge) > 0)
+				score += REVENGE_KILL_POINTS;
+
+			return score;
+		}
+
 		private partial class ServerStateMachine
 		{
 			// Private data only used in this file:
@@ -268,7 +289,7 @@ namespace FiringSquad.Networking
 					{
 						mMachine.mPlayerScores[damage.source.netId].kills++;
 						killInfo.mFlags = CalculateFlagsForKill(wasHeadshot, dead, killer);
-						mMachine.mPlayerScores[damage.source.netId].score += GetScoreForFlags(killInfo.mFlags);
+						mMachine.mPlayerScores[damage.source.netId].score += GetScoreForKillFlags(killInfo.mFlags);
 					}
 
 					LogKill(dead, killer);
@@ -308,27 +329,6 @@ namespace FiringSquad.Networking
 						result |= KillFlags.Kingslayer;
 
 					return result;
-				}
-
-				/// <summary>
-				/// Returns the score amount for the flags that have been determined.
-				/// </summary>
-				/// <param name="killInfoFlags">The relevant flags.</param>
-				private int GetScoreForFlags(KillFlags killInfoFlags)
-				{
-					int score = STANDARD_KILL_POINTS;
-					if ((killInfoFlags & KillFlags.Kingslayer) > 0)
-						score += KINGSLAYER_POINTS;
-					if ((killInfoFlags & KillFlags.Multikill) > 0)
-						score += MULTI_KILL_POINTS;
-					if ((killInfoFlags & KillFlags.Headshot) > 0)
-						score += HEADSHOT_KILL_POINTS;
-					if ((killInfoFlags & KillFlags.Killstreak) > 0)
-						score += KILLSTREAK_POINTS;
-					if ((killInfoFlags & KillFlags.Revenge) > 0)
-						score += REVENGE_KILL_POINTS;
-
-					return score;
 				}
 
 				/// <summary>
