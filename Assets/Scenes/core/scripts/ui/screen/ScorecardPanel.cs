@@ -112,8 +112,8 @@ namespace FiringSquad.Gameplay.UI
 			if (score.playerName != player.playerName)
 				score.playerName = player.playerName;
 
-			score.killCount = killChange > 0 ? (uint)killChange : 0;
-			score.deathCount = deathChange > 0 ? (uint)deathChange : 0;
+			score.killCount += killChange > 0 ? (uint)killChange : 0;
+			score.deathCount += deathChange > 0 ? (uint)deathChange : 0;
 			score.playerScore += scoreChange;
 
 			// SET RANK
