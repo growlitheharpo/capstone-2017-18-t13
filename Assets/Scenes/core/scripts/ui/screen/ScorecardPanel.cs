@@ -18,7 +18,7 @@ namespace FiringSquad.Gameplay.UI
 		[SerializeField] private LayoutGroup mScoreGrid;
 
 		/// <inheritdoc />
-		public bool disablesInput { get { return true; } }
+		public bool disablesInput { get { return false; } }
 
 		/// <summary>
 		/// Unity's Start function.

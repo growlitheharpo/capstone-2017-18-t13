@@ -60,15 +60,16 @@ namespace FiringSquad.Gameplay
 				.RegisterInput(Input.GetButtonDown, inputMap.activateADSButton, INPUT_EnterAimDownSights, InputLevel.Gameplay)
 				.RegisterInput(Input.GetButtonUp, inputMap.activateADSButton, INPUT_ExitAimDownSights, InputLevel.Gameplay)
 				.RegisterInput(Input.GetButtonDown, inputMap.pauseButton, INPUT_TogglePause, InputLevel.PauseMenu)
-				.RegisterInput(Input.GetButtonDown, inputMap.statusButton, INPUT_ShowScorecard, InputLevel.Gameplay)
-				.RegisterInput(Input.GetButtonUp, inputMap.statusButton, INPUT_HideScorecard, InputLevel.Gameplay)
+				.RegisterInput(Input.GetButtonDown, inputMap.statusButton, INPUT_ShowScorecard, InputLevel.Scorecard)
+				.RegisterInput(Input.GetButtonUp, inputMap.statusButton, INPUT_HideScorecard, InputLevel.Scorecard)
 				.RegisterInput(Input.GetKeyDown, KeyCode.J, INPUT_ActivateGunPanic, InputLevel.Gameplay)
 				.RegisterAxis(Input.GetAxis, inputMap.zoomAxis, INPUT_ZoomLevel, InputLevel.Gameplay)
 
 				// input levels
 				.EnableInputLevel(InputLevel.Gameplay)
 				.EnableInputLevel(InputLevel.HideCursor)
-				.EnableInputLevel(InputLevel.PauseMenu);
+				.EnableInputLevel(InputLevel.PauseMenu)
+				.EnableInputLevel(InputLevel.Scorecard);
 
 			ServiceLocator.Get<IGameConsole>()
 				.RegisterCommand("set-team", CONSOLE_SetPlayerTeam);
@@ -395,8 +396,7 @@ namespace FiringSquad.Gameplay
 
 			// Disable input (because we're dead).
 			ServiceLocator.Get<IInput>()
-				.DisableInputLevel(InputLevel.Gameplay)
-				.DisableInputLevel(InputLevel.PauseMenu);
+				.DisableInputLevel(InputLevel.Gameplay);
 
 			INPUT_ExitAimDownSights(); // force an ADS exit
 
@@ -434,8 +434,7 @@ namespace FiringSquad.Gameplay
 
 				// Re-enable our input
 				ServiceLocator.Get<IInput>()
-					.EnableInputLevel(InputLevel.Gameplay)
-					.EnableInputLevel(InputLevel.PauseMenu);
+					.EnableInputLevel(InputLevel.Gameplay);
 
 				// Send us back to the spawn position the server chose for us.
 				playerRoot.ResetPlayerValues(spawnPosition, spawnRotation);
