@@ -46,6 +46,8 @@ namespace FiringSquad.Gameplay.UI
 		private void Awake()
 		{
 			mUIText = GetComponent<UnityEngine.UI.Text>();
+			mShadow = GetComponent<UnityEngine.UI.Shadow>();
+
 			EventManager.LocalGUI.OnSetHintState += OnSetHintState;
 			mActiveHints = new List<Hint>();
 

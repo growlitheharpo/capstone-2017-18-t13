@@ -866,7 +866,12 @@ namespace FiringSquad.Gameplay
 		{
 			mHealth = value;
 			if (mLocalHealthVar != null)
+			{
 				mLocalHealthVar.value = value;
+
+				if (isCurrentPlayer)
+					EventManager.LocalGUI.SetHintState(CrosshairHintText.Hint.LowHealth, mHealth <= 25.0f);
+			}
 
 			if (mThirdPersonView != null)
 				mThirdPersonView.UpdateHealthAmount(value);
