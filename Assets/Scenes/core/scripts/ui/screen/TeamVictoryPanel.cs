@@ -1,11 +1,8 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using FiringSquad.Core;
-using FiringSquad.Core.State;
 using FiringSquad.Core.UI;
 using FiringSquad.Data;
 using UnityEngine;
-using UnityEngine.Networking;
 using UnityEngine.UI;
 using UIText = UnityEngine.UI.Text;
 
@@ -31,6 +28,9 @@ namespace FiringSquad.Gameplay.UI
 		int mOrangeScore, mBlueScore;
 
 		IList<PlayerScore> mScores;
+
+		/// <inheritdoc />
+		public bool disablesInput { get { return true; } }
 
 		/// <summary>
 		/// Unity's Start function.

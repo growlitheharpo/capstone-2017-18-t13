@@ -16,6 +16,8 @@ namespace FiringSquad.Data
 		[SerializeField] private int mDeaths;
 		[SerializeField] private int mScore;
 
+		private CltPlayer mPlayer;
+
 		/// <summary>
 		/// The player ID of this player.
 		/// </summary>
@@ -31,6 +33,9 @@ namespace FiringSquad.Data
 		/// </summary>
 		public int deaths { get { return mDeaths; } set { mDeaths = value; } }
 
+		/// <summary>
+		/// The score value of this player (including special bonuses)
+		/// </summary>
 		public int score { get { return mScore; } set { mScore = value; } }
 
 		/// <summary>
@@ -38,8 +43,15 @@ namespace FiringSquad.Data
 		/// </summary>
 		public CltPlayer player
 		{
-			get { return ClientScene.FindLocalObject(mPlayerId).GetComponent<CltPlayer>(); }
-			set { mPlayerId = value.netId; }
+			get
+			{
+				return mPlayer ?? (mPlayer = ClientScene.FindLocalObject(mPlayerId).GetComponent<CltPlayer>());
+			}
+			set
+			{
+				mPlayer = value;
+				mPlayerId = value.netId;
+			}
 		}
 
 		/// <summary>
@@ -59,6 +71,7 @@ namespace FiringSquad.Data
 		public PlayerScore(CltPlayer p)
 		{
 			mPlayerId = p.netId;
+			mPlayer = p;
 			mKills = 0;
 			mDeaths = 0;
 			mScore = 0;
@@ -81,6 +94,7 @@ namespace FiringSquad.Data
 		public PlayerScore(CltPlayer p, int kill, int death, int score)
 		{
 			mPlayerId = p.netId;
+			mPlayer = p;
 			mKills = kill;
 			mDeaths = death;
 			mScore = score;
