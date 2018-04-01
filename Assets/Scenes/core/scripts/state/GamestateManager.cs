@@ -64,6 +64,7 @@ namespace FiringSquad.Core.State
 		public const string MAIN_SCENE = "main";
 		public const string MENU_SCENE = "menu";
 		public const string ART_PROTOTYPE_SCENE = "artproto";
+		public const string DRAFT_DUALMODE = "draft2player_gameplay_01";
 		public const string DRAFT_GAMEPLAY = "draft6player_gameplay";
 		public const string FOURPLAYER_GAMEPLAY = "game4player_gameplay";
 		public const string TWOPLAYER_WORLD = "game2player_world";
@@ -99,6 +100,7 @@ namespace FiringSquad.Core.State
 				{ ART_PROTOTYPE_SCENE, new MenuSceneState() },
 				{ GUN_GLOSSARY, new MenuSceneState() },
 				{ TWOPLAYER_GAMEPLAY, new GameSceneState() },
+				{ DRAFT_DUALMODE, new GameSceneState() },
 				{ DRAFT_GAMEPLAY, new GameSceneState() },
 				{ FOURPLAYER_GAMEPLAY, new GameSceneState() },
 				{ "sandbox_networked", new GameSceneState() },
