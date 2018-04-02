@@ -143,7 +143,7 @@ namespace FiringSquad.Gameplay.UI
 		}
 
 		/// <summary>
-		/// 
+		/// Launch the arena mode.
 		/// </summary>
 		private void Launch_ArenaBattle()
 		{
@@ -154,12 +154,16 @@ namespace FiringSquad.Gameplay.UI
 			mMenuMusic.Kill();
 		}
 
+		/// <summary>
+		/// Launch the two player mode.
+		/// </summary>
 		private void Launch_DualMode()
 		{
-			//TODO: set up 1v1 scene
-			UnityEngine.Debug.Log("Dual Mode Coming Soon");
+			mSubPlayAnimator.SetTrigger("Exit");
+			ServiceLocator.Get<IGamestateManager>()
+				.RequestSceneChange(GamestateManager.DRAFT_DUALMODE);
 
-			//mMenuMusic.Kill(true);
+			mMenuMusic.Kill();
 		}
 
 		/// <summary>
