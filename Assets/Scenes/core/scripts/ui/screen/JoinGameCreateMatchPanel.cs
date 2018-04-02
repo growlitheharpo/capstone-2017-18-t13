@@ -16,7 +16,8 @@ namespace FiringSquad.Gameplay.UI
 	{
 		/// Inspector variables
 		[SerializeField] private InputField mNameEntryField;
-		[SerializeField] private Button mCancelButton;
+		[SerializeField] private Button mCancelButton01;
+		[SerializeField] private Button mCancelButton02;
 		[SerializeField] private Button mConfirmButton;
 		[SerializeField] private Dropdown mPlayerCountDropdown;
 		[SerializeField] private Dropdown mGameModeDropdown;
@@ -38,7 +39,8 @@ namespace FiringSquad.Gameplay.UI
 			mMatchType = GameData.MatchType.Deathmatch;
 			mNetworkManager = FindObjectOfType<NetworkGameManager>();
 
-			mCancelButton.onClick.AddListener(OnClickCancelButton);
+			mCancelButton01.onClick.AddListener(OnClickCancelButton);
+			mCancelButton02.onClick.AddListener(OnClickCancelButton);
 			mConfirmButton.onClick.AddListener(OnClickConfirmButton);
 
 			mPlayerCountDropdown.onValueChanged.AddListener(delegate { OnChangePlayerCount(); });
@@ -52,7 +54,8 @@ namespace FiringSquad.Gameplay.UI
 		/// </summary>
 		private void OnDestroy()
 		{
-			mCancelButton.onClick.RemoveListener(OnClickCancelButton);
+			mCancelButton01.onClick.RemoveListener(OnClickCancelButton);
+			mCancelButton02.onClick.RemoveListener(OnClickCancelButton);
 			mConfirmButton.onClick.RemoveListener(OnClickConfirmButton);
 			mPlayerCountDropdown.onValueChanged.RemoveListener(delegate { OnChangePlayerCount(); });
 			mGameModeDropdown.onValueChanged.RemoveListener(delegate { OnChangeGameType(); });

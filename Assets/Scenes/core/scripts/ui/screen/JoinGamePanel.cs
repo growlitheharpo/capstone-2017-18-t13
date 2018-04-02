@@ -19,9 +19,12 @@ namespace FiringSquad.Gameplay.UI
 		[SerializeField] private LayoutGroup mMatchDataHolder;
 		[SerializeField] private MatchDataInfoPanel mMatchDataPrefab;
 		[SerializeField] private Button mCreateMatchButton;
+		[SerializeField] private Button mJoinMatchButton;
 		[SerializeField] private Button mRefreshMatchesButton;
 		[SerializeField] private Text mStatusText;
 		[SerializeField] private JoinGameCreateMatchPanel mCreateMatchPanel;
+		[SerializeField] private GameObject mJoinMatchPanel;
+
 
 		/// Private variables
 		private NetworkGameManager mNetworkManager;
@@ -44,6 +47,7 @@ namespace FiringSquad.Gameplay.UI
 
 			mRefreshMatchesButton.onClick.AddListener(RefreshMatchList);
 			mCreateMatchButton.onClick.AddListener(ClickCreateMatch);
+			mJoinMatchButton.onClick.AddListener(ClickJoinMatch);
 
 			EventManager.Local.OnLocalPlayerSpawned += OnLocalPlayerSpawned;
 
@@ -105,6 +109,15 @@ namespace FiringSquad.Gameplay.UI
 		{
 			DestroyAllMatchPanels();
 			mCreateMatchPanel.gameObject.SetActive(true);
+		}
+
+		/// <summary>
+		/// Enable the JoinMatch panel when the player clicks the appropriate button.
+		/// </summary>
+		private void ClickJoinMatch()
+		{
+			DestroyAllMatchPanels();
+			mJoinMatchPanel.gameObject.SetActive(true); 
 		}
 
 		/// <summary>
