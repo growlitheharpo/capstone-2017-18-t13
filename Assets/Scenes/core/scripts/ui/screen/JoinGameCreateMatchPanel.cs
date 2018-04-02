@@ -26,16 +26,17 @@ namespace FiringSquad.Gameplay.UI
 		private JoinGamePanel mJoinGamePanel;
 
 		// Info for starting the game
-		int mPlayerCount;
-		GameData.MatchType mMatchType;
+		private GameData.MatchType mMatchType;
+		private int mPlayerCount;
 
 		/// <summary>
 		/// Unity's Awake signal.
 		/// </summary>
 		private void Awake()
 		{
-			mPlayerCount = 4;
-			mMatchType = GameData.MatchType.Deathmatch;
+			mMatchType = GameData.MatchType.Invalid;
+			mPlayerCount = -1;
+
 			mNetworkManager = FindObjectOfType<NetworkGameManager>();
 
 			mCancelButton.onClick.AddListener(OnClickCancelButton);
@@ -98,13 +99,9 @@ namespace FiringSquad.Gameplay.UI
 			int dropVal = mPlayerCountDropdown.value;
 
 			if (dropVal == 0)
-			{
 				mPlayerCount = 4;
-			}
 			else if (dropVal == 1)
-			{
 				mPlayerCount = 6;
-			}
 		}
 
 		/// <summary>
@@ -116,13 +113,9 @@ namespace FiringSquad.Gameplay.UI
 			int dropVal = mGameModeDropdown.value;
 
 			if (dropVal == 0)
-			{
 				mMatchType = GameData.MatchType.Deathmatch;
-			}
 			else if (dropVal == 1)
-			{
 				mMatchType = GameData.MatchType.TeamDeathmatch;
-			}
 		}
 
 		/// <summary>

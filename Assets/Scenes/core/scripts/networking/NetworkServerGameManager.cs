@@ -5,6 +5,7 @@ using FiringSquad.Core;
 using FiringSquad.Data;
 using FiringSquad.Debug;
 using FiringSquad.Gameplay;
+using FiringSquad.Gameplay.UI;
 using KeatsLib.State;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -30,13 +31,15 @@ namespace FiringSquad.Networking
 		/// </summary>
 		public override void OnStartServer()
 		{
-			GameObject createGamePanel = GameObject.Find("CreateMatchPanel");
-			FiringSquad.Gameplay.UI.JoinGameCreateMatchPanel panel = createGamePanel.GetComponent<FiringSquad.Gameplay.UI.JoinGameCreateMatchPanel>();
-
-			mStateMachine = new ServerStateMachine(this);
 			ServiceLocator.Get<IGameConsole>().RegisterCommand("force-start", CONSOLE_ForceStartGame);
-			mData.goalPlayerCount = panel.playerCount();
-			mData.currentType = panel.matchType();
+			mStateMachine = new ServerStateMachine(this);
+
+			JoinGameCreateMatchPanel panel = GameObject.Find("CreateMatchPanel").GetComponent<JoinGameCreateMatchPanel>();
+			if (panel.playerCount() > 0)
+				mData.goalPlayerCount = panel.playerCount();
+
+			if (panel.matchType() != GameData.MatchType.Invalid)
+				mData.currentType = panel.matchType();
 		}
 
 		/// <summary>
