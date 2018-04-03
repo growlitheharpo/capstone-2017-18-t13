@@ -118,11 +118,11 @@ namespace FiringSquad.Gameplay.UI
 
 			if (dropVal == 0)
 			{
-				mPlayerCount = 4;
+				mPlayerCount = 6;
 			}
 			else if (dropVal == 1)
 			{
-				mPlayerCount = 6;
+				mPlayerCount = 4;
 			}
 		}
 
@@ -136,11 +136,11 @@ namespace FiringSquad.Gameplay.UI
 
 			if (dropVal == 0)
 			{
-				mMatchType = GameData.MatchType.Deathmatch;
+				mMatchType = GameData.MatchType.TeamDeathmatch;
 			}
 			else if (dropVal == 1)
 			{
-				mMatchType = GameData.MatchType.TeamDeathmatch;
+				mMatchType = GameData.MatchType.Deathmatch;
 			}
 		}
 
