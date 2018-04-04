@@ -35,13 +35,13 @@ MonoBehaviour:
     value: 1
   intensity:
     overrideState: 1
-    value: 1
+    value: 2
   threshold:
     overrideState: 1
-    value: 0.45
+    value: 1
   softKnee:
     overrideState: 1
-    value: 0.8
+    value: 0.9
   diffusion:
     overrideState: 1
     value: 8
@@ -122,7 +122,7 @@ MonoBehaviour:
     value: 0.1
   vignette:
     overrideState: 1
-    value: 0.8
+    value: 0.9
 --- !u!114 &114674673133728108
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -229,7 +229,7 @@ MonoBehaviour:
     overrideState: 0
     value: {fileID: 0}
   tonemapper:
-    overrideState: 0
+    overrideState: 1
     value: 0
   toneCurveToeStrength:
     overrideState: 0
@@ -278,7 +278,7 @@ MonoBehaviour:
     value: 0
   contrast:
     overrideState: 1
-    value: 0
+    value: -3.9
   mixerRedOutRedIn:
     overrideState: 1
     value: 110
@@ -310,11 +310,11 @@ MonoBehaviour:
     overrideState: 0
     value: {x: 1, y: 1, z: 1, w: 0}
   gamma:
-    overrideState: 0
-    value: {x: 1, y: 1, z: 1, w: 0}
+    overrideState: 1
+    value: {x: 1, y: 1, z: 1, w: -0.21892102}
   gain:
-    overrideState: 0
-    value: {x: 1, y: 1, z: 1, w: 0}
+    overrideState: 1
+    value: {x: 1, y: 1, z: 1, w: -0.21892099}
   masterCurve:
     overrideState: 0
     value:
