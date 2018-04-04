@@ -151,7 +151,7 @@ namespace FiringSquad.Gameplay.UI
 			ServiceLocator.Get<IGamestateManager>()
 				.RequestSceneChange(GamestateManager.DRAFT_GAMEPLAY);
 
-			mMenuMusic.Kill();
+			KillMusic ();
 		}
 
 		/// <summary>
@@ -163,7 +163,7 @@ namespace FiringSquad.Gameplay.UI
 			ServiceLocator.Get<IGamestateManager>()
 				.RequestSceneChange(GamestateManager.DRAFT_DUALMODE);
 
-			mMenuMusic.Kill();
+			KillMusic ();
 		}
 
 		/// <summary>
@@ -195,7 +195,12 @@ namespace FiringSquad.Gameplay.UI
 			ServiceLocator.Get<IGamestateManager>()
 				.RequestSceneChange(GamestateManager.KIOSK_SCENE);
 
-			mMenuMusic.Kill(false);
+			KillMusic ();
+		}
+
+		private void KillMusic()
+		{
+			mMenuMusic.Kill();
 		}
 
 		/// <summary>
