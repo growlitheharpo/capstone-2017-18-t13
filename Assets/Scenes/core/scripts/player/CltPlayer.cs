@@ -10,6 +10,7 @@ using FiringSquad.Core.Weapons;
 using FiringSquad.Data;
 using FiringSquad.Gameplay.UI;
 using FiringSquad.Gameplay.Weapons;
+using FiringSquad.Networking;
 using JetBrains.Annotations;
 using KeatsLib.Unity;
 using UnityEngine;
@@ -621,17 +622,24 @@ namespace FiringSquad.Gameplay
 		private void OnPlayerCapturedStage(StageCaptureArea stage, IList<CltPlayer> players)
 		{
 			if (players.Contains(this))
-				TargetNotifyCapturedStage(connectionToClient);
+				RpcNotifyCapturedStage();
 		}
 
 		/// <summary>
-		/// Notify the local client that the server has confirmed that we've captured a stage.
+		/// Notify the client that the server has confirmed that we've captured a stage.
 		/// </summary>
-		/// <param name="connection"></param>
-		[TargetRpc]
-		private void TargetNotifyCapturedStage(NetworkConnection connection)
+		/// <para>
+		/// NOTE: This used to be a TargetRPC but we've converted it to a broadcast so that everyone
+		/// can keep their scorecards accurate.
+		/// </para>
+		[ClientRpc]
+		private void RpcNotifyCapturedStage()
 		{
-			EventManager.Notify(EventManager.Local.LocalPlayerCapturedStage);
+			if (isCurrentPlayer)
+				EventManager.Notify(EventManager.Local.LocalPlayerCapturedStage);
+
+			EventManager.Notify(() => 
+				EventManager.LocalGeneric.PlayerScoreChanged(this, NetworkServerGameManager.STAGE_CAPTURE_POINTS, 0, 0));
 		}
 
 		#endregion
@@ -795,6 +803,9 @@ namespace FiringSquad.Gameplay
 					EventManager.Notify(() => EventManager.Local.LocalPlayerGotKill(this, killerAsClient.weapon, killInfo.mFlags));
 				else
 					killerAsClient.mThirdPersonView.ReflectGotKill(killInfo);
+
+				// Either way, update the killer's score
+				EventManager.LocalGeneric.PlayerScoreChanged(killerAsClient, NetworkServerGameManager.GetScoreForKillFlags(killInfo.mFlags), 1, 0);
 			}
 
 			// If the person who died is the local player, notify the game that the client has died.
@@ -806,6 +817,9 @@ namespace FiringSquad.Gameplay
 
 			// No matter what, let the game know that SOMEONE has died (primarily for crowd audio).
 			EventManager.Notify(EventManager.LocalGeneric.PlayerDied);
+
+			// Also notify that this player got one more death.
+			EventManager.LocalGeneric.PlayerScoreChanged(this, 0, 0, 1);
 		}
 
 		/// <summary>
@@ -852,7 +866,12 @@ namespace FiringSquad.Gameplay
 		{
 			mHealth = value;
 			if (mLocalHealthVar != null)
+			{
 				mLocalHealthVar.value = value;
+
+				if (isCurrentPlayer)
+					EventManager.LocalGUI.SetHintState(CrosshairHintText.Hint.LowHealth, mHealth <= 25.0f);
+			}
 
 			if (mThirdPersonView != null)
 				mThirdPersonView.UpdateHealthAmount(value);

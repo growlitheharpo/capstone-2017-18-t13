@@ -16,7 +16,8 @@ namespace FiringSquad.Gameplay.UI
 	{
 		/// Inspector variables
 		[SerializeField] private InputField mNameEntryField;
-		[SerializeField] private Button mCancelButton;
+		[SerializeField] private Button mCancelButton01;
+		[SerializeField] private Button mCancelButton02;
 		[SerializeField] private Button mConfirmButton;
 		[SerializeField] private Dropdown mPlayerCountDropdown;
 		[SerializeField] private Dropdown mGameModeDropdown;
@@ -24,21 +25,22 @@ namespace FiringSquad.Gameplay.UI
 		/// Private variables
 		private NetworkGameManager mNetworkManager;
 		private JoinGamePanel mJoinGamePanel;
+		private bool mPanelActive;
 
 		// Info for starting the game
-		int mPlayerCount;
-		GameData.MatchType mMatchType;
+		private GameData.MatchType mMatchType;
+		private int mPlayerCount;
 
 		/// <summary>
 		/// Unity's Awake signal.
 		/// </summary>
 		private void Awake()
 		{
-			mPlayerCount = 4;
-			mMatchType = GameData.MatchType.Deathmatch;
+			mMatchType = GameData.MatchType.Invalid;
+			mPlayerCount = -1;
+
 			mNetworkManager = FindObjectOfType<NetworkGameManager>();
 
-			mCancelButton.onClick.AddListener(OnClickCancelButton);
 			mConfirmButton.onClick.AddListener(OnClickConfirmButton);
 
 			mPlayerCountDropdown.onValueChanged.AddListener(delegate { OnChangePlayerCount(); });
@@ -52,7 +54,8 @@ namespace FiringSquad.Gameplay.UI
 		/// </summary>
 		private void OnDestroy()
 		{
-			mCancelButton.onClick.RemoveListener(OnClickCancelButton);
+			mCancelButton01.onClick.RemoveListener(OnClickCancelButton);
+			mCancelButton02.onClick.RemoveListener(OnClickCancelButton);
 			mConfirmButton.onClick.RemoveListener(OnClickConfirmButton);
 			mPlayerCountDropdown.onValueChanged.RemoveListener(delegate { OnChangePlayerCount(); });
 			mGameModeDropdown.onValueChanged.RemoveListener(delegate { OnChangeGameType(); });
@@ -65,6 +68,20 @@ namespace FiringSquad.Gameplay.UI
 		{
 			string defaultName = ServiceLocator.Get<IGamestateManager>().currentUserName + "\'s Game";
 			mNameEntryField.text = defaultName;
+
+			mCancelButton01.onClick.AddListener(OnClickCancelButton);
+			mCancelButton02.onClick.AddListener(OnClickCancelButton);
+			mPanelActive = true;
+		}
+
+		/// <summary>
+		/// Unity's OnDisable signal.
+		/// </summary>
+		private void OnDisable()
+		{
+			mCancelButton01.onClick.RemoveListener(OnClickCancelButton);
+			mCancelButton02.onClick.RemoveListener(OnClickCancelButton);
+			mPanelActive = false;
 		}
 
 		/// <summary>
@@ -72,7 +89,10 @@ namespace FiringSquad.Gameplay.UI
 		/// </summary>
 		private void OnClickCancelButton()
 		{
-			gameObject.SetActive(false);
+			if (mPanelActive == true)
+			{
+				gameObject.SetActive(false);
+			}
 		}
 
 		/// <summary>
@@ -98,13 +118,9 @@ namespace FiringSquad.Gameplay.UI
 			int dropVal = mPlayerCountDropdown.value;
 
 			if (dropVal == 0)
-			{
-				mPlayerCount = 4;
-			}
-			else if (dropVal == 1)
-			{
 				mPlayerCount = 6;
-			}
+			else if (dropVal == 1)
+				mPlayerCount = 4;
 		}
 
 		/// <summary>
@@ -116,13 +132,9 @@ namespace FiringSquad.Gameplay.UI
 			int dropVal = mGameModeDropdown.value;
 
 			if (dropVal == 0)
-			{
-				mMatchType = GameData.MatchType.Deathmatch;
-			}
-			else if (dropVal == 1)
-			{
 				mMatchType = GameData.MatchType.TeamDeathmatch;
-			}
+			else if (dropVal == 1)
+				mMatchType = GameData.MatchType.Deathmatch;
 		}
 
 		/// <summary>

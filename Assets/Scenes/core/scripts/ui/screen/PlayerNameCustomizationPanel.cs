@@ -13,7 +13,11 @@ namespace FiringSquad.Gameplay.UI
 	{
 		/// Inspector variables
 		[SerializeField] private InputField mInputField;
+		[SerializeField] private Button mReturnButton;
 		[SerializeField] private ActionProvider mConfirmButton;
+
+		/// <inheritdoc />
+		public bool disablesInput { get { return true; } }
 
 		/// <summary>
 		/// Unity's Start function.
@@ -21,6 +25,7 @@ namespace FiringSquad.Gameplay.UI
 		private void Start()
 		{
 			mConfirmButton.OnClick += ConfirmName;
+			mReturnButton.onClick.AddListener(ClickReturnToMenu);
 			
 			ServiceLocator.Get<IUIManager>()
 				.RegisterPanel(this, ScreenPanelTypes.PlayerNameEntry, false);
@@ -50,6 +55,15 @@ namespace FiringSquad.Gameplay.UI
 
 			ServiceLocator.Get<IGamestateManager>().currentUserName = mInputField.text;
 			Destroy(gameObject);
+		}
+
+		/// <summary>
+		/// Send the player back to the main menu
+		/// </summary>
+		private void ClickReturnToMenu()
+		{
+			ServiceLocator.Get<IGamestateManager>()
+				.RequestSceneChange(GamestateManager.MENU_SCENE);
 		}
 
 		/// <inheritdoc />

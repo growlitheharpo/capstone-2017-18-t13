@@ -1,6 +1,4 @@
 ﻿using System.Collections;
-using System.Linq;
-using FiringSquad.Gameplay.Weapons;
 using KeatsLib.Unity;
 using UnityEngine;
 using UnityEngine.UI;
@@ -21,8 +19,6 @@ namespace FiringSquad.Gameplay.UI
 
 		private Color mVisibleColor;
 		private Color mHiddenColor;
-
-		private Coroutine mFadeVignetteRoutine;
 
 		private const float FADE_OUT_TIME = 0.35f;
 
@@ -109,7 +105,7 @@ namespace FiringSquad.Gameplay.UI
 
 		private void FadeVignette()
 		{
-			mFadeVignetteRoutine = StartCoroutine(FadeOutColor(mCritImage, mVisibleColor, mHiddenColor, FADE_OUT_TIME, false));
+			StartCoroutine(FadeOutColor(mCritImage, mVisibleColor, mHiddenColor, FADE_OUT_TIME, false));
 		}
 
 		/// <summary>

@@ -50,7 +50,7 @@ namespace FiringSquad.Gameplay.UI
 		/// Unity's OnDestroy function.
 		/// Cleans everything up if we have a property.
 		/// </summary>
-		private void OnDestroy()
+		protected virtual void OnDestroy()
 		{
 			if (mProperty == null)
 				return;

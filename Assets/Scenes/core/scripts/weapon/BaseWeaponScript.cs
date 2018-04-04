@@ -6,6 +6,7 @@ using FiringSquad.Core.Audio;
 using FiringSquad.Core.UI;
 using FiringSquad.Core.Weapons;
 using FiringSquad.Data;
+using FiringSquad.Networking;
 using KeatsLib.Unity;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -64,6 +65,9 @@ namespace FiringSquad.Gameplay.Weapons
 
 		/// <inheritdoc />
 		public bool aimDownSightsActive {get { return mAimDownSightsActive; }}
+
+		/// <inheritdoc />
+		public int shotsLeftInClip { get { return mShotsInClip != null ? mShotsInClip.value : 0; } }
 
 		/// <inheritdoc />
 		public WeaponData currentData
@@ -355,8 +359,15 @@ namespace FiringSquad.Gameplay.Weapons
 			if (bearer.isCurrentPlayer)
 				EventManager.Notify(() => EventManager.Local.LocalPlayerAttachedPart(this, newPartInstance));
 
-			if (bearer is CltPlayer && newPartInstance.isLegendary)
+			if (newPartInstance.isLegendary)
+			{
+				CltPlayer player = bearer as CltPlayer;
+				if (player == null)
+					return;
+
 				EventManager.Notify(EventManager.LocalGeneric.PlayerEquippedLegendaryPart);
+				EventManager.LocalGeneric.PlayerScoreChanged(player, NetworkServerGameManager.LEGENDARY_PART_POINTS, 0, 0);
+			}
 		}
 
 		#endregion

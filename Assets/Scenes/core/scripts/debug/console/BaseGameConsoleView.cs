@@ -10,6 +10,9 @@ namespace FiringSquad.Debug
 	/// </summary>
 	public abstract class BaseGameConsoleView : MonoBehaviour, IScreenPanel
 	{
+		/// <inheritdoc />
+		public bool disablesInput { get { return true; } }
+
 		/// <summary>
 		/// Clear all of the saved logs.
 		/// </summary>
