@@ -10,6 +10,7 @@ namespace FiringSquad.Data
 	{
 		public enum MatchType
 		{
+			Invalid = -1,
 			Deathmatch,
 			TeamDeathmatch,
 		}

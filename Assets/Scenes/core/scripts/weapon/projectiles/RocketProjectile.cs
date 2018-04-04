@@ -16,7 +16,7 @@ namespace FiringSquad.Gameplay.Weapons
 		[SerializeField] private float mSplashDamageRadius;
 		[SerializeField] private bool mRecognizeHeadshots;
 		[SerializeField] private LayerMask mSplashDamageMask;
-
+		[SerializeField] private AnimationCurve mDamageFalloffCurve;
 
 		/// Private variables
 		private Transform mDirectHit;
@@ -131,7 +131,12 @@ namespace FiringSquad.Gameplay.Weapons
 				if (hitreceiver != c)
 					continue;
 
-				c.ApplyDamage(mData.damage * 0.5f, hitInfo.point, hitInfo.normal, this, false);
+				// Calc ratio based on falloff curve
+				float pos = Vector3.Distance(col.transform.position, transform.position);
+
+				UnityEngine.Debug.Log(pos);
+
+				c.ApplyDamage(mData.damage * mDamageFalloffCurve.Evaluate(pos), hitInfo.point, hitInfo.normal, this, false);
 				hits.Add(c);
 			}
 		}
