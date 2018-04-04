@@ -320,6 +320,26 @@ public partial class EventManager
 		{
 			OnTeamVictoryScreen(score);
 		}
+
+		/// <summary>
+		/// Event called when the player equips a rocket grip
+		/// </summary>
+		public static event Action OnEquipRocketGrip = () => { LogEvent(); };
+
+		public static void EquipRocketGrip()
+		{
+			OnEquipRocketGrip();
+		}
+
+		/// <summary>
+		/// Event called when the player unequips the rocket grip
+		/// </summary>
+		public static event Action OnUnequipRocketGrip = () => { LogEvent(); };
+
+		public static void UnequipRocketGrip()
+		{
+			OnUnequipRocketGrip();
+		}
 	}
 
 	/// <summary>
