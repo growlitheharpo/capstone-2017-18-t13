@@ -735,6 +735,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mUniqueId: 123
+  mIsLegendary: 0
   mPrettyName: Arrows
   mDescription: Our sponsor, Renfield Arms provided us with this prototype receiver.
     It wasn't originally meant to fire arrows, but our weaponry team shoved them in
@@ -779,6 +780,8 @@ MonoBehaviour:
   mFireFromBarrelTip: 1
   mAmmoTypeSprite: {fileID: 21300000, guid: e1eb1008c56c17f44879a95804e87921, type: 3}
   mAnimator: {fileID: 95298421023807020}
+  mMuzzleFlashVfxPrefab: {fileID: 1648331268614058, guid: ec2c9fb8b373e6345b5a9d8b4fdfa82d,
+    type: 2}
 --- !u!114 &114922298323808758
 MonoBehaviour:
   m_ObjectHideFlags: 1

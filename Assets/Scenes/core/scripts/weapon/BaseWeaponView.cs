@@ -25,7 +25,8 @@ namespace FiringSquad.Gameplay.Weapons
 		private Dictionary<Attachment, Transform> mAttachPoints;
 		private Animator mAnimator, mArmAnimator;
 
-		private ParticleSystem mPartBreakPrefab, mCurrentMuzzleFlashVfx;
+		private ParticleSystem mPartBreakPrefab;
+		private GameObject mCurrentMuzzleFlashVfxPrefab;
 
 		private float mWeaponBobProgress;
 		private Queue<Vector3> mRecentPlayerPositions;
@@ -287,20 +288,15 @@ namespace FiringSquad.Gameplay.Weapons
 			}
 
 			// Spawn the muzzle flash if this is the barrel.
-			if (newPart.attachPoint == Attachment.Barrel)
+			if (newPart.attachPoint == Attachment.Mechanism)
 			{
-				WeaponPartScriptBarrel realScript = (WeaponPartScriptBarrel)newPart;
+				WeaponPartScriptMechanism realScript = (WeaponPartScriptMechanism)newPart;
 				GameObject prefab = realScript.muzzleFlashVfxPrefab;
 
 				if (prefab == null)
 					return;
 
-				GameObject instance = Instantiate(prefab, realScript.barrelTip, false);
-				mCurrentMuzzleFlashVfx = instance.GetComponent<ParticleSystem>();
-
-				Vector3 scale = mCurrentMuzzleFlashVfx.transform.localScale;
-				mCurrentMuzzleFlashVfx.transform.ResetLocalValues();
-				mCurrentMuzzleFlashVfx.transform.localScale = scale;
+				mCurrentMuzzleFlashVfxPrefab = prefab;
 			}
 		}
 
@@ -353,9 +349,6 @@ namespace FiringSquad.Gameplay.Weapons
 
 			mWeaponScript.bearer.PlayFireAnimation();
 			
-			if (mCurrentMuzzleFlashVfx != null)
-				mCurrentMuzzleFlashVfx .Play();
-
 			if (mWeaponScript.currentParts.mechanism != null)
 			{
 				ServiceLocator.Get<IAudioManager>()
@@ -366,6 +359,15 @@ namespace FiringSquad.Gameplay.Weapons
 
 			if (mWeaponScript.currentParts.barrel != null)
 			{
+				GameObject instance = Instantiate(mCurrentMuzzleFlashVfxPrefab, mWeaponScript.currentParts.barrel.barrelTip);
+				instance.transform.ResetLocalValues();
+				StartCoroutine(Coroutines.InvokeAfterSeconds(0.6f, () =>
+				{
+					// ReSharper disable once ConditionIsAlwaysTrueOrFalse
+					if (instance != null)
+						Destroy(instance);
+				}));
+
 				ServiceLocator.Get<IAudioManager>()
 					.CreateSound(AudioEvent.BarrelLayer, transform, false)
 					.SetParameter("BarrelType", mWeaponScript.currentParts.barrel.audioOverrideBarrelType)
