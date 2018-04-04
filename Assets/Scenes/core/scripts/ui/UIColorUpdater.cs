@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using FiringSquad.Data;
 using UnityEngine;
+using Logger = FiringSquad.Debug.Logger;
 using UIGraphic = UnityEngine.UI.Graphic;
 using UIShadow = UnityEngine.UI.Shadow;
 
@@ -49,10 +50,26 @@ namespace FiringSquad.Gameplay.UI
 			Color shadow = localPlayer.playerTeam == GameData.PlayerTeam.Orange ? mShadowOrangeColor : mShadowBlueColor;
 
 			foreach (UIGraphic g in mGraphics)
+			{
+				if (g == null)
+				{
+					Logger.Warn(string.Format("Warning: Null object in UI Color Updater \"{0}\"", name));
+					continue;
+				}
+
 				g.color = new Color(primary.r, primary.g, primary.b, g.color.a);
+			}
 
 			foreach (UIShadow s in mShadows)
+			{
+				if (s == null)
+				{
+					Logger.Warn(string.Format("Warning: Null object in UI Color Updater \"{0}\"", name));
+					continue;
+				}
+
 				s.effectColor = new Color(shadow.r, shadow.g, shadow.b, s.effectColor.a);
+			}
 
 			if (localPlayer.playerTeam == GameData.PlayerTeam.Deathmatch)
 				return;
