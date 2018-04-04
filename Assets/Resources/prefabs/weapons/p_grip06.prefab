@@ -11,23 +11,6 @@ Prefab:
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 1956010330703226}
   m_IsPrefabParent: 1
---- !u!1 &1165540779369154
-GameObject:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  serializedVersion: 5
-  m_Component:
-  - component: {fileID: 4472428557563764}
-  - component: {fileID: 33471579942079994}
-  - component: {fileID: 23774567817238092}
-  m_Layer: 0
-  m_Name: mesh_grenade
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
 --- !u!1 &1534445826434994
 GameObject:
   m_ObjectHideFlags: 0
@@ -40,6 +23,23 @@ GameObject:
   m_Layer: 10
   m_Name: PickupView
   m_TagString: interactable
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!1 &1695688271476398
+GameObject:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 4754674091733946}
+  - component: {fileID: 33414824223232924}
+  - component: {fileID: 23808880043824554}
+  m_Layer: 0
+  m_Name: mesh_rocketGrip
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -95,6 +95,24 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!1 &1956868901589158
+GameObject:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 4448373805439784}
+  - component: {fileID: 33638647381955780}
+  - component: {fileID: 23414032140066080}
+  - component: {fileID: 114925107793236782}
+  m_Layer: 0
+  m_Name: mesh_rocketGrip
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
 --- !u!4 &4407564692587820
 Transform:
   m_ObjectHideFlags: 1
@@ -108,19 +126,19 @@ Transform:
   m_Father: {fileID: 4578239147880508}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!4 &4472428557563764
+--- !u!4 &4448373805439784
 Transform:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1165540779369154}
-  m_LocalRotation: {x: 0, y: 0, z: -0.7071068, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 0, z: 0.112}
-  m_LocalScale: {x: 20, y: 20, z: 20}
+  m_GameObject: {fileID: 1956868901589158}
+  m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 4578239147880508}
-  m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: -90}
+  m_Father: {fileID: 4742767972358300}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &4578239147880508
 Transform:
   m_ObjectHideFlags: 1
@@ -132,7 +150,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4407564692587820}
-  - {fileID: 4472428557563764}
+  - {fileID: 4754674091733946}
   m_Father: {fileID: 4756281058840460}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -145,9 +163,23 @@ Transform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
+  m_Children:
+  - {fileID: 4448373805439784}
   m_Father: {fileID: 4756281058840460}
   m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!4 &4754674091733946
+Transform:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1695688271476398}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -0.824, y: -0.047, z: 0}
+  m_LocalScale: {x: 4, y: 4, z: 4}
+  m_Children: []
+  m_Father: {fileID: 4578239147880508}
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &4756281058840460
 Transform:
@@ -156,7 +188,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1956010330703226}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 16.381918, y: 5.3997946, z: 0.37108994}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4742767972358300}
@@ -164,12 +196,12 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!23 &23774567817238092
+--- !u!23 &23414032140066080
 MeshRenderer:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1165540779369154}
+  m_GameObject: {fileID: 1956868901589158}
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
@@ -177,7 +209,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_Materials:
-  - {fileID: 2100000, guid: d5a2428aa21729c4f88e422d6e02a9ee, type: 2}
+  - {fileID: 2100000, guid: f60a2b4b8d65fd34e9397720305e2471, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -196,13 +228,52 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!33 &33471579942079994
+--- !u!23 &23808880043824554
+MeshRenderer:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1695688271476398}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_Materials:
+  - {fileID: 2100000, guid: f60a2b4b8d65fd34e9397720305e2471, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+--- !u!33 &33414824223232924
 MeshFilter:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1165540779369154}
-  m_Mesh: {fileID: 4300000, guid: ad009cf6363991942bd496c4ca2d8796, type: 3}
+  m_GameObject: {fileID: 1695688271476398}
+  m_Mesh: {fileID: 4300000, guid: 0cc29f3ba1ba73e49b1e545e9756b762, type: 3}
+--- !u!33 &33638647381955780
+MeshFilter:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1956868901589158}
+  m_Mesh: {fileID: 4300000, guid: 0cc29f3ba1ba73e49b1e545e9756b762, type: 3}
 --- !u!54 &54655291910512096
 Rigidbody:
   m_ObjectHideFlags: 1
@@ -228,8 +299,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 0.55, y: 0.63801044, z: 0.56444925}
-  m_Center: {x: 0, y: -0.061690807, z: 0.10722464}
+  m_Size: {x: 0.43360746, y: 0.86102057, z: 1.0520635}
+  m_Center: {x: 0.058196247, y: 0.17451644, z: 0.009285331}
 --- !u!114 &114209195650215972
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -281,8 +352,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mUniqueId: 65
   mIsLegendary: 0
-  mPrettyName: Rocket Grip
-  mDescription: FLAVOR TEXT
+  mPrettyName: Rocket Booster
+  mDescription: "Ever had a dream about flying? We\u2019re here to tell you that dream
+    is now a reality. Advanced gravity-modifying technology combined with a condensed-core
+    rocket engine allows you to soar around the arena like a bird of prey!"
   mData:
     mMinDispersionModifier:
       mAmount: 0
@@ -314,7 +387,7 @@ MonoBehaviour:
     mClipSizeModifier:
       mAmount: 0
       mType: 0
-  mDurability: 80
+  mDurability: 50
 --- !u!114 &114290261631415562
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -359,3 +432,20 @@ MonoBehaviour:
     i15: 214
   m_ServerOnly: 0
   m_LocalPlayerAuthority: 1
+--- !u!114 &114925107793236782
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1956868901589158}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b6a79cc8387fa540af19169480e81c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mBoundProperty: player_part_durability_grip
+  mEmissiveProperty: _EmissionColor
+  mStartColor: {r: 0.2629758, g: 0.9411765, b: 0.6630674, a: 1}
+  mEndColor: {r: 1, g: 0, b: 0, a: 1}
+  mBlinkingThreshold: 0.15
+  mBlinkingRate: 0.15
