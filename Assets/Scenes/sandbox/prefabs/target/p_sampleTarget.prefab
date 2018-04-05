@@ -21,7 +21,7 @@ GameObject:
   - component: {fileID: 4009013003171238}
   - component: {fileID: 198371394280771544}
   - component: {fileID: 199610335689098880}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: death_effect
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -38,7 +38,7 @@ GameObject:
   - component: {fileID: 224516292865650724}
   - component: {fileID: 222805715758132002}
   - component: {fileID: 114430386460282732}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Damage
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -56,7 +56,7 @@ GameObject:
   - component: {fileID: 223861051501629276}
   - component: {fileID: 114554997009478952}
   - component: {fileID: 114862031180789266}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -74,7 +74,7 @@ GameObject:
   - component: {fileID: 222628167585505094}
   - component: {fileID: 114671686230729468}
   - component: {fileID: 114295020891779266}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Health
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -90,7 +90,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4183376461698450}
   - component: {fileID: 114282121691719356}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: p_sampleTarget
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -108,7 +108,7 @@ GameObject:
   - component: {fileID: 33746441935826474}
   - component: {fileID: 23615507023672684}
   - component: {fileID: 65518159601736208}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: p_sampleTargetView
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -224,7 +224,7 @@ MonoBehaviour:
     type: 2}
   mMesh: {fileID: 1566193802756944}
   mText: {fileID: 114430386460282732}
-  mStartHealth: 1000
+  mStartHealth: 100
 --- !u!114 &114295020891779266
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -236,8 +236,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0a7b5f0645bb48feaffc4cc5e56e2997, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mBoundProperty: p_aggressiveTarget1-health
-  mDisplayFormat: 
+  mBoundProperty: p_sampleTarget1-health
+  mDisplayFormat: '#####.#'
 --- !u!114 &114430386460282732
 MonoBehaviour:
   m_ObjectHideFlags: 1
