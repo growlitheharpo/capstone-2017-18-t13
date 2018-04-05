@@ -224,6 +224,7 @@ namespace FiringSquad.Core.State
 				/// </summary>
 				private void OnConfirmQuitGame()
 				{
+					Debug.Logger.Info("CONFIRM SHUTDOWN");
 					NetworkManager.singleton.StopHost();
 					NetworkManager.Shutdown();
 

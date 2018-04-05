@@ -45,6 +45,7 @@ namespace FiringSquad.Gameplay.UI
 		[Header("Other")]
 		[SerializeField]
 		private float mKioskTimerLength = 30;
+		[SerializeField] private GameObject mLoadingScreen;
 
 		/// Private variables
 		private float mKioskTimer;
@@ -147,11 +148,12 @@ namespace FiringSquad.Gameplay.UI
 		/// </summary>
 		private void Launch_ArenaBattle()
 		{
+			LoadScreen ();
 			mSubPlayAnimator.SetTrigger("Exit");
 			ServiceLocator.Get<IGamestateManager>()
 				.RequestSceneChange(GamestateManager.DRAFT_GAMEPLAY);
 
-			mMenuMusic.Kill();
+			KillMusic ();
 		}
 
 		/// <summary>
@@ -159,11 +161,12 @@ namespace FiringSquad.Gameplay.UI
 		/// </summary>
 		private void Launch_DualMode()
 		{
+			LoadScreen ();
 			mSubPlayAnimator.SetTrigger("Exit");
 			ServiceLocator.Get<IGamestateManager>()
 				.RequestSceneChange(GamestateManager.DRAFT_DUALMODE);
 
-			mMenuMusic.Kill();
+			KillMusic ();
 		}
 
 		/// <summary>
@@ -195,7 +198,17 @@ namespace FiringSquad.Gameplay.UI
 			ServiceLocator.Get<IGamestateManager>()
 				.RequestSceneChange(GamestateManager.KIOSK_SCENE);
 
-			mMenuMusic.Kill(false);
+			KillMusic ();
+		}
+
+		private void LoadScreen()
+		{
+			mLoadingScreen.gameObject.SetActive (true);
+		}
+
+		private void KillMusic()
+		{
+			mMenuMusic.Kill();
 		}
 
 		/// <summary>

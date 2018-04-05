@@ -15,6 +15,7 @@ namespace FiringSquad.Gameplay.Weapons
 		[SerializeField] private bool mFireFromBarrelTip;
 		[FormerlySerializedAs("mDurabilitySprite")][SerializeField] private Sprite mAmmoTypeSprite;
 		[SerializeField] private Animator mAnimator;
+		[SerializeField] private GameObject mMuzzleFlashVfxPrefab;
 
 		/// <inheritdoc />
 		public override Attachment attachPoint { get { return Attachment.Mechanism; } }
@@ -46,5 +47,10 @@ namespace FiringSquad.Gameplay.Weapons
 		/// </summary>
 		[CanBeNull]
 		public Animator attachedAnimator { get { return mAnimator; } }
+
+		/// <summary>
+		/// The prefab for the particle system that we will use when this mechanism is active.
+		/// </summary>
+		public GameObject muzzleFlashVfxPrefab { get { return mMuzzleFlashVfxPrefab; } }
 	}
 }

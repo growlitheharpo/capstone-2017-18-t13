@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using FiringSquad.Core;
+using FiringSquad.Core.State;
 using FiringSquad.Core.UI;
 using FiringSquad.Debug;
 using FiringSquad.Networking;
@@ -19,9 +20,13 @@ namespace FiringSquad.Gameplay.UI
 		[SerializeField] private LayoutGroup mMatchDataHolder;
 		[SerializeField] private MatchDataInfoPanel mMatchDataPrefab;
 		[SerializeField] private Button mCreateMatchButton;
+		[SerializeField] private Button mJoinMatchButton;
 		[SerializeField] private Button mRefreshMatchesButton;
+		[SerializeField] private Button mReturnToMenuButton;
 		[SerializeField] private Text mStatusText;
 		[SerializeField] private JoinGameCreateMatchPanel mCreateMatchPanel;
+		[SerializeField] private GameObject mJoinMatchPanel;
+
 
 		/// Private variables
 		private NetworkGameManager mNetworkManager;
@@ -44,6 +49,8 @@ namespace FiringSquad.Gameplay.UI
 
 			mRefreshMatchesButton.onClick.AddListener(RefreshMatchList);
 			mCreateMatchButton.onClick.AddListener(ClickCreateMatch);
+			mJoinMatchButton.onClick.AddListener(ClickJoinMatch);
+			mReturnToMenuButton.onClick.AddListener(ClickReturnToMenu);
 
 			EventManager.Local.OnLocalPlayerSpawned += OnLocalPlayerSpawned;
 
@@ -65,6 +72,8 @@ namespace FiringSquad.Gameplay.UI
 
 			ServiceLocator.Get<IGameConsole>()
 				.UnregisterCommand(CONSOLE_ConnectToIpAddress);
+			ServiceLocator.Get<IUIManager>()
+				.UnregisterPanel(this);
 		}
 
 		/// <summary>
@@ -105,6 +114,25 @@ namespace FiringSquad.Gameplay.UI
 		{
 			DestroyAllMatchPanels();
 			mCreateMatchPanel.gameObject.SetActive(true);
+		}
+
+		/// <summary>
+		/// Enable the JoinMatch panel when the player clicks the appropriate button.
+		/// </summary>
+		private void ClickJoinMatch()
+		{
+			DestroyAllMatchPanels();
+			mJoinMatchPanel.gameObject.SetActive(true);
+		}
+
+		/// <summary>
+		/// Send the player back to the main menu
+		/// </summary>
+		private void ClickReturnToMenu()
+		{
+			ServiceLocator.Get<IGamestateManager>()
+				.RequestSceneChange(GamestateManager.MENU_SCENE);
+
 		}
 
 		/// <summary>
