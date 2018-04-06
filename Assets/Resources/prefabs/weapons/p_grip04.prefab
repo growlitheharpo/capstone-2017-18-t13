@@ -707,7 +707,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mUniqueId: 63
-  mIsLegendary: 0
+  mIsLegendary: 1
   mPrettyName: Riot Shield
   mDescription: They say the best defense is a good offense, but a massive shield
     works too! Hard-light technology allows this attachment to project an impenetrable
@@ -717,13 +717,13 @@ MonoBehaviour:
       mAmount: 0.9
       mType: 3
     mMaxDispersionModifier:
-      mAmount: 0.9
+      mAmount: 1.5
       mType: 3
     mDispersionRampModifier:
       mAmount: 0
       mType: 0
     mRecoilAmountModifier:
-      mAmount: 0.8
+      mAmount: 1.2
       mType: 3
     mRecoilTimeModifier:
       mAmount: 0
@@ -732,7 +732,7 @@ MonoBehaviour:
       mAmount: 0
       mType: 0
     mDamageFalloffDistanceModifier:
-      mAmount: 0
+      mAmount: -5
       mType: 0
     mFireRateModifier:
       mAmount: 0
@@ -743,7 +743,7 @@ MonoBehaviour:
     mClipSizeModifier:
       mAmount: 0
       mType: 0
-  mDurability: 60
+  mDurability: 25
 --- !u!114 &114152333758624012
 MonoBehaviour:
   m_ObjectHideFlags: 1

@@ -197,7 +197,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1122678007204700}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -7.9301963, y: 17.7, z: 3.9284658}
+  m_LocalPosition: {x: 0.1, y: 0.45, z: -1.48}
   m_LocalScale: {x: 3, y: 3, z: 3}
   m_Children:
   - {fileID: 4541558892577342}
@@ -416,8 +416,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mAudioWeaponType: 1
   mHitParticles: {fileID: 198527440103319292}
-  mSpeed: 500
-  mSplashDamageRadius: 2.2
+  mSpeed: 800
+  mSplashDamageRadius: 3
   mRecognizeHeadshots: 0
   mSplashDamageMask:
     serializedVersion: 2
@@ -426,16 +426,16 @@ MonoBehaviour:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 2
-      time: 0
-      value: 1
+      time: -0.008331299
+      value: 0.99687576
       inSlope: 0
       outSlope: 0
       tangentMode: 0
     - serializedVersion: 2
-      time: 1
-      value: 0.5
-      inSlope: 0.023733359
-      outSlope: 0.023733359
+      time: 3.0017405
+      value: 0.24284887
+      inSlope: -0.36876667
+      outSlope: -0.36876667
       tangentMode: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
@@ -564,7 +564,7 @@ ParticleSystem:
   moveWithTransform: 0
   moveWithCustomTransform: {fileID: 0}
   scalingMode: 1
-  randomSeed: 673797555
+  randomSeed: 163158961
   InitialModule:
     serializedVersion: 3
     enabled: 1
@@ -3831,7 +3831,7 @@ ParticleSystem:
   moveWithTransform: 0
   moveWithCustomTransform: {fileID: 0}
   scalingMode: 1
-  randomSeed: 2010434852
+  randomSeed: -141130965
   InitialModule:
     serializedVersion: 3
     enabled: 1
@@ -7098,7 +7098,7 @@ ParticleSystem:
   moveWithTransform: 0
   moveWithCustomTransform: {fileID: 0}
   scalingMode: 1
-  randomSeed: -729016876
+  randomSeed: -704505320
   InitialModule:
     serializedVersion: 3
     enabled: 1
@@ -7740,7 +7740,7 @@ ParticleSystem:
     m_BurstCount: 1
     m_Bursts:
     - time: 0
-      minCount: 20
+      minCount: 30
       maxCount: 30
       cycleCount: 1
       repeatInterval: 0.01
@@ -10365,7 +10365,7 @@ ParticleSystem:
   moveWithTransform: 0
   moveWithCustomTransform: {fileID: 0}
   scalingMode: 1
-  randomSeed: 2018664185
+  randomSeed: -853239562
   InitialModule:
     serializedVersion: 3
     enabled: 1
@@ -10639,9 +10639,9 @@ ParticleSystem:
         m_RotationOrder: 4
     startRotationX:
       serializedVersion: 2
-      minMaxState: 3
-      scalar: 3.1415925
-      minScalar: -3.1415925
+      minMaxState: 0
+      scalar: 0
+      minScalar: 0
       maxCurve:
         serializedVersion: 2
         m_Curve:
@@ -10680,9 +10680,9 @@ ParticleSystem:
         m_RotationOrder: 4
     startRotationY:
       serializedVersion: 2
-      minMaxState: 3
-      scalar: 3.1415925
-      minScalar: -3.1415925
+      minMaxState: 0
+      scalar: 0
+      minScalar: 0
       maxCurve:
         serializedVersion: 2
         m_Curve:
@@ -10721,9 +10721,9 @@ ParticleSystem:
         m_RotationOrder: 4
     startRotation:
       serializedVersion: 2
-      minMaxState: 3
-      scalar: 3.1415925
-      minScalar: -3.1415925
+      minMaxState: 0
+      scalar: 0
+      minScalar: 0
       maxCurve:
         serializedVersion: 2
         m_Curve:
@@ -10763,7 +10763,7 @@ ParticleSystem:
     randomizeRotationDirection: 0
     maxNumParticles: 1000
     size3D: 0
-    rotation3D: 1
+    rotation3D: 0
     gravityModifier:
       serializedVersion: 2
       minMaxState: 0
@@ -11007,8 +11007,8 @@ ParticleSystem:
     m_BurstCount: 1
     m_Bursts:
     - time: 0
-      minCount: 10
-      maxCount: 10
+      minCount: 30
+      maxCount: 30
       cycleCount: 1
       repeatInterval: 0.01
   SizeModule:
@@ -13664,7 +13664,7 @@ ParticleSystemRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: -6
+  m_SortingOrder: 0
   m_RenderMode: 0
   m_SortMode: 0
   m_MinParticleSize: 0
@@ -13749,7 +13749,7 @@ ParticleSystemRenderer:
   m_LightProbeUsage: 0
   m_ReflectionProbeUsage: 0
   m_Materials:
-  - {fileID: 2100000, guid: 89d45b282051cd045a4d5e3a4ad4d360, type: 2}
+  - {fileID: 2100000, guid: 4d2d5f9d7c25b7f4084a3d4862e9efb7, type: 2}
   - {fileID: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
@@ -13768,14 +13768,14 @@ ParticleSystemRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 21
+  m_SortingOrder: 0
   m_RenderMode: 1
   m_SortMode: 0
   m_MinParticleSize: 0
   m_MaxParticleSize: 0.5
   m_CameraVelocityScale: 0
   m_VelocityScale: 0.05
-  m_LengthScale: 0.68
+  m_LengthScale: 1.81
   m_SortingFudge: 0
   m_NormalDirection: 1
   m_RenderAlignment: 0
