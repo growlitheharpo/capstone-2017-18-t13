@@ -17,6 +17,7 @@ namespace FiringSquad.Core.Input
 		InGameMenu = 32,
 		PauseMenu = 64,
 		DevConsole = 128,
+		Scorecard = 256,
 		All = int.MaxValue
 	}
 

@@ -342,19 +342,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mUniqueId: 7
+  mIsLegendary: 0
   mPrettyName: Semi-Auto Barrel
-  mDescription: 'Care to pray, not spray? Then this is the barrel for you. Semi-automatic
-    action as fast as you can pull the trigger ensures optimal shot placement for
-    hard hitting mechanisms, offering unrivaled control. '
+  mDescription: 'Care to pCare to pray, not spray? This may be the barrel for you.
+    Semi-automatic action as fast as you can pull the trigger ensures optimal shot
+    placement for hard hitting mechanisms, offering unrivaled control.ray, not spray?
+    Then this is the barrel for you. Semi-automatic action as fast as you can pull
+    the trigger ensures optimal shot placement for hard hitting mechanisms, offering
+    unrivaled control. '
   mData:
     mMinDispersionModifier:
-      mAmount: 0
-      mType: 0
+      mAmount: 0.85
+      mType: 3
     mMaxDispersionModifier:
-      mAmount: 0
-      mType: 0
+      mAmount: 1.25
+      mType: 3
     mDispersionRampModifier:
-      mAmount: 1
+      mAmount: 2
       mType: 3
     mRecoilAmountModifier:
       mAmount: 3
@@ -377,15 +381,13 @@ MonoBehaviour:
     mClipSizeModifier:
       mAmount: -2
       mType: 0
-  mDurability: 16
+  mDurability: 32
   mTip: {fileID: 4693763784081758}
   mAudioOverrideBarrelType: 1
   mProjectileCount: 1
   mShotsPerClick: 1
   mCrosshairSprite: {fileID: 21300000, guid: 35c3b3b8a34346948ac7ff144fe23fa0, type: 3}
   mAnimator: {fileID: 0}
-  mMuzzleFlashVfxPrefab: {fileID: 1409651286611546, guid: fc441af24ffa9da4c86e29cf21ecd6b1,
-    type: 2}
   mOverrideRecoilCurve: 0
   mRecoilCurve:
     serializedVersion: 2

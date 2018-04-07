@@ -14,7 +14,8 @@ namespace FiringSquad.Core.UI
 		Console,
 		DebugMenu,
 		HandleConnection,
-		TeamVictory
+		TeamVictory,
+		Scorecard,
 	}
 
 	/// <summary>

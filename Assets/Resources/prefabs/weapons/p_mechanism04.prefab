@@ -737,18 +737,17 @@ MonoBehaviour:
   mUniqueId: 123
   mIsLegendary: 0
   mPrettyName: Arrows
-  mDescription: Our sponsor, Renfield Arms provided us with this prototype receiver.
+  mDescription: Our sponsor, Renfield Arms, provided us with this prototype receiver.
     It wasn't originally meant to fire arrows, but our weaponry team shoved them in
     anyways and made it work. Arrows travel fast and deal a significant amount of
-    damage; however, you'll have to try to be as accurate as possible to get these
-    to work effectively.
+    damage, but you'll have to be as accurate as possible to use them effectively.
   mData:
     mMinDispersionModifier:
-      mAmount: 0
-      mType: 0
+      mAmount: 0.5
+      mType: 3
     mMaxDispersionModifier:
-      mAmount: 0
-      mType: 0
+      mAmount: 0.5
+      mType: 3
     mDispersionRampModifier:
       mAmount: 0
       mType: 0
@@ -756,16 +755,16 @@ MonoBehaviour:
       mAmount: 0.75
       mType: 3
     mRecoilTimeModifier:
-      mAmount: 0
-      mType: 0
+      mAmount: 0.25
+      mType: 3
     mDamageModifier:
-      mAmount: 2
+      mAmount: 1.5
       mType: 2
     mDamageFalloffDistanceModifier:
-      mAmount: 0
+      mAmount: 6
       mType: 0
     mFireRateModifier:
-      mAmount: 0.85
+      mAmount: 0.75
       mType: 3
     mReloadTimeModifier:
       mAmount: 1.75

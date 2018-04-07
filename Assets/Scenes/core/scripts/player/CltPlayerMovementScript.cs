@@ -39,15 +39,18 @@ namespace FiringSquad.Gameplay
 		private float mSmoothedRecoil, mStandingHeight, mStandingRadius;
 		private bool mJump, mIsJumping, mIsRunning, mPreviouslyGrounded, mCrouching;
 
-		// Float for the speed
+		/// Float for the speed
 		private float mCurrentSpeed;
-		// Variables to keep track of previous x and y
+		/// Variables to keep track of previous x and y
 		private float mPrevXInput, mPrevYInput;
 
 		private const float DEFAULT_FIELD_OF_VIEW = 60.0f;
 
 		/// <summary> Cover up Unity's "transform" component with the one of our CltPlayer. </summary>
 		private new Transform transform { get { return mController.transform; } }
+
+		private float mSpeedMultiplier, mGravMultiplier, mJumpMultiplier;
+
 
 		/// <summary>
 		/// Unity's Awake function.
@@ -73,6 +76,10 @@ namespace FiringSquad.Gameplay
 			// Initialize the speed
 			mCurrentSpeed = 0.0f;
 
+			mGravMultiplier = 1;
+			mSpeedMultiplier = 1;
+			mJumpMultiplier = 1;
+
 			// Register all of the movement input
 			mInputBindings = GetComponent<CltPlayerLocal>().inputMap;
 			ServiceLocator.Get<IInput>()
@@ -90,6 +97,8 @@ namespace FiringSquad.Gameplay
 			EventManager.Local.OnApplyOptionsData += ApplyOptionsData;
 			EventManager.Local.OnLocalPlayerDied += OnLocalPlayerDied;
 			EventManager.LocalGUI.OnRequestNewFieldOfView += OnRequestNewFieldOfView;
+			EventManager.Local.OnEquipRocketGrip += OnEquipRocketGrip;
+			EventManager.Local.OnUnequipRocketGrip += OnUnequipRocketGrip;
 		}
 
 		/// <summary>
@@ -109,6 +118,8 @@ namespace FiringSquad.Gameplay
 			EventManager.Local.OnApplyOptionsData -= ApplyOptionsData;
 			EventManager.Local.OnLocalPlayerDied -= OnLocalPlayerDied;
 			EventManager.LocalGUI.OnRequestNewFieldOfView -= OnRequestNewFieldOfView;
+			EventManager.Local.OnEquipRocketGrip -= OnEquipRocketGrip;
+			EventManager.Local.OnUnequipRocketGrip -= OnUnequipRocketGrip;
 		}
 
 		#region Input Delegates
@@ -351,7 +362,7 @@ namespace FiringSquad.Gameplay
 
 			if (mInput.y != 0 || mInput.x != 0)
 			{
-				desiredSpeed = mMovementData.speed;
+				desiredSpeed = mMovementData.speed * mSpeedMultiplier;
 			}
 			else if (mInput.y == 0.0f && mInput.x == 0.0f)
 			{
@@ -371,9 +382,9 @@ namespace FiringSquad.Gameplay
 			}
 
 
-			if (speed > mMovementData.speed)
+			if (speed > mMovementData.speed * mSpeedMultiplier)
 			{
-				speed = mMovementData.speed;
+				speed = mMovementData.speed * mSpeedMultiplier;
 			}
 			//UnityEngine.Debug.Log(mCurrentSpeed);
 			//float speed = mMovementData.speed;
@@ -395,7 +406,7 @@ namespace FiringSquad.Gameplay
 
 				if (mJump)
 				{
-					mMoveDirection.y = mMovementData.jumpForce;
+					mMoveDirection.y = mMovementData.jumpForce * mJumpMultiplier;
 
 					// play jump sound
 					IAudioManager audioService = ServiceLocator.Get<IAudioManager>();
@@ -422,7 +433,7 @@ namespace FiringSquad.Gameplay
 			{
 
 
-				mMoveDirection += Physics.gravity * mMovementData.gravityMultiplier * Time.fixedDeltaTime;
+				mMoveDirection += Physics.gravity * mMovementData.gravityMultiplier * mGravMultiplier * Time.fixedDeltaTime;
 
 			}
 
@@ -491,6 +502,26 @@ namespace FiringSquad.Gameplay
 			}
 
 			mRealCameraRef.fieldOfView = newFov;
+		}
+
+		/// <summary>
+		/// Event handler for equipping the rocket grip
+		/// </summary>
+		private void OnEquipRocketGrip()
+		{
+			mGravMultiplier = mMovementData.rocketGripDescentMultiplier;
+			mSpeedMultiplier = mMovementData.rocketGripSpeed;
+			mJumpMultiplier = mMovementData.rocketJumpForce;
+		}
+
+		/// <summary>
+		/// Event handler for unequipping the rocket grip
+		/// </summary>
+		private void OnUnequipRocketGrip()
+		{
+			mGravMultiplier = 1;
+			mSpeedMultiplier = 1;
+			mJumpMultiplier = 1;
 		}
 	}
 }

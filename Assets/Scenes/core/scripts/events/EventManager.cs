@@ -320,6 +320,26 @@ public partial class EventManager
 		{
 			OnTeamVictoryScreen(score);
 		}
+
+		/// <summary>
+		/// Event called when the player equips a rocket grip
+		/// </summary>
+		public static event Action OnEquipRocketGrip = () => { LogEvent(); };
+
+		public static void EquipRocketGrip()
+		{
+			OnEquipRocketGrip();
+		}
+
+		/// <summary>
+		/// Event called when the player unequips the rocket grip
+		/// </summary>
+		public static event Action OnUnequipRocketGrip = () => { LogEvent(); };
+
+		public static void UnequipRocketGrip()
+		{
+			OnUnequipRocketGrip();
+		}
 	}
 
 	/// <summary>
@@ -433,6 +453,27 @@ public partial class EventManager
 		public static void PlayerEquippedLegendaryPart()
 		{
 			OnPlayerEquippedLegendaryPart();
+		}
+
+		/// <summary>
+		/// Event called when ANY player's score has changed, not just the local player.
+		/// </summary>
+		/// PARAMETER 1: Which player changed.
+		/// PARAMETER 2: The amount of score change.
+		/// PARAMETER 3: The amount of change to kill count.
+		/// PARAMETER 4: The amount of change to death count.
+		public static event Action<CltPlayer, int, int, int> OnPlayerScoreChanged = (p, x, y, z) => { LogEvent(); };
+
+		/// <summary>
+		/// Event called when ANY player's score has changed, not just the local player.
+		/// </summary>
+		/// <param name="player">Which player changed.</param>
+		/// <param name="scoreChange">The amount of score change.</param>
+		/// <param name="killChange">The amount of change to kill count.</param>
+		/// <param name="deathChange">The amount of change to death count.</param>
+		public static void PlayerScoreChanged(CltPlayer player, int scoreChange, int killChange, int deathChange)
+		{
+			OnPlayerScoreChanged(player, scoreChange, killChange, deathChange);
 		}
 	}
 

@@ -145,7 +145,7 @@ namespace FiringSquad.Core.State
 					EventManager.Local.OnReceiveFinishEvent += OnReceiveFinishEvent;
 					EventManager.Local.OnConfirmQuitGame += OnConfirmQuitGame;
 					EventManager.Local.OnTeamVictoryScreen += OnTeamVictoryScreen;
-
+					mInRealGame = false;
 				}
 
 				/// <inheritdoc />
@@ -156,7 +156,6 @@ namespace FiringSquad.Core.State
 					EventManager.Local.OnReceiveFinishEvent -= OnReceiveFinishEvent;
 					EventManager.Local.OnConfirmQuitGame -= OnConfirmQuitGame;
 					EventManager.Local.OnTeamVictoryScreen -= OnTeamVictoryScreen;
-
 				}
 
 				/// <summary>
@@ -166,7 +165,7 @@ namespace FiringSquad.Core.State
 				private void OnReceiveLobbyEndTime(CltPlayer player, long time)
 				{
 					mInRealGame = false;
-					OnReceiveGameEndTime(time);
+					SetupTimer(time);
 				}
 
 				/// <summary>
@@ -176,6 +175,15 @@ namespace FiringSquad.Core.State
 				private void OnReceiveGameEndTime(long time)
 				{
 					mInRealGame = true;
+					SetupTimer(time);
+				}
+
+				/// <summary>
+				/// Setup the actual timer to display the lobby/round time.
+				/// </summary>
+				/// <param name="time">The end time of the game (in global ticks)</param>
+				private void SetupTimer(long time)
+				{
 					mRoundEndTime = time;
 
 					if (mRemainingTime == null)
@@ -201,8 +209,12 @@ namespace FiringSquad.Core.State
 				/// </summary>
 				private void OnReceiveFinishEvent(IList<PlayerScore> scores)
 				{
-					IScreenPanel panel = ServiceLocator.Get<IUIManager>()
-						.PushNewPanel(ScreenPanelTypes.GameOver);
+					IUIManager ui = ServiceLocator.Get<IUIManager>();
+					ui.PopPanel(ScreenPanelTypes.Scorecard);
+					ServiceLocator.Get<IInput>()
+						.DisableInputLevel(InputLevel.Scorecard);
+
+					IScreenPanel panel = ui.PushNewPanel(ScreenPanelTypes.GameOver);
 					((GameOverPanel)panel).SetDisplayScores(scores);
 				}
 
@@ -212,6 +224,7 @@ namespace FiringSquad.Core.State
 				/// </summary>
 				private void OnConfirmQuitGame()
 				{
+					Debug.Logger.Info("CONFIRM SHUTDOWN");
 					NetworkManager.singleton.StopHost();
 					NetworkManager.Shutdown();
 

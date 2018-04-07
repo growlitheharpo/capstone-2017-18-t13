@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using FiringSquad.Core;
 using FiringSquad.Core.Audio;
 using FiringSquad.Data;
+using FiringSquad.Gameplay.UI;
 using KeatsLib.Unity;
 using UnityEngine;
 
@@ -318,6 +319,9 @@ namespace FiringSquad.Gameplay.Weapons
 
 			AnimationUtility.PlayAnimation(mAnimator, "reload");
 			StartCoroutine(WaitForReload(time));
+
+			// Notify the hint that the player is reloading
+			EventManager.LocalGUI.SetHintState(CrosshairHintText.Hint.LowClip, false);
 		}
 
 		/// <summary>
@@ -374,6 +378,9 @@ namespace FiringSquad.Gameplay.Weapons
 					.SetParameter("IsCurrentPlayer", Convert.ToSingle(mWeaponScript.bearer.isCurrentPlayer))
 					.Start();
 			}
+
+			if (mWeaponScript.shotsLeftInClip == 0)
+				EventManager.LocalGUI.SetHintState(CrosshairHintText.Hint.LowClip, true);
 		}
 
 		/// <summary>

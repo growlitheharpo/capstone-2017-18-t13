@@ -160,6 +160,9 @@ namespace FiringSquad.Core.Audio
 			public float crowdHypeLevel { get { return GetParameter("CrowdHypeLevel"); } set { SetParameter("CrowdHypeLevel", value); } }
 
 			/// <inheritdoc />
+			public float isPlayButton { get { return GetParameter("IsPlayButton"); } set { SetParameter("IsPlayButton", value); } }
+
+			/// <inheritdoc />
 			public IAudioReference SetParameter(string name, float value)
 			{
 				RESULT result = mEvent.setParameterValue(name, value);

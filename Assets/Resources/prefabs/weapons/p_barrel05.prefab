@@ -386,20 +386,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mUniqueId: 5
+  mIsLegendary: 0
   mPrettyName: Burst Barrel
-  mDescription: 'A true workhorse of the re[mod] arena, the burst barrel fires 3 shots
-    in quick suggession when the trigger is held down, this barrel is perfect for
-    your next mid-range encounter. '
+  mDescription: A true workhorse of the re[Mod] arena, the burst barrel fires 3 shots
+    in quick suggestion when the trigger is held down. Perfect for your next mid-range
+    encounter.
   mData:
     mMinDispersionModifier:
       mAmount: 0
       mType: 0
     mMaxDispersionModifier:
-      mAmount: 0
-      mType: 0
+      mAmount: 2
+      mType: 3
     mDispersionRampModifier:
-      mAmount: 0
-      mType: 0
+      mAmount: 1.25
+      mType: 3
     mRecoilAmountModifier:
       mAmount: 2
       mType: 3
@@ -413,7 +414,7 @@ MonoBehaviour:
       mAmount: 10
       mType: 0
     mFireRateModifier:
-      mAmount: 5
+      mAmount: 4.5
       mType: 3
     mReloadTimeModifier:
       mAmount: 0
@@ -428,8 +429,6 @@ MonoBehaviour:
   mShotsPerClick: 3
   mCrosshairSprite: {fileID: 21300000, guid: 35c3b3b8a34346948ac7ff144fe23fa0, type: 3}
   mAnimator: {fileID: 0}
-  mMuzzleFlashVfxPrefab: {fileID: 1409651286611546, guid: fc441af24ffa9da4c86e29cf21ecd6b1,
-    type: 2}
   mOverrideRecoilCurve: 0
   mRecoilCurve:
     serializedVersion: 2

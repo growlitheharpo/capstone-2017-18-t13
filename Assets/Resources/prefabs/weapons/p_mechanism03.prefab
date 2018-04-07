@@ -710,10 +710,9 @@ MonoBehaviour:
   mIsLegendary: 1
   mPrettyName: Rockets
   mDescription: 'Rockets will grab the attention of all of our contestants. Their
-    damage is unmatched, but, trying to fire one of these bad boys is no easy process.
-    Rockets add significant recoil to weapons and have a very slow rate of fire. However,
-    contestants will always find their opponents running and screaming whenever they
-    have this mechanism attached. '
+    damage is unmatched, but rockets add significant recoil to weapons and have a
+    very slow rate of fire. Still, contestants will always find their opponents running
+    and screaming whenever they have this mechanism attached. '
   mData:
     mMinDispersionModifier:
       mAmount: 0
@@ -725,13 +724,13 @@ MonoBehaviour:
       mAmount: 0
       mType: 0
     mRecoilAmountModifier:
-      mAmount: 3
+      mAmount: 4
       mType: 3
     mRecoilTimeModifier:
-      mAmount: 2.5
+      mAmount: 2
       mType: 3
     mDamageModifier:
-      mAmount: 4
+      mAmount: 4.35
       mType: 2
     mDamageFalloffDistanceModifier:
       mAmount: 0
@@ -740,7 +739,7 @@ MonoBehaviour:
       mAmount: 0.5
       mType: 3
     mReloadTimeModifier:
-      mAmount: 2.5
+      mAmount: 2
       mType: 3
     mClipSizeModifier:
       mAmount: 0

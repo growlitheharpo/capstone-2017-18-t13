@@ -666,9 +666,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mUniqueId: 3
+  mIsLegendary: 0
   mPrettyName: Sniper Barrel
-  mDescription: 'A heavy, expertly rifled barrel designed for extreme ranges. Slow
-    rate of fire with exceptional damage. '
+  mDescription: A heavy, expertly crafted barrel designed for extreme ranges. Slow
+    rate of fire, but does exceptional damage.
   mData:
     mMinDispersionModifier:
       mAmount: 0.65
@@ -677,13 +678,13 @@ MonoBehaviour:
       mAmount: 2
       mType: 3
     mDispersionRampModifier:
-      mAmount: 5
+      mAmount: 1.5
       mType: 3
     mRecoilAmountModifier:
-      mAmount: 2
+      mAmount: 6
       mType: 3
     mRecoilTimeModifier:
-      mAmount: 2
+      mAmount: 0.5
       mType: 3
     mDamageModifier:
       mAmount: 5.6
@@ -692,23 +693,21 @@ MonoBehaviour:
       mAmount: 200
       mType: 0
     mFireRateModifier:
-      mAmount: 0.4
+      mAmount: 0.35
       mType: 3
     mReloadTimeModifier:
-      mAmount: 0
-      mType: 0
+      mAmount: 1.75
+      mType: 3
     mClipSizeModifier:
       mAmount: -6
       mType: 0
-  mDurability: 8
+  mDurability: 12
   mTip: {fileID: 4467395475359334}
   mAudioOverrideBarrelType: 4
   mProjectileCount: 1
   mShotsPerClick: 1
   mCrosshairSprite: {fileID: 21300000, guid: 1e872e46bbf1f2549a5937166db10b72, type: 3}
   mAnimator: {fileID: 95478973002726390}
-  mMuzzleFlashVfxPrefab: {fileID: 1409651286611546, guid: fc441af24ffa9da4c86e29cf21ecd6b1,
-    type: 2}
   mOverrideRecoilCurve: 0
   mRecoilCurve:
     serializedVersion: 2

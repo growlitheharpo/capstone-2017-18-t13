@@ -328,11 +328,29 @@ MonoBehaviour:
   mAudioWeaponType: 1
   mHitParticles: {fileID: 198625216423804770}
   mSpeed: 0
-  mSplashDamageRadius: 10
+  mSplashDamageRadius: 6
   mRecognizeHeadshots: 0
   mSplashDamageMask:
     serializedVersion: 2
     m_Bits: 4294905800
+  mDamageFalloffCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 2
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    - serializedVersion: 2
+      time: 1
+      value: 0.5
+      inSlope: 0.023733359
+      outSlope: 0.023733359
+      tangentMode: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 0
 --- !u!114 &114185923026591396
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1104,8 +1122,8 @@ ParticleSystem:
       countCurve:
         serializedVersion: 2
         minMaxState: 0
-        scalar: 50
-        minScalar: 50
+        scalar: 30
+        minScalar: 30
         maxCurve:
           serializedVersion: 2
           m_Curve:

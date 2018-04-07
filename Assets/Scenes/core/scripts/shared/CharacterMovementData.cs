@@ -21,6 +21,9 @@ namespace FiringSquad.Data
 		[SerializeField] private float mAimDownSightsLookMultiplier;
 		[SerializeField] private float mAccelerationLerpSpeed;
 		[SerializeField] private float mDecelerationLerpSpeed;
+		[SerializeField] private float mRocketGripSpeedMultiplier;
+		[SerializeField] private float mRocketDescentSpeedMultiplier;
+		[SerializeField] private float mRocketJumpForceMultiplier;
 
 		/// <summary>
 		/// Lateral movement speed.
@@ -86,5 +89,20 @@ namespace FiringSquad.Data
 		/// Character movement deceleration lerp speed
 		/// </summary>
 		public float decelerationLerpSpeed { get { return mDecelerationLerpSpeed; } }
+
+		/// <summary>
+		/// Character movement rocket grip speed multiplier
+		/// </summary>
+		public float rocketGripSpeed { get { return mRocketGripSpeedMultiplier; } }
+
+		/// <summary>
+		/// Gravity multiplier to make you descend slower
+		/// </summary>
+		public float rocketGripDescentMultiplier { get { return mRocketDescentSpeedMultiplier; } }
+
+		/// <summary>
+		/// Character movement rocket jump force multiplier
+		/// </summary>
+		public float rocketJumpForce { get { return mRocketJumpForceMultiplier; } }
 	}
 }

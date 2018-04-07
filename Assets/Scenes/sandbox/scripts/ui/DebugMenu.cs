@@ -22,6 +22,9 @@ namespace FiringSquad.Debug
 		[SerializeField] private WeaponPartScript[] mScopes;
 		[SerializeField] private WeaponPartScript[] mGrips;
 
+		/// <inheritdoc />
+		public bool disablesInput { get { return true; } }
+
 		/// <summary>
 		/// Update our WeaponList from the service.
 		/// </summary>
@@ -42,7 +45,7 @@ namespace FiringSquad.Debug
 		{
 			RefreshWeaponList();
 			ServiceLocator.Get<IInput>()
-				.RegisterInput(Input.GetKeyDown, KeyCode.Tab, ToggleUI, InputLevel.None);
+				.RegisterInput(Input.GetKeyDown, KeyCode.F2, ToggleUI, InputLevel.None);
 
 			ServiceLocator.Get<IUIManager>()
 				.RegisterPanel(this, ScreenPanelTypes.DebugMenu);

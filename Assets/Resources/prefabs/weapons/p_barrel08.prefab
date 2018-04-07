@@ -344,16 +344,19 @@ MonoBehaviour:
   mUniqueId: 8
   mIsLegendary: 1
   mPrettyName: Blast Barrel
-  mDescription: 'We here at re[Mod] love shotguns, so when we recieved the latest
+  mDescription: 'We here at reThe folks here at re[Mod] love shotguns, so when we
+    received the latest shipment of shotgun barrels from Rensfield arms, we decided
+    to tape 4 of them together. If you want a wall of whatever your gun is firing,
+    the blast barrel will provide.[Mod] love shotguns, so when we recieved the latest
     shipment of shotgun barrels from Rensfield arms, we decided to tape 4 of them
     together. A little R&D later, and the blast barrel was born. If you want a wall
     of whatever your gun is following, the blast barrel will provide. '
   mData:
     mMinDispersionModifier:
-      mAmount: 3.5
+      mAmount: 2.5
       mType: 3
     mMaxDispersionModifier:
-      mAmount: 5
+      mAmount: 4
       mType: 3
     mDispersionRampModifier:
       mAmount: 2.5
@@ -371,7 +374,7 @@ MonoBehaviour:
       mAmount: -10
       mType: 0
     mFireRateModifier:
-      mAmount: 0.5
+      mAmount: 0.475
       mType: 3
     mReloadTimeModifier:
       mAmount: 0
@@ -386,8 +389,6 @@ MonoBehaviour:
   mShotsPerClick: 1
   mCrosshairSprite: {fileID: 21300000, guid: 455aba421ab8eb84e9f031519019321e, type: 3}
   mAnimator: {fileID: 0}
-  mMuzzleFlashVfxPrefab: {fileID: 1409651286611546, guid: fc441af24ffa9da4c86e29cf21ecd6b1,
-    type: 2}
   mOverrideRecoilCurve: 0
   mRecoilCurve:
     serializedVersion: 2
