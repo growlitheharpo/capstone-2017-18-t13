@@ -17,6 +17,7 @@ namespace FiringSquad.Gameplay.UI
 		[SerializeField] private GameOverIndividualScorePanel mScorePrefab;
 		[SerializeField] private LayoutGroup mScoreGrid;
 		[SerializeField] private GameObject mTeamScores;
+		[SerializeField] private bool mIsInWorld;
 
 		private Dictionary<CltPlayer, GameOverIndividualScorePanel> mScores;
 		private BoundProperty<int> mBlueTeamScore, mOrangeTeamScore;
@@ -29,14 +30,16 @@ namespace FiringSquad.Gameplay.UI
 		/// </summary>
 		private void Start()
 		{
-			ServiceLocator.Get<IUIManager>()
-				.RegisterPanel(this, ScreenPanelTypes.Scorecard);
+			if (!mIsInWorld)
+			{
+				ServiceLocator.Get<IUIManager>()
+					.RegisterPanel(this, ScreenPanelTypes.Scorecard);
+
+				mBlueTeamScore = new BoundProperty<int>(0, UIManager.BLUE_TEAM_SCORE);
+				mOrangeTeamScore = new BoundProperty<int>(0, UIManager.ORANGE_TEAM_SCORE);
+			}
 
 			mScores = new Dictionary<CltPlayer, GameOverIndividualScorePanel>();
-
-			mBlueTeamScore = new BoundProperty<int>(0, UIManager.BLUE_TEAM_SCORE);
-			mOrangeTeamScore = new BoundProperty<int>(0, UIManager.ORANGE_TEAM_SCORE);
-
 			EventManager.Local.OnReceiveLobbyEndTime += OnReceiveLobbyEndTime;
 			EventManager.Local.OnReceiveGameEndTime += OnReceiveGameEndTime;
 			EventManager.LocalGeneric.OnPlayerScoreChanged += OnPlayerScoreChanged;
@@ -47,15 +50,18 @@ namespace FiringSquad.Gameplay.UI
 		/// </summary>
 		private void OnDestroy()
 		{
-			mBlueTeamScore.Cleanup();
-			mOrangeTeamScore.Cleanup();
-
 			EventManager.Local.OnReceiveLobbyEndTime -= OnReceiveLobbyEndTime;
 			EventManager.Local.OnReceiveGameEndTime -= OnReceiveGameEndTime;
 			EventManager.LocalGeneric.OnPlayerScoreChanged -= OnPlayerScoreChanged;
 
-			ServiceLocator.Get<IUIManager>()
-				.UnregisterPanel(this);
+			if (!mIsInWorld)
+			{
+				mBlueTeamScore.Cleanup();
+				mOrangeTeamScore.Cleanup();
+
+				ServiceLocator.Get<IUIManager>()
+					.UnregisterPanel(this);
+			}
 		}
 
 		/// <summary>
