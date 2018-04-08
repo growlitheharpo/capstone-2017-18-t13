@@ -1,14 +1,10 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using FiringSquad.Core;
+﻿using FiringSquad.Core;
 using FiringSquad.Core.State;
-using FiringSquad.Debug;
 using FiringSquad.Networking;
 using FiringSquad.Data;
 using UnityEngine;
 using UnityEngine.Networking.Match;
 using UnityEngine.UI;
-using Logger = FiringSquad.Debug.Logger;
 
 namespace FiringSquad.Gameplay.UI
 {
