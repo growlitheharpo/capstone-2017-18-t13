@@ -238,10 +238,7 @@ namespace FiringSquad.Gameplay.UI
 		public void FinishConnection()
 		{
 			ServiceLocator.Get<IUIManager>()
-				.PopPanel(ScreenPanelTypes.HandleConnection)
-				.UnregisterPanel(this);
-
-			Destroy(gameObject);
+				.PopPanel(ScreenPanelTypes.HandleConnection);
 		}
 	}
 }

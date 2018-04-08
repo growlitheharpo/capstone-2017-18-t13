@@ -38,6 +38,8 @@ namespace FiringSquad.Networking
 
 			if (panel.matchType != GameData.MatchType.Invalid)
 				mData.currentType = panel.matchType;
+
+			NetworkManager.singleton.maxConnections = mData.goalPlayerCount;
 		}
 
 		/// <summary>
