@@ -12,6 +12,7 @@ namespace FiringSquad.Gameplay.UI
 	{
 		/// Inspector variables
 		[SerializeField] private InputField mNameEntryField;
+		[SerializeField] private int mLevelDomain;
 		[SerializeField] private Button mCancelButton01;
 		[SerializeField] private Button mCancelButton02;
 		[SerializeField] private Button mConfirmButton;
@@ -26,6 +27,22 @@ namespace FiringSquad.Gameplay.UI
 		// Info for starting the game
 		private GameData.MatchType mMatchType;
 		private int mPlayerCount;
+
+
+		/// <summary>
+		/// The requested player count (or -1 if use default)
+		/// </summary>
+		public int playerCount { get { return mPlayerCount; } }
+
+		/// <summary>
+		/// The requested match type (or invalid if use default)
+		/// </summary>
+		public GameData.MatchType matchType { get { return mMatchType; } }
+
+		/// <summary>
+		/// The domain for this level when using networking.
+		/// </summary>
+		public int levelDomain { get { return mLevelDomain; } }
 
 		/// <summary>
 		/// Unity's Awake signal.
@@ -102,7 +119,7 @@ namespace FiringSquad.Gameplay.UI
 			if (mNetworkManager.matchMaker == null)
 				mNetworkManager.StartMatchMaker();
 
-			mNetworkManager.matchMaker.CreateMatch(matchName, 5, true, "", Network.player.ipAddress, Network.player.ipAddress, 0, 0, OnMatchCreate);
+			mNetworkManager.matchMaker.CreateMatch(matchName, 5, true, "", Network.player.ipAddress, Network.player.ipAddress, 0, mLevelDomain, OnMatchCreate);
 		}
 
 		/// <summary>
@@ -149,8 +166,5 @@ namespace FiringSquad.Gameplay.UI
 			mNetworkManager.StartHost();
 			mJoinGamePanel.FinishConnection();
 		}
-
-		public int playerCount() { return mPlayerCount; }
-		public GameData.MatchType matchType() { return mMatchType; }
 	}
 }
