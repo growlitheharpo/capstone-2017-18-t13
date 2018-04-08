@@ -423,7 +423,6 @@ namespace FiringSquad.Gameplay
 					mPlayer.localAnimator.SetTrigger("Jump");
 					mPlayer.networkAnimator.SetTrigger("Jump");
 
-					mJump = false;
 					mIsJumping = true;
 				}
 			}
@@ -437,6 +436,7 @@ namespace FiringSquad.Gameplay
 
 			}
 
+			mJump = false;
 			mController.Move(mMoveDirection * Time.fixedDeltaTime);
 
 			mCurrentSpeed = speed;
