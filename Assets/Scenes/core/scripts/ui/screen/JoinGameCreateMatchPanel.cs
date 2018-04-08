@@ -1,14 +1,13 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using FiringSquad.Core;
 using FiringSquad.Core.State;
-using FiringSquad.Debug;
+using FiringSquad.Core.UI;
 using FiringSquad.Networking;
 using FiringSquad.Data;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.Networking.Match;
 using UnityEngine.UI;
-using Logger = FiringSquad.Debug.Logger;
 
 namespace FiringSquad.Gameplay.UI
 {
@@ -16,6 +15,7 @@ namespace FiringSquad.Gameplay.UI
 	{
 		/// Inspector variables
 		[SerializeField] private InputField mNameEntryField;
+		[SerializeField] private int mLevelDomain;
 		[SerializeField] private Button mCancelButton01;
 		[SerializeField] private Button mCancelButton02;
 		[SerializeField] private Button mConfirmButton;
@@ -29,7 +29,23 @@ namespace FiringSquad.Gameplay.UI
 
 		// Info for starting the game
 		private GameData.MatchType mMatchType;
+		private Coroutine mRepeatCreateRoutine;
 		private int mPlayerCount;
+
+		/// <summary>
+		/// The requested player count (or -1 if use default)
+		/// </summary>
+		public int playerCount { get { return mPlayerCount; } }
+
+		/// <summary>
+		/// The requested match type (or invalid if use default)
+		/// </summary>
+		public GameData.MatchType matchType { get { return mMatchType; } }
+
+		/// <summary>
+		/// The domain for this level when using networking.
+		/// </summary>
+		public int levelDomain { get { return mLevelDomain; } }
 
 		/// <summary>
 		/// Unity's Awake signal.
@@ -59,6 +75,7 @@ namespace FiringSquad.Gameplay.UI
 			mConfirmButton.onClick.RemoveListener(OnClickConfirmButton);
 			mPlayerCountDropdown.onValueChanged.RemoveListener(delegate { OnChangePlayerCount(); });
 			mGameModeDropdown.onValueChanged.RemoveListener(delegate { OnChangeGameType(); });
+			EventManager.Server.OnStartGame -= OnStartGame;
 		}
 
 		/// <summary>
@@ -106,7 +123,39 @@ namespace FiringSquad.Gameplay.UI
 			if (mNetworkManager.matchMaker == null)
 				mNetworkManager.StartMatchMaker();
 
-			mNetworkManager.matchMaker.CreateMatch(matchName, 5, true, "", Network.player.ipAddress, Network.player.ipAddress, 0, 0, OnMatchCreate);
+			mNetworkManager.matchMaker.CreateMatch(matchName, 5, true, "", Network.player.ipAddress, Network.player.ipAddress, 0, mLevelDomain, OnMatchCreate);
+			mRepeatCreateRoutine = FindObjectOfType<EventSystem>().StartCoroutine(RepeatMatchCreation());
+			EventManager.Server.OnStartGame += OnStartGame;
+		}
+
+		/// <summary>
+		/// Handle
+		/// </summary>
+		private void OnStartGame(long time)
+		{
+			EventManager.Server.OnStartGame -= OnStartGame;
+			StopCoroutine(mRepeatCreateRoutine);
+		}
+
+		/// <summary>
+		/// Just keep making the match over and over until the end of time.
+		/// </summary>
+		/// <returns></returns>
+		private IEnumerator RepeatMatchCreation()
+		{
+			while (true)
+			{
+				float timer = 0.0f;
+				while (timer < 30.0f)
+				{
+					timer += Time.deltaTime;
+					yield return null;
+				}
+
+				string matchName = mNameEntryField.text;
+				matchName += ":" + Network.player.ipAddress;
+				mNetworkManager.matchMaker.CreateMatch(matchName, 5, true, "", Network.player.ipAddress, Network.player.ipAddress, 0, mLevelDomain, (x, y, z) => {});
+			}
 		}
 
 		/// <summary>
@@ -153,8 +202,5 @@ namespace FiringSquad.Gameplay.UI
 			mNetworkManager.StartHost();
 			mJoinGamePanel.FinishConnection();
 		}
-
-		public int playerCount() { return mPlayerCount; }
-		public GameData.MatchType matchType() { return mMatchType; }
 	}
 }

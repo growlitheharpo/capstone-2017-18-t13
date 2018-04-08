@@ -27,7 +27,6 @@ namespace FiringSquad.Gameplay.UI
 		[SerializeField] private JoinGameCreateMatchPanel mCreateMatchPanel;
 		[SerializeField] private GameObject mJoinMatchPanel;
 
-
 		/// Private variables
 		private NetworkGameManager mNetworkManager;
 
@@ -146,7 +145,7 @@ namespace FiringSquad.Gameplay.UI
 			if (mNetworkManager.matchMaker == null)
 				mNetworkManager.StartMatchMaker();
 
-			mNetworkManager.matchMaker.ListMatches(0, 8, "", false, 0, 0, OnRefreshMatchList);
+			mNetworkManager.matchMaker.ListMatches(0, 8, "", false, 0, mCreateMatchPanel.levelDomain, OnRefreshMatchList);
 		}
 
 		/// <summary>
@@ -239,10 +238,7 @@ namespace FiringSquad.Gameplay.UI
 		public void FinishConnection()
 		{
 			ServiceLocator.Get<IUIManager>()
-				.PopPanel(ScreenPanelTypes.HandleConnection)
-				.UnregisterPanel(this);
-
-			Destroy(gameObject);
+				.PopPanel(ScreenPanelTypes.HandleConnection);
 		}
 	}
 }

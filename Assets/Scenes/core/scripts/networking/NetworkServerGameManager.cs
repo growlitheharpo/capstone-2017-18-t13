@@ -24,8 +24,6 @@ namespace FiringSquad.Networking
 		/// Private variables
 		private ServerStateMachine mStateMachine;
 
-		
-
 		/// <summary>
 		/// Unity function. Called when this class begins on the server.
 		/// </summary>
@@ -35,11 +33,13 @@ namespace FiringSquad.Networking
 			mStateMachine = new ServerStateMachine(this);
 
 			JoinGameCreateMatchPanel panel = GameObject.Find("CreateMatchPanel").GetComponent<JoinGameCreateMatchPanel>();
-			if (panel.playerCount() > 0)
-				mData.goalPlayerCount = panel.playerCount();
+			if (panel.playerCount > 0)
+				mData.goalPlayerCount = panel.playerCount;
 
-			if (panel.matchType() != GameData.MatchType.Invalid)
-				mData.currentType = panel.matchType();
+			if (panel.matchType != GameData.MatchType.Invalid)
+				mData.currentType = panel.matchType;
+
+			NetworkManager.singleton.maxConnections = mData.goalPlayerCount;
 		}
 
 		/// <summary>
