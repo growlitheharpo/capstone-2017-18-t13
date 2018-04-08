@@ -13,6 +13,10 @@ namespace FiringSquad.Gameplay.Weapons
 	/// </summary>
 	public class HitscanProjectileLocalManager : NetworkBehaviour
 	{
+		[SerializeField] private GameObject mBulletImpactEffect;
+
+		private GameObjectPool mBulletEffectPool;
+
 		/// <summary>
 		/// Unity's client-side start event.
 		/// </summary>
@@ -22,6 +26,8 @@ namespace FiringSquad.Gameplay.Weapons
 			{
 				NetworkManager.singleton.client.RegisterHandler(HitscanProjectile.HITSCAN_MESSAGE_TYPE, OnHitscanMessage);
 			}));
+
+			mBulletEffectPool = new GameObjectPool(200, mBulletImpactEffect, transform);
 		}
 
 		/// <summary>
@@ -56,6 +62,14 @@ namespace FiringSquad.Gameplay.Weapons
 
 			HitscanProjectile instance = Instantiate(prefab).GetComponent<HitscanProjectile>();
 			instance.PositionAndVisualize(source.weapon, msg.mEnd, audioEvent);
+
+			// Play the wall hit effect too
+			GameObject effect = mBulletEffectPool.ReleaseNewItem();
+			effect.transform.position = msg.mEnd;
+			effect.transform.forward = msg.mNormal;
+
+			effect.GetComponent<ParticleSystem>().Play(true);
+			StartCoroutine(Coroutines.InvokeAfterSeconds(1.05f, () => mBulletEffectPool.ReturnItem(effect)));
 		}
 	}
 }

@@ -20,6 +20,11 @@ namespace FiringSquad.Gameplay.Weapons
 			/// The final world position hit.
 			/// </summary>
 			public Vector3 mEnd;
+
+			/// <summary>
+			/// The normal of the hit.
+			/// </summary>
+			public Vector3 mNormal;
 			
 			/// <summary>
 			/// The network ID of the source player of this projectile.
@@ -76,6 +81,8 @@ namespace FiringSquad.Gameplay.Weapons
 			// Check for whatever object we hit
 			IDamageReceiver hitObject = null;
 			Vector3 endPoint = initialDirection.origin + initialDirection.direction * 2000.0f;
+			Vector3 normal = Vector3.up;
+
 			var hits = Physics.RaycastAll(initialDirection, 10000.0f, int.MaxValue, QueryTriggerInteraction.Ignore);
 			if (hits.Length > 0)
 			{
@@ -89,6 +96,8 @@ namespace FiringSquad.Gameplay.Weapons
 				foreach (RaycastHit hit in hits)
 				{
 					endPoint = hit.point;
+					normal = hit.normal;
+
 					float damage = GetDamage(data, Vector3.Distance(weapon.transform.position, endPoint));
 					bool wasHeadshot = false;
 
@@ -121,6 +130,7 @@ namespace FiringSquad.Gameplay.Weapons
 			{
 				mSource = source.netId,
 				mEnd = endPoint,
+				mNormal = normal,
 				mHitObject = netObject == null ? NetworkInstanceId.Invalid : netObject.netId,
 				mMechanismId = weapon.currentParts.mechanism != null ? weapon.currentParts.mechanism.partId : (byte)0
 			};
