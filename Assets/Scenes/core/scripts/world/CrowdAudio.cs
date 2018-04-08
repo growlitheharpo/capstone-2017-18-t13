@@ -89,7 +89,7 @@ namespace FiringSquad.Gameplay
 		/// <summary>
 		/// EVENT HANDLER: LocalGeneric.OnPlayerDied
 		/// </summary>
-		private void OnPlayerDied()
+		private void OnPlayerDied(CltPlayer player)
 		{
 			IncreaseHypeLevel(mValues.standardDeathGain);
 		}
@@ -97,7 +97,7 @@ namespace FiringSquad.Gameplay
 		/// <summary>
 		/// EVENT HANDLER: LocalGeneric.OnPlayerEquippedLegendaryPart
 		/// </summary>
-		private void OnPlayerEquippedLegendaryPart()
+		private void OnPlayerEquippedLegendaryPart(CltPlayer player)
 		{
 			IncreaseHypeLevel(mValues.legendaryPartGain);
 		}

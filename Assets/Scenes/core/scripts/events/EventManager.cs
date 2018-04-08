@@ -432,27 +432,27 @@ public partial class EventManager
 		/// <summary>
 		/// Event called when ANY player has died.
 		/// </summary>
-		public static event Action OnPlayerDied = () => { LogEvent(); };
+		public static event Action<CltPlayer> OnPlayerDied = (p) => { LogEvent(); };
 		
 		/// <summary>
 		/// Event called when ANY player has died.
 		/// </summary>
-		public static void PlayerDied()
+		public static void PlayerDied(CltPlayer player)
 		{
-			OnPlayerDied();
+			OnPlayerDied(player);
 		}
 
 		/// <summary>
 		/// Event called when ANY player has equipped a legendary part.
 		/// </summary>
-		public static event Action OnPlayerEquippedLegendaryPart = () => { LogEvent(); };
+		public static event Action<CltPlayer> OnPlayerEquippedLegendaryPart = (p) => { LogEvent(); };
 		
 		/// <summary>
 		/// Event called when ANY player has equipped a legendary part.
 		/// </summary>
-		public static void PlayerEquippedLegendaryPart()
+		public static void PlayerEquippedLegendaryPart(CltPlayer player)
 		{
-			OnPlayerEquippedLegendaryPart();
+			OnPlayerEquippedLegendaryPart(player);
 		}
 
 		/// <summary>

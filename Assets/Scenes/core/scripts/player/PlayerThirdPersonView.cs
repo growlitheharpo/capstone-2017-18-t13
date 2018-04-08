@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using FiringSquad.Data;
+using FiringSquad.Gameplay.Weapons;
 using UnityEngine;
 
 namespace FiringSquad.Gameplay
@@ -52,6 +53,7 @@ namespace FiringSquad.Gameplay
 			}
 
 			mTargetValue = mDefaultValueLayer = SpriteValue.Neutral;
+
 		}
 
 		/// <summary>
@@ -62,6 +64,33 @@ namespace FiringSquad.Gameplay
 			// Just setting an int is cheap, so we can do it every frame.
 			if (mTargetMaterial != null)
 				mTargetMaterial.SetInt("_CurrentSprite", (int)mTargetValue);
+		}
+
+		/// <summary>
+		/// Reflect that an enemy got a legendary part
+		/// </summary>
+		public void ReflectEnemyGotLegendaryPart()
+		{
+			StopAllCoroutines();
+			StartCoroutine(ChangeFaceTemporarily(SpriteValue.OtherPlayerGotLegendary, 2.5f));
+		}
+
+		/// <summary>
+		/// Reflect that this player picked up a legendary part
+		/// </summary>
+		public void ReflectGotLegendaryPart()
+		{
+			StopAllCoroutines();
+			StartCoroutine(ChangeFaceTemporarily(SpriteValue.GotLegendary, 2.5f));
+		}
+
+		/// <summary>
+		/// Reflect that the player has lost a teammate
+		/// </summary>
+		public void ReflectTeammateDied()
+		{
+			StopAllCoroutines();
+			StartCoroutine(ChangeFaceTemporarily(SpriteValue.TeammateKilled, 2.5f));
 		}
 
 		/// <summary>
@@ -84,7 +113,17 @@ namespace FiringSquad.Gameplay
 		public void ReflectGotKill(PlayerKill killInfo)
 		{
 			StopAllCoroutines();
-			StartCoroutine(ChangeFaceTemporarily(SpriteValue.GotKill, 2.5f));
+			// Check if it was a kill streak
+			if ((killInfo.mFlags & KillFlags.Killstreak) != KillFlags.None)
+			{
+				StartCoroutine(ChangeFaceTemporarily(SpriteValue.KillingSpree, 2.5f));
+			}
+			else if ((killInfo.mFlags & KillFlags.Multikill) != KillFlags.None)
+			{
+				StartCoroutine(ChangeFaceTemporarily(SpriteValue.Dominated, 2.5f));
+			}
+			else
+				StartCoroutine(ChangeFaceTemporarily(SpriteValue.GotKill, 2.5f));
 		}
 
 		/// <summary>
