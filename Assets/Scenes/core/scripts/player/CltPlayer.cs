@@ -164,6 +164,9 @@ namespace FiringSquad.Gameplay
 
 			mCharacterController = GetComponent<CharacterController>();
 
+			EventManager.LocalGeneric.OnPlayerDied += OnPlayerDied;
+			EventManager.LocalGeneric.OnPlayerEquippedLegendaryPart += OnPlayerEquippedLegendaryPart;
+
 			GameObject hitObject = new GameObject("HitIndicator");
 			hitObject.transform.SetParent(transform);
 			mHitIndicator = hitObject.AddComponent<RemotePlayerHitIndicator>();
@@ -282,6 +285,11 @@ namespace FiringSquad.Gameplay
 			EventManager.Server.OnFinishGame -= OnFinishGame;
 			EventManager.Server.OnPlayerCapturedStage -= OnPlayerCapturedStage;
 			EventManager.Server.OnStartIntroSequence -= OnStartIntroSequence;
+
+			EventManager.LocalGeneric.OnPlayerDied -= OnPlayerDied;
+			EventManager.LocalGeneric.OnPlayerEquippedLegendaryPart -= OnPlayerEquippedLegendaryPart;
+
+
 
 			CltPlayerLocal localPlayer = mLocalPlayerScript;
 			if (localPlayer != null)
@@ -816,7 +824,7 @@ namespace FiringSquad.Gameplay
 			}
 
 			// No matter what, let the game know that SOMEONE has died (primarily for crowd audio).
-			EventManager.Notify(EventManager.LocalGeneric.PlayerDied);
+			EventManager.Notify(() => EventManager.LocalGeneric.PlayerDied(this));
 
 			// Also notify that this player got one more death.
 			EventManager.LocalGeneric.PlayerScoreChanged(this, 0, 0, 1);
@@ -852,6 +860,38 @@ namespace FiringSquad.Gameplay
 
 			if (weapon != null)
 				weapon.ResetToDefaultParts();
+		}
+
+		/// <summary>
+		/// EVENT HANDLER: LocalGeneric.OnPlayerDied
+		/// </summary>
+		private void OnPlayerDied(CltPlayer player)
+		{
+			if (mThirdPersonView != null)
+			{
+				if (player.mTeam == mTeam)
+				{
+					mThirdPersonView.ReflectTeammateDied();
+				}
+			}		   
+		}
+
+		/// <summary>
+		/// EVENT HANDLER: LocalGeneric.OnPlayerEquippedLegendaryPart
+		/// </summary>
+		private void OnPlayerEquippedLegendaryPart(CltPlayer player)
+		{
+			if (mThirdPersonView != null)
+			{
+				if (player == this)
+				{
+					mThirdPersonView.ReflectGotLegendaryPart();
+				}
+				else
+				{
+					mThirdPersonView.ReflectEnemyGotLegendaryPart();
+				}
+			}  
 		}
 
 		#endregion
