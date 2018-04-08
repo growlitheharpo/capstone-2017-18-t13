@@ -2,6 +2,7 @@
 using System.Linq;
 using FiringSquad.Core;
 using FiringSquad.Core.Audio;
+using KeatsLib.Unity;
 using UnityEngine;
 using UnityEngine.Networking;
 using Logger = FiringSquad.Debug.Logger;
@@ -18,6 +19,7 @@ namespace FiringSquad.Gameplay
 		[SerializeField] private float mProvidedHealth;
 		[SerializeField] private float mRotationRate;
 		[SerializeField] private float mRespawnTime;
+		[SerializeField] private GameObject mPickupEffectPrefab;
 
 		/// Syncvars
 		[SyncVar(hook = "OnChangeVisible")] private bool mVisible = true;
@@ -25,6 +27,7 @@ namespace FiringSquad.Gameplay
 		/// Private variables
 		private Collider mCollider;
 		private GameObject mView;
+		private ParticleSystem mPickupEffect;
 
 		/// <summary>
 		/// Unity's Awake function.
@@ -33,6 +36,9 @@ namespace FiringSquad.Gameplay
 		{
 			mCollider = GetComponent<Collider>();
 			mView = transform.Find("EnabledView").gameObject;
+
+			mPickupEffect = Instantiate(mPickupEffectPrefab, transform, false).GetComponent<ParticleSystem>();
+			mPickupEffect.transform.ResetLocalValues();
 		}
 
 		/// <summary>
@@ -111,10 +117,21 @@ namespace FiringSquad.Gameplay
 			mVisible = newValue;
 
 			if (!mVisible)
+			{
 				CheckForAudio();
+				PlayEffect();
+			}
 
 			mView.SetActive(mVisible);
 			mCollider.enabled = mVisible;
+		}
+
+		/// <summary>
+		/// Play an effect when we're collected.
+		/// </summary>
+		private void PlayEffect()
+		{
+			mPickupEffect.Play();
 		}
 
 		/// <summary>

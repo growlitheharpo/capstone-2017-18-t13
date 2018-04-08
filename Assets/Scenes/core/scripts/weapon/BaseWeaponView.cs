@@ -19,6 +19,7 @@ namespace FiringSquad.Gameplay.Weapons
 		[SerializeField] private Transform mGripAttach;
 		[SerializeField] private WeaponMovementData mGeneralMovementData;
 		[SerializeField] private WeaponMovementData mAimDownSightsMovementData;
+		[SerializeField] private ParticleSystem mPartBreakPrefab;
 
 		/// Private variables
 		private IWeapon mWeaponScript;
@@ -26,7 +27,6 @@ namespace FiringSquad.Gameplay.Weapons
 		private Dictionary<Attachment, Transform> mAttachPoints;
 		private Animator mAnimator, mArmAnimator;
 
-		private ParticleSystem mPartBreakPrefab;
 		private GameObject mCurrentMuzzleFlashVfxPrefab;
 
 		private float mWeaponBobProgress;
@@ -43,7 +43,6 @@ namespace FiringSquad.Gameplay.Weapons
 		{
 			mAnimator = GetComponent<Animator>();
 			mWeaponScript = GetComponent<IWeapon>();
-			mPartBreakPrefab = Resources.Load<GameObject>("prefabs/weapons/effects/p_vfx_partBreak").GetComponent<ParticleSystem>();
 
 			mAttachPoints = new Dictionary<Attachment, Transform>
 			{

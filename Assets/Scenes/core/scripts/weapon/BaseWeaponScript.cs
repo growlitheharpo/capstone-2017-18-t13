@@ -365,7 +365,7 @@ namespace FiringSquad.Gameplay.Weapons
 				if (player == null)
 					return;
 
-				EventManager.Notify(EventManager.LocalGeneric.PlayerEquippedLegendaryPart);
+				EventManager.Notify(() => EventManager.LocalGeneric.PlayerEquippedLegendaryPart(player));
 				EventManager.LocalGeneric.PlayerScoreChanged(player, NetworkServerGameManager.LEGENDARY_PART_POINTS, 0, 0);
 			}
 		}
