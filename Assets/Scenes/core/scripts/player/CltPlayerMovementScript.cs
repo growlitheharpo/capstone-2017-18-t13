@@ -422,6 +422,7 @@ namespace FiringSquad.Gameplay
 					mPlayer.localAnimator.ResetTrigger("Land");
 					mPlayer.localAnimator.SetTrigger("Jump");
 					mPlayer.networkAnimator.SetTrigger("Jump");
+					EventManager.Notify(EventManager.Local.LocalPlayerJumped);
 
 					mIsJumping = true;
 				}

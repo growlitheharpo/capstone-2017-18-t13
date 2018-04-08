@@ -120,6 +120,19 @@ public partial class EventManager
 		}
 
 		/// <summary>
+		/// Event called when the player jumps. This is just silly but we need it for the rocket grip.
+		/// </summary>
+		public static event Action OnLocalPlayerJumped = () => { LogEvent(); };
+
+		/// <summary>
+		/// Event called when the player jumps. This is just silly but we need it for the rocket grip.
+		/// </summary>
+		public static void LocalPlayerJumped()
+		{
+			OnLocalPlayerJumped();
+		}
+
+		/// <summary>
 		/// Event called when the local player has attached a new part onto their weapon.
 		/// PARAMETER 1: The weapon of the local player, which has had a part attached.
 		/// PARAMETER 2: The weapon part that was attached.
