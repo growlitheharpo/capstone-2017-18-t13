@@ -22,12 +22,11 @@ namespace FiringSquad.Gameplay.UI
 		[SerializeField] private GameObject mBorder1;
 		[SerializeField] private GameObject mBorder2;
 
-		int mTimer = 100;
+		private int mTimer = 100;
 
 		// Team scores
-		int mOrangeScore, mBlueScore;
-
-		IList<PlayerScore> mScores;
+		private int mOrangeScore, mBlueScore;
+		private IList<PlayerScore> mScores;
 
 		/// <inheritdoc />
 		public bool disablesInput { get { return true; } }
@@ -76,17 +75,11 @@ namespace FiringSquad.Gameplay.UI
 				CltPlayer player = score.player;
 
 				if (player.playerTeam == GameData.PlayerTeam.Blue)
-				{
 					mBlueScore += score.score;
-				}
 				else if (player.playerTeam == GameData.PlayerTeam.Orange)
-				{
 					mOrangeScore += score.score;
-				}
 				else
-				{
 					deathmatch = true;
-				}
 			}
 
 			if (mBlueScore > mOrangeScore)

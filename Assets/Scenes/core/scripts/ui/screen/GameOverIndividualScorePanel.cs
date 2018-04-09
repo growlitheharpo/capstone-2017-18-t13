@@ -1,5 +1,4 @@
-﻿using FiringSquad.Data;
-using KeatsLib.Collections;
+﻿using KeatsLib.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 

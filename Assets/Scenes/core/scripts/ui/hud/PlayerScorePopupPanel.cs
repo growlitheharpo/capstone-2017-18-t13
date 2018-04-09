@@ -153,7 +153,7 @@ namespace FiringSquad.Gameplay.UI
 		/// </summary>
 		public void OnLocalPlayerCheated()
 		{
-			var instance = DisplayNewMessage("CHEATER	  -" + NetworkServerGameManager.CHEATING_PENALTY_POINTS);
+			Text instance = DisplayNewMessage("CHEATER	   -" + NetworkServerGameManager.CHEATING_PENALTY_POINTS);
 			instance.color = Color.red;
 		}
 

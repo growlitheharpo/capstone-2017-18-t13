@@ -1,7 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
-using FiringSquad.Core;
 using FiringSquad.Gameplay;
 using FiringSquad.Gameplay.Weapons;
 using UnityEngine.Networking;
@@ -15,8 +13,8 @@ namespace FiringSquad.Data
 		[SerializeField] private string mWeaponPadAnalyticsFile = "WeaponPad.csv";
 
 		// List of the healthpacks and the number of times they were used
-		Dictionary<string, int> mPackCount;
-		Dictionary<string, int> mWeaponPadCount;
+		private Dictionary<string, int> mPackCount;
+		private Dictionary<string, int> mWeaponPadCount;
 
 		/// <summary>
 		/// Unity's awake function
@@ -34,21 +32,21 @@ namespace FiringSquad.Data
 			if (!System.IO.File.Exists(mKillAnalyticsFile))
 			{
 				// Start the file with formatting
-				string tmp = "Killer,Killed,Killer Location - X, Y, Z,KilledLocation - X, Y, Z,Weapon Parts,,,,\n";
+				const string tmp = "Killer,Killed,Killer Location - X, Y, Z,KilledLocation - X, Y, Z,Weapon Parts,,,,\n";
 				System.IO.File.WriteAllText(mKillAnalyticsFile, tmp);
 			}
 
 			if (!System.IO.File.Exists(mHealthAnalyticsFile))
 			{
 				// Start the file with formatting
-				string tmp = "Health Pack Name, Times Used,\n";
+				const string tmp = "Health Pack Name, Times Used,\n";
 				System.IO.File.WriteAllText(mHealthAnalyticsFile, tmp);
 			}
 
 			if (!System.IO.File.Exists(mWeaponPadAnalyticsFile))
 			{
 				// Start the file with formatting
-				string tmp = "Weapon Pad Name, Times Used,\n";
+				const string tmp = "Weapon Pad Name, Times Used,\n";
 				System.IO.File.WriteAllText(mWeaponPadAnalyticsFile, tmp);
 			}
 		}
@@ -80,9 +78,9 @@ namespace FiringSquad.Data
 				string strOut = killer.gameObject.GetComponent<CltPlayer>().playerName + "," + deadPlayer.playerName + ",";
 
 				// Add locations for the killer and the killed
-				string locs = killer.gameObject.transform.position.x.ToString() + "," + killer.gameObject.transform.position.y.ToString()
-					+ "," + killer.gameObject.transform.position.z.ToString() + "," + deadPlayer.gameObject.transform.position.x.ToString()
-					+ "," + deadPlayer.gameObject.transform.position.y.ToString() + "," + deadPlayer.gameObject.transform.position.z.ToString();
+				string locs = killer.gameObject.transform.position.x + "," + killer.gameObject.transform.position.y
+					+ "," + killer.gameObject.transform.position.z + "," + deadPlayer.gameObject.transform.position.x
+					+ "," + deadPlayer.gameObject.transform.position.y + "," + deadPlayer.gameObject.transform.position.z;
 
 				// Concatenate to the out string
 				strOut += locs;
@@ -91,11 +89,12 @@ namespace FiringSquad.Data
 				string weaponParts = "";
 
 				// Temporarily getting the weapon part collection
-				WeaponPartCollection tmp = killer.gameObject.GetComponent<CltPlayer>().weapon.currentParts;
-
-				foreach (WeaponPartScript part in tmp)
+				IWeapon weapon = killer.gameObject.GetComponent<CltPlayer>().weapon;
+				if (weapon != null)
 				{
-					weaponParts += "," + part.prettyName;
+					WeaponPartCollection tmp = weapon.currentParts;
+					foreach (WeaponPartScript part in tmp)
+						weaponParts += "," + part.prettyName;
 				}
 
 				// Concatenating the weapon parts
@@ -120,22 +119,11 @@ namespace FiringSquad.Data
 		[EventHandler]
 		private void OnHealthPickedUp(PlayerHealthPack pack)
 		{
-			if (mPackCount == null)
-			{
-				mPackCount.Add(pack.gameObject.name, 1);
-			}
+			// If the dictionary already contains this health pack
+			if (mPackCount.ContainsKey(pack.gameObject.name))
+				mPackCount[pack.name] += 1;
 			else
-			{
-				// If the dictionary already contains this health pack
-				if (mPackCount.ContainsKey(pack.gameObject.name))
-				{
-					mPackCount[pack.name] += 1;
-				}
-				else
-				{
-					mPackCount.Add(pack.gameObject.name, 1);
-				}
-			}  
+				mPackCount.Add(pack.gameObject.name, 1);
 		}
 
 		/// <summary>
@@ -145,22 +133,11 @@ namespace FiringSquad.Data
 		[EventHandler]
 		private void OnPartPickedUp(WeaponPartPad pad)
 		{
-			if (mWeaponPadCount == null)
-			{
-				mWeaponPadCount.Add(pad.gameObject.name, 1);
-			}
+			// If the dictionary already contains this health pack
+			if (mWeaponPadCount.ContainsKey(pad.gameObject.name))
+				mWeaponPadCount[pad.name] += 1;
 			else
-			{
-				// If the dictionary already contains this health pack
-				if (mWeaponPadCount.ContainsKey(pad.gameObject.name))
-				{
-					mWeaponPadCount[pad.name] += 1;
-				}
-				else
-				{
-					mWeaponPadCount.Add(pad.gameObject.name, 1);
-				}
-			}
+				mWeaponPadCount.Add(pad.gameObject.name, 1);
 		}
 
 		/// <summary>
@@ -174,7 +151,7 @@ namespace FiringSquad.Data
 			using (System.IO.StreamWriter file = new System.IO.StreamWriter(mHealthAnalyticsFile, true))
 			{
 				// Write the health pack data to a file
-				foreach(KeyValuePair<string, int> entry in mPackCount)
+				foreach(var entry in mPackCount)
 				{
 					string outputString = entry.Key + "," + entry.Value;
 					file.WriteLine(outputString);
@@ -184,7 +161,7 @@ namespace FiringSquad.Data
 			using (System.IO.StreamWriter file = new System.IO.StreamWriter(mWeaponPadAnalyticsFile, true))
 			{
 				// Write the weapon pad data to a file
-				foreach (KeyValuePair<string, int> entry in mWeaponPadCount)
+				foreach (var entry in mWeaponPadCount)
 				{
 					string outputString = entry.Key + "," + entry.Value;
 					file.WriteLine(outputString);
@@ -195,13 +172,12 @@ namespace FiringSquad.Data
 		/// <summary>
 		/// Output the string to the file
 		/// </summary>
-		/// <param name="outputString"></param>
-		private void OutputToFile(string outputString, string fileName)
+		/// <param name="outputString">The string to write</param>
+		/// <param name="fileName">The file to write to.</param>
+		private static void OutputToFile(string outputString, string fileName)
 		{
 			using (System.IO.StreamWriter file = new System.IO.StreamWriter(fileName, true))
-			{
 				file.WriteLine(outputString);
-			}
 		}
 	}
 }

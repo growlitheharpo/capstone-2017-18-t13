@@ -1,7 +1,6 @@
 ﻿using FiringSquad.Data;
 using UnityEngine;
 using UnityEngine.Networking;
-using Logger = FiringSquad.Debug.Logger;
 
 namespace FiringSquad.Gameplay.Weapons
 {

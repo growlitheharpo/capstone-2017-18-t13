@@ -38,7 +38,7 @@ public sealed class Quickfade : PostProcessEffectSettings
 		{
 			if (currentTime < time.value)
 			{
-				blend.Override(1.0f - (currentTime / time));
+				blend.Override(1.0f - currentTime / time);
 				return true;
 			}
 

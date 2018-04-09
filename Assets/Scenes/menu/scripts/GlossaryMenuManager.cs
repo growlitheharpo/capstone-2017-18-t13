@@ -1,11 +1,8 @@
 ﻿using System.Linq;
 using FiringSquad.Core;
-using FiringSquad.Core.State;
 using FiringSquad.Core.Weapons;
 using FiringSquad.Gameplay.Weapons;
-using FiringSquad.Data;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UIButton = UnityEngine.UI.Button;
 using UIText = UnityEngine.UI.Text;
 using UILayoutGroup = UnityEngine.UI.LayoutGroup;

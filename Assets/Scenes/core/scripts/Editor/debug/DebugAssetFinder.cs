@@ -17,7 +17,7 @@ namespace UnityEditor
 			GetWindow<DebugAssetFinder>(true, "Asset Finder", true);
 		}
 
-		private string mID;
+		private string mId;
 		private GameObject mObject;
 
 		/// <summary>
@@ -26,7 +26,7 @@ namespace UnityEditor
 		private void OnEnable()
 		{
 			mObject = null;
-			mID = "";
+			mId = "";
 		}
 
 		/// <summary>
@@ -34,14 +34,14 @@ namespace UnityEditor
 		/// </summary>
 		private void OnGUI()
 		{
-			mID = EditorGUILayout.TextField("Asset ID: ", mID);
+			mId = EditorGUILayout.TextField("Asset ID: ", mId);
 
 			if (GUILayout.Button("Search"))
 			{
 				try
 				{
 					
-				string path = AssetDatabase.GUIDToAssetPath(mID);
+				string path = AssetDatabase.GUIDToAssetPath(mId);
 				if (!string.IsNullOrEmpty(path))
 					mObject = AssetDatabase.LoadAssetAtPath<GameObject>(path);
 				}

@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using FiringSquad.Core;
 using FiringSquad.Core.State;
-using FiringSquad.Core.UI;
 using FiringSquad.Networking;
 using FiringSquad.Data;
 using UnityEngine;
@@ -106,10 +105,8 @@ namespace FiringSquad.Gameplay.UI
 		/// </summary>
 		private void OnClickCancelButton()
 		{
-			if (mPanelActive == true)
-			{
+			if (mPanelActive)
 				gameObject.SetActive(false);
-			}
 		}
 
 		/// <summary>
@@ -156,6 +153,9 @@ namespace FiringSquad.Gameplay.UI
 				matchName += ":" + Network.player.ipAddress;
 				mNetworkManager.matchMaker.CreateMatch(matchName, 5, true, "", Network.player.ipAddress, Network.player.ipAddress, 0, mLevelDomain, (x, y, z) => {});
 			}
+			
+			// ReSharper disable once IteratorNeverReturns
+			// This coroutine is ended by StopCoroutine
 		}
 
 		/// <summary>

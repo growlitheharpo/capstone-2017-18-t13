@@ -205,24 +205,6 @@ namespace FiringSquad.Gameplay.UI
 		}
 
 		/// <summary>
-		/// Called when an async JoinMatch call has completed.
-		/// </summary>
-		/// <param name="success">Whether or not the call was complete.</param>
-		/// <param name="extendedinfo">Extended string info on the error if success is false.</param>
-		/// <param name="responsedata">Data about the match that has been joined.</param>
-		private void OnJoinMatch(bool success, string extendedinfo, MatchInfo responsedata)
-		{
-			if (!success)
-			{
-				DisplayError("Unable to join match\nERR: " + extendedinfo);
-				return;
-			}
-
-			mNetworkManager.OnMatchJoined(true, extendedinfo, responsedata);
-			FinishConnection();
-		}
-
-		/// <summary>
 		/// Display a message to the user as an error.
 		/// </summary>
 		/// <param name="message">The exact message to display.</param>

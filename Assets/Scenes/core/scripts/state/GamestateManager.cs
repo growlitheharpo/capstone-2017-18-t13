@@ -45,19 +45,6 @@ namespace FiringSquad.Core.State
 			public virtual void OnExit() { }
 		}
 
-		/// <summary>
-		/// Empty state used to hold the state machine in place for a frame.
-		/// Transitions away based on scene name rules immediately the next frame.
-		/// </summary>
-		private class NullState : BaseGameState
-		{
-			/// <inheritdoc />
-			public override IState GetTransition()
-			{
-				return instance.ChooseStateByScene();
-			}
-		}
-
 		private Dictionary<string, IGameState> mBaseStates;
 		private IGameState mCurrentState;
 

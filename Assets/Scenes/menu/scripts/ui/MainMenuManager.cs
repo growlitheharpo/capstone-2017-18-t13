@@ -3,7 +3,6 @@ using FiringSquad.Core.Audio;
 using FiringSquad.Core.State;
 using KeatsLib.Unity;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UIButton = UnityEngine.UI.Button;
 
 namespace FiringSquad.Gameplay.UI

@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using KeatsLib.Unity;
+﻿using KeatsLib.Unity;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -9,8 +8,6 @@ namespace FiringSquad.Gameplay
 	{
 		// Forcefield effect prefab to spawn
 		[SerializeField] private GameObject mForcefieldEffectPrefab;
-
-		private IEnumerator mCoroutine;
 
 		/// <inheritdoc />
 		public float currentHealth { get { return default(float); } }

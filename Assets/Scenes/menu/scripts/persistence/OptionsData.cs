@@ -30,65 +30,35 @@ namespace FiringSquad.Data
 			float IOptionsData.fieldOfView
 			{
 				get { return mFieldOfView; }
-				set
-				{
-					if (mFieldOfView == value)
-						return;
-
-					mFieldOfView = value;
-				}
+				set { mFieldOfView = value; }
 			}
 
 			/// <inheritdoc />
 			float IOptionsData.masterVolume
 			{
 				get { return mMasterVolume; }
-				set
-				{
-					if (mMasterVolume == value)
-						return;
-
-					mMasterVolume = value;
-				}
+				set { mMasterVolume = value; }
 			}
 
 			/// <inheritdoc />
 			public float sfxVolume
 			{
 				get { return mSfxVolume; }
-				set
-				{
-					if (mSfxVolume == value)
-						return;
-
-					mSfxVolume = value;
-				}
+				set { mSfxVolume = value; }
 			}
 
 			/// <inheritdoc />
 			public float musicVolume
 			{
 				get { return mMusicVolume; }
-				set
-				{
-					if (mMusicVolume == value)
-						return;
-
-					mMusicVolume = value;
-				}
+				set { mMusicVolume = value; }
 			}
 
 			/// <inheritdoc />
 			float IOptionsData.mouseSensitivity
 			{
 				get { return mMouseSensitivity; }
-				set
-				{
-					if (mMouseSensitivity == value)
-						return;
-
-					mMouseSensitivity = value;
-				}
+				set { mMouseSensitivity = value; }
 			}
 		}
 

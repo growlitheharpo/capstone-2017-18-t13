@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using FiringSquad.Data;
+﻿using FiringSquad.Data;
 using UnityEngine;
 using Logger = FiringSquad.Debug.Logger;
 using UIGraphic = UnityEngine.UI.Graphic;

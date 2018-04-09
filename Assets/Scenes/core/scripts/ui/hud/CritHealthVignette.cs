@@ -22,11 +22,10 @@ namespace FiringSquad.Gameplay.UI
 
 		private const float FADE_OUT_TIME = 0.35f;
 
-		private bool mIsEnabled = false;
-
+		private bool mIsEnabled;
 
 		// Use this for initialization
-		void Start()
+		private void Start()
 		{
 			mCritImage = GetComponent<UIImage>();
 
@@ -38,7 +37,7 @@ namespace FiringSquad.Gameplay.UI
 		}
 
 		// Update is called once per frame
-		void Update()
+		private void Update()
 		{
 			SearchForPlayer();
 
@@ -59,12 +58,12 @@ namespace FiringSquad.Gameplay.UI
 			}
 			else
 			{
-				if (!mIsEnabled)
-				{
-					// Check if 
-					EnableVignette();
-					mIsEnabled = true;
-				}	   
+				if (mIsEnabled)
+					return;
+
+				// Check if 
+				EnableVignette();
+				mIsEnabled = true;
 			}
 		}
 
@@ -84,15 +83,7 @@ namespace FiringSquad.Gameplay.UI
 		/// </summary>
 		private bool CheckPlayerHealth()
 		{
-			if (mPlayerRef.currentHealth <= mCritHealthNumber)
-			{
-
-				return false;
-			}
-			else
-			{
-				return true;
-			}
+			return !(mPlayerRef.currentHealth <= mCritHealthNumber);
 		}
 
 		/// <summary>
@@ -105,7 +96,7 @@ namespace FiringSquad.Gameplay.UI
 
 		private void FadeVignette()
 		{
-			StartCoroutine(FadeOutColor(mCritImage, mVisibleColor, mHiddenColor, FADE_OUT_TIME, false));
+			StartCoroutine(FadeOutColor(mCritImage, mVisibleColor, mHiddenColor, FADE_OUT_TIME));
 		}
 
 		/// <summary>
@@ -115,9 +106,8 @@ namespace FiringSquad.Gameplay.UI
 		/// <param name="a"></param>
 		/// <param name="b"></param>
 		/// <param name="time"></param>
-		/// <param name="returnToPool"></param>
 		/// <returns></returns>
-		private IEnumerator FadeOutColor(Graphic image, Color a, Color b, float time, bool returnToPool)
+		private IEnumerator FadeOutColor(Graphic image, Color a, Color b, float time)
 		{
 			image.color = a;
 			yield return Coroutines.LerpUIColor(image, b, time);

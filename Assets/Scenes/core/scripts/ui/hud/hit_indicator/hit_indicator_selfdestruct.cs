@@ -1,12 +1,9 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class hit_indicator_selfdestruct : MonoBehaviour
 {
-
-	void Delete ()
+	private void Delete ()
 	{
-		Destroy(this.gameObject);
+		Destroy(gameObject);
 	}
 }

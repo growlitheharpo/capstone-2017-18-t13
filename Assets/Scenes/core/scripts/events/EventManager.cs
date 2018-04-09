@@ -8,7 +8,6 @@ using FiringSquad.Debug;
 using FiringSquad.Gameplay;
 using FiringSquad.Gameplay.UI;
 using FiringSquad.Gameplay.Weapons;
-using UnityEngine;
 
 /// <summary>
 /// A list of game events for this project.
@@ -673,7 +672,6 @@ public partial class EventManager
 		/// </summary>
 		/// <param name="baseWeaponScript">The weapon that this part was attached to.</param>
 		/// <param name="weaponPartScript">The part instance that was attached.</param>
-		/// <param name="bearer">The bearer that attached the new part.</param>
 		public static void PlayerAttachedPart(BaseWeaponScript baseWeaponScript, WeaponPartScript weaponPartScript)
 		{
 			OnPlayerAttachedPart(baseWeaponScript, weaponPartScript);

@@ -72,7 +72,7 @@ namespace FiringSquad.Gameplay.UI
 
 			yield return null;
 			yield return null;
-			while (mCurrentValue == null || (mFullValueProperty == null && !string.IsNullOrEmpty(mFullProperty)))
+			while (mCurrentValue == null || mFullValueProperty == null && !string.IsNullOrEmpty(mFullProperty))
 			{
 				mCurrentValue = mUIManagerRef.GetProperty<T>(mCurrentHash);
 				if (!string.IsNullOrEmpty(mFullProperty))

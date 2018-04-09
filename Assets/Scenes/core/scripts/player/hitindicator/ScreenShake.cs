@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using KeatsLib.Unity;
 using UnityEngine;
 
 namespace FiringSquad.Gameplay.UI
@@ -43,10 +42,10 @@ namespace FiringSquad.Gameplay.UI
 			while (currentTime < time)
 			{
 				// Get random position within the unit circle to move the camera to
-				Vector2 new_xy = new Vector2(mOrigPosition.x, mOrigPosition.y);
-				new_xy = new_xy + Random.insideUnitCircle * mAmount;
+				Vector2 newXy = new Vector2(mOrigPosition.x, mOrigPosition.y);
+				newXy = newXy + Random.insideUnitCircle * mAmount;
 
-				transform.localPosition = new Vector3(new_xy.x, new_xy.y, mOrigPosition.z);
+				transform.localPosition = new Vector3(newXy.x, newXy.y, mOrigPosition.z);
 
 				currentTime += Time.deltaTime;
 				yield return null;

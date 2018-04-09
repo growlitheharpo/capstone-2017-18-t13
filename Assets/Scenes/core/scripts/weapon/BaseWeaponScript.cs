@@ -466,6 +466,9 @@ namespace FiringSquad.Gameplay.Weapons
 			if (mCurrentParts.mechanism == null || mCurrentParts.barrel == null)
 				throw new InvalidOperationException("Attempted to fire a weapon without setting the mechanism and barrel!");
 
+			if (currentParts.mechanism == null || currentParts.barrel == null)
+				return;
+
 			GameObject instance = Instantiate(currentParts.mechanism.projectilePrefab, currentParts.barrel.barrelTip.position, Quaternion.identity);
 			IProjectile projectile = instance.GetComponent<IProjectile>();
 

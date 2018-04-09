@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 
 // ReSharper disable InconsistentNaming
 // Disabled because this class is meant to match the Stack interface 1-to-1

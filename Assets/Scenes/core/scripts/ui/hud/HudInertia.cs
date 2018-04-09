@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace FiringSquad.Gameplay.UI
 {
@@ -71,18 +69,12 @@ namespace FiringSquad.Gameplay.UI
 				{
 					// check if the rotation is greater in euler angles than the previous
 					if (newRot.eulerAngles.y > prevRot.eulerAngles.y)
-					{
 						transform.localPosition = Vector3.Lerp(transform.localPosition, new Vector3(mOrigPosition.x - 50.0f, mOrigPosition.y, mOrigPosition.z), Time.deltaTime / 2f);
-					}
 					else if (newRot.eulerAngles.y < prevRot.eulerAngles.y)
-					{
 						transform.localPosition = Vector3.Lerp(transform.localPosition, new Vector3(mOrigPosition.x + 50.0f, mOrigPosition.y, mOrigPosition.z), Time.deltaTime / 2f);
-					}
 				}
 				else
-				{
 					transform.localPosition = Vector3.Lerp(transform.localPosition, mOrigPosition, Time.deltaTime * 3);
-				}
 
 				mPlayerPrevRot = newRot;
 			}  

@@ -60,8 +60,8 @@ namespace KeatsLib.State
 			}
 		}
 
-		private Stack<IState> mCurrentStates = new Stack<IState>(5);
-		protected IState currentState { get { return mCurrentStates.Count > 0 ? mCurrentStates.Peek() : null; } }
+		private readonly Stack<IState> mCurrentStates = new Stack<IState>(5);
+		private IState currentState { get { return mCurrentStates.Count > 0 ? mCurrentStates.Peek() : null; } }
 
 		/// <summary>
 		/// Update the state machine. 

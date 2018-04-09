@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using UnityEngine;
 
 namespace FiringSquad.Data
@@ -13,8 +12,8 @@ namespace FiringSquad.Data
 		[Serializable]
 		public class Float
 		{
-			[SerializeField] private float mAmount;
-			[SerializeField] private ModType mType;
+			[SerializeField] private readonly float mAmount;
+			[SerializeField] private readonly ModType mType;
 
 			/// <summary>
 			/// Apply this Modifier's effect to the provided number.
@@ -46,8 +45,8 @@ namespace FiringSquad.Data
 		[Serializable]
 		public class Int
 		{
-			[SerializeField] private int mAmount;
-			[SerializeField] private ModType mType;
+			[SerializeField] private readonly int mAmount;
+			[SerializeField] private readonly ModType mType;
 
 			/// <summary>
 			/// Apply this Modifier's effect to the provided number.
@@ -73,31 +72,6 @@ namespace FiringSquad.Data
 			{
 				mType = type;
 				mAmount = value;
-			}
-		}
-
-		[Serializable]
-		public class Array<T>
-		{
-			[SerializeField] private T[] mAmount;
-			[SerializeField] private ModType mType;
-
-			/// <summary>
-			/// Apply this Modifier's effect to the provided number.
-			/// </summary>
-			public T[] Apply(T[] input)
-			{
-				switch (mType)
-				{
-					case ModType.SetAbsolute:
-					case ModType.SetPercentage:
-						return mAmount;
-					case ModType.AdditiveAbsolute:
-					case ModType.AdditivePercent:
-						return input.Concat(mAmount).ToArray();
-				}
-
-				return input;
 			}
 		}
 

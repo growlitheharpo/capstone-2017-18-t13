@@ -65,10 +65,8 @@ namespace FiringSquad.Gameplay.UI
 			StopAllCoroutines();
 			StartCoroutine(FadeBackColors(mFadeTime));
 
-			GameObject tmpMarker;
-
 			// Spawn a hitmarker
-			tmpMarker = Instantiate(mMarker, this.transform);
+			GameObject tmpMarker = Instantiate(mMarker, transform);
 			tmpMarker.transform.localPosition = new Vector3(0, 0, 0);
 			tmpMarker.transform.localScale = new Vector3(.5f, .5f, .5f);
 		}

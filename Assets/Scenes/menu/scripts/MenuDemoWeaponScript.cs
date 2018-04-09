@@ -76,7 +76,7 @@ namespace FiringSquad.Gameplay.UI
 
 			currentData = WeaponData.ActivatePartEffects(baseData, currentParts);
 
-			foreach (var r in GetComponentsInChildren<Renderer>())
+			foreach (Renderer r in GetComponentsInChildren<Renderer>())
 				ObjectHighlight.instance.AddRendererToHighlightList(r);
 		}
 

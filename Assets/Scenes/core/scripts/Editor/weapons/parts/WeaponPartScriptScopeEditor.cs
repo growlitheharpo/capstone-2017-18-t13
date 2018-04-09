@@ -10,12 +10,10 @@ namespace UnityEditor
 	[CustomEditor(typeof(FiringSquad.Gameplay.Weapons.WeaponPartScriptScope))]
 	public class WeaponPartScriptScopeEditor : Editor
 	{
-		//private Editor mCachedScriptableObjectEditor;
-		//private Object mCachedObject;
 		private class EditorObjectBind
 		{
-			public Editor editor;
-			public Object obj;
+			public Editor mEditor;
+			public Object mObj;
 		}
 
 		private Dictionary<SerializedProperty, EditorObjectBind> mPropertyEditors;
@@ -70,17 +68,17 @@ namespace UnityEditor
 
 				// Creating an editor is expensive, so we only do it when necessary
 				bool needRefresh = !mPropertyEditors.ContainsKey(item)
-									|| mPropertyEditors[item].obj == null
-									|| mPropertyEditors[item].obj != item.objectReferenceValue
-									|| mPropertyEditors[item].editor == null;
+									|| mPropertyEditors[item].mObj == null
+									|| mPropertyEditors[item].mObj != item.objectReferenceValue
+									|| mPropertyEditors[item].mEditor == null;
 				if (needRefresh)
 				{
 					mPropertyEditors[item] = new EditorObjectBind();
-					CreateCachedEditor(item.objectReferenceValue, null, ref mPropertyEditors[item].editor);
-					mPropertyEditors[item].obj = item.objectReferenceValue;
+					CreateCachedEditor(item.objectReferenceValue, null, ref mPropertyEditors[item].mEditor);
+					mPropertyEditors[item].mObj = item.objectReferenceValue;
 				}
 
-				mPropertyEditors[item].editor.OnInspectorGUI();
+				mPropertyEditors[item].mEditor.OnInspectorGUI();
 				EditorGUI.indentLevel--;
 				EditorGUI.indentLevel--;
 			}

@@ -21,7 +21,7 @@ namespace FiringSquad.Gameplay.Weapons
 		/// <summary>
 		/// The position offset of this weapon to the character's eye.
 		/// </summary>
-		new Vector3 positionOffset { get; set; }
+		new Vector3 positionOffset { set; }
 
 		/// <summary>
 		/// Bind the properties of this weapon to the UI.

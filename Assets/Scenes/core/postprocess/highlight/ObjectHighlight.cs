@@ -14,6 +14,7 @@ namespace FiringSquad.Gameplay
 	/// </summary>
 	public class ObjectHighlight : MonoSingleton<ObjectHighlight>
 	{
+		// ReSharper disable UnusedMember.Local
 		private enum ShaderPasses
 		{
 			SimpleGlowPass = 0,

@@ -21,8 +21,8 @@ namespace FiringSquad.Data
 		[SerializeField] private float mDispersionRamp;
 
 		[FormerlySerializedAs("mRecoil")] [SerializeField] private float mRecoilAmount;
-		[SerializeField] private float mRecoilTime;
 		[SerializeField] private AnimationCurve mRecoilCurve;
+		[SerializeField] private float mRecoilTime;
 
 		[SerializeField] private float mDamage;
 		[SerializeField] private float mDamageFalloffDistance;

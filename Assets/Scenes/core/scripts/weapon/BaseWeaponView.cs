@@ -186,7 +186,7 @@ namespace FiringSquad.Gameplay.Weapons
 			// Average the change in the player's position over the last few frames.
 			// This is (roughly) the player's velocity.
 			for (int i = 0; i < positions.Length - 1; ++i)
-				result += (positions[i + 1] - positions[i]);
+				result += positions[i + 1] - positions[i];
 
 			return result / (positions.Length - 1);
 		}

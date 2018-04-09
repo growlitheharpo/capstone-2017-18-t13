@@ -5,7 +5,6 @@ using FiringSquad.Core.Audio;
 using KeatsLib.Unity;
 using UnityEngine;
 using UnityEngine.Networking;
-using Logger = FiringSquad.Debug.Logger;
 
 namespace FiringSquad.Gameplay
 {

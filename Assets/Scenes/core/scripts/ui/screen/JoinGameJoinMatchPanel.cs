@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using FiringSquad.Core;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 public class JoinGameJoinMatchPanel : MonoBehaviour {
@@ -11,27 +8,25 @@ public class JoinGameJoinMatchPanel : MonoBehaviour {
 	[SerializeField] private Button mCancelButton02;
 
 	/// Private variables
-	private bool panelActive = false;
+	private bool mPanelActive;
 
 	private void OnEnable()
 	{
 		mCancelButton01.onClick.AddListener(OnClickCancelButton);
 		mCancelButton02.onClick.AddListener(OnClickCancelButton);
-		panelActive = true;
+		mPanelActive = true;
 	}
 
 	private void OnDisable()
 	{
 		mCancelButton01.onClick.RemoveListener(OnClickCancelButton);
 		mCancelButton02.onClick.RemoveListener(OnClickCancelButton);
-		panelActive = false;
+		mPanelActive = false;
 	}
 
 	private void OnClickCancelButton()
 	{
-		if (panelActive == true)
-		{
+		if (mPanelActive)
 			gameObject.SetActive(false);
-		}
 	}
 }

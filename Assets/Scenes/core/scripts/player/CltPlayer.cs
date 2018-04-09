@@ -867,13 +867,8 @@ namespace FiringSquad.Gameplay
 		/// </summary>
 		private void OnPlayerDied(CltPlayer player)
 		{
-			if (mThirdPersonView != null)
-			{
-				if (player.mTeam == mTeam)
-				{
-					mThirdPersonView.ReflectTeammateDied();
-				}
-			}		   
+			if (mThirdPersonView != null && player.mTeam == mTeam)
+				mThirdPersonView.ReflectTeammateDied();
 		}
 
 		/// <summary>
@@ -881,17 +876,13 @@ namespace FiringSquad.Gameplay
 		/// </summary>
 		private void OnPlayerEquippedLegendaryPart(CltPlayer player)
 		{
-			if (mThirdPersonView != null)
-			{
-				if (player == this)
-				{
-					mThirdPersonView.ReflectGotLegendaryPart();
-				}
-				else
-				{
-					mThirdPersonView.ReflectEnemyGotLegendaryPart();
-				}
-			}  
+			if (mThirdPersonView == null)
+				return;
+
+			if (player == this)
+				mThirdPersonView.ReflectGotLegendaryPart();
+			else if (player.playerTeam != mTeam)
+				mThirdPersonView.ReflectEnemyGotLegendaryPart();
 		}
 
 		#endregion
@@ -976,7 +967,7 @@ namespace FiringSquad.Gameplay
 				EventManager.Notify(() => EventManager.LocalGUI.LocalPlayerAssignedTeam(this));
 			else
 			{
-				bool isEnemy = value == GameData.PlayerTeam.Deathmatch || (localPlayerReference != null && localPlayerReference.mTeam != value);
+				bool isEnemy = value == GameData.PlayerTeam.Deathmatch || localPlayerReference != null && localPlayerReference.mTeam != value;
 				PlayerNameWorldCanvas display = GetComponentInChildren<PlayerNameWorldCanvas>();
 				if (display != null)
 					display.SetIsEnemyPlayer(isEnemy);

@@ -51,9 +51,8 @@ namespace FiringSquad.Gameplay.Timeline
 		}
 
 		/// <summary>
-		/// 
+		/// Called after the intro has faded in.
 		/// </summary>
-		/// <param name="f"></param>
 		private void OnQuickfadeInComplete()
 		{
 			mQuickfadeInstance.time.Override(mFadeOutTime);

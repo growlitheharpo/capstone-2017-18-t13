@@ -81,7 +81,7 @@ namespace FiringSquad.Gameplay.UI
 			if (offScreen)
 				UpdateOffScreen(viewportPos, dot);
 			else
-				UpdateOnScreen(viewportPos, targetPos);
+				UpdateOnScreen(viewportPos);
 		}
 
 		/// <summary>
@@ -115,8 +115,7 @@ namespace FiringSquad.Gameplay.UI
 		/// Update the pointer when the target is on screen.
 		/// </summary>
 		/// <param name="viewportPos">The position of the target in viewport space.</param>
-		/// <param name="worldPos">The position of the target in world space.</param>
-		private void UpdateOnScreen(Vector2 viewportPos, Vector3 worldPos)
+		private void UpdateOnScreen(Vector2 viewportPos)
 		{
 			viewportPos.x = viewportPos.x.Rescale(0.1f, 0.9f);
 			viewportPos.y = viewportPos.y.Rescale(0.1f, 0.9f);

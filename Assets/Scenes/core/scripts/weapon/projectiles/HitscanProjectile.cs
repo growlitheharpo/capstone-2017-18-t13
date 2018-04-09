@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Linq;
+﻿using System.Linq;
 using FiringSquad.Core;
 using FiringSquad.Core.Audio;
 using FiringSquad.Data;
@@ -8,7 +7,7 @@ using UnityEngine.Networking;
 
 namespace FiringSquad.Gameplay.Weapons
 {
-	/// <inheritdoc />
+	/// <inheritdoc cref="IProjectile" />
 	public class HitscanProjectile : MonoBehaviour, IProjectile
 	{
 		/// <summary>

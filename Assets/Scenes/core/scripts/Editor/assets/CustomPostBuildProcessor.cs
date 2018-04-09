@@ -158,8 +158,8 @@ namespace UnityEditor
 		{
 			SvnWrapper window = EditorWindow.GetWindow<SvnWrapper>(true, "SVN", true);
 			window.Initialize(projectPath, "checkout https://pineapple.champlain.edu/svn/capstone-2017-18-t13.svn@HEAD CloudBuild");
-			window.OnProcessFail += LogProcessFailure;
-			window.OnProcessComplete += () => {
+			window.mOnProcessFail += LogProcessFailure;
+			window.mOnProcessComplete += () => {
 				kCurrentState = GetLatestVersionState;
 			};
 		}
@@ -228,8 +228,8 @@ namespace UnityEditor
 		{
 			SvnWrapper window = EditorWindow.GetWindow<SvnWrapper>(true, "SVN", true);
 			window.Initialize(kProjectPath + "\\CloudBuild", "add * --force");
-			window.OnProcessFail = LogProcessFailure;
-			window.OnProcessComplete = () => {
+			window.mOnProcessFail = LogProcessFailure;
+			window.mOnProcessComplete = () => {
 				kCurrentState = CommitNewBuildState;
 			};
 		}
@@ -239,15 +239,15 @@ namespace UnityEditor
 			SvnWrapper window = EditorWindow.GetWindow<SvnWrapper>(true, "SVN", true);
 			string commitMessage = string.Format("BUILD {0}-{1}", kCurrentGitBranch, kVersionNumber);
 			window.Initialize(kProjectPath + "\\CloudBuild", "commit -m \"" + commitMessage + "\"");
-			window.OnProcessFail = LogProcessFailure;
-			window.OnProcessComplete = Complete;
+			window.mOnProcessFail = LogProcessFailure;
+			window.mOnProcessComplete = Complete;
 		}
 
 		#endregion
 		
 		private class SvnWrapper : EditorWindow
 		{
-			public Action OnProcessComplete = () => { }, OnProcessFail = () => { };
+			public Action mOnProcessComplete = () => { }, mOnProcessFail = () => { };
 			private Process mSvnProcess;
 			private string mOutput, mInput, mErrorOutput = "";
 			private enum Status { Running, Success, Fail, Stalled };
@@ -309,13 +309,13 @@ namespace UnityEditor
 				switch (mStatus) 
 				{
 					case Status.Success:
-						OnProcessComplete();
+						mOnProcessComplete();
 						Close();
 						break;
 					case Status.Fail:
 						mStatus = Status.Stalled;
 						GUILayout.Box(mErrorOutput, style);
-						OnProcessFail();
+						mOnProcessFail();
 						break;
 					case Status.Stalled:
 						GUILayout.Box(mErrorOutput, style);

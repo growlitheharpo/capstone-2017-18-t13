@@ -47,7 +47,7 @@ namespace UnityEditor
 			BalanceWeights();
 
 			if (GUILayout.Button("Snap To Floor"))
-				SnapToFloor((target) as Component);
+				SnapToFloor(target as Component);
 
 			serializedObject.ApplyModifiedProperties();
 		}
@@ -72,7 +72,7 @@ namespace UnityEditor
 		/// Snap the crates to the floor.
 		/// </summary>
 		/// <param name="component"></param>
-		private void SnapToFloor(Component component)
+		private static void SnapToFloor(Component component)
 		{
 			Transform t = component.transform;
 			Ray r = new Ray(t.position, Vector3.down);

@@ -151,6 +151,9 @@ namespace FiringSquad.Core
 				public float isCurrentPlayer { get { return default(float); } set { } }
 
 				/// <inheritdoc />
+				public float isPlayButton { get { return default(float); } set { } }
+
+				/// <inheritdoc />
 				public float healthGained { get { return default(float); } set { } }
 
 				/// <inheritdoc />

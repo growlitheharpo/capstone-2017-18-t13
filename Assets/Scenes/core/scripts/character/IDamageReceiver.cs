@@ -1,5 +1,4 @@
-﻿using FiringSquad.Data;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace FiringSquad.Gameplay
 {

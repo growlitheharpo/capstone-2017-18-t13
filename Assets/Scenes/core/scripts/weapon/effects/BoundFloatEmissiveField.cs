@@ -50,7 +50,8 @@ namespace FiringSquad.Gameplay.Weapons
 		{
 			Color black = Color.black;
 			float currentTime = 0.0f;
-			while (true)
+
+			while (property.value <= mBlinkingThreshold)
 			{
 				float currentPercent = Mathf.PingPong(currentTime, mBlinkingRate) / mBlinkingRate;
 				Color val = Color.Lerp(mEndColor, black, currentPercent);

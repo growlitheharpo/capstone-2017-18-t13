@@ -108,7 +108,9 @@ namespace FiringSquad.Data
 			mScore = reader.ReadInt16();
 		}
 
-		/// <inheritdoc />
+		/// <summary>
+		/// Write this object to the provided stream.
+		/// </summary>
 		public void Serialize(NetworkWriter writer)
 		{
 			writer.Write(mPlayerId);
@@ -117,13 +119,17 @@ namespace FiringSquad.Data
 			writer.Write((short)mScore);
 		}
 
-		/// <inheritdoc />
+		/// <summary>
+		/// Read an object from the provided stream and write it to the target.
+		/// </summary>
 		public void Deserialize(NetworkReader reader, out object result)
 		{
 			result = new PlayerScore(reader);
 		}
 
-		/// <inheritdoc />
+		/// <summary>
+		/// Read an object from the provided stream and return it.
+		/// </summary>
 		public PlayerScore Deserialize(NetworkReader reader)
 		{
 			object result;

@@ -1,14 +1,12 @@
 ﻿using FiringSquad.Core;
 using FiringSquad.Core.Audio;
-using FiringSquad.Core.State;
-using KeatsLib.Unity;
 using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine.Serialization;
 
 public class MenuButtonSFX : MonoBehaviour {
 
 	/// Inspector variables
-	[SerializeField] private bool playButton;
+	[SerializeField] [FormerlySerializedAs("playButton")] private bool mPlayButton;
 	
 	/// Private variables
 	private IAudioReference mButtonHoverSound;
@@ -34,13 +32,7 @@ public class MenuButtonSFX : MonoBehaviour {
 		if (mButtonPressSound == null)
 		{
 			mButtonPressSound = ServiceLocator.Get<IAudioManager>().CreateSound(AudioEvent.MenuButtonPress, gameObject.transform, false);
-			if (playButton)
-			{
-				mButtonPressSound.SetParameter("IsPlayButton", 1f);
-			} else
-			{
-				mButtonPressSound.SetParameter("IsPlayButton", 0f);
-			}
+			mButtonPressSound.SetParameter("IsPlayButton", mPlayButton ? 1f : 0f);
 			mButtonPressSound.Start();
 		}
 	}

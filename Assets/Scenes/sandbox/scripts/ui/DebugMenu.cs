@@ -30,6 +30,7 @@ namespace FiringSquad.Debug
 		/// </summary>
 		public void RefreshWeaponList()
 		{
+			// ReSharper disable once SuggestVarOrType_SimpleTypes
 			var parts = ServiceLocator.Get<IWeaponPartManager>().GetAllPrefabScripts(true).Values;
 
 			mMechanisms = parts.Where(x => x.attachPoint == Attachment.Mechanism).ToArray();
@@ -104,16 +105,16 @@ namespace FiringSquad.Debug
 				if (part.description != "")
 					label += "\n\n" + part.description;
 
-				if (GUILayout.Button(label, GUILayout.MaxHeight(100.0f)))
-				{
-					CltPlayer player = CltPlayer.localPlayerReference;
-					if (player != null)
-						player.CmdDebugEquipWeaponPart(part.partId);
+				if (!GUILayout.Button(label, GUILayout.MaxHeight(100.0f)))
+					continue;
 
-					var ui = FindObjectOfType<PlayerScorePopupPanel>();
-					if (ui != null)
-						ui.OnLocalPlayerCheated();
-				}
+				CltPlayer player = CltPlayer.localPlayerReference;
+				if (player != null)
+					player.CmdDebugEquipWeaponPart(part.partId);
+
+				PlayerScorePopupPanel ui = FindObjectOfType<PlayerScorePopupPanel>();
+				if (ui != null)
+					ui.OnLocalPlayerCheated();
 			}
 			GUILayout.EndArea();
 		}

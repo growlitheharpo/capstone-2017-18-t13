@@ -44,6 +44,7 @@ namespace UnityEditor
 
 				float sum = pMech.floatValue + pBarrel.floatValue + pScope.floatValue + pGrip.floatValue;
 
+				// ReSharper disable once CompareOfFloatsByEqualityOperator
 				if (sum == 0.0f)
 					pMech.floatValue = 1.0f;
 				else

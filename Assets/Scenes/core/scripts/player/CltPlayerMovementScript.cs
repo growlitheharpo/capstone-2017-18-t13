@@ -341,9 +341,7 @@ namespace FiringSquad.Gameplay
 			{
 				// If there is still momentum
 				if (mCurrentSpeed > 0.0f)
-				{
 					desiredMove = transform.forward * mPrevYInput + transform.right * mPrevXInput;
-				}
 				// Else there is none
 				else
 				{
@@ -361,31 +359,17 @@ namespace FiringSquad.Gameplay
 			float desiredSpeed = 0.0f;
 
 			if (mInput.y != 0 || mInput.x != 0)
-			{
 				desiredSpeed = mMovementData.speed * mSpeedMultiplier;
-			}
 			else if (mInput.y == 0.0f && mInput.x == 0.0f)
-			{
 				desiredSpeed = 0.0f;
-			}
-
-			float speed = 0.0f;
 
 			// Check for lerp speed
-			if (desiredSpeed > 0)
-			{
-				speed = Mathf.Lerp(mCurrentSpeed, desiredSpeed, 1.0f * Time.deltaTime * mMovementData.accelerationLerpSpeed);
-			}
-			else
-			{
-				speed = Mathf.Lerp(mCurrentSpeed, desiredSpeed, 1.0f * Time.deltaTime * mMovementData.decelerationLerpSpeed);
-			}
-
+			float speed = Mathf.Lerp(mCurrentSpeed,
+				desiredSpeed,
+				Time.deltaTime * (desiredSpeed > 0 ? mMovementData.accelerationLerpSpeed : mMovementData.decelerationLerpSpeed));
 
 			if (speed > mMovementData.speed * mSpeedMultiplier)
-			{
 				speed = mMovementData.speed * mSpeedMultiplier;
-			}
 			//UnityEngine.Debug.Log(mCurrentSpeed);
 			//float speed = mMovementData.speed;
 			//speed = Mathf.Lerp(mCurrentSpeed, mMovementData.speed, 0.1f);
@@ -430,12 +414,7 @@ namespace FiringSquad.Gameplay
 
 			// Apply new air movement stuff
 			else
-			{
-
-
 				mMoveDirection += Physics.gravity * mMovementData.gravityMultiplier * mGravMultiplier * Time.fixedDeltaTime;
-
-			}
 
 			mJump = false;
 			mController.Move(mMoveDirection * Time.fixedDeltaTime);

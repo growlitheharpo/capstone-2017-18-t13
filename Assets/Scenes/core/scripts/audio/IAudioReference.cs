@@ -53,7 +53,12 @@ namespace FiringSquad.Core.Audio
 		/// FMOD PARAMETER "IsCurrentPlayer"
 		/// </summary>
 		float isCurrentPlayer { get; set; }
-		
+
+		/// <summary>
+		/// FMOD PARAMETER: "IsPlayButton"
+		/// </summary>
+		float isPlayButton { get; set; }
+
 		/// <summary>
 		/// FMOD PARAMETER "HealthGained"
 		/// </summary>

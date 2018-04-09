@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Linq;
 using FiringSquad.Gameplay.Weapons;
 using UnityEngine;
 using UIText = UnityEngine.UI.Text;

@@ -1,7 +1,5 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using FiringSquad.Data;
-using FiringSquad.Gameplay.Weapons;
 using UnityEngine;
 
 namespace FiringSquad.Gameplay
@@ -113,15 +111,12 @@ namespace FiringSquad.Gameplay
 		public void ReflectGotKill(PlayerKill killInfo)
 		{
 			StopAllCoroutines();
+
 			// Check if it was a kill streak
 			if ((killInfo.mFlags & KillFlags.Killstreak) != KillFlags.None)
-			{
 				StartCoroutine(ChangeFaceTemporarily(SpriteValue.KillingSpree, 2.5f));
-			}
 			else if ((killInfo.mFlags & KillFlags.Multikill) != KillFlags.None)
-			{
 				StartCoroutine(ChangeFaceTemporarily(SpriteValue.Dominated, 2.5f));
-			}
 			else
 				StartCoroutine(ChangeFaceTemporarily(SpriteValue.GotKill, 2.5f));
 		}

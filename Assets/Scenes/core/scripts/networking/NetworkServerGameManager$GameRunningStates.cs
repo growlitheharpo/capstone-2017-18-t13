@@ -215,7 +215,7 @@ namespace FiringSquad.Networking
 				/// <summary>
 				/// Instantiate a legendary part because a stage has been captured.
 				/// </summary>
-				private void SpawnLegendaryPart(StageCaptureArea stage, CltPlayer player)
+				private void SpawnLegendaryPart(StageCaptureArea stage, IWeaponBearer player)
 				{
 					WeaponPartScript choice;
 					if (player.weapon != null)

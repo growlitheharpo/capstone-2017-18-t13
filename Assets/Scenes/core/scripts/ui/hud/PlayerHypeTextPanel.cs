@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using FiringSquad.Data;
+﻿using FiringSquad.Data;
 using FiringSquad.Gameplay.Weapons;
 using KeatsLib.Unity;
 using UnityEngine;
@@ -89,7 +87,7 @@ namespace FiringSquad.Gameplay.UI
 		/// Display a new hype text message on the screen.
 		/// </summary>
 		/// <param name="message">The fully-formatted message to display.</param>
-		private Text DisplayNewMessage(string message)
+		private void DisplayNewMessage(string message)
 		{
 			GameObject instance = Instantiate(mTextPrefab, transform);
 			instance.transform.SetAsFirstSibling();
@@ -111,8 +109,6 @@ namespace FiringSquad.Gameplay.UI
 			// Prep the animation and fade out time
 			Animator anim = instance.GetComponent<Animator>();
 			StartCoroutine(Coroutines.InvokeAfterSeconds(mTextLifetime, () => KillInstance(anim)));
-
-			return text;
 		}
 
 		/// <summary>

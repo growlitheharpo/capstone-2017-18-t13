@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections;
-using System.Linq;
 using FiringSquad.Data;
 using FiringSquad.Gameplay.Weapons;
 using UnityEngine;

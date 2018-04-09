@@ -1,17 +1,22 @@
 ﻿using System.Collections;
 using UnityEngine;
+// ReSharper disable UnusedMember.Local
 
 namespace FiringSquad.Gameplay.Weapons
 {
 	/// <summary>
 	/// Display the effect for a hitscan bullet.
-	/// TODO: This was supposed to just be placeholder. HOW are we still using it??
 	/// </summary>
 	public class HitscanShootEffect : MonoBehaviour
 	{
-		enum tEffectType { flash, fade };
+		private enum EffectType
+		{
+			Flash,
+			Fade
+		};
+
 		/// Inspector variables
-		[SerializeField] private tEffectType mEffectType;
+		[SerializeField] private EffectType mEffectType;
 		
 		/// <summary>
 		/// Used for Flash
@@ -44,20 +49,8 @@ namespace FiringSquad.Gameplay.Weapons
 			// Don't change the signature of this function, or this next line here:
 			Vector3 realEnd = endSpace == Space.World ? end : transform.TransformPoint(end);
 
-			// TODO: Everything after here can be changed for the new hitscan effect!
-
 			if (mEffectRoutine == null)
-			{
-				if (mEffectType == 0)
-				{
-					mEffectRoutine = StartCoroutine(Flash(realEnd));
-				}
-
-				else
-				{
-					mEffectRoutine = StartCoroutine(Fade(realEnd));
-				}
-			}
+				mEffectRoutine = StartCoroutine(mEffectType == EffectType.Flash ? Flash(realEnd) : Fade(realEnd));
 		}
 		/// <summary>
 		/// Actually perform the flash effect by lerping values across our line renderer.
@@ -88,8 +81,8 @@ namespace FiringSquad.Gameplay.Weapons
 		private IEnumerator Fade(Vector3 realEnd)
 		{
 			Vector3 start = transform.position;
-			GradientAlphaKey[] aStart = (GradientAlphaKey[])mRenderer.colorGradient.alphaKeys.Clone();
-			GradientAlphaKey[] newA = (GradientAlphaKey[])mRenderer.colorGradient.alphaKeys.Clone();
+			var aStart = (GradientAlphaKey[])mRenderer.colorGradient.alphaKeys.Clone();
+			var newA = (GradientAlphaKey[])mRenderer.colorGradient.alphaKeys.Clone();
 			Gradient gr = new Gradient();
 			mRenderer.positionCount = 3;
 			mRenderer.SetPosition(0, start);

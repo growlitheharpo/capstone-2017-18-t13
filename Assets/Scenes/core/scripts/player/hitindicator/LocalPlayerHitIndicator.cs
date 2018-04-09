@@ -61,7 +61,7 @@ namespace FiringSquad.Gameplay.UI
 			if (mIndicatorPool.usePercentage >= 1.0f)
 				return;
 
-			SpawnHitIndicator(receiver.transform, sourcePosition, amount);
+			SpawnHitIndicator(receiver.transform, sourcePosition);
 			FlashScreenVignette();
 		}
 
@@ -70,8 +70,7 @@ namespace FiringSquad.Gameplay.UI
 		/// </summary>
 		/// <param name="receiver">The transform of the damage receiver.</param>
 		/// <param name="sourcePosition">The world position of the damage source.</param>
-		/// <param name="amount">How much damage was caused.</param>
-		private void SpawnHitIndicator(Transform receiver, Vector3 sourcePosition, float amount)
+		private void SpawnHitIndicator(Transform receiver, Vector3 sourcePosition)
 		{
 			// "Instantiate" a new hit indicator.
 			GameObject newObj = mIndicatorPool.ReleaseNewItem();
@@ -90,7 +89,7 @@ namespace FiringSquad.Gameplay.UI
 
 			// Scale the damage spike based on distance
 			// Clamp between scale of .25 and .5
-			float yScale = newObj.transform.Find("Hit Spike").transform.localScale.y + ((dis / 2) / 100);
+			float yScale = newObj.transform.Find("Hit Spike").transform.localScale.y + dis / 2.0f / 100.0f;
 			Mathf.Clamp(yScale, .25f, .5f);
 			newObj.transform.Find("Hit Spike").transform.localScale.Set(newObj.transform.Find("Hit Spike").transform.localScale.x, yScale, newObj.transform.Find("Hit Spike").transform.localScale.z);
  

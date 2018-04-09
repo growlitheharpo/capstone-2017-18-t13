@@ -165,7 +165,6 @@ namespace FiringSquad.Core.UI
 			mPanelObjectToTypeMap.Remove(panelObject);
 			mPanelTypeToObjectMap.Remove(type);
 
-			GameObject go = panelObject.gameObject;
 			mActivePanels.Remove(panelObject);
 
 			return this;
