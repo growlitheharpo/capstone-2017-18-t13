@@ -1,37 +1,19 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
-using FiringSquad.Core;
+using KeatsLib.Unity;
 using UnityEngine;
+using UnityEngine.Networking;
 
 namespace FiringSquad.Gameplay
 {
-	public class ForceField : MonoBehaviour, IDamageReceiver
+	public class ForceField : NetworkBehaviour, IDamageReceiver
 	{
-		private float mHealth;
-		private GameObject mGameObject;
-
 		// Forcefield effect prefab to spawn
-		[SerializeField] GameObject mForcefieldEffectPrefab;
-
-		/// <inheritdoc />
-		public GameObject gameObject { get { return mGameObject; } }
+		[SerializeField] private GameObject mForcefieldEffectPrefab;
 
 		private IEnumerator mCoroutine;
 
-		/// <inheritdoc /> Here because it has to be
-		public float currentHealth { get { return mHealth; } }
-
-		// Use this for initialization
-		void Start()
-		{
-
-		}
-
-		// Update is called once per frame
-		void Update()
-		{
-
-		}
+		/// <inheritdoc />
+		public float currentHealth { get { return default(float); } }
 
 		/// <summary>
 		/// Doesn't actually deal damage, but spawns a prefab at the spot hit
@@ -44,32 +26,20 @@ namespace FiringSquad.Gameplay
 		public void ApplyDamage(float amount, Vector3 point, Vector3 normal, IDamageSource cause, bool wasHeadshot)
 		{
 			// Spawn a force field prefab at the point of hit
-			GameObject tmp = GameObject.Instantiate(mForcefieldEffectPrefab, point, transform.rotation);
-
-			mCoroutine = WaitAndDestroy(tmp);
-			StartCoroutine(mCoroutine);
+			RpcDisplayEffect(point, normal);
 		}
 
 		/// <inheritdoc /> Here because it has to be
-		public void HealDamage(float amount)
-		{
-		}
+		public void HealDamage(float amount) { }
 
 		/// <summary>
-		/// Coroutine to destroy the particle system when it is done playing
+		/// Display and destroy the assigned particle system.
 		/// </summary>
-		/// <param name="particlePrefab"></param>
-		/// <returns></returns>
-		IEnumerator WaitAndDestroy(GameObject particlePrefab)
+		[ClientRpc]
+		private void RpcDisplayEffect(Vector3 point, Vector3 normal)
 		{
-			// Wait for the duration of the particle
-			yield return new WaitForSeconds(particlePrefab.GetComponent<ParticleSystem>().main.duration);
-
-			// Destroy after the time
-			Destroy(particlePrefab);
+			GameObject tmp = Instantiate(mForcefieldEffectPrefab, point, transform.rotation);
+			StartCoroutine(Coroutines.WaitAndDestroyParticleSystem(tmp.GetComponent<ParticleSystem>()));
 		}
 	}
 }
-
-
-
