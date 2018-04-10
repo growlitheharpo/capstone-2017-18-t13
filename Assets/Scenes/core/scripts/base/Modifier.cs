@@ -12,8 +12,8 @@ namespace FiringSquad.Data
 		[Serializable]
 		public class Float
 		{
-			[SerializeField] private readonly float mAmount;
-			[SerializeField] private readonly ModType mType;
+			[SerializeField] private float mAmount;
+			[SerializeField] private ModType mType;
 
 			/// <summary>
 			/// Apply this Modifier's effect to the provided number.
@@ -45,8 +45,8 @@ namespace FiringSquad.Data
 		[Serializable]
 		public class Int
 		{
-			[SerializeField] private readonly int mAmount;
-			[SerializeField] private readonly ModType mType;
+			[SerializeField] private int mAmount;
+			[SerializeField] private ModType mType;
 
 			/// <summary>
 			/// Apply this Modifier's effect to the provided number.
