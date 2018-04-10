@@ -211,6 +211,7 @@ namespace FiringSquad.Gameplay
 		private void INPUT_SprintStart()
 		{
 			mIsRunning = true;
+			mWalkingSound.isSprinting = 1f;
 		}
 
 		/// <summary>
@@ -221,6 +222,7 @@ namespace FiringSquad.Gameplay
 		{
 			if (!mInputBindings.stickySprint)
 				mIsRunning = false;
+			mWalkingSound.isSprinting = 0f; 
 		}
 
 		#endregion

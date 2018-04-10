@@ -139,6 +139,9 @@ namespace FiringSquad.Core
 				public bool isPlaying { get { return false; } }
 
 				/// <inheritdoc />
+				public float isSprinting { get { return default(float); } set { } }
+
+				/// <inheritdoc />
 				public float playerSpeed { get { return default(float); } set { } }
 
 				/// <inheritdoc />

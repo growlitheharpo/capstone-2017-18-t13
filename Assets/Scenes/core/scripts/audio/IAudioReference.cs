@@ -40,6 +40,11 @@ namespace FiringSquad.Core.Audio
 		float playerSpeed { get; set; }
 
 		/// <summary>
+		/// FMOD PARAMETER "isRunning"
+		/// </summary>
+		float isSprinting { get; set; }
+
+		/// <summary>
 		/// FMOD PARAMETER "weaponType"
 		/// </summary>
 		float weaponType { get; set; }
