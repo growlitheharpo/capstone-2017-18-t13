@@ -46,14 +46,21 @@ public partial class EventManager : MonoSingleton<EventManager>
 
 		for (int i = 0; i < initialCount; ++i)
 		{
+			// This is the most exception-safe way to execute this.
+			// It grabs all the delegates from each event and executes them one-by-one, catching exceptions from each.
+
 			Action e = kEventsFromLastFrame.Dequeue();
-			try
+			var delegates = e.GetInvocationList();
+			foreach (Delegate d in delegates)
 			{
-				e.Invoke();
-			}
-			catch (Exception except)
-			{
-				Debug.LogException(except);
+				try
+				{
+					d.Method.Invoke(e.Target, null);
+				}
+				catch (Exception except)
+				{
+					Debug.LogException(except);
+				}
 			}
 		}
 	}
