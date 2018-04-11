@@ -8,9 +8,20 @@ namespace FiringSquad.Gameplay
 	{
 		// Forcefield effect prefab to spawn
 		[SerializeField] private GameObject mForcefieldEffectPrefab;
+		[SerializeField] private Vector3 mRotationAdjustment;
+
+		private Quaternion mCachedRotation;
 
 		/// <inheritdoc />
 		public float currentHealth { get { return default(float); } }
+		
+		/// <summary>
+		/// Unity's Awake function
+		/// </summary>
+		private void Awake()
+		{
+			mCachedRotation = Quaternion.Euler(mRotationAdjustment);
+		}
 
 		/// <summary>
 		/// Doesn't actually deal damage, but spawns a prefab at the spot hit
@@ -35,7 +46,7 @@ namespace FiringSquad.Gameplay
 		[ClientRpc]
 		private void RpcDisplayEffect(Vector3 point, Vector3 normal)
 		{
-			GameObject tmp = Instantiate(mForcefieldEffectPrefab, point, transform.rotation);
+			GameObject tmp = Instantiate(mForcefieldEffectPrefab, point, mCachedRotation * transform.rotation);
 			StartCoroutine(Coroutines.WaitAndDestroyParticleSystem(tmp.GetComponent<ParticleSystem>()));
 		}
 	}
