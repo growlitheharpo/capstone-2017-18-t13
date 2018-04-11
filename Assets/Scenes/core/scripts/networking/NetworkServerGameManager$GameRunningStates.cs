@@ -106,6 +106,16 @@ namespace FiringSquad.Networking
 					/// How much time has elapsed since the player's last death.
 					/// </summary>
 					public float timeSinceLastDeath { get { return Time.time - lastDeath; } }
+
+					/// <summary>
+					/// The log of each player's kills.
+					/// </summary>
+					public PlayerKillLog()
+					{
+						killHistory = new List<PlayerKillServerInfo>();
+						killStreak = 0;
+						lastDeath = 0.0f;
+					}
 				}
 
 				/// <summary>
@@ -127,17 +137,11 @@ namespace FiringSquad.Networking
 				public override void OnEnter()
 				{
 					// Set up everything we need for kill logging.
+					mMachine.mPlayerList = FindObjectsOfType<CltPlayer>();
+
 					mKillLogs = new Dictionary<CltPlayer, PlayerKillLog>();
 					foreach (CltPlayer player in mMachine.mPlayerList)
-					{
-						PlayerKillLog newLog = new PlayerKillLog
-						{
-							killHistory = new List<PlayerKillServerInfo>(),
-							killStreak = 0,
-							lastDeath = 0.0f,
-						};
-						mKillLogs.Add(player, newLog);
-					}
+						mKillLogs.Add(player, new PlayerKillLog());
 
 					mCachedLegendaryList = ServiceLocator.Get<IWeaponPartManager>()
 						.GetAllPrefabScripts(false)

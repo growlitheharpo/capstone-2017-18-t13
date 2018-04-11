@@ -85,6 +85,15 @@ namespace KeatsLib.State
 		}
 
 		/// <summary>
+		/// Immediately pops every state from the machine
+		/// </summary>
+		public virtual void OnDestroy()
+		{
+			while (mCurrentStates.Count > 0)
+				PopState();
+		}
+
+		/// <summary>
 		/// Immediately transition to a new state by calling OnExit on the current
 		/// and then OnEnter on the new one.
 		/// </summary>

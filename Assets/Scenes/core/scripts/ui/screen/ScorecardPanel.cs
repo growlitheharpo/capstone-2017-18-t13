@@ -141,10 +141,13 @@ namespace FiringSquad.Gameplay.UI
 			}
 
 			// UPDATE TEAM
-			if (player.playerTeam == GameData.PlayerTeam.Blue)
-				mBlueTeamScore.value += scoreChange;
-			else if (player.playerTeam == GameData.PlayerTeam.Orange)
-				mOrangeTeamScore.value += scoreChange;
+			if (!mIsInWorld)
+			{
+				if (player.playerTeam == GameData.PlayerTeam.Blue)
+					mBlueTeamScore.value += scoreChange;
+				else if (player.playerTeam == GameData.PlayerTeam.Orange)
+					mOrangeTeamScore.value += scoreChange;
+			}
 		}
 
 		/// <inheritdoc />
