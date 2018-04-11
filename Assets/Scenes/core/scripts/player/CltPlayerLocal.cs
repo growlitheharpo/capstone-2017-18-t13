@@ -92,8 +92,8 @@ namespace FiringSquad.Gameplay
 			if (mDeathCameraHolder != null)
 				Destroy(mDeathCameraHolder);
 
-			EventManager.Local.OnLocalPlayerDied -= OnLocalPlayerDied;
 			EventManager.Local.OnApplyOptionsData -= OnApplyOptionsData;
+			EventManager.Local.OnLocalPlayerDied -= OnLocalPlayerDied;
 			EventManager.Local.OnIntroBegin -= OnIntroBegin;
 			EventManager.Local.OnIntroEnd -= OnIntroEnd;
 

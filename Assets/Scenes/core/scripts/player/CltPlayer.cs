@@ -289,8 +289,6 @@ namespace FiringSquad.Gameplay
 			EventManager.LocalGeneric.OnPlayerDied -= OnPlayerDied;
 			EventManager.LocalGeneric.OnPlayerEquippedLegendaryPart -= OnPlayerEquippedLegendaryPart;
 
-
-
 			CltPlayerLocal localPlayer = mLocalPlayerScript;
 			if (localPlayer != null)
 				localPlayer.CleanupCamera();

@@ -36,6 +36,18 @@ namespace FiringSquad.Core.State
 				mIsPaused = false;
 			}
 
+			/// <inheritdoc />
+			public void OnExit()
+			{
+				TransitionStates(new NullState());
+
+				EventManager.Local.OnInputLevelChanged -= OnInputLevelChanged;
+				EventManager.Local.OnTogglePause -= OnTogglePause;
+				EventManager.Local.OnLocalPlayerSpawned -= OnLocalPlayerSpawned;
+				EventManager.Local.OnIntroBegin -= OnIntroBegin;
+				SetCursorState(false);
+			}
+
 			/// <summary>
 			/// EVENT HANDLER: Local.OnLocalPlayerSpawned
 			/// Save a reference to the local player.
@@ -100,18 +112,6 @@ namespace FiringSquad.Core.State
 			public new void Update()
 			{
 				base.Update();
-			}
-
-			/// <inheritdoc />
-			public void OnExit()
-			{
-				TransitionStates(new NullState());
-
-				EventManager.Local.OnInputLevelChanged -= OnInputLevelChanged;
-				EventManager.Local.OnTogglePause -= OnTogglePause;
-				EventManager.Local.OnLocalPlayerSpawned -= OnLocalPlayerSpawned;
-				EventManager.Local.OnIntroBegin -= OnIntroBegin;
-				SetCursorState(false);
 			}
 
 			/// <inheritdoc />

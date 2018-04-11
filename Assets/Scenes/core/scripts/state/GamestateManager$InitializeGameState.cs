@@ -29,6 +29,13 @@ namespace FiringSquad.Core.State
 			}
 
 			/// <inheritdoc />
+			public override void OnExit()
+			{
+				kOccured = true;
+				EventManager.Local.OnInitialAudioLoadComplete -= OnInitialAudioLoadComplete;
+			}
+
+			/// <inheritdoc />
 			public override bool safeToTransition { get { return false; } }
 
 			/// <inheritdoc />
@@ -43,13 +50,6 @@ namespace FiringSquad.Core.State
 			private void OnInitialAudioLoadComplete()
 			{
 				mAudioLoadComplete = true;
-			}
-
-			/// <inheritdoc />
-			public override void OnExit()
-			{
-				kOccured = true;
-				EventManager.Local.OnInitialAudioLoadComplete -= OnInitialAudioLoadComplete;
 			}
 		}
 	}
