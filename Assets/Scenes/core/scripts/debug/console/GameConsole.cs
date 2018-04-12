@@ -50,6 +50,9 @@ namespace FiringSquad.Debug
 		private void OnDestroy()
 		{
 			Application.logMessageReceived -= UnityLogToConsole;
+			UnregisterCommand(ToggleCheatsCommand);
+			UnregisterCommand(ClearConsoleCmmand);
+			UnregisterCommand(ListCommandsCommand);
 		}
 
 		/// <inheritdoc />

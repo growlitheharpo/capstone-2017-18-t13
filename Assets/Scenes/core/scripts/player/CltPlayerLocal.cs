@@ -98,6 +98,9 @@ namespace FiringSquad.Gameplay
 			EventManager.Local.OnIntroEnd -= OnIntroEnd;
 
 			CleanupCamera();
+			
+			ServiceLocator.Get<IGameConsole>()
+				.UnregisterCommand(CONSOLE_SetPlayerTeam);
 
 			ServiceLocator.Get<IInput>()
 				// networked

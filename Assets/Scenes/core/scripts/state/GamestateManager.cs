@@ -101,11 +101,8 @@ namespace FiringSquad.Core.State
 			mCurrentState = new InitializeGameState();
 			Logger.Info("Setting current state to InitializeGameState", Logger.System.State);
 			mCurrentState.OnEnter();
-
-			ServiceLocator.Get<IGameConsole>()
-				.RegisterCommand("close", s => RequestSceneChange(MENU_SCENE));
 		}
-
+		
 		/// <summary>
 		/// Unity's Update function.
 		/// </summary>
