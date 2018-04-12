@@ -31,29 +31,30 @@ namespace FiringSquad.Gameplay
 
 		/// Inspector variables
 		[HideInInspector] [SerializeField] private List<PartWeightSet> mParts; // [HideInInspector] because this is drawn with custom editor
+		[SerializeField] private bool mIsInLobby;
 		[SerializeField] private float mRespawnTimePlayerGrabbedMin;
 		[SerializeField] private float mRespawnTimePlayerGrabbedMax;
 		[SerializeField] private float mRespawnTimeTimeoutMin;
 		[SerializeField] private float mRespawnTimeTimeoutMax;
 
 		/// Syncvars
-		[SyncVar(hook = "OnChangeActivated")] private bool mActivated = true;
+		[SyncVar(hook = "OnChangeActivated")] private bool mActivated;
 
 		/// Private variables
-		private Color mActiveColor, mInactiveColor;
-		private Material mPadMaterial;
-		private Light mLight;
+		private Color mActiveColor2, mInactiveColor;
+		private Material mPadMaterial1, mPadMaterial2;
+		private bool mGameStarted;
 
 		/// <summary>
 		/// Unity's Awake function.
 		/// </summary>
 		private void Awake()
 		{
-			mPadMaterial = GetComponentInChildren<MeshRenderer>().material;
-			mLight = GetComponentInChildren<Light>();
+			mPadMaterial1 = GetComponentInChildren<MeshRenderer>().materials[0];
+			mPadMaterial2 = GetComponentInChildren<MeshRenderer>().materials[1];
 
-			mActiveColor = mPadMaterial.GetColor("_EmissionColor");
-			mInactiveColor = mActiveColor * 0.25f;
+			mActiveColor2 = mPadMaterial2.GetColor("_EmissionColor");
+			mInactiveColor = mActiveColor2 * 0.1f;
 		}
 
 		/// <summary>
@@ -61,7 +62,33 @@ namespace FiringSquad.Gameplay
 		/// </summary>
 		public override void OnStartServer()
 		{
-			SpawnPart();
+			EventManager.Server.OnStartGame += OnStartGame;
+
+			if (mIsInLobby)
+				SpawnPart();
+			else
+				mActivated = false;
+		}
+
+		/// <summary>
+		/// EVENT HANDLER: Server.OnStartGame
+		/// </summary>
+		/// <param name="obj"></param>
+		private void OnStartGame(long obj)
+		{
+			mGameStarted = true;
+			EventManager.Server.OnStartGame -= OnStartGame;
+
+			if (!mIsInLobby)
+				StartCoroutine(Coroutines.InvokeAfterSeconds(Random.Range(0.0f, 1.5f), SpawnPart));
+		}
+
+		/// <summary>
+		/// Unity's OnDestroy function
+		/// </summary>
+		private void OnDestroy()
+		{
+			EventManager.Server.OnStartGame -= OnStartGame;
 		}
 
 		/// <summary>
@@ -132,6 +159,10 @@ namespace FiringSquad.Gameplay
 		private IEnumerator PrepRespawn(bool playerGrabbed)
 		{
 			mActivated = false;
+
+			if (mIsInLobby && mGameStarted)
+				yield break;
+
 			float pickupTime = playerGrabbed
 				? Random.Range(mRespawnTimePlayerGrabbedMin, mRespawnTimePlayerGrabbedMax)
 				: Random.Range(mRespawnTimeTimeoutMin, mRespawnTimeTimeoutMax);
@@ -159,13 +190,8 @@ namespace FiringSquad.Gameplay
 		/// </summary>
 		private void SetViewActivated()
 		{
-			mPadMaterial.SetColor("_EmissionColor", mActiveColor);
-
-			if (mLight != null)
-			{
-				mLight.color = mActiveColor;
-				mLight.intensity = 3.0f;
-			}
+			mPadMaterial1.SetFloat("_EmissionStrength", 3.0f);
+			mPadMaterial2.SetColor("_EmissionColor", mActiveColor2);
 		}
 
 		/// <summary>
@@ -173,13 +199,8 @@ namespace FiringSquad.Gameplay
 		/// </summary>
 		private void SetViewDeactivated()
 		{
-			mPadMaterial.SetColor("_EmissionColor", mInactiveColor);
-
-			if (mLight != null)
-			{
-				mLight.color = mInactiveColor;
-				mLight.intensity = 1.0f;
-			}
+			mPadMaterial1.SetFloat("_EmissionStrength", 0.0f);
+			mPadMaterial2.SetColor("_EmissionColor", mInactiveColor);
 		}
 	}
 }
