@@ -301,8 +301,6 @@ namespace FiringSquad.Gameplay
 
 			foreach (Transform w in weapon.transform)
 			{
-				UnityEngine.Debug.Log(w.name + ": " + w.localPosition);
-
 				if (w.name.ToLower() != "tip")
 					w.localPosition = Vector3.zero;
 			}

@@ -30,7 +30,6 @@ namespace FiringSquad.Gameplay
 		private void Start()
 		{
 			mPlayer = GetComponentInParent<CltPlayer>();
-			UnityEngine.Debug.Log("Grabbed " + mPlayer);
 		}
 	}
 }

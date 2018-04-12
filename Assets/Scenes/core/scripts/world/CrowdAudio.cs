@@ -109,7 +109,6 @@ namespace FiringSquad.Gameplay
 		private void IncreaseHypeLevel(int amount)
 		{
 			mCurrentCrowdLevel = Mathf.Clamp(mCurrentCrowdLevel + amount, mValues.minHypeValue, mValues.maxHypeValue);
-			UnityEngine.Debug.Log(mCurrentCrowdLevel);
 			mCrowdSound.crowdHypeLevel = mCurrentCrowdLevel;
 
 			mTimer = mValues.initialDecreaseTimerLength;
