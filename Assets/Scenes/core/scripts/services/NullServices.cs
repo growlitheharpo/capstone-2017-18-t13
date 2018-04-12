@@ -142,6 +142,12 @@ namespace FiringSquad.Core
 				public float isSprinting { get { return default(float); } set { } }
 
 				/// <inheritdoc />
+				public float countDownTimeRemaining { get { return default(float); } set { } }
+
+				/// <inheritdoc />
+				public float usingRocketBooster { get { return default(float); } set { } }
+
+				/// <inheritdoc />
 				public float playerSpeed { get { return default(float); } set { } }
 
 				/// <inheritdoc />

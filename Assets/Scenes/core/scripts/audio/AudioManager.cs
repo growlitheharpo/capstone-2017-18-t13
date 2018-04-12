@@ -156,6 +156,12 @@ namespace FiringSquad.Core.Audio
 			public float isSprinting { get { return GetParameter("isRunning"); } set { SetParameter("isRunning", value); } }
 
 			/// <inheritdoc />
+			public float countDownTimeRemaining { get { return GetParameter("Timer"); } set { SetParameter("Timer", value); } }
+
+			/// <inheritdoc />
+			public float usingRocketBooster { get { return GetParameter("usingRocketBooster"); } set { SetParameter("usingRocketBooster", value); } }
+
+			/// <inheritdoc />
 			public float weaponType { get { return GetParameter("WeaponType"); } set { SetParameter("WeaponType", value); } }
 
 			/// <inheritdoc />
