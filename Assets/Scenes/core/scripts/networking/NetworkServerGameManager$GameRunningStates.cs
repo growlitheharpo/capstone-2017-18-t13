@@ -281,6 +281,13 @@ namespace FiringSquad.Networking
 						? PlayerSpawnPosition.GetAll().Select(x => x.transform).ToList()
 						: PlayerSpawnPosition.GetAll(dead.playerTeam).Select(x => x.transform).ToList();
 
+					// Make sure the player isn't still dead from last time
+					if (mKillLogs[dead].timeSinceLastDeath < PLAYER_RESPAWN_TIME - 0.5f)
+					{
+						dead.HealDamage(dead.defaultData.defaultHealth);
+						return;
+					}
+
 					Transform newPosition = ChooseSafestSpawnPosition(mMachine.mPlayerList, dead, spawnList);
 
 					mMachine.mPlayerScores[dead.netId].deaths++;
