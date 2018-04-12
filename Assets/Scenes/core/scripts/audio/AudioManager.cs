@@ -34,7 +34,9 @@ namespace FiringSquad.Core.Audio
 		EnterAimDownSights = 75,
 
 		// VO
+		FlyingShips = 77,
 		AmbientCrowd = 78,
+		Grinders = 79,
 		AnnouncerMatchStarts = 80,
 		AnnouncerMatchEnds = 85,
 		AnnouncerStageAreaSpawns = 90,
@@ -53,11 +55,17 @@ namespace FiringSquad.Core.Audio
 		AnnouncerPlayerDeath = 155,
 		AnnouncerBreaksCamera = 160,
 		AnnouncerMultiKill = 165,
+		AnnouncerInterrupt = 170,
+		CameraGreeting = 225,
+		CameraPain = 230,
+		CameraPlayerDeath = 235,
+		CameraIntro = 240,
 
 		// UI
 		MenuButtonHover = 180,
 		MenuButtonPress = 185,
 		HypeText = 190,
+		CountdownTimer = 195,
 
 		// Music
 		MenuMusic = 200,

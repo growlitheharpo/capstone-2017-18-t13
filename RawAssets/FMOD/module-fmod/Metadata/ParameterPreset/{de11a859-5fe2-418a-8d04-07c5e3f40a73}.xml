@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.01.10.00">
+    <object class="ParameterPreset" id="{de11a859-5fe2-418a-8d04-07c5e3f40a73}">
+        <property name="name">
+            <value>usingRocketBooster</value>
+        </property>
+        <relationship name="folder">
+            <destination>{ba583e1d-5b61-4535-819d-0ffcbe8ad33b}</destination>
+        </relationship>
+        <relationship name="parameter">
+            <destination>{00f73e86-c708-4843-96de-35e65b79adc3}</destination>
+        </relationship>
+    </object>
+    <object class="GameParameter" id="{00f73e86-c708-4843-96de-35e65b79adc3}">
+        <property name="maximum">
+            <value>2</value>
+        </property>
+        <property name="initialValue">
+            <value>0</value>
+        </property>
+    </object>
+</objects>
