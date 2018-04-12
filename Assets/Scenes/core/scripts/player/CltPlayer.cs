@@ -580,6 +580,9 @@ namespace FiringSquad.Gameplay
 			if (magnetArm != null)
 				magnetArm.ForceDropItem();
 
+			if (weapon != null)
+				weapon.ResetToDefaultParts();
+
 			TargetHandleInitialGameTime(connectionToClient, gameEndTime);
 		}
 
