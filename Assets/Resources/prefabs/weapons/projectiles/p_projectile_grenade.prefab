@@ -24,7 +24,6 @@ GameObject:
   - component: {fileID: 54703118205995948}
   - component: {fileID: 114185923026591396}
   - component: {fileID: 114490112249467448}
-  - component: {fileID: 96452238346950940}
   m_Layer: 12
   m_Name: p_projectile_grenade
   m_TagString: Untagged
@@ -91,6 +90,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4920345005845964}
+  - component: {fileID: 96881758294775594}
   m_Layer: 0
   m_Name: prefab_grenade
   m_TagString: Untagged
@@ -210,7 +210,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1122678007204700}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 4.9789634, y: 4.0453653, z: 2.15837}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 3, y: 3, z: 3}
   m_Children:
   - {fileID: 4541558892577342}
@@ -312,13 +312,13 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!96 &96452238346950940
+--- !u!96 &96881758294775594
 TrailRenderer:
   serializedVersion: 2
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1122678007204700}
+  m_GameObject: {fileID: 1613768000673290}
   m_Enabled: 1
   m_CastShadows: 0
   m_ReceiveShadows: 1
