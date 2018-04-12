@@ -481,9 +481,9 @@ namespace FiringSquad.Gameplay
 			RaycastUtils.RaycastHitDistComparer comparer = new RaycastUtils.RaycastHitDistComparer();
 			Array.Sort(mCachedHits, 0, count, comparer);
 			
-			foreach (RaycastHit hitInfo in mCachedHits)
+			for (int i = 0; i < count; ++i)
 			{
-				WeaponPickupScript grabbable = hitInfo.collider.GetComponentInParent<WeaponPickupScript>();
+				WeaponPickupScript grabbable = mCachedHits[i].collider.GetComponentInParent<WeaponPickupScript>();
 				if (grabbable != null && !grabbable.currentlyLocked)
 					return grabbable;
 			}

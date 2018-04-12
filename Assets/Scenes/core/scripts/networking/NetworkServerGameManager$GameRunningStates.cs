@@ -249,7 +249,9 @@ namespace FiringSquad.Networking
 				{
 					stage.Disable();
 
-					StageCaptureArea nextStage = mMachine.mCaptureAreas.Where(x => x != stage).ChooseRandom();
+					StageCaptureArea nextStage = mMachine.mCaptureAreas.Length > 1
+						? mMachine.mCaptureAreas.Where(x => x != stage).ChooseRandom()
+						: stage;
 					mStageEnableRoutine = mMachine.mScript.StartCoroutine(EnableStageArea(nextStage));
 				}
 
