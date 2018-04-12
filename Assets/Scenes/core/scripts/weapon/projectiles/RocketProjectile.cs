@@ -134,8 +134,6 @@ namespace FiringSquad.Gameplay.Weapons
 				// Calc ratio based on falloff curve
 				float pos = Vector3.Distance(col.transform.position, transform.position);
 
-				UnityEngine.Debug.Log(pos);
-
 				c.ApplyDamage(mData.damage * mDamageFalloffCurve.Evaluate(pos), hitInfo.point, hitInfo.normal, this, false);
 				hits.Add(c);
 			}

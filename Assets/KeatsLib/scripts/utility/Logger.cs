@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using FiringSquad.Core;
 using KeatsLib.Collections;
 
@@ -40,14 +41,17 @@ namespace FiringSquad.Debug
 		/// </summary>
 		/// <param name="message">The message to be printed.</param>
 		/// <param name="system">The system of origin for the log, if applicable. Will affect color and header.</param>
+		[Conditional("INCLUDE_ALL_LOGS")]
 		public static void Info(string message, System system = System.Generic)
 		{
+#if INCLUDE_ALL_LOGS
 			if (!CheckLevel(system))
 				return;
 
 			var colorPair = GetColorPair(system);
 			string label = system == System.Generic ? "Info" : system.ToString();
 			UnityEngine.Debug.Log(colorPair.first + label + ": " + message + colorPair.second);
+#endif
 		}
 
 		/// <summary>
@@ -56,14 +60,17 @@ namespace FiringSquad.Debug
 		/// </summary>
 		/// <param name="message">The message to be printed.</param>
 		/// <param name="system">The system of origin for the log, if applicable. Will affect color and header.</param>
+		[Conditional("INCLUDE_ALL_LOGS")]
 		public static void Warn(string message, System system = System.Generic)
 		{
+#if INCLUDE_ALL_LOGS
 			if (!CheckLevel(system))
 				return;
 
 			var colorPair = GetColorPair(system);
 			string label = system == System.Generic ? "Info" : system.ToString();
 			UnityEngine.Debug.LogWarning(colorPair.first + label + ": " + message + colorPair.second);
+#endif
 		}
 
 		/// <summary>
@@ -72,14 +79,17 @@ namespace FiringSquad.Debug
 		/// </summary>
 		/// <param name="message">The message to be printed.</param>
 		/// <param name="system">The system of origin for the log, if applicable. Will affect color and header.</param>
+		[Conditional("INCLUDE_ALL_LOGS")]
 		public static void Error(string message, System system = System.Generic)
 		{
+#if INCLUDE_ALL_LOGS
 			if (!CheckLevel(system))
 				return;
 
 			var colorPair = GetColorPair(system);
 			string label = system == System.Generic ? "Info" : system.ToString();
 			UnityEngine.Debug.LogError(colorPair.first + label + ": " + message + colorPair.second);
+#endif
 		}
 		
 		/// <summary>

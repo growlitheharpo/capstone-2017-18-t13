@@ -42,7 +42,7 @@ namespace FiringSquad.Gameplay.Weapons
 				foreach (Material m in mMaterialInstances)
 					m.SetColor(mEmissiveProperty, val);
 			}
-			else if (mBlinkRoutine == null)
+			else if (mBlinkRoutine == null && gameObject.activeInHierarchy)
 				mBlinkRoutine = StartCoroutine(BlinkValue());
 		}
 

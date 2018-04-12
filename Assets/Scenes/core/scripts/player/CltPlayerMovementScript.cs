@@ -107,13 +107,15 @@ namespace FiringSquad.Gameplay
 		private void OnDestroy()
 		{
 			ServiceLocator.Get<IInput>()
+				.UnregisterAxis(INPUT_LeftRightMovement)
+				.UnregisterAxis(INPUT_ForwardBackMovement)
+				.UnregisterAxis(INPUT_LookHorizontal)
+				.UnregisterAxis(INPUT_LookVertical)
 				.UnregisterInput(INPUT_Jump)
 				.UnregisterInput(INPUT_CrouchStart)
 				.UnregisterInput(INPUT_CrouchStop)
-				.UnregisterAxis(INPUT_ForwardBackMovement)
-				.UnregisterAxis(INPUT_LeftRightMovement)
-				.UnregisterAxis(INPUT_LookHorizontal)
-				.UnregisterAxis(INPUT_LookVertical);
+				.UnregisterInput(INPUT_SprintStart)
+				.UnregisterInput(INPUT_SprintStop);
 
 			EventManager.Local.OnApplyOptionsData -= ApplyOptionsData;
 			EventManager.Local.OnLocalPlayerDied -= OnLocalPlayerDied;
@@ -376,9 +378,6 @@ namespace FiringSquad.Gameplay
 
 			if (speed > mMovementData.speed * mSpeedMultiplier)
 				speed = mMovementData.speed * mSpeedMultiplier;
-			//UnityEngine.Debug.Log(mCurrentSpeed);
-			//float speed = mMovementData.speed;
-			//speed = Mathf.Lerp(mCurrentSpeed, mMovementData.speed, 0.1f);
 
 			if (mIsRunning && mInput.x == 0 && mInput.y != 0) // Also make sure they're only going forward
 				speed *= mMovementData.sprintMultiplier;

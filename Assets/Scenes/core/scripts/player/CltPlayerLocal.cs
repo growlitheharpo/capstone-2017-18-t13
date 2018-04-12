@@ -92,12 +92,17 @@ namespace FiringSquad.Gameplay
 			if (mDeathCameraHolder != null)
 				Destroy(mDeathCameraHolder);
 
-			EventManager.Local.OnLocalPlayerDied -= OnLocalPlayerDied;
 			EventManager.Local.OnApplyOptionsData -= OnApplyOptionsData;
+			EventManager.Local.OnLocalPlayerDied -= OnLocalPlayerDied;
 			EventManager.Local.OnIntroBegin -= OnIntroBegin;
 			EventManager.Local.OnIntroEnd -= OnIntroEnd;
 
+			mRespawnTimer.Cleanup();
+
 			CleanupCamera();
+			
+			ServiceLocator.Get<IGameConsole>()
+				.UnregisterCommand(CONSOLE_SetPlayerTeam);
 
 			ServiceLocator.Get<IInput>()
 				// networked
@@ -107,13 +112,16 @@ namespace FiringSquad.Gameplay
 				.UnregisterInput(INPUT_Interact1Down)
 				.UnregisterInput(INPUT_Interact1Held)
 				.UnregisterInput(INPUT_Interact1Up)
-				.UnregisterAxis(INPUT_ZoomLevel)
+				.UnregisterInput(INPUT_Interact2Down)
 
 				// local
 				.UnregisterInput(INPUT_EnterAimDownSights)
 				.UnregisterInput(INPUT_ExitAimDownSights)
 				.UnregisterInput(INPUT_TogglePause)
-				.UnregisterInput(INPUT_ActivateGunPanic);
+				.UnregisterInput(INPUT_ShowScorecard)
+				.UnregisterInput(INPUT_HideScorecard)
+				.UnregisterInput(INPUT_ActivateGunPanic)
+				.UnregisterAxis(INPUT_ZoomLevel);
 		}
 
 		/// <summary>
@@ -293,8 +301,6 @@ namespace FiringSquad.Gameplay
 
 			foreach (Transform w in weapon.transform)
 			{
-				UnityEngine.Debug.Log(w.name + ": " + w.localPosition);
-
 				if (w.name.ToLower() != "tip")
 					w.localPosition = Vector3.zero;
 			}

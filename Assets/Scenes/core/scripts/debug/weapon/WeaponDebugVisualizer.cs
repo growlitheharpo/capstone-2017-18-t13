@@ -23,6 +23,9 @@ namespace FiringSquad.Debug
 		private BaseWeaponScript mCurrentScript;
 		private bool mEnabled;
 
+		/// <summary>
+		/// Unity's Start function
+		/// </summary>
 		private void Start()
 		{
 			ServiceLocator.Get<IInput>()
@@ -41,6 +44,15 @@ namespace FiringSquad.Debug
 			mLineRenderers[0].material.SetColor("_LineColor", Color.green);
 			mLineRenderers[1].material.SetColor("_LineColor", Color.red);
 			mLineRenderers[2].material.SetColor("_LineColor", new Color(0.0f, 0.4f, 1.0f));
+		}
+
+		/// <summary>
+		/// Unity's OnDestroy function
+		/// </summary>
+		private void OnDestroy()
+		{
+			ServiceLocator.Get<IInput>()
+				.UnregisterInput(INPUT_ToggleState);
 		}
 
 		/// <summary>

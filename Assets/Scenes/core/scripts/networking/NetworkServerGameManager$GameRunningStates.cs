@@ -194,7 +194,9 @@ namespace FiringSquad.Networking
 					foreach (CltPlayer p in players)
 						mMachine.mPlayerScores[p.netId].score += STAGE_CAPTURE_POINTS;
 
-					StageCaptureArea nextStage = mMachine.mCaptureAreas.Where(x => x != stage).ChooseRandom();
+					StageCaptureArea nextStage = mMachine.mCaptureAreas.Length > 1
+						? mMachine.mCaptureAreas.Where(x => x != stage).ChooseRandom() 
+						: stage;
 					mStageEnableRoutine = mMachine.mScript.StartCoroutine(EnableStageArea(nextStage));
 				}
 
@@ -247,7 +249,9 @@ namespace FiringSquad.Networking
 				{
 					stage.Disable();
 
-					StageCaptureArea nextStage = mMachine.mCaptureAreas.Where(x => x != stage).ChooseRandom();
+					StageCaptureArea nextStage = mMachine.mCaptureAreas.Length > 1
+						? mMachine.mCaptureAreas.Where(x => x != stage).ChooseRandom()
+						: stage;
 					mStageEnableRoutine = mMachine.mScript.StartCoroutine(EnableStageArea(nextStage));
 				}
 
