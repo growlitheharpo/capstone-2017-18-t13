@@ -101,7 +101,7 @@ namespace FiringSquad.Gameplay.UI
 					mEnemyTimerBar.gameObject.SetActive(false);
 					mEnemyTimerBar.SetFillAmount(0.0f, true);
 
-					mPointer.StopPointing();
+					mPointer.EnableAndPoint(area);
 					break;
 
 				case Mode.OtherCapturing:
