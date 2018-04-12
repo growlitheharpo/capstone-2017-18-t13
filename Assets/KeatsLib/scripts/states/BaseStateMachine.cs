@@ -64,6 +64,14 @@ namespace KeatsLib.State
 		private IState currentState { get { return mCurrentStates.Count > 0 ? mCurrentStates.Peek() : null; } }
 
 		/// <summary>
+		/// Destructor for a state machine should pop every state
+		/// </summary>
+		~BaseStateMachine()
+		{
+			OnDestroy();
+		}
+
+		/// <summary>
 		/// Update the state machine. 
 		/// </summary>
 		/// <para>
