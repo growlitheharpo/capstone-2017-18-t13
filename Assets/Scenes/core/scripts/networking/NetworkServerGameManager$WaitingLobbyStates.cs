@@ -239,8 +239,7 @@ namespace FiringSquad.Networking
 					foreach (CltPlayer player in mMachine.mPlayerList)
 					{
 						GameData.PlayerTeam team = player.playerTeam;
-						player.AssignPlayerTeam(GameData.PlayerTeam.DebugForceReset);
-						player.AssignPlayerTeam(team);
+						player.AssignPlayerTeam(team, true);
 					}
 				}
 
@@ -258,6 +257,7 @@ namespace FiringSquad.Networking
 						spawnCopy.RemoveAt(spawnCopy.Count - 1);
 
 						player.MoveToStartPosition(target.position, target.rotation);
+						player.AssignPlayerTeam(GameData.PlayerTeam.Deathmatch, true);
 					}
 				}
 
