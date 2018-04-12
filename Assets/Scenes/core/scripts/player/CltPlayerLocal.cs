@@ -107,13 +107,16 @@ namespace FiringSquad.Gameplay
 				.UnregisterInput(INPUT_Interact1Down)
 				.UnregisterInput(INPUT_Interact1Held)
 				.UnregisterInput(INPUT_Interact1Up)
-				.UnregisterAxis(INPUT_ZoomLevel)
+				.UnregisterInput(INPUT_Interact2Down)
 
 				// local
 				.UnregisterInput(INPUT_EnterAimDownSights)
 				.UnregisterInput(INPUT_ExitAimDownSights)
 				.UnregisterInput(INPUT_TogglePause)
-				.UnregisterInput(INPUT_ActivateGunPanic);
+				.UnregisterInput(INPUT_ShowScorecard)
+				.UnregisterInput(INPUT_HideScorecard)
+				.UnregisterInput(INPUT_ActivateGunPanic)
+				.UnregisterAxis(INPUT_ZoomLevel);
 		}
 
 		/// <summary>

@@ -107,13 +107,15 @@ namespace FiringSquad.Gameplay
 		private void OnDestroy()
 		{
 			ServiceLocator.Get<IInput>()
+				.UnregisterAxis(INPUT_LeftRightMovement)
+				.UnregisterAxis(INPUT_ForwardBackMovement)
+				.UnregisterAxis(INPUT_LookHorizontal)
+				.UnregisterAxis(INPUT_LookVertical)
 				.UnregisterInput(INPUT_Jump)
 				.UnregisterInput(INPUT_CrouchStart)
 				.UnregisterInput(INPUT_CrouchStop)
-				.UnregisterAxis(INPUT_ForwardBackMovement)
-				.UnregisterAxis(INPUT_LeftRightMovement)
-				.UnregisterAxis(INPUT_LookHorizontal)
-				.UnregisterAxis(INPUT_LookVertical);
+				.UnregisterInput(INPUT_SprintStart)
+				.UnregisterInput(INPUT_SprintStop);
 
 			EventManager.Local.OnApplyOptionsData -= ApplyOptionsData;
 			EventManager.Local.OnLocalPlayerDied -= OnLocalPlayerDied;

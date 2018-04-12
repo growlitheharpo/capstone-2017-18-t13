@@ -52,6 +52,18 @@ namespace FiringSquad.Debug
 		}
 
 		/// <summary>
+		/// Unity's OnDestroy function
+		/// </summary>
+		private void OnDestroy()
+		{
+			ServiceLocator.Get<IInput>()
+				.UnregisterInput(INPUT_ToggleConsole);
+
+			ServiceLocator.Get<IUIManager>()
+				.UnregisterPanel(this);
+		}
+
+		/// <summary>
 		/// INPUT HANDLER: Toggle the debug game console.
 		/// </summary>
 		private void INPUT_ToggleConsole()
