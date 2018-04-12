@@ -156,6 +156,9 @@ namespace FiringSquad.Core.State
 					EventManager.Local.OnReceiveFinishEvent -= OnReceiveFinishEvent;
 					EventManager.Local.OnConfirmQuitGame -= OnConfirmQuitGame;
 					EventManager.Local.OnTeamVictoryScreen -= OnTeamVictoryScreen;
+
+					if (mRemainingTime != null)
+						mRemainingTime.Cleanup();
 				}
 
 				/// <summary>

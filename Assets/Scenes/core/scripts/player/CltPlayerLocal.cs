@@ -97,6 +97,8 @@ namespace FiringSquad.Gameplay
 			EventManager.Local.OnIntroBegin -= OnIntroBegin;
 			EventManager.Local.OnIntroEnd -= OnIntroEnd;
 
+			mRespawnTimer.Cleanup();
+
 			CleanupCamera();
 			
 			ServiceLocator.Get<IGameConsole>()

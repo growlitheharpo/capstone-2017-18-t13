@@ -55,6 +55,7 @@ namespace FiringSquad.Gameplay.Weapons
 					continue;
 				Destroy(e);
 			}
+			base.OnDestroy();
 		}
 	}
 }
