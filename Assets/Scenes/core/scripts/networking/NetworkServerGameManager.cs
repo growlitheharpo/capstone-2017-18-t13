@@ -48,7 +48,9 @@ namespace FiringSquad.Networking
 		private void OnDestroy()
 		{
 			ServiceLocator.Get<IGameConsole>().UnregisterCommand(CONSOLE_ForceStartGame);
-			mStateMachine.OnDestroy();
+
+			if (mStateMachine != null)
+				mStateMachine.OnDestroy();
 		}
 
 		/// <summary>

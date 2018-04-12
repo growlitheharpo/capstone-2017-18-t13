@@ -32,6 +32,14 @@ namespace KeatsLib.State
 				mMachine = machine;
 			}
 
+			/// <summary>
+			/// Ensure OnExit is ALWAYS called.
+			/// </summary>
+			~BaseState()
+			{
+				OnExit();
+			}
+
 			/// <inheritdoc />
 			public virtual void OnEnter() { }
 
