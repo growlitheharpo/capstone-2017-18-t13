@@ -258,18 +258,26 @@ namespace FiringSquad.Core.Input
 		/// </summary>
 		private void Update()
 		{
-			// TODO: Examine the performance of the LINQ here.
 			foreach (var i in mCommands)
 			{
-				if (i.Value.Any(x => x.Enabled() && x.Activated()))
-					i.Key.Invoke();
+				foreach (BaseInputMap x in i.Value)
+				{
+					if (x.Enabled() && x.Activated())
+					{
+						i.Key.Invoke();
+						break;
+					}
+				}
 			}
 
 			foreach (var i in mAxes)
 			{
-				float value = i.Value
-					.Where(input => input.Enabled())
-					.Sum(input => input.CurrentValue());
+				float value = 0.0f;
+				foreach (var input in i.Value)
+				{
+					if (input.Enabled())
+						value += input.CurrentValue();
+				}
 				i.Key.Invoke(value);
 			}
 		}
