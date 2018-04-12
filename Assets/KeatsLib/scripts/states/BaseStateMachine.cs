@@ -32,14 +32,6 @@ namespace KeatsLib.State
 				mMachine = machine;
 			}
 
-			/// <summary>
-			/// Ensure OnExit is ALWAYS called.
-			/// </summary>
-			~BaseState()
-			{
-				OnExit();
-			}
-
 			/// <inheritdoc />
 			public virtual void OnEnter() { }
 
@@ -70,14 +62,6 @@ namespace KeatsLib.State
 
 		private readonly Stack<IState> mCurrentStates = new Stack<IState>(5);
 		private IState currentState { get { return mCurrentStates.Count > 0 ? mCurrentStates.Peek() : null; } }
-
-		/// <summary>
-		/// Destructor for a state machine should pop every state
-		/// </summary>
-		~BaseStateMachine()
-		{
-			OnDestroy();
-		}
 
 		/// <summary>
 		/// Update the state machine. 
