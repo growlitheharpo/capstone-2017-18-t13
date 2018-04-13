@@ -103,7 +103,7 @@ namespace FiringSquad.Core.Audio
 		/// Private variables
 		private Dictionary<AudioEvent, string> mEventDictionary;
 		private Dictionary<AudioEvent, AnnouncerPriority> mAnnouncerPriority;
-		private Queue<AudioEvent> mAnnouncerLineQueue;
+		private List<AudioEvent> mAnnouncerLineQueue;
 
 		private IAudioReference mCurrentAnnouncerEvent;
 
@@ -112,7 +112,7 @@ namespace FiringSquad.Core.Audio
 		/// </summary>
 		private void Start()
 		{
-			mAnnouncerLineQueue = new Queue<AudioEvent>(5); // 5 is a magic number, we probably won't have any more than that queued at once
+			mAnnouncerLineQueue = new List<AudioEvent>(5); // 5 is a magic number, we probably won't have any more than that queued at once
 			mAnnouncerPriority = new Dictionary<AudioEvent, AnnouncerPriority>
 			{
 				{ AudioEvent.AnnouncerMatchStarts, AnnouncerPriority.Interrupt},
@@ -217,7 +217,8 @@ namespace FiringSquad.Core.Audio
 					return;
 
 				// If the queue isn't empty and the last line is done, play the next one in the queue
-				var newEvent = mAnnouncerLineQueue.Dequeue();
+				var newEvent = mAnnouncerLineQueue[0];
+				mAnnouncerLineQueue.RemoveAt(0);
 				mCurrentAnnouncerEvent = CreateSound(newEvent, null);
 			}
 		}
@@ -250,7 +251,7 @@ namespace FiringSquad.Core.Audio
 				return null;
 			else if (priority == AnnouncerPriority.Queue)
 			{
-				mAnnouncerLineQueue.Enqueue(e);
+				mAnnouncerLineQueue.Add(e);
 				return mCurrentAnnouncerEvent;
 			}
 			else // priority == interrupt
@@ -259,7 +260,7 @@ namespace FiringSquad.Core.Audio
 				// the high-priority event for after the interrupt is finished
 				mCurrentAnnouncerEvent.Kill();
 				mCurrentAnnouncerEvent = CreateSound(AudioEvent.AnnouncerInterrupt, null);
-				mAnnouncerLineQueue.Enqueue(e);
+				mAnnouncerLineQueue.Insert(0, e);
 				return mCurrentAnnouncerEvent;
 			}
 		}
