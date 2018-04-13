@@ -203,6 +203,13 @@ namespace FiringSquad.Core
 			}
 
 			/// <inheritdoc />
+			public IAudioReference PlayAnnouncerLine(AudioEvent e)
+			{
+				Logger.Info("NULL SERVICE: IAudioManager.PlayAnnouncerLine()", Logger.System.Services);
+				return new NullAudioReference();
+			}
+
+			/// <inheritdoc />
 			// ReSharper disable once RedundantAssignment
 			public IAudioReference CheckReferenceAlive(ref IAudioReference reference)
 			{

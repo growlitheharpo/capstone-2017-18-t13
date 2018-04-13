@@ -33,6 +33,13 @@ namespace FiringSquad.Core.Audio
 		IAudioReference CreateSound(AudioEvent e, Transform location, Vector3 offset, Space offsetType, bool autoPlay = true);
 
 		/// <summary>
+		/// Play a special Announcer event.
+		/// </summary>
+		/// <param name="e">The event enum to play</param>
+		/// <returns>An IAudioReference to the new sound.</returns>
+		IAudioReference PlayAnnouncerLine(AudioEvent e);
+
+		/// <summary>
 		/// Check if a reference is still playing. Will set the reference to null if it is not.
 		/// </summary>
 		/// <param name="reference">The reference to check.</param>
