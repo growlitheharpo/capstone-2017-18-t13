@@ -37,11 +37,12 @@ namespace FiringSquad.Core.Audio
 		FlyingShips = 77,
 		AmbientCrowd = 78,
 		Grinders = 79,
+		PlayerDamagedGrunt = 100,
+
 		AnnouncerMatchStarts = 80,
 		AnnouncerMatchEnds = 85,
 		AnnouncerStageAreaSpawns = 90,
 		AnnouncerStageAreaCaptured = 95,
-		PlayerDamagedGrunt = 100,
 		AnnouncerGetsLegendary = 105,
 		AnnouncerGetsKillstreak = 110,
 		AnnouncerGetsDeathstreak = 115,
@@ -56,6 +57,7 @@ namespace FiringSquad.Core.Audio
 		AnnouncerBreaksCamera = 160,
 		AnnouncerMultiKill = 165,
 		AnnouncerInterrupt = 170,
+
 		CameraGreeting = 225,
 		CameraPain = 230,
 		CameraPlayerDeath = 235,
@@ -110,6 +112,7 @@ namespace FiringSquad.Core.Audio
 		/// </summary>
 		private void Start()
 		{
+			mAnnouncerLineQueue = new Queue<AudioEvent>(5); // 5 is a magic number, we probably won't have any more than that queued at once
 			mAnnouncerPriority = new Dictionary<AudioEvent, AnnouncerPriority>
 			{
 				{ AudioEvent.AnnouncerMatchStarts, AnnouncerPriority.Interrupt},
@@ -212,6 +215,10 @@ namespace FiringSquad.Core.Audio
 			{
 				if (CheckReferenceAlive(ref mCurrentAnnouncerEvent) != null)
 					return;
+
+				// If the queue isn't empty and the last line is done, play the next one in the queue
+				var newEvent = mAnnouncerLineQueue.Dequeue();
+				mCurrentAnnouncerEvent = CreateSound(newEvent, null);
 			}
 		}
 
@@ -222,7 +229,39 @@ namespace FiringSquad.Core.Audio
 		/// <returns></returns>
 		public IAudioReference PlayAnnouncerLine(AudioEvent e)
 		{
-			throw new NotImplementedException();
+			// Ensure this is actually an announcer line
+			AnnouncerPriority priority;
+			if (!mAnnouncerPriority.TryGetValue(e, out priority))
+			{
+				Logger.Error("Cannot use non-announcer event in event system: " + e);
+				return null;
+			}
+
+			// If nothing is playing right now, we can go ahead and play this one.
+			CheckReferenceAlive(ref mCurrentAnnouncerEvent);
+			if (mCurrentAnnouncerEvent == null)
+			{
+				mCurrentAnnouncerEvent = CreateSound(e, null);
+				return mCurrentAnnouncerEvent;
+			}
+
+			// If we're here, another event is playing right now. Check our priority.
+			if (priority == AnnouncerPriority.Drop)
+				return null;
+			else if (priority == AnnouncerPriority.Queue)
+			{
+				mAnnouncerLineQueue.Enqueue(e);
+				return mCurrentAnnouncerEvent;
+			}
+			else // priority == interrupt
+			{
+				// we need to kill our last sound, immediately play the interrupt event, and queue up
+				// the high-priority event for after the interrupt is finished
+				mCurrentAnnouncerEvent.Kill();
+				mCurrentAnnouncerEvent = CreateSound(AudioEvent.AnnouncerInterrupt, null);
+				mAnnouncerLineQueue.Enqueue(e);
+				return mCurrentAnnouncerEvent;
+			}
 		}
 
 		/// <inheritdoc />
