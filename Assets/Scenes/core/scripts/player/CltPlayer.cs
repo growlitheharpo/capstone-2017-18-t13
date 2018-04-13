@@ -608,7 +608,7 @@ namespace FiringSquad.Gameplay
 			//EventManager.Notify(() => EventManager.Local.ReceiveFinishEvent(scores));
 			EventManager.Notify(() => EventManager.Local.TeamVictoryScreen(scores));
 			ServiceLocator.Get<IAudioManager>()
-				.CreateSound(AudioEvent.AnnouncerMatchEnds, transform);
+				.PlayAnnouncerLine(AudioEvent.AnnouncerMatchEnds);
 		}
 
 		/// <summary>

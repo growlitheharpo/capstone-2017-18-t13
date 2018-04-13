@@ -311,7 +311,7 @@ namespace FiringSquad.Gameplay
 
 			kUIManager.SetMode(active ? StageCaptureUI.Mode.NoCapturing : StageCaptureUI.Mode.NoPoints, this);
 			if (active)
-				ServiceLocator.Get<IAudioManager>().CreateSound(AudioEvent.AnnouncerStageAreaSpawns, transform);
+				ServiceLocator.Get<IAudioManager>().PlayAnnouncerLine(AudioEvent.AnnouncerStageAreaSpawns);
 		}
 	}
 }

@@ -375,7 +375,7 @@ namespace FiringSquad.Gameplay
 					.EnableInputLevel(InputLevel.PauseMenu);
 
 				ServiceLocator.Get<IAudioManager>()
-					.CreateSound(AudioEvent.AnnouncerMatchStarts, transform);
+					.PlayAnnouncerLine(AudioEvent.AnnouncerMatchStarts);
 
 				return false;
 			}));

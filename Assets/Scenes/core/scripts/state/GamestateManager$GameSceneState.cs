@@ -246,14 +246,14 @@ namespace FiringSquad.Core.State
 					if (mInRealGame && mRemainingTime.value < 120 & mPlayedSoundSponsor == false)
 					{
 						ServiceLocator.Get<IAudioManager>()
-							.CreateSound(AudioEvent.AnnouncerSponsor, null);
+							.PlayAnnouncerLine(AudioEvent.AnnouncerSponsor);
 						mPlayedSoundSponsor = true;
 					}
 
 					if (mInRealGame && mRemainingTime.value < 30 & mPlayedSoundTimeWarning == false)
 					{
 						ServiceLocator.Get<IAudioManager>()
-							.CreateSound(AudioEvent.AnnouncerTimeWarning, null);
+							.PlayAnnouncerLine(AudioEvent.AnnouncerTimeWarning);
 						mPlayedSoundTimeWarning = true;
 					}
 				}
