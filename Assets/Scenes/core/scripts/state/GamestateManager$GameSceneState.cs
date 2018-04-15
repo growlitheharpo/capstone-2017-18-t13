@@ -36,6 +36,18 @@ namespace FiringSquad.Core.State
 				mIsPaused = false;
 			}
 
+			/// <inheritdoc />
+			public void OnExit()
+			{
+				TransitionStates(new NullState());
+
+				EventManager.Local.OnInputLevelChanged -= OnInputLevelChanged;
+				EventManager.Local.OnTogglePause -= OnTogglePause;
+				EventManager.Local.OnLocalPlayerSpawned -= OnLocalPlayerSpawned;
+				EventManager.Local.OnIntroBegin -= OnIntroBegin;
+				SetCursorState(false);
+			}
+
 			/// <summary>
 			/// EVENT HANDLER: Local.OnLocalPlayerSpawned
 			/// Save a reference to the local player.
@@ -103,18 +115,6 @@ namespace FiringSquad.Core.State
 			}
 
 			/// <inheritdoc />
-			public void OnExit()
-			{
-				TransitionStates(new NullState());
-
-				EventManager.Local.OnInputLevelChanged -= OnInputLevelChanged;
-				EventManager.Local.OnTogglePause -= OnTogglePause;
-				EventManager.Local.OnLocalPlayerSpawned -= OnLocalPlayerSpawned;
-				EventManager.Local.OnIntroBegin -= OnIntroBegin;
-				SetCursorState(false);
-			}
-
-			/// <inheritdoc />
 			public IState GetTransition()
 			{
 				return this; //we never explicitly leave
@@ -156,6 +156,9 @@ namespace FiringSquad.Core.State
 					EventManager.Local.OnReceiveFinishEvent -= OnReceiveFinishEvent;
 					EventManager.Local.OnConfirmQuitGame -= OnConfirmQuitGame;
 					EventManager.Local.OnTeamVictoryScreen -= OnTeamVictoryScreen;
+
+					if (mRemainingTime != null)
+						mRemainingTime.Cleanup();
 				}
 
 				/// <summary>
@@ -243,14 +246,14 @@ namespace FiringSquad.Core.State
 					if (mInRealGame && mRemainingTime.value < 120 & mPlayedSoundSponsor == false)
 					{
 						ServiceLocator.Get<IAudioManager>()
-							.CreateSound(AudioEvent.AnnouncerSponsor, null);
+							.PlayAnnouncerLine(AudioEvent.AnnouncerSponsor);
 						mPlayedSoundSponsor = true;
 					}
 
 					if (mInRealGame && mRemainingTime.value < 30 & mPlayedSoundTimeWarning == false)
 					{
 						ServiceLocator.Get<IAudioManager>()
-							.CreateSound(AudioEvent.AnnouncerTimeWarning, null);
+							.PlayAnnouncerLine(AudioEvent.AnnouncerTimeWarning);
 						mPlayedSoundTimeWarning = true;
 					}
 				}

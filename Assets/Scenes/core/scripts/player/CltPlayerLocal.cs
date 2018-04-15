@@ -29,6 +29,8 @@ namespace FiringSquad.Gameplay
 		private GameObject mDeathCameraHolder;
 		private Quaternion mCameraOriginalRot;
 		private BoundProperty<float> mRespawnTimer;
+		private IAudioReference mTimerSound;
+		private float mTheSameNumber = 6f;
 
 		/// <summary> The input map for this player. </summary>
 		public PlayerInputMap inputMap { get { return mInputMap; } }
@@ -92,12 +94,17 @@ namespace FiringSquad.Gameplay
 			if (mDeathCameraHolder != null)
 				Destroy(mDeathCameraHolder);
 
-			EventManager.Local.OnLocalPlayerDied -= OnLocalPlayerDied;
 			EventManager.Local.OnApplyOptionsData -= OnApplyOptionsData;
+			EventManager.Local.OnLocalPlayerDied -= OnLocalPlayerDied;
 			EventManager.Local.OnIntroBegin -= OnIntroBegin;
 			EventManager.Local.OnIntroEnd -= OnIntroEnd;
 
+			mRespawnTimer.Cleanup();
+
 			CleanupCamera();
+			
+			ServiceLocator.Get<IGameConsole>()
+				.UnregisterCommand(CONSOLE_SetPlayerTeam);
 
 			ServiceLocator.Get<IInput>()
 				// networked
@@ -107,13 +114,16 @@ namespace FiringSquad.Gameplay
 				.UnregisterInput(INPUT_Interact1Down)
 				.UnregisterInput(INPUT_Interact1Held)
 				.UnregisterInput(INPUT_Interact1Up)
-				.UnregisterAxis(INPUT_ZoomLevel)
+				.UnregisterInput(INPUT_Interact2Down)
 
 				// local
 				.UnregisterInput(INPUT_EnterAimDownSights)
 				.UnregisterInput(INPUT_ExitAimDownSights)
 				.UnregisterInput(INPUT_TogglePause)
-				.UnregisterInput(INPUT_ActivateGunPanic);
+				.UnregisterInput(INPUT_ShowScorecard)
+				.UnregisterInput(INPUT_HideScorecard)
+				.UnregisterInput(INPUT_ActivateGunPanic)
+				.UnregisterAxis(INPUT_ZoomLevel);
 		}
 
 		/// <summary>
@@ -293,8 +303,6 @@ namespace FiringSquad.Gameplay
 
 			foreach (Transform w in weapon.transform)
 			{
-				UnityEngine.Debug.Log(w.name + ": " + w.localPosition);
-
 				if (w.name.ToLower() != "tip")
 					w.localPosition = Vector3.zero;
 			}
@@ -359,20 +367,41 @@ namespace FiringSquad.Gameplay
 				{
 					// Update the respawn UI timer.
 					mRespawnTimer.value = Mathf.Ceil(NetworkServerGameManager.PLAYER_RESPAWN_TIME - time);
+					PlayCountDownSound();
 					return true; // signal to continue this coroutine
 				}
 
 				mRespawnTimer.value = 0.0f;
+
 				ServiceLocator.Get<IInput>()
 					.EnableInputLevel(InputLevel.Gameplay)
 					.EnableInputLevel(InputLevel.HideCursor)
 					.EnableInputLevel(InputLevel.PauseMenu);
 
 				ServiceLocator.Get<IAudioManager>()
-					.CreateSound(AudioEvent.AnnouncerMatchStarts, transform);
+					.PlayAnnouncerLine(AudioEvent.AnnouncerMatchStarts);
 
 				return false;
 			}));
+		}
+
+		/// <summary>
+		/// Plays the count down timer sound
+		/// </summary>
+		private void PlayCountDownSound()
+		{
+			IAudioManager audioService = ServiceLocator.Get<IAudioManager>();
+			mTimerSound = audioService.CheckReferenceAlive(ref mTimerSound);
+			if (mTimerSound == null)
+			{
+				mTimerSound = ServiceLocator.Get<IAudioManager>().CreateSound(AudioEvent.CountdownTimer, mCameraRef.transform, false);
+				mTimerSound.countDownTimeRemaining = mRespawnTimer.value;
+				if (mTheSameNumber != mTimerSound.countDownTimeRemaining)
+				{
+					mTheSameNumber = mTimerSound.countDownTimeRemaining;
+					mTimerSound.Start(); 
+				}
+			}
 		}
 
 		/// <summary>
@@ -426,6 +455,7 @@ namespace FiringSquad.Gameplay
 				{
 					// Update the respawn UI timer.
 					mRespawnTimer.value = Mathf.Ceil(NetworkServerGameManager.PLAYER_RESPAWN_TIME - time);
+					PlayCountDownSound();
 					return true; // signal to continue this coroutine
 				}
 

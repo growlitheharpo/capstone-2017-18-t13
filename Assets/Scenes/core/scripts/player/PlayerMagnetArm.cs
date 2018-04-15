@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using FiringSquad.Core;
 using FiringSquad.Core.Audio;
 using FiringSquad.Data;
 using FiringSquad.Gameplay.UI;
 using FiringSquad.Gameplay.Weapons;
+using KeatsLib.Unity;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Networking;
@@ -40,6 +42,9 @@ namespace FiringSquad.Gameplay
 		private float mReelingTime;
 		private bool mPushedCrosshairHint;
 		private Animator mViewAnimator;
+
+		// Avoid Garbage collection with these variables
+		private RaycastHit[] mCachedHits;
 
 		private const float SNAP_THRESHOLD_DISTANCE = 2.5f;
 
@@ -213,6 +218,7 @@ namespace FiringSquad.Gameplay
 			mViewAnimator = view.GetChild(0).GetComponent<Animator>();
 
 			EventManager.Local.OnLocalPlayerDied += OnLocalPlayerDied;
+			mCachedHits = new RaycastHit[128];
 		}
 
 		/// <summary>
@@ -467,16 +473,17 @@ namespace FiringSquad.Gameplay
 		{
 			Ray r = new Ray(bearer.eye.position, bearer.eye.forward);
 
-			var hits = Physics.SphereCastAll(r, mPullRadius, mGrabLayers);
-			if (hits.Length == 0)
+			int count = Physics.SphereCastNonAlloc(r, mPullRadius, mCachedHits, 10000.0f, mGrabLayers);
+			if (count == 0)
 				return null;
 
 			// could also sort by dot product instead of distance to get the "most accurate" pull instead of the closest.
-			hits = hits.OrderBy(x => x.distance).ToArray(); 
-
-			foreach (RaycastHit hitInfo in hits)
+			RaycastUtils.RaycastHitDistComparer comparer = new RaycastUtils.RaycastHitDistComparer();
+			Array.Sort(mCachedHits, 0, count, comparer);
+			
+			for (int i = 0; i < count; ++i)
 			{
-				WeaponPickupScript grabbable = hitInfo.collider.GetComponentInParent<WeaponPickupScript>();
+				WeaponPickupScript grabbable = mCachedHits[i].collider.GetComponentInParent<WeaponPickupScript>();
 				if (grabbable != null && !grabbable.currentlyLocked)
 					return grabbable;
 			}

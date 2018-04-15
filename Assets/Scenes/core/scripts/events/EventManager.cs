@@ -700,6 +700,14 @@ public partial class EventManager
 	}
 
 	/// <summary>
+	/// Unity's OnDestroy function.
+	/// </summary>
+	private void OnDestroy()
+	{
+		ServiceLocator.Get<IGameConsole>().UnregisterCommand(FireEventFromConsole);
+	}
+
+	/// <summary>
 	/// Force-fire an event from the console in Debug or Development builds.
 	/// Don't look at this function. Really. Just don't.
 	/// </summary>

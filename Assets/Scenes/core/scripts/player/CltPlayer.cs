@@ -57,7 +57,7 @@ namespace FiringSquad.Gameplay
 
 		[SyncVar(hook = "OnPlayerNameUpdate")] private string mPlayerName;
 
-		[SyncVar(hook = "OnPlayerTeamUpdate")] private GameData.PlayerTeam mTeam = GameData.PlayerTeam.Deathmatch;
+		[SyncVar(hook = "OnPlayerTeamUpdate")] private GameData.PlayerTeam mTeam = GameData.PlayerTeam.DebugForceReset;
 
 		/// <inheritdoc />
 		public bool isCurrentPlayer { get { return isLocalPlayer; } }
@@ -261,9 +261,22 @@ namespace FiringSquad.Gameplay
 		/// <summary>
 		/// Assign the player to a particular team.
 		/// </summary>
-		public void AssignPlayerTeam(GameData.PlayerTeam newTeam)
+		public void AssignPlayerTeam(GameData.PlayerTeam newTeam, bool forceResync = false)
 		{
-			mTeam = newTeam;
+			if (forceResync || newTeam == mTeam)
+				RpcForceTeamResync(mTeam);
+			else
+				mTeam = newTeam;
+		}
+
+		/// <summary>
+		/// Forces an immediate re-sync of the player's team
+		/// </summary>
+		[ClientRpc]
+		private void RpcForceTeamResync(GameData.PlayerTeam newTeam)
+		{
+			UnityEngine.Debug.Log("Force resync team! " + newTeam + "  " + playerName);
+			OnPlayerTeamUpdate(newTeam);
 		}
 
 		/// <summary>
@@ -288,8 +301,6 @@ namespace FiringSquad.Gameplay
 
 			EventManager.LocalGeneric.OnPlayerDied -= OnPlayerDied;
 			EventManager.LocalGeneric.OnPlayerEquippedLegendaryPart -= OnPlayerEquippedLegendaryPart;
-
-
 
 			CltPlayerLocal localPlayer = mLocalPlayerScript;
 			if (localPlayer != null)
@@ -569,6 +580,9 @@ namespace FiringSquad.Gameplay
 			if (magnetArm != null)
 				magnetArm.ForceDropItem();
 
+			if (weapon != null)
+				weapon.ResetToDefaultParts();
+
 			TargetHandleInitialGameTime(connectionToClient, gameEndTime);
 		}
 
@@ -610,7 +624,7 @@ namespace FiringSquad.Gameplay
 			//EventManager.Notify(() => EventManager.Local.ReceiveFinishEvent(scores));
 			EventManager.Notify(() => EventManager.Local.TeamVictoryScreen(scores));
 			ServiceLocator.Get<IAudioManager>()
-				.CreateSound(AudioEvent.AnnouncerMatchEnds, transform);
+				.PlayAnnouncerLine(AudioEvent.AnnouncerMatchEnds);
 		}
 
 		/// <summary>

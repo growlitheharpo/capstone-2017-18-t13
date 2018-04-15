@@ -267,6 +267,23 @@ namespace KeatsLib.Unity
 		}
 	}
 
+	public static class RaycastUtils
+	{
+		/// <summary>
+		/// Utility IComparer for sorting on distance
+		/// NOTE: This is a struct, so it should be allocated on the stack instead of the heap!
+		/// </summary>
+		public struct RaycastHitDistComparer : IComparer<RaycastHit>
+		{
+			public int Compare(RaycastHit a, RaycastHit b)
+			{
+				if (a.distance < b.distance)
+					return -1;
+				return 1;
+			}
+		}
+	}
+
 	public static class TransformExt
 	{
 		/// <summary>

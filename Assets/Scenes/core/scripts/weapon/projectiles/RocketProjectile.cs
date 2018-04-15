@@ -18,6 +18,9 @@ namespace FiringSquad.Gameplay.Weapons
 		[SerializeField] private LayerMask mSplashDamageMask;
 		[SerializeField] private AnimationCurve mDamageFalloffCurve;
 
+		[SerializeField] private ParticleSystem mTrailParticles;
+		[SerializeField] private TrailRenderer mTrailRenderer;
+
 		/// Private variables
 		private Transform mDirectHit;
 		private Rigidbody mRigidbody;
@@ -134,8 +137,6 @@ namespace FiringSquad.Gameplay.Weapons
 				// Calc ratio based on falloff curve
 				float pos = Vector3.Distance(col.transform.position, transform.position);
 
-				UnityEngine.Debug.Log(pos);
-
 				c.ApplyDamage(mData.damage * mDamageFalloffCurve.Evaluate(pos), hitInfo.point, hitInfo.normal, this, false);
 				hits.Add(c);
 			}
@@ -160,6 +161,11 @@ namespace FiringSquad.Gameplay.Weapons
 			mView.SetActive(false);
 			mRigidbody.velocity = Vector3.zero;
 			mRigidbody.angularVelocity = Vector3.zero;
+
+			if (mTrailParticles != null)
+				mTrailParticles.Stop(true);
+			if (mTrailRenderer != null)
+				mTrailRenderer.enabled = false;
 
 			mHitParticles.transform.SetParent(null);
 			mHitParticles.transform.localScale = Vector3.one;

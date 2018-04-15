@@ -19,7 +19,7 @@ namespace FiringSquad.Networking
 {
 	public partial class NetworkServerGameManager
 	{
-		public const float PLAYER_RESPAWN_TIME = 4.5f;
+		public const float PLAYER_RESPAWN_TIME = 5f;
 
 		public const int STANDARD_KILL_POINTS = 100;
 		public const int HEADSHOT_KILL_POINTS = 25;
@@ -194,7 +194,9 @@ namespace FiringSquad.Networking
 					foreach (CltPlayer p in players)
 						mMachine.mPlayerScores[p.netId].score += STAGE_CAPTURE_POINTS;
 
-					StageCaptureArea nextStage = mMachine.mCaptureAreas.Where(x => x != stage).ChooseRandom();
+					StageCaptureArea nextStage = mMachine.mCaptureAreas.Length > 1
+						? mMachine.mCaptureAreas.Where(x => x != stage).ChooseRandom() 
+						: stage;
 					mStageEnableRoutine = mMachine.mScript.StartCoroutine(EnableStageArea(nextStage));
 				}
 
@@ -247,7 +249,9 @@ namespace FiringSquad.Networking
 				{
 					stage.Disable();
 
-					StageCaptureArea nextStage = mMachine.mCaptureAreas.Where(x => x != stage).ChooseRandom();
+					StageCaptureArea nextStage = mMachine.mCaptureAreas.Length > 1
+						? mMachine.mCaptureAreas.Where(x => x != stage).ChooseRandom()
+						: stage;
 					mStageEnableRoutine = mMachine.mScript.StartCoroutine(EnableStageArea(nextStage));
 				}
 
@@ -276,6 +280,13 @@ namespace FiringSquad.Networking
 					var spawnList = mMachine.data.currentType == GameData.MatchType.Deathmatch
 						? PlayerSpawnPosition.GetAll().Select(x => x.transform).ToList()
 						: PlayerSpawnPosition.GetAll(dead.playerTeam).Select(x => x.transform).ToList();
+
+					// Make sure the player isn't still dead from last time
+					if (mKillLogs[dead].timeSinceLastDeath < PLAYER_RESPAWN_TIME - 0.5f)
+					{
+						dead.HealDamage(dead.defaultData.defaultHealth);
+						return;
+					}
 
 					Transform newPosition = ChooseSafestSpawnPosition(mMachine.mPlayerList, dead, spawnList);
 

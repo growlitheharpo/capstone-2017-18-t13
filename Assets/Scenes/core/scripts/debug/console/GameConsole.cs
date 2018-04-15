@@ -44,6 +44,17 @@ namespace FiringSquad.Debug
 			RegisterCommand("help", ListCommandsCommand);
 		}
 
+		/// <summary>
+		/// Unity's OnDestroy function
+		/// </summary>
+		private void OnDestroy()
+		{
+			Application.logMessageReceived -= UnityLogToConsole;
+			UnregisterCommand(ToggleCheatsCommand);
+			UnregisterCommand(ClearConsoleCmmand);
+			UnregisterCommand(ListCommandsCommand);
+		}
+
 		/// <inheritdoc />
 		public void AssertCheatsEnabled()
 		{

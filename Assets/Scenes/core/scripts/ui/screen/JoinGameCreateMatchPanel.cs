@@ -142,16 +142,13 @@ namespace FiringSquad.Gameplay.UI
 		{
 			while (true)
 			{
-				float timer = 0.0f;
-				while (timer < 30.0f)
-				{
-					timer += Time.deltaTime;
-					yield return null;
-				}
+				yield return new WaitForSeconds(30.0f);
 
 				string matchName = mNameEntryField.text;
 				matchName += ":" + Network.player.ipAddress;
-				mNetworkManager.matchMaker.CreateMatch(matchName, 5, true, "", Network.player.ipAddress, Network.player.ipAddress, 0, mLevelDomain, (x, y, z) => {});
+
+				if (mNetworkManager.matchMaker != null)
+					mNetworkManager.matchMaker.CreateMatch(matchName, 5, true, "", Network.player.ipAddress, Network.player.ipAddress, 0, mLevelDomain, (x, y, z) => {});
 			}
 			
 			// ReSharper disable once IteratorNeverReturns

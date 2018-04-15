@@ -82,47 +82,56 @@ namespace FiringSquad.Gameplay.Weapons
 			Vector3 endPoint = initialDirection.origin + initialDirection.direction * 2000.0f;
 			Vector3 normal = Vector3.up;
 
+			int validHitCount = 0;
+			int lastValidHit = -1;
+
 			var hits = Physics.RaycastAll(initialDirection, 10000.0f, int.MaxValue, QueryTriggerInteraction.Ignore);
 			if (hits.Length > 0)
 			{
 				// Ensure that the hits are sorted by distance
 				hits = hits.OrderBy(x => Vector3.Distance(x.point, initialDirection.origin)).ToArray();
 
-				int wallPenetrationCount = mMaxPenetrationObjects,
-					hitObjectCount = mMaxHitObjects;
+				int wallPenetrationCountdown = mMaxPenetrationObjects,
+					hitObjectCountdown = mMaxHitObjects;
 
-				// Check if each hit has hit a damage receiver and break if so.
-				foreach (RaycastHit hit in hits)
+				// Check if each hit has hit a damage receiver and break if we're at our penetration limit.
+				for (int i = 0; i < hits.Length; i++)
 				{
+					RaycastHit hit = hits[i];
 					endPoint = hit.point;
 					normal = hit.normal;
 
-					float damage = GetDamage(data, Vector3.Distance(weapon.transform.position, endPoint));
-					bool wasHeadshot = false;
+					float damage;
+					bool wasHeadshot;
+					DetermineHitData(data, weapon, hit, out hitObject, out damage, out wasHeadshot);
 
-					IDamageZone hitZone = hit.GetDamageZone();
-					if (hitZone != null)
+					validHitCount++;
+					if (hitObject == weapon.bearer)
 					{
-						hitObject = hitZone.receiver;
-						damage = hitZone.damageModification.Apply(damage);
-						wasHeadshot = hitZone.isHeadshot;
-					}
-					else
-						hitObject = hit.GetDamageReceiver();
+						--validHitCount;
+						if (lastValidHit >= 0)
+							endPoint = hits[lastValidHit].point;
 
-					if (hitObject != null && hitObject != weapon.bearer)
+						continue;
+					}
+
+					if (hitObject != null)
 					{
 						hitObject.ApplyDamage(damage, endPoint, hit.normal, this, wasHeadshot);
-						--hitObjectCount;
+						--hitObjectCountdown;
+						lastValidHit = i;
 					}
 					else
-						--wallPenetrationCount;
+						--wallPenetrationCountdown;
 
-					if (hitObjectCount <= 0 || wallPenetrationCount <= 0)
+					if (hitObjectCountdown <= 0 || wallPenetrationCountdown <= 0)
 						break;
 				}
 			}
-			
+
+			if (validHitCount == 0)
+				endPoint = initialDirection.origin + initialDirection.direction * 2000.0f;
+
 			// Prepare the network message for this object
 			NetworkBehaviour netObject = hitObject as NetworkBehaviour;
 			HitscanMessage msg = new HitscanMessage
@@ -139,6 +148,31 @@ namespace FiringSquad.Gameplay.Weapons
 			// TODO: Instantiating and immediately destroying is wasteful, is there a better way?
 			// TODO: This means that, for the host, each bullet is spawned and destroyed twice. Better than the network waste before, but not good.
 			Destroy(gameObject); // We don't actually need this object on the server, so destroy it.
+		}
+
+		/// <summary>
+		/// Determine the hit data for a raycast hit.
+		/// </summary>
+		/// <param name="data">The weapon data for determining damage.</param>
+		/// <param name="weapon">The weapon that fired this projectile.</param>
+		/// <param name="hit">The raycast hit we're evaluating.</param>
+		/// <param name="hitObject">OUTPUT: The object that was hit. Can be null.</param>
+		/// <param name="damage">OUTPUT: How much damage to apply.</param>
+		/// <param name="wasHeadshot">OUTPUT: Whether this was a headshot.</param>
+		private void DetermineHitData(WeaponData data, IWeapon weapon, RaycastHit hit, out IDamageReceiver hitObject, out float damage, out bool wasHeadshot)
+		{
+			damage = GetDamage(data, Vector3.Distance(weapon.transform.position, hit.point));
+			wasHeadshot = false;
+
+			IDamageZone hitZone = hit.GetDamageZone();
+			if (hitZone != null)
+			{
+				hitObject = hitZone.receiver;
+				damage = hitZone.damageModification.Apply(damage);
+				wasHeadshot = hitZone.isHeadshot;
+			}
+			else
+				hitObject = hit.GetDamageReceiver();
 		}
 
 		/// <summary>

@@ -42,7 +42,7 @@ namespace FiringSquad.Gameplay.Weapons
 				foreach (Material m in mMaterialInstances)
 					m.SetColor(mEmissiveProperty, val);
 			}
-			else if (mBlinkRoutine == null)
+			else if (mBlinkRoutine == null && gameObject.activeInHierarchy)
 				mBlinkRoutine = StartCoroutine(BlinkValue());
 		}
 
@@ -51,7 +51,7 @@ namespace FiringSquad.Gameplay.Weapons
 			Color black = Color.black;
 			float currentTime = 0.0f;
 
-			while (property.value <= mBlinkingThreshold)
+			while (property != null && property.value <= mBlinkingThreshold)
 			{
 				float currentPercent = Mathf.PingPong(currentTime, mBlinkingRate) / mBlinkingRate;
 				Color val = Color.Lerp(mEndColor, black, currentPercent);
