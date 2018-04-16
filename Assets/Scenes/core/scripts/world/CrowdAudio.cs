@@ -12,9 +12,11 @@ namespace FiringSquad.Gameplay
 	/// </summary>
 	public class CrowdAudio : MonoBehaviour
 	{
+		[SerializeField] private GameObject mCatcher;
 		[SerializeField] private CrowdAudioEventValues mValues;
 
 		private IAudioReference mCrowdSound;
+		private IAudioReference mGrinderAudio;
 		private int mCurrentCrowdLevel;
 		private float mTimer;
 
@@ -28,6 +30,14 @@ namespace FiringSquad.Gameplay
 			EventManager.LocalGeneric.OnPlayerCapturedStage += OnPlayerCapturedStage;
 			EventManager.LocalGeneric.OnPlayerDied += OnPlayerDied;
 			EventManager.LocalGeneric.OnPlayerEquippedLegendaryPart += OnPlayerEquippedLegendaryPart;
+
+			IAudioManager audioService = ServiceLocator.Get<IAudioManager>();
+			mGrinderAudio = audioService.CheckReferenceAlive(ref mGrinderAudio);
+			if (mGrinderAudio == null)
+			{
+				mGrinderAudio = ServiceLocator.Get<IAudioManager>().CreateSound(AudioEvent.Grinders, mCatcher.gameObject.transform, true);
+				mGrinderAudio.Start();
+			}
 		}
 
 		private void InitializeSound()
