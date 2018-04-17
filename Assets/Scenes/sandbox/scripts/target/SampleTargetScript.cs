@@ -134,12 +134,12 @@ namespace FiringSquad.Prototyping
 		/// <summary>
 		/// Handle the target hitting 0 health.
 		/// </summary>
+		[Server]
 		private void Die()
 		{
 			//mMesh.SetActive(false);
-			// Player animation here
+			mHealth = 100;
 			RpcReflectDeathLocally();
-			mDeathParticles.Play();
 		}
 
 		/// <summary>
@@ -148,6 +148,8 @@ namespace FiringSquad.Prototyping
 		[ClientRpc]
 		private void RpcReflectDeathLocally()
 		{
+			mDeathParticles.Play();
+			gameObject.GetComponentInChildren<Animator>().Play("shot");
 		}
 	}
 }
