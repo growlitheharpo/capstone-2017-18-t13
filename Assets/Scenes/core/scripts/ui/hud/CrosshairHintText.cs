@@ -2,6 +2,7 @@
 using System.Linq;
 using KeatsLib.Collections;
 using UnityEngine;
+using FiringSquad.Data;
 
 namespace FiringSquad.Gameplay.UI
 {
@@ -49,6 +50,7 @@ namespace FiringSquad.Gameplay.UI
 			mShadow = GetComponent<UnityEngine.UI.Shadow>();
 
 			EventManager.LocalGUI.OnSetHintState += OnSetHintState;
+			EventManager.Local.OnLocalPlayerDied += OnLocalPlayerDied;
 			mActiveHints = new List<Hint>();
 
 			UpdateText();
@@ -60,6 +62,8 @@ namespace FiringSquad.Gameplay.UI
 		private void OnDestroy()
 		{
 			EventManager.LocalGUI.OnSetHintState -= OnSetHintState;
+			EventManager.Local.OnLocalPlayerDied -= OnLocalPlayerDied;
+
 		}
 
 		/// <summary>
@@ -131,6 +135,12 @@ namespace FiringSquad.Gameplay.UI
 			}
 			else
 				mUIText.text = "";
+		}
+
+		private void OnLocalPlayerDied(PlayerKill killInfo, ICharacter killer)
+		{
+			mActiveHints.Clear();
+			UpdateText();
 		}
 	}
 }
