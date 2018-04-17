@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using KeatsLib.Unity;
+using UnityEngine;
 
 namespace FiringSquad.Gameplay.Weapons
 {
@@ -17,7 +18,8 @@ namespace FiringSquad.Gameplay.Weapons
 			// Fire event on the player if they are equpping it
 			if (weapon.bearer != null && weapon.bearer.isCurrentPlayer)
 			{
-				EventManager.Notify(EventManager.Local.EquipRocketGrip);
+				// 5 frames is barely noticeable, but ensures a re-equip won't cause any errors
+				result.StartCoroutine(Coroutines.InvokeAfterFrames(5, EventManager.Local.EquipRocketGrip));
 				EventManager.Local.OnLocalPlayerJumped += result.OnLocalPlayerJumped;
 			}
 
@@ -40,7 +42,7 @@ namespace FiringSquad.Gameplay.Weapons
 		protected override void OnDestroy()
 		{
 			if (mWeapon != null && mWeapon.bearer != null && mWeapon.bearer.isCurrentPlayer)
-				EventManager.Notify(EventManager.Local.UnequipRocketGrip);
+				EventManager.Local.UnequipRocketGrip();
 
 			EventManager.Local.OnLocalPlayerJumped -= OnLocalPlayerJumped;
 			base.OnDestroy();

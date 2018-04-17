@@ -142,6 +142,12 @@ namespace FiringSquad.Core
 				public float isSprinting { get { return default(float); } set { } }
 
 				/// <inheritdoc />
+				public float countDownTimeRemaining { get { return default(float); } set { } }
+
+				/// <inheritdoc />
+				public float usingRocketBooster { get { return default(float); } set { } }
+
+				/// <inheritdoc />
 				public float playerSpeed { get { return default(float); } set { } }
 
 				/// <inheritdoc />
@@ -193,6 +199,13 @@ namespace FiringSquad.Core
 			public IAudioReference CreateSound(AudioEvent e, Transform location, Vector3 offset, Space offsetType = Space.Self, bool autoPlay = true)
 			{
 				Logger.Info("NULL SERVICE: IAudioManager.CreateSound()", Logger.System.Services);
+				return new NullAudioReference();
+			}
+
+			/// <inheritdoc />
+			public IAudioReference PlayAnnouncerLine(AudioEvent e)
+			{
+				Logger.Info("NULL SERVICE: IAudioManager.PlayAnnouncerLine()", Logger.System.Services);
 				return new NullAudioReference();
 			}
 

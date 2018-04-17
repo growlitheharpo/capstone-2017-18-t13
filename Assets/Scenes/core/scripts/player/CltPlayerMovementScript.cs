@@ -28,6 +28,8 @@ namespace FiringSquad.Gameplay
 		private IAudioReference mWalkingSound;
 		private IAudioReference mJumpSound;
 		private IAudioReference mLandSound;
+		private IAudioReference mGrinderAudio;
+		private bool mBoosterEquipped = false;
 		private Coroutine mZoomInRoutine;
 		private Camera mRealCameraRef;
 
@@ -405,6 +407,14 @@ namespace FiringSquad.Gameplay
 					{
 						mJumpSound = ServiceLocator.Get<IAudioManager>().CreateSound(AudioEvent.Jump, mPlayer.transform, false);
 						mJumpSound.AttachToRigidbody(mController.GetComponent<Rigidbody>());
+						if (mBoosterEquipped)
+						{
+							mJumpSound.usingRocketBooster = 1f;
+						}
+						else
+						{
+							mJumpSound.usingRocketBooster = 0f;
+						}
 						mJumpSound.Start();
 					}
 					
@@ -497,6 +507,7 @@ namespace FiringSquad.Gameplay
 			mGravMultiplier = mMovementData.rocketGripDescentMultiplier;
 			mSpeedMultiplier = mMovementData.rocketGripSpeed;
 			mJumpMultiplier = mMovementData.rocketJumpForce;
+			mBoosterEquipped = true;
 		}
 
 		/// <summary>
@@ -507,6 +518,7 @@ namespace FiringSquad.Gameplay
 			mGravMultiplier = 1;
 			mSpeedMultiplier = 1;
 			mJumpMultiplier = 1;
+			mBoosterEquipped = false;
 		}
 	}
 }

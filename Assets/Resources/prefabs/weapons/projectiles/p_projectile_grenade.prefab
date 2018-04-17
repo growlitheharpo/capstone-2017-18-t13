@@ -210,7 +210,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1122678007204700}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -31.79393, y: 8.045365, z: 10.064743}
   m_LocalScale: {x: 3, y: 3, z: 3}
   m_Children:
   - {fileID: 4541558892577342}
@@ -440,6 +440,8 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 0
+  mTrailParticles: {fileID: 0}
+  mTrailRenderer: {fileID: 0}
 --- !u!114 &114185923026591396
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -564,7 +566,7 @@ ParticleSystem:
   moveWithTransform: 0
   moveWithCustomTransform: {fileID: 0}
   scalingMode: 1
-  randomSeed: 1133441107
+  randomSeed: -1610377252
   InitialModule:
     serializedVersion: 3
     enabled: 1
@@ -3831,7 +3833,7 @@ ParticleSystem:
   moveWithTransform: 0
   moveWithCustomTransform: {fileID: 0}
   scalingMode: 1
-  randomSeed: -1736536195
+  randomSeed: -1290731011
   InitialModule:
     serializedVersion: 3
     enabled: 1
@@ -7496,7 +7498,7 @@ ParticleSystem:
     randomizeRotationDirection: 0
     maxNumParticles: 1000
     size3D: 0
-    rotation3D: 1
+    rotation3D: 0
     gravityModifier:
       serializedVersion: 2
       minMaxState: 0
@@ -10371,7 +10373,7 @@ ParticleSystem:
   moveWithTransform: 0
   moveWithCustomTransform: {fileID: 0}
   scalingMode: 1
-  randomSeed: 1037305341
+  randomSeed: 337522882
   InitialModule:
     serializedVersion: 3
     enabled: 1

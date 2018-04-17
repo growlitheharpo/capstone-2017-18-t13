@@ -116,9 +116,13 @@ namespace FiringSquad.Gameplay.Weapons
 			Destroy(copy.GetComponent<NetworkTransform>());
 			Destroy(copy.GetComponent<NetworkIdentity>());
 
+			// If our bearer is the current player, bind this part's durability to the UI
+			// Otherwise, destroy our durability reflector script
 			WeaponPartScript script = copy.GetComponent<WeaponPartScript>();
 			if (weapon.bearer != null && weapon.bearer.isCurrentPlayer)
 				script.BindDurabilityToUI();
+			else
+				Destroy(copy.GetComponentInChildren<BoundFloatEmissiveField>());
 
 			return script;
 		}
