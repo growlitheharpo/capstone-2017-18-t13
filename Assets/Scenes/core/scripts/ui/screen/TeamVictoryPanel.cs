@@ -67,6 +67,10 @@ namespace FiringSquad.Gameplay.UI
 
 			mScores = scores;
 
+			// High score for deathmatch
+			int hiscore = 0;
+			CltPlayer highest = scores[0].player;
+
 			bool deathmatch = false;
 
 			for (uint i = 0; i < scores.Count; ++i)
@@ -79,7 +83,14 @@ namespace FiringSquad.Gameplay.UI
 				else if (player.playerTeam == GameData.PlayerTeam.Orange)
 					mOrangeScore += score.score;
 				else
+				{
 					deathmatch = true;
+					if (score.score > hiscore)
+					{
+						hiscore = score.score;
+						highest = player;
+					}
+				}
 			}
 
 			if (mBlueScore > mOrangeScore)
@@ -104,8 +115,13 @@ namespace FiringSquad.Gameplay.UI
 			}
 			else
 			{
-				mLabel1.text = "THIS WAS A";
-				mLabel2.text = "GAME";
+				mTeamName.color = scores[0].player.defaultData.blueTeamColor;
+				mBorder1.GetComponent<RawImage>().color = scores[0].player.defaultData.blueTeamColor;
+				mBorder2.GetComponent<RawImage>().color = scores[0].player.defaultData.blueTeamColor;
+
+				mLabel1.text = "";
+				mLabel2.text = "WINS";
+				mTeamName.text = highest.playerName.ToUpper();
 			}
 		}
 
