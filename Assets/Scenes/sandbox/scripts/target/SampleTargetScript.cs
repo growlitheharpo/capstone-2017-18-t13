@@ -5,14 +5,15 @@ using FiringSquad.Data;
 using FiringSquad.Debug;
 using FiringSquad.Gameplay;
 using UnityEngine;
+using UnityEngine.Networking;
 using UIText = UnityEngine.UI.Text;
 
 namespace FiringSquad.Prototyping
 {
 	/// <summary>
-	/// Sample target. Not networked. Just receives and displays damage.
+	/// Target should now be networked.
 	/// </summary>
-	public class SampleTargetScript : MonoBehaviour, IDamageReceiver
+	public class SampleTargetScript : NetworkBehaviour, IDamageReceiver
 	{
 		/// Inspector variables
 		[SerializeField] private ParticleSystem mDeathParticles;
@@ -22,26 +23,38 @@ namespace FiringSquad.Prototyping
 		[SerializeField] private float mStartHealth;
 
 		/// Private variables
-		private BoundProperty<float> mHealth;
+		private float mHealth;
 
 		/// <inheritdoc />
-		public float currentHealth { get { return mHealth.value; } }
+		public float currentHealth { get { return mHealth; } }
 
 		public GameData.PlayerTeam playerTeam { get { return GameData.PlayerTeam.Deathmatch; } }
 
 		/// <summary>
 		/// The health of this target.
 		/// </summary>
-		public BoundProperty<float> health { get { return mHealth; } }
+		public float health { get { return mHealth; } }
 
 		/// <summary>
-		/// Unity's Awake function
+		/// Unity function: first frame on server.
 		/// </summary>
-		private void Start()
+		public override void OnStartServer()
 		{
-			mHealth = new BoundProperty<float>(mStartHealth, (gameObject.name + "-health").GetHashCode());
-			ServiceLocator.Get<IGameConsole>()
-				.RegisterCommand("target", CONSOLE_Reset);
+			mHealth = 100;
+		}
+
+		/// <summary>
+		/// Unity function: first frame on client.
+		/// </summary>
+		public override void OnStartClient()
+		{
+		}
+
+		[ServerCallback]
+		private void Update()
+		{
+			if (mHealth <= 0.0f)
+				return;
 		}
 
 		/// <summary>
@@ -51,8 +64,6 @@ namespace FiringSquad.Prototyping
 		{
 			ServiceLocator.Get<IGameConsole>()
 				.UnregisterCommand("target");
-
-			mHealth.Cleanup();
 		}
 
 		/// <summary>
@@ -67,14 +78,14 @@ namespace FiringSquad.Prototyping
 				case "reset":
 					foreach (SampleTargetScript obj in allObjects)
 					{
-						obj.mHealth.value = obj.mStartHealth;
+						obj.mHealth = obj.mStartHealth;
 						obj.mMesh.SetActive(true);
 					}
 					break;
 				case "sethealth":
 					foreach (SampleTargetScript obj in allObjects)
 					{
-						obj.mHealth.value = float.Parse(args[1]);
+						obj.mHealth = float.Parse(args[1]);
 						obj.mMesh.SetActive(true);
 					}
 					break;
@@ -84,53 +95,61 @@ namespace FiringSquad.Prototyping
 		}
 
 		/// <inheritdoc />
-		public void ApplyDamage(float amount, Vector3 point, Vector3 normal, IDamageSource cause = null, bool wasHeadshot = false)
+		public void HealDamage(float amount)
 		{
-			StopAllCoroutines();
-			mHealth.value = Mathf.Clamp(mHealth.value - amount, 0.0f, float.MaxValue);
-
-			if (mHealth.value <= 0.0f)
-				Die();
-
-			mText.color = new Color(0.4f, 0.4f, 0.4f, 1.0f);
-			mText.text = "Damage:\n" + amount.ToString("####");
-
-			Instantiate(mHitIndicator, point, Quaternion.identity);
-
-			StartCoroutine(FadeText());
+			mHealth += amount;
 		}
 
 		/// <inheritdoc />
-		public void HealDamage(float amount)
+		[Server]
+		public void ApplyDamage(float amount, Vector3 point, Vector3 normal, IDamageSource cause, bool wasHeadshot)
 		{
-			mHealth.value += amount;
+			RpcReflectTurretDamageLocally(point, normal, cause.source.gameObject.transform.position, amount, cause.source.netId);
+
+			if (mHealth <= 0.0f)
+				return;
+
+			mHealth = Mathf.Clamp(mHealth - amount, 0.0f, float.MaxValue);
+
+			if (mHealth <= 0.0f)
+				Die();
 		}
 
 		/// <summary>
-		/// Fade out our text after the hit occurs.
+		/// Reflect damage that occured on the server on each local client.
 		/// </summary>
-		private IEnumerator FadeText()
+		/// <param name="point">The point where the damage occurred.</param>
+		/// <param name="normal">The normal of the hit.</param>
+		/// <param name="origin">The position where the hit originated from.</param>
+		/// <param name="amount">The amount of damage that was caused.</param>
+		/// <param name="source">The network id of the source of the damage.</param>
+		[ClientRpc]
+		private void RpcReflectTurretDamageLocally(Vector3 point, Vector3 normal, Vector3 origin, float amount, NetworkInstanceId source)
 		{
-			Color startCol = mText.color;
-			float currentTime = 0.0f;
-
-			while (currentTime < 0.75f)
-			{
-				mText.color = Color.Lerp(startCol, new Color(startCol.r, startCol.g, startCol.b, 0.0f), currentTime / 0.75f);
-				currentTime += Time.deltaTime;
-				yield return null;
-			}
-
-			yield return null;
+			ICharacter realSource = ClientScene.FindLocalObject(source).GetComponent<ICharacter>();
+			if (realSource.isCurrentPlayer)
+				EventManager.Notify(() => EventManager.Local.LocalPlayerCausedDamage(amount));
 		}
 
 		/// <summary>
 		/// Handle the target hitting 0 health.
 		/// </summary>
+		[Server]
 		private void Die()
 		{
-			mMesh.SetActive(false);
+			//mMesh.SetActive(false);
+			mHealth = 100;
+			RpcReflectDeathLocally();
+		}
+
+		/// <summary>
+		/// Handle the target dying on the clients
+		/// </summary>
+		[ClientRpc]
+		private void RpcReflectDeathLocally()
+		{
 			mDeathParticles.Play();
+			gameObject.GetComponentInChildren<Animator>().Play("shot");
 		}
 	}
 }
