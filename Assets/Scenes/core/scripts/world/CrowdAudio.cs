@@ -12,17 +12,9 @@ namespace FiringSquad.Gameplay
 	/// </summary>
 	public class CrowdAudio : MonoBehaviour
 	{
-		[SerializeField] private GameObject mCatcher;
-		[SerializeField] private GameObject mFlyingShip01;
-		[SerializeField] private GameObject mFlyingShip02;
-		[SerializeField] private GameObject mFlyingShip03;
 		[SerializeField] private CrowdAudioEventValues mValues; 
 
 		private IAudioReference mCrowdSound;
-		private IAudioReference mGrinderAudio;
-		private IAudioReference mShipSound01;
-		private IAudioReference mShipSound02;
-		private IAudioReference mShipSound03;
 		private int mCurrentCrowdLevel;
 		private float mTimer;
 
@@ -36,36 +28,6 @@ namespace FiringSquad.Gameplay
 			EventManager.LocalGeneric.OnPlayerCapturedStage += OnPlayerCapturedStage;
 			EventManager.LocalGeneric.OnPlayerDied += OnPlayerDied;
 			EventManager.LocalGeneric.OnPlayerEquippedLegendaryPart += OnPlayerEquippedLegendaryPart;
-
-			IAudioManager audioService = ServiceLocator.Get<IAudioManager>();
-			mGrinderAudio = audioService.CheckReferenceAlive(ref mGrinderAudio);
-			if (mGrinderAudio == null)
-			{
-				mGrinderAudio = ServiceLocator.Get<IAudioManager>().CreateSound(AudioEvent.Grinders, mCatcher.gameObject.transform, true);
-				mGrinderAudio.Start();
-			}
-
-			mShipSound01 = audioService.CheckReferenceAlive(ref mShipSound01);
-			if (mShipSound01 == null)
-			{
-				mShipSound01 = ServiceLocator.Get<IAudioManager>().CreateSound(AudioEvent.FlyingShips, mFlyingShip01.gameObject.transform, true);
-				mShipSound01.AttachToRigidbody(mFlyingShip01.GetComponent<Rigidbody>());
-				mShipSound01.Start();
-			}
-			mShipSound02 = audioService.CheckReferenceAlive(ref mShipSound02);
-			if (mShipSound02 == null)
-			{
-				mShipSound02 = ServiceLocator.Get<IAudioManager>().CreateSound(AudioEvent.FlyingShips, mFlyingShip02.gameObject.transform, true);
-				mShipSound02.AttachToRigidbody(mFlyingShip02.GetComponent<Rigidbody>());
-				mShipSound02.Start();
-			}
-			mShipSound03 = audioService.CheckReferenceAlive(ref mShipSound03);
-			if (mShipSound03 == null)
-			{
-				mShipSound03 = ServiceLocator.Get<IAudioManager>().CreateSound(AudioEvent.FlyingShips, mFlyingShip03.gameObject.transform, true);
-				mShipSound03.AttachToRigidbody(mFlyingShip03.GetComponent<Rigidbody>());
-				mShipSound03.Start();
-			}
 		}
 
 		private void InitializeSound()

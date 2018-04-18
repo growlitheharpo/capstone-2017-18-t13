@@ -3925,6 +3925,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1380034099}
   - component: {fileID: 1380034100}
+  - component: {fileID: 1380034101}
   m_Layer: 5
   m_Name: UIManager
   m_TagString: Untagged
@@ -3986,6 +3987,28 @@ MonoBehaviour:
   mCreditsAnimator: {fileID: 1528134856}
   mKioskTimerLength: 60
   mLoadingScreen: {fileID: 1721054904}
+--- !u!114 &1380034101
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1380034098}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a6610d2e704f1648819acc8d7460285, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Event: event:/Music/Menu/MenuMusic
+  PlayEvent: 1
+  StopEvent: 2
+  CollisionTag: 
+  AllowFadeout: 1
+  TriggerOnce: 0
+  Preload: 0
+  Params: []
+  OverrideAttenuation: 0
+  OverrideMinDistance: 0
+  OverrideMaxDistance: 0
 --- !u!1 &1394886711
 GameObject:
   m_ObjectHideFlags: 0
