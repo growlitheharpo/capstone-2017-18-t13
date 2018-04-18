@@ -3,6 +3,7 @@ using System.Linq;
 using KeatsLib.Collections;
 using UnityEngine;
 using FiringSquad.Data;
+using KeatsLib.Unity;
 
 namespace FiringSquad.Gameplay.UI
 {
@@ -139,8 +140,11 @@ namespace FiringSquad.Gameplay.UI
 
 		private void OnLocalPlayerDied(PlayerKill killInfo, ICharacter killer)
 		{
-			mActiveHints.Clear();
-			UpdateText();
+			StartCoroutine(Coroutines.InvokeAfterSeconds(1.0f, () =>
+			{
+				mActiveHints.Clear();
+				UpdateText();
+			}));
 		}
 	}
 }
