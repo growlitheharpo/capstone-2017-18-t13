@@ -21,6 +21,7 @@ namespace FiringSquad.Gameplay.UI
 
 		[SerializeField] private GameObject mBorder1;
 		[SerializeField] private GameObject mBorder2;
+		[SerializeField] private GameObject mCenterBorder;
 
 		private int mTimer = 100;
 
@@ -99,6 +100,7 @@ namespace FiringSquad.Gameplay.UI
 				mTeamName.color = scores[0].player.defaultData.blueTeamColor;
 				mBorder1.GetComponent<RawImage>().color = scores[0].player.defaultData.blueTeamColor;
 				mBorder2.GetComponent<RawImage>().color = scores[0].player.defaultData.blueTeamColor;
+				mCenterBorder.GetComponent<RawImage>().color = scores[0].player.defaultData.blueTeamColor;
 			}
 			else if (mOrangeScore > mBlueScore)
 			{
@@ -106,6 +108,7 @@ namespace FiringSquad.Gameplay.UI
 				mTeamName.color = scores[0].player.defaultData.orangeTeamColor;
 				mBorder1.GetComponent<RawImage>().color = scores[0].player.defaultData.orangeTeamColor;
 				mBorder2.GetComponent<RawImage>().color = scores[0].player.defaultData.orangeTeamColor;
+				mCenterBorder.GetComponent<RawImage>().color = scores[0].player.defaultData.orangeTeamColor;
 			}
 			else if (!deathmatch)
 			{
@@ -118,6 +121,7 @@ namespace FiringSquad.Gameplay.UI
 				mTeamName.color = scores[0].player.defaultData.blueTeamColor;
 				mBorder1.GetComponent<RawImage>().color = scores[0].player.defaultData.blueTeamColor;
 				mBorder2.GetComponent<RawImage>().color = scores[0].player.defaultData.blueTeamColor;
+				mCenterBorder.GetComponent<RawImage>().color = scores[0].player.defaultData.blueTeamColor;
 
 				mLabel1.text = "";
 				mLabel2.text = "WINS";
