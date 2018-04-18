@@ -23,11 +23,11 @@ namespace FiringSquad.Networking
 
 		public const int STANDARD_KILL_POINTS = 100;
 		public const int HEADSHOT_KILL_POINTS = 25;
-		public const int MULTI_KILL_POINTS = 50;
-		public const int KILLSTREAK_POINTS = 75;
+		public const int MULTI_KILL_POINTS = 200;
+		public const int KILLSTREAK_POINTS = 25;
 		public const int KINGSLAYER_POINTS = 75;
-		public const int REVENGE_KILL_POINTS = 25;
-		public const int STAGE_CAPTURE_POINTS = 100;
+		public const int REVENGE_KILL_POINTS = 50;
+		public const int STAGE_CAPTURE_POINTS = 75;
 		public const int LEGENDARY_PART_POINTS = 50;
 		public const int CHEATING_PENALTY_POINTS = 100;
 

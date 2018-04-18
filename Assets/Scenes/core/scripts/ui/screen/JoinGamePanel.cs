@@ -22,6 +22,7 @@ namespace FiringSquad.Gameplay.UI
 		[SerializeField] private Button mCreateMatchButton;
 		[SerializeField] private Button mJoinMatchButton;
 		[SerializeField] private Button mRefreshMatchesButton;
+		[SerializeField] private Button mRefreshMatchesButton02;
 		[SerializeField] private Button mReturnToMenuButton;
 		[SerializeField] private Text mStatusText;
 		[SerializeField] private JoinGameCreateMatchPanel mCreateMatchPanel;
@@ -47,6 +48,7 @@ namespace FiringSquad.Gameplay.UI
 			}
 
 			mRefreshMatchesButton.onClick.AddListener(RefreshMatchList);
+			mRefreshMatchesButton02.onClick.AddListener(RefreshMatchList);
 			mCreateMatchButton.onClick.AddListener(ClickCreateMatch);
 			mJoinMatchButton.onClick.AddListener(ClickJoinMatch);
 			mReturnToMenuButton.onClick.AddListener(ClickReturnToMenu);

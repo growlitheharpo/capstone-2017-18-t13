@@ -28,6 +28,7 @@ namespace FiringSquad.Gameplay
 		private IAudioReference mWalkingSound;
 		private IAudioReference mJumpSound;
 		private IAudioReference mLandSound;
+		private IAudioReference mGrinderAudio;
 		private bool mBoosterEquipped = false;
 		private Coroutine mZoomInRoutine;
 		private Camera mRealCameraRef;
