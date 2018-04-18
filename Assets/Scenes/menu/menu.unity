@@ -331,7 +331,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1f6d3fb179902cd4783eafd983e19eeb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playButton: 0
+  mPlayButton: 0
 --- !u!114 &37965715
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2121,7 +2121,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1f6d3fb179902cd4783eafd983e19eeb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playButton: 0
+  mPlayButton: 0
 --- !u!114 &664759993
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2749,7 +2749,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1f6d3fb179902cd4783eafd983e19eeb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playButton: 0
+  mPlayButton: 0
 --- !u!1 &915669171
 GameObject:
   m_ObjectHideFlags: 0
@@ -3228,7 +3228,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1f6d3fb179902cd4783eafd983e19eeb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playButton: 0
+  mPlayButton: 0
 --- !u!114 &1019694306
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3555,6 +3555,7 @@ MonoBehaviour:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 0
+  mPartBreakPrefab: {fileID: 0}
 --- !u!114 &1087413657
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3571,7 +3572,6 @@ MonoBehaviour:
     mMaximumDispersion: 0.09
     mDispersionRamp: 0.2
     mRecoilAmount: 0.75
-    mRecoilTime: 0.35
     mRecoilCurve:
       serializedVersion: 2
       m_Curve:
@@ -3596,6 +3596,7 @@ MonoBehaviour:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 0
+    mRecoilTime: 0.35
     mDamage: 14
     mDamageFalloffDistance: 40
     mFireRate: 2
@@ -4715,7 +4716,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1f6d3fb179902cd4783eafd983e19eeb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playButton: 0
+  mPlayButton: 0
 --- !u!114 &1641283184
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4941,10 +4942,6 @@ Prefab:
       propertyPath: mWeapon
       value: 
       objectReference: {fileID: 1087413657}
-    - target: {fileID: 1316423635847074, guid: f5a6681be4181bb44bdbfd0e0e175ca7, type: 2}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: f5a6681be4181bb44bdbfd0e0e175ca7, type: 2}
   m_IsPrefabParent: 0
@@ -5256,7 +5253,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1f6d3fb179902cd4783eafd983e19eeb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playButton: 0
+  mPlayButton: 0
 --- !u!1 &1750565013
 GameObject:
   m_ObjectHideFlags: 0
@@ -6075,10 +6072,6 @@ Prefab:
         type: 2}
       propertyPath: m_Pivot.y
       value: 0.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 1188488610122420, guid: b175ff73f48aef04fa434ba5314d6cab, type: 2}
-      propertyPath: m_IsActive
-      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: b175ff73f48aef04fa434ba5314d6cab, type: 2}
