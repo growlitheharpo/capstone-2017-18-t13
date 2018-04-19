@@ -26,9 +26,11 @@ namespace FiringSquad.Gameplay.Weapons
 		/// Used for Fade
 		/// </summary>
 		[SerializeField] private float mLifetime;
+
 		/// Private variables
 		private LineRenderer mRenderer;
 		private Coroutine mEffectRoutine;
+		private float mEmergencyTimer;
 
 		/// <summary>
 		/// Unity's Awake function
@@ -36,6 +38,14 @@ namespace FiringSquad.Gameplay.Weapons
 		private void Awake()
 		{
 			mRenderer = GetComponent<LineRenderer>();
+			mEmergencyTimer = float.PositiveInfinity;
+		}
+
+		private void Update()
+		{
+			mEmergencyTimer -= Time.deltaTime;
+			if (mEmergencyTimer < 0.0f)
+				Destroy(gameObject);
 		}
 
 		/// <summary>
@@ -47,6 +57,7 @@ namespace FiringSquad.Gameplay.Weapons
 		public void PlayEffect(Vector3 end, Space endSpace = Space.World)
 		{
 			// Don't change the signature of this function, or this next line here:
+			mEmergencyTimer = 2.0f;
 			Vector3 realEnd = endSpace == Space.World ? end : transform.TransformPoint(end);
 
 			if (mEffectRoutine == null)

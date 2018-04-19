@@ -69,7 +69,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4486054454167430}
-  - component: {fileID: 135967848962127234}
+  - component: {fileID: 136960495377614606}
   - component: {fileID: 114238171664549942}
   - component: {fileID: 54543894025795432}
   - component: {fileID: 114049620504337776}
@@ -190,7 +190,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1377323775718846}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1007.11346, y: 0.446, z: 4041.3555}
+  m_LocalPosition: {x: 0, y: 1, z: 1}
   m_LocalScale: {x: 4.2, y: 4.2, z: 4.2}
   m_Children:
   - {fileID: 4053954172746764}
@@ -251,7 +251,7 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 0
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
 --- !u!96 &96697237407036302
 TrailRenderer:
   serializedVersion: 2
@@ -423,8 +423,8 @@ MonoBehaviour:
   m_SnapThreshold: 5
   m_InterpolateRotation: 1
   m_InterpolateMovement: 1
---- !u!135 &135967848962127234
-SphereCollider:
+--- !u!136 &136960495377614606
+CapsuleCollider:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
@@ -432,8 +432,9 @@ SphereCollider:
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.05
+  m_Radius: 0.03
+  m_Height: 0.2
+  m_Direction: 0
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!198 &198505633712481692
 ParticleSystem:

@@ -48,7 +48,6 @@ namespace FiringSquad.Gameplay.UI
 
 		/// Private variables
 		private float mKioskTimer;
-		private IAudioReference mMenuMusic;
 
 		/// <summary>
 		/// Unity's Start function
@@ -86,16 +85,6 @@ namespace FiringSquad.Gameplay.UI
 			}));
 
 			mKioskTimer = mKioskTimerLength;
-
-			// play music
-			IAudioManager audioService = ServiceLocator.Get<IAudioManager>();
-			mMenuMusic = audioService.CheckReferenceAlive(ref mMenuMusic);
-
-			if (mMenuMusic == null)
-			{
-				mMenuMusic = ServiceLocator.Get<IAudioManager>().CreateSound(AudioEvent.MenuMusic, gameObject.transform, false);
-				mMenuMusic.Start();
-			}
 		}
 
 		#region Section Swapping
@@ -151,8 +140,6 @@ namespace FiringSquad.Gameplay.UI
 			mSubPlayAnimator.SetTrigger("Exit");
 			ServiceLocator.Get<IGamestateManager>()
 				.RequestSceneChange(GamestateManager.DRAFT_GAMEPLAY);
-
-			KillMusic ();
 		}
 
 		/// <summary>
@@ -164,8 +151,6 @@ namespace FiringSquad.Gameplay.UI
 			mSubPlayAnimator.SetTrigger("Exit");
 			ServiceLocator.Get<IGamestateManager>()
 				.RequestSceneChange(GamestateManager.DRAFT_DUALMODE);
-
-			KillMusic ();
 		}
 
 		/// <summary>
@@ -196,18 +181,11 @@ namespace FiringSquad.Gameplay.UI
 		{
 			ServiceLocator.Get<IGamestateManager>()
 				.RequestSceneChange(GamestateManager.KIOSK_SCENE);
-
-			KillMusic ();
 		}
 
 		private void LoadScreen()
 		{
 			mLoadingScreen.gameObject.SetActive (true);
-		}
-
-		private void KillMusic()
-		{
-			mMenuMusic.Kill();
 		}
 
 		/// <summary>
