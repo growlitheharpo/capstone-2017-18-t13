@@ -126,10 +126,12 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4384032572802932}
-  - component: {fileID: 95006711634786092}
+  - component: {fileID: 135608062697865086}
+  - component: {fileID: 114629066973904428}
   - component: {fileID: 114509638195550804}
+  - component: {fileID: 95006711634786092}
   m_Layer: 0
-  m_Name: p_cameraDrone
+  m_Name: p_cameradrone
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -291,6 +293,52 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2a3a78b9106e69a4eb97cd24068893a5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mAnimatorEntryState: 
+  mViewAnimator: {fileID: 95609126331940280}
+--- !u!114 &114629066973904428
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1908754988211646}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 372142912, guid: 870353891bb340e2b2a9c8707e7419ba, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SceneId:
+    m_Value: 0
+  m_AssetId:
+    i0: 113
+    i1: 166
+    i2: 194
+    i3: 144
+    i4: 83
+    i5: 187
+    i6: 73
+    i7: 164
+    i8: 58
+    i9: 81
+    i10: 213
+    i11: 127
+    i12: 120
+    i13: 7
+    i14: 56
+    i15: 94
+  m_ServerOnly: 0
+  m_LocalPlayerAuthority: 0
+--- !u!135 &135608062697865086
+SphereCollider:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1908754988211646}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.25
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!137 &137849944161728098
 SkinnedMeshRenderer:
   m_ObjectHideFlags: 1

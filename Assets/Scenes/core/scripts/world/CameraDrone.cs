@@ -19,7 +19,7 @@ namespace FiringSquad.Gameplay.NPC
 		private Animator mMovementAnimator;
 
 		/// <inheritdoc />
-		public float currentHealth { get { return 100.0f; } }
+		public float currentHealth { get { return default(float); } }
 
 		/// <summary>
 		/// Unity's Awake function
@@ -84,21 +84,34 @@ namespace FiringSquad.Gameplay.NPC
 		/// <inheritdoc />
 		public void ApplyDamage(float amount, Vector3 point, Vector3 normal, IDamageSource cause, bool wasHeadshot)
 		{
-			throw new System.NotImplementedException();
+			UnityEngine.Debug.Log("We got hit! " + gameObject.name);
+			RpcReflectDamage(cause.source.netId);
 		}
 
 		/// <summary>
 		/// Reflect that we've been damaged locally
 		/// </summary>
 		[ClientRpc]
-		private void RpcReflectDamage()
+		private void RpcReflectDamage(NetworkInstanceId sourceId)
 		{
 			mViewAnimator.SetTrigger("Shot");
 
+			float wasHitByPlayer = 0.0f;
+
+			// Check if the damage source is the local player
+			GameObject sourceGo = ClientScene.FindLocalObject(sourceId);
+			if (sourceGo != null)
+			{
+				CltPlayer player = sourceGo.GetComponent<CltPlayer>();
+				if (player != null && player.isCurrentPlayer)
+					wasHitByPlayer = 1.0f;
+			}
+
 			// Play "ouch" sound here!
-			// Just replace the event name and nothing else!
+			// Just replace the event name and the parameter name!
 			ServiceLocator.Get<IAudioManager>()
-				.CreateSound(AudioEvent.PlayerDamagedGrunt, null);
+				.CreateSound(AudioEvent.PlayerDamagedGrunt, transform)
+				.SetParameter("IsCurrentPlayer", wasHitByPlayer);
 		}
 	}
 }
