@@ -21,7 +21,6 @@ GameObject:
   - component: {fileID: 4329894913411852}
   - component: {fileID: 33649288287117870}
   - component: {fileID: 23428673837554892}
-  - component: {fileID: 95042249309651206}
   - component: {fileID: 65487507177515162}
   m_Layer: 0
   m_Name: p_props_crate
@@ -52,6 +51,7 @@ MeshRenderer:
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
@@ -67,6 +67,7 @@ MeshRenderer:
   m_PreserveUVs: 0
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
+  m_StitchLightmapSeams: 0
   m_SelectedEditorRenderState: 3
   m_MinimumChartSize: 4
   m_AutoUVMaxDistance: 0.5
@@ -94,20 +95,3 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 0.68057954, y: 0.6805794, z: 0.68057954}
   m_Center: {x: 0, y: 0.3402897, z: 0}
---- !u!95 &95042249309651206
-Animator:
-  serializedVersion: 3
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1373784483115542}
-  m_Enabled: 1
-  m_Avatar: {fileID: 9000000, guid: a7feeb575b49a410681a44d81cc8ebbb, type: 3}
-  m_Controller: {fileID: 0}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1

@@ -62648,6 +62648,7 @@ Transform:
   - {fileID: 638767039}
   - {fileID: 763447798}
   - {fileID: 912279158}
+  - {fileID: 1758432430}
   m_Father: {fileID: 0}
   m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -71681,6 +71682,58 @@ Transform:
   m_PrefabParentObject: {fileID: 4800071833320554, guid: 0cea456782008b44d97281290f5ccee7,
     type: 2}
   m_PrefabInternal: {fileID: 1758066403}
+--- !u!1001 &1758432429
+Prefab:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 1537942765}
+    m_Modifications:
+    - target: {fileID: 4384032572802932, guid: 71a6c29053bb49a43a51d57f7807385e, type: 2}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4384032572802932, guid: 71a6c29053bb49a43a51d57f7807385e, type: 2}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4384032572802932, guid: 71a6c29053bb49a43a51d57f7807385e, type: 2}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4384032572802932, guid: 71a6c29053bb49a43a51d57f7807385e, type: 2}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4384032572802932, guid: 71a6c29053bb49a43a51d57f7807385e, type: 2}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4384032572802932, guid: 71a6c29053bb49a43a51d57f7807385e, type: 2}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4384032572802932, guid: 71a6c29053bb49a43a51d57f7807385e, type: 2}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4384032572802932, guid: 71a6c29053bb49a43a51d57f7807385e, type: 2}
+      propertyPath: m_RootOrder
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 114509638195550804, guid: 71a6c29053bb49a43a51d57f7807385e,
+        type: 2}
+      propertyPath: mAnimatorEntryState
+      value: StartDuelMode
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_ParentPrefab: {fileID: 100100000, guid: 71a6c29053bb49a43a51d57f7807385e, type: 2}
+  m_IsPrefabParent: 0
+--- !u!4 &1758432430 stripped
+Transform:
+  m_PrefabParentObject: {fileID: 4384032572802932, guid: 71a6c29053bb49a43a51d57f7807385e,
+    type: 2}
+  m_PrefabInternal: {fileID: 1758432429}
 --- !u!1001 &1759756087
 Prefab:
   m_ObjectHideFlags: 0

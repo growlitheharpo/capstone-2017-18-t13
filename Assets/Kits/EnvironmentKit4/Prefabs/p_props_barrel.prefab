@@ -21,7 +21,6 @@ GameObject:
   - component: {fileID: 4314783463929368}
   - component: {fileID: 33867395785542008}
   - component: {fileID: 23157421062542752}
-  - component: {fileID: 95703350119609158}
   - component: {fileID: 65923201719644830}
   m_Layer: 0
   m_Name: p_props_barrel
@@ -52,6 +51,7 @@ MeshRenderer:
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
@@ -67,6 +67,7 @@ MeshRenderer:
   m_PreserveUVs: 0
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
+  m_StitchLightmapSeams: 0
   m_SelectedEditorRenderState: 3
   m_MinimumChartSize: 4
   m_AutoUVMaxDistance: 0.5
@@ -94,20 +95,3 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 0.5063648, y: 0.94317496, z: 0.50587845}
   m_Center: {x: 0.007941246, y: 0.47158718, z: 0.015690804}
---- !u!95 &95703350119609158
-Animator:
-  serializedVersion: 3
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1775966616353408}
-  m_Enabled: 1
-  m_Avatar: {fileID: 9000000, guid: 1904d7904982a4f06a2cc8ca8f6f6700, type: 3}
-  m_Controller: {fileID: 0}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1

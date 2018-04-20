@@ -21,7 +21,6 @@ GameObject:
   - component: {fileID: 4701699778855098}
   - component: {fileID: 33728586949201832}
   - component: {fileID: 23634354869134976}
-  - component: {fileID: 95390951441685654}
   - component: {fileID: 65598989988840616}
   m_Layer: 0
   m_Name: p_architecture_floor_3x3
@@ -52,6 +51,7 @@ MeshRenderer:
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
@@ -67,6 +67,7 @@ MeshRenderer:
   m_PreserveUVs: 0
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
+  m_StitchLightmapSeams: 0
   m_SelectedEditorRenderState: 3
   m_MinimumChartSize: 4
   m_AutoUVMaxDistance: 0.5
@@ -94,20 +95,3 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 3, y: 0.09073089, z: 3}
   m_Center: {x: -1.5, y: 0, z: 1.5}
---- !u!95 &95390951441685654
-Animator:
-  serializedVersion: 3
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1645900383983454}
-  m_Enabled: 1
-  m_Avatar: {fileID: 9000000, guid: 1fbc18330b8066e45b16a014335e3eda, type: 3}
-  m_Controller: {fileID: 0}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
