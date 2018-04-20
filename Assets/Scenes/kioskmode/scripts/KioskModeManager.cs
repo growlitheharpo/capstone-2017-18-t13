@@ -12,7 +12,7 @@ namespace FiringSquad.Gameplay.UI
 		private void Update()
 		{
 			// Get mouse or key input
-			if (Input.anyKey)
+			if (Input.anyKey || Mathf.Abs(Input.GetAxis("Mouse X")) > 0.01f)
 				LaunchMainMenu();
 		}
 
