@@ -12,11 +12,13 @@ namespace FiringSquad.Gameplay.UI
 		[SerializeField] private UIButton mControlsButton;
 		[SerializeField] private UIButton mHudButton;
 		[SerializeField] private UIButton mTipsButton;
+		[SerializeField] private UIButton mTeamButton;
 
 		[SerializeField] private Animator mObjectiveAnimator;
 		[SerializeField] private Animator mControlsAnimator;
 		[SerializeField] private Animator mHudAnimator;
 		[SerializeField] private Animator mTipsAnimator;
+		[SerializeField] private Animator mTeamAnimator;
 
 		private Animator mCurrentActiveAnimator;
 
@@ -29,7 +31,8 @@ namespace FiringSquad.Gameplay.UI
 			mControlsButton.onClick.AddListener(() => SwitchToButton(mControlsAnimator));
 			mHudButton.onClick.AddListener(() => SwitchToButton(mHudAnimator));
 			mTipsButton.onClick.AddListener(() => SwitchToButton(mTipsAnimator));
-
+			mTeamButton.onClick.AddListener(() => SwitchToButton(mTeamAnimator));
+			 
 			ResetEverything();
 		}
 
@@ -42,6 +45,7 @@ namespace FiringSquad.Gameplay.UI
 			mControlsAnimator.SetBool("Enabled", false);
 			mHudAnimator.SetBool("Enabled", false);
 			mTipsAnimator.SetBool("Enabled", false);
+			mTeamAnimator.SetBool("Enabled", false); 
 		}
 
 		/// <summary>
