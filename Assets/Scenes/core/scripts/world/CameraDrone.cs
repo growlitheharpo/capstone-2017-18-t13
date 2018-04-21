@@ -110,7 +110,7 @@ namespace FiringSquad.Gameplay.NPC
 			// Play "ouch" sound here!
 			// Just replace the event name and the parameter name!
 			ServiceLocator.Get<IAudioManager>()
-				.CreateSound(AudioEvent.PlayerDamagedGrunt, transform)
+				.CreateSound(AudioEvent.CameraPain, transform) 
 				.SetParameter("IsCurrentPlayer", wasHitByPlayer);
 		}
 	}
