@@ -1004,7 +1004,7 @@ Light:
   m_Enabled: 1
   serializedVersion: 8
   m_Type: 2
-  m_Color: {r: 0.79659563, g: 0.8046403, b: 0.9632353, a: 1}
+  m_Color: {r: 0.9632353, g: 0.8875809, b: 0.79659563, a: 1}
   m_Intensity: 5.08
   m_Range: 20.02
   m_SpotAngle: 30
@@ -3898,7 +3898,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b9a305e18de0c04dbd257a21cd47087, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sharedProfile: {fileID: 11400000, guid: 0b798440acb2bad40ac5885db2da2cd5, type: 2}
+  sharedProfile: {fileID: 11400000, guid: 813674120fb255a49a9a4ded6dd9c2a3, type: 2}
   isGlobal: 1
   blendDistance: 0
   weight: 1
@@ -4921,6 +4921,20 @@ Prefab:
       propertyPath: mWeapon
       value: 
       objectReference: {fileID: 1087413657}
+    - target: {fileID: 1316423635847074, guid: f5a6681be4181bb44bdbfd0e0e175ca7, type: 2}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224175902083726592, guid: f5a6681be4181bb44bdbfd0e0e175ca7,
+        type: 2}
+      propertyPath: m_RootOrder
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 224833529968149320, guid: f5a6681be4181bb44bdbfd0e0e175ca7,
+        type: 2}
+      propertyPath: m_RootOrder
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: f5a6681be4181bb44bdbfd0e0e175ca7, type: 2}
   m_IsPrefabParent: 0
@@ -6064,8 +6078,6 @@ GameObject:
   m_Component:
   - component: {fileID: 2144068126}
   - component: {fileID: 2144068129}
-  - component: {fileID: 2144068128}
-  - component: {fileID: 2144068127}
   - component: {fileID: 2144068130}
   m_Layer: 0
   m_Name: GunCamera
@@ -6087,35 +6099,6 @@ Transform:
   m_Father: {fileID: 1026467380}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2144068127
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 2144068125}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 53892b2f5e5de654ea061e0016962c00, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  downsample: 0
-  blurSize: 1.3
-  blurIterations: 4
-  blurType: 0
-  blurShader: {fileID: 4800000, guid: 998fbffc91156b14bb363b022907f16f, type: 3}
---- !u!114 &2144068128
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 2144068125}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 93b91c615da8f694db3c765526e2618f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mColor: {r: 0.75686276, g: 0.76862746, b: 1, a: 0.6666667}
-  mGlowPass: 1
 --- !u!20 &2144068129
 Camera:
   m_ObjectHideFlags: 0
