@@ -471,6 +471,10 @@ namespace FiringSquad.Gameplay
 				mCameraRef.transform.SetParent(playerRoot.eye, false);
 				mCameraRef.transform.ResetLocalValues();
 
+				// Do our best to force the camera and gun position to be correct.
+				INPUT_EnterAimDownSights();
+				StartCoroutine(Coroutines.InvokeAfterFrames(1, INPUT_ExitAimDownSights));
+
 				// Destroy the red "death" effect.
 				RuntimeUtilities.DestroyVolume(volume, false);
 				Destroy(temporaryVignette);
