@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using FiringSquad.Core.State;
 using FMOD;
@@ -141,10 +142,20 @@ namespace FiringSquad.Core.Audio
 		/// <inheritdoc />
 		public void InitializeDatabase()
 		{
-			// TODO: We can wait async here
-			FMODUnity.RuntimeManager.LoadBank("Weapons", true);
+			StartCoroutine(LoadAllAudio());
+		}
+
+		private IEnumerator LoadAllAudio()
+		{
+			FMODUnity.RuntimeManager.LoadBank("Ambient", true);
+			FMODUnity.RuntimeManager.LoadBank("Music", true);
 			FMODUnity.RuntimeManager.LoadBank("Player", true);
-			FMODUnity.RuntimeManager.WaitForAllLoads();
+			FMODUnity.RuntimeManager.LoadBank("UI", true);
+			FMODUnity.RuntimeManager.LoadBank("VO", true);
+			FMODUnity.RuntimeManager.LoadBank("Weapons", true);
+			
+			while (FMODUnity.RuntimeManager.AnyBankLoading())
+				yield return null;
 
 			mEventDictionary = new Dictionary<AudioEvent, string>(mEventBindList.Count);
 			foreach (EnumFmodBind e in mEventBindList)
