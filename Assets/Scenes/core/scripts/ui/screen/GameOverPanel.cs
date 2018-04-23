@@ -3,6 +3,7 @@ using System.Linq;
 using FiringSquad.Core;
 using FiringSquad.Core.UI;
 using FiringSquad.Data;
+using KeatsLib.Unity;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -85,6 +86,9 @@ namespace FiringSquad.Gameplay.UI
 
 			mBlueScore.text = "BLUE: " + blue.ToString("0000");
 			mOrangeScore.text = "ORANGE: " + orange.ToString("0000");
+
+			// Force the player back to the main menu if they forget to click the button
+			StartCoroutine(Coroutines.InvokeAfterSeconds(60.0f, HandleQuit));
 		}
 
 		/// <summary>

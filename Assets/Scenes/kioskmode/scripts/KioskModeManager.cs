@@ -1,18 +1,40 @@
 ﻿using FiringSquad.Core;
 using FiringSquad.Core.State;
+using KeatsLib.Unity;
 using UnityEngine;
+using UnityEngine.Video;
 
 namespace FiringSquad.Gameplay.UI
 {
 	public class KioskModeManager : MonoBehaviour
 	{
+		private VideoPlayer mPlayer;
+
+		/// <summary>
+		/// Unity's Awake function
+		/// </summary>
+		private void Awake()
+		{
+			mPlayer = GetComponent<VideoPlayer>();
+			mPlayer.loopPointReached += OnLoopPointReached;
+		}
+
+		/// <summary>
+		/// Event Handler: called when the video reaches its end
+		/// </summary>
+		/// <param name="source"></param>
+		private void OnLoopPointReached(VideoPlayer source)
+		{
+			StartCoroutine(Coroutines.InvokeAfterSeconds(5.0f, mPlayer.Play));
+		}
+
 		/// <summary>
 		/// Unity's update function
 		/// </summary>
 		private void Update()
 		{
 			// Get mouse or key input
-			if (Input.anyKey)
+			if (Input.anyKey || Mathf.Abs(Input.GetAxis("Mouse X")) > 0.01f)
 				LaunchMainMenu();
 		}
 
