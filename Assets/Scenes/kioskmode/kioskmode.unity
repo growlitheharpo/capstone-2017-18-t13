@@ -456,7 +456,7 @@ VideoPlayer:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 2031030053}
   m_Enabled: 1
-  m_VideoClip: {fileID: 0}
+  m_VideoClip: {fileID: 32900000, guid: 70af1e78b1d68a241b66b716738efee8, type: 3}
   m_TargetCameraAlpha: 1
   m_TargetCamera: {fileID: 2031030057}
   m_TargetTexture: {fileID: 0}
@@ -468,15 +468,17 @@ VideoPlayer:
   m_DataSource: 0
   m_PlaybackSpeed: 1
   m_AudioOutputMode: 1
-  m_TargetAudioSources: []
-  m_DirectAudioVolumes: []
-  m_Url: 
-  m_EnabledAudioTracks: 
-  m_DirectAudioMutes: 
-  m_ControlledAudioTrackCount: 0
+  m_TargetAudioSources:
+  - {fileID: 2030086765}
+  m_DirectAudioVolumes:
+  - 1
+  m_Url: https://doc-0s-7c-docs.googleusercontent.com/docs/securesc/61r1uvbuiciju3760o1u19ge4hl7d8d7/skhvknk3i1inajutgs5e5o2qrfa0pbud/1524513600000/16019035762956600757/11199910483982505337/146F2LwTAOQuWlUOKLWA0fWJLN_pF_T5P?h=06954740232732527649&e=download
+  m_EnabledAudioTracks: 01
+  m_DirectAudioMutes: 00
+  m_ControlledAudioTrackCount: 1
   m_PlayOnAwake: 1
   m_SkipOnDrop: 1
-  m_Looping: 1
+  m_Looping: 0
   m_WaitForFirstFrame: 1
   m_FrameReadyEventEnabled: 0
 --- !u!114 &2031030061
