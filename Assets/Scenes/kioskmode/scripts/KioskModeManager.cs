@@ -17,6 +17,9 @@ namespace FiringSquad.Gameplay.UI
 		{
 			mPlayer = GetComponent<VideoPlayer>();
 			mPlayer.loopPointReached += OnLoopPointReached;
+
+			Cursor.lockState = CursorLockMode.Confined;
+			Cursor.visible = false;
 		}
 
 		/// <summary>
@@ -43,6 +46,9 @@ namespace FiringSquad.Gameplay.UI
 		/// </summary>
 		private void LaunchMainMenu()
 		{
+			Cursor.lockState = CursorLockMode.None;
+			Cursor.visible = true;
+
 			ServiceLocator.Get<IGamestateManager>()
 				.RequestSceneChange(GamestateManager.MENU_SCENE);
 		}
