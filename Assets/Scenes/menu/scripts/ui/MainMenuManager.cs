@@ -54,6 +54,8 @@ namespace FiringSquad.Gameplay.UI
 		/// </summary>
 		private void Start()
 		{
+			FMODUnity.RuntimeManager.GetBus("bus:/").setVolume(1.0f);
+
 			mSubPlayButton.onClick.AddListener(SwitchTo_SubPlay);
 			mGunGlossaryButton.onClick.AddListener(SwitchTo_GunGlossary);
 			mHowToPlayButton.onClick.AddListener(SwitchTo_HowToPlay);
