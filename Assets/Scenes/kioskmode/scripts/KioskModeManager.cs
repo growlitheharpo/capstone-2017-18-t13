@@ -28,7 +28,8 @@ namespace FiringSquad.Gameplay.UI
 		/// <param name="source"></param>
 		private void OnLoopPointReached(VideoPlayer source)
 		{
-			StartCoroutine(Coroutines.InvokeAfterSeconds(5.0f, mPlayer.Play));
+			//StartCoroutine(Coroutines.InvokeAfterSeconds(5.0f, mPlayer.Play));
+			LaunchMainMenu();
 		}
 
 		/// <summary>
